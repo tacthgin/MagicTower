@@ -1,0 +1,11 @@
+[
+    {
+        "hp": 1000,
+        "attack": 100,
+        "defence": 100,
+        "gold": 0,
+        "animation": ["player_up", "player_right", "player_down", "player_left"],
+        "pos": [5, 10],
+        "direction": 2
+    }
+]

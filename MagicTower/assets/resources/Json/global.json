@@ -1,0 +1,36 @@
+{
+    "heroSpeed": 0.2,
+    "npcSpeed": 0.5,
+    "fadeInterval": 0.5,
+    "beginProps": {
+        "swardId": 12,
+        "shieldId": 17,
+        "prop": {}
+    },
+    "weakenAttr": {
+        "hp": 400,
+        "attack": 10,
+        "defence": 10
+    },
+    "attackInterval": 0.1,
+    "testLoad": {
+        "currentLevel": 10,
+        "maps": {},
+        "heroPos": [5, 9],
+        "gold": 10000000,
+        "attack": 100,
+        "defence": 30,
+        "props": {
+            "1": 5,
+            "3": 1
+        }
+    },
+    "shop": {
+        "beginGold": 20,
+        "ratio": 20,
+        "hp": 100,
+        "attack": 2,
+        "defence": 4
+    },
+    "useTestLoad": true
+}
