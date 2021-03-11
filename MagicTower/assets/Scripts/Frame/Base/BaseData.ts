@@ -1,14 +1,12 @@
-import { js, sys } from "cc";
-import { CustomEventData } from "../Managers/NotifyCenter";
+import { js } from "cc";
+import { CustomEventTarget } from "../Managers/NotifyCenter";
 
-export abstract class BaseData extends CustomEventData {
-    saveData() {}
+export abstract class BaseData extends CustomEventTarget {
+    /** 需要缓存到本地的数据 */
+    protected data: any = {};
 
-    static saveAll() {
-        sys.localStorage.setItem(js.getClassName(this), this);
-    }
-
-    static loadData(itemName: string) {
-        return sys.localStorage.getItem(itemName);
+    save() {
+        let className = js.getClassName(this);
+        localStorage.setItem(className, this.data);
     }
 }

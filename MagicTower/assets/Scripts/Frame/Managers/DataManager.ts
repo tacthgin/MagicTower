@@ -1,6 +1,6 @@
 import { js } from "cc";
 
-class _DataManager {
+export class DataManager {
     /** 存储json解析器 */
     private jsonParserMap: any = {};
 
@@ -102,6 +102,3 @@ class _DataManager {
         return this.customDataMap[dataName] || null;
     }
 }
-
-/** 数据管理唯一实例 */
-export let DataManager = new _DataManager();

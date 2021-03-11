@@ -1,5 +1,5 @@
 import { Component, instantiate, Node, NodePool, Prefab, _decorator } from "cc";
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 /** 对象池节点 */
 @ccclass("BasePoolNode")
@@ -27,5 +27,15 @@ export class BasePoolNode extends Component {
         } else {
             this.node.destroy();
         }
+    }
+
+    removeAllPoolNode() {
+        this.node.children.forEach((node: Node) => {
+            let poolNode = node.getComponent(BasePoolNode);
+            if (poolNode) {
+                poolNode.removeAllPoolNode();
+                poolNode.remove();
+            }
+        });
     }
 }

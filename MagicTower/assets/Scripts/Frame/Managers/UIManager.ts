@@ -6,7 +6,8 @@ export enum ToastType {
     RICH,
 }
 
-class UIManager {
+/** UI管理器 */
+export class UIManager {
     /** 弹窗起始优先级 */
     private DIALOG_PRIORITY: number = 255;
 
@@ -113,6 +114,3 @@ class UIManager {
         });
     }
 }
-
-/** UI管理器 */
-export let UIManger = new UIManager();

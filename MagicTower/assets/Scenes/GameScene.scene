@@ -1160,9 +1160,7 @@
       "b": 255,
       "a": 255
     },
-    "_spriteFrame": {
-      "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d@b5978"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_fillType": 0,
     "_sizeMode": 1,
@@ -1175,9 +1173,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_useGrayscale": false,
-    "_atlas": {
-      "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d"
-    },
+    "_atlas": null,
     "_id": "a8OsimN75KNo907ymhMmPV"
   },
   {
@@ -1426,9 +1422,7 @@
       "b": 255,
       "a": 255
     },
-    "_spriteFrame": {
-      "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d@75f28"
-    },
+    "_spriteFrame": null,
     "_type": 2,
     "_fillType": 0,
     "_sizeMode": 0,
@@ -1441,9 +1435,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_useGrayscale": false,
-    "_atlas": {
-      "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d"
-    },
+    "_atlas": null,
     "_id": "34scidoddGaoPF6oYxz36H"
   },
   {
@@ -1629,9 +1621,7 @@
       "b": 255,
       "a": 255
     },
-    "_spriteFrame": {
-      "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d@19e2c"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_fillType": 0,
     "_sizeMode": 1,
@@ -1644,9 +1634,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_useGrayscale": false,
-    "_atlas": {
-      "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d"
-    },
+    "_atlas": null,
     "_id": "973FY2QcJAcp3HAGJol3Ge"
   },
   {
@@ -3445,9 +3433,7 @@
       "b": 255,
       "a": 255
     },
-    "_spriteFrame": {
-      "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d@089e7"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_fillType": 0,
     "_sizeMode": 1,
@@ -3460,9 +3446,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_useGrayscale": false,
-    "_atlas": {
-      "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d"
-    },
+    "_atlas": null,
     "_id": "57VyiIl+FMXIMtm5SJ+69u"
   },
   {
@@ -3551,6 +3535,7 @@
       "__id__": 2
     },
     "_enabled": true,
+    "__prefab": null,
     "levelLabel": {
       "__id__": 9
     },
@@ -3585,15 +3570,9 @@
       }
     ],
     "keySpriteFrames": [
-      {
-        "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d@c979d"
-      },
-      {
-        "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d@7aa4a"
-      },
-      {
-        "__uuid__": "9da473b7-c112-43e9-92e4-fad4cb10270d@385a0"
-      }
+      null,
+      null,
+      null
     ],
     "keyPrefab": {
       "__uuid__": "13332497-7ef7-4bbe-a4f5-8c784c723232"

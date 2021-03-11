@@ -18,9 +18,11 @@ export default class LoginScene extends Component {
     allResourcesLoadFailed() {
         //GameManager.getInstance().showToast(ToastString.LOAD_RESOURCES_FAILED);
     }
+
     beginLoadResources() {
         ResourceManager.loadResources();
     }
+
     loadLocalInfos() {
         //let localInfos = {
         //[Constant.ARCHIVE_NAME]: "GameInfo",
@@ -35,6 +37,7 @@ export default class LoginScene extends Component {
         //this.gotoGameScene();
         //});
     }
+
     gotoGameScene() {
         //ElementManager.loadRes((success: boolean) => {
         //cc.director.preloadScene("GameScene", null, (error: Error, asset: cc.SceneAsset) => {

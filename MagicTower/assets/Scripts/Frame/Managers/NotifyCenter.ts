@@ -1,7 +1,7 @@
 import { _decorator, EventTarget } from "cc";
 
 /** 自定义事件，支持整型和字符创类型事件分发 */
-export class CustomEventData extends EventTarget {
+export class CustomEventTarget extends EventTarget {
     on<TFunction extends (...any: any[]) => void>(type: number | string, callback: TFunction, thisArg?: any, once?: boolean): typeof callback {
         return super.on(type.toString(), callback, thisArg, once);
     }
@@ -20,4 +20,4 @@ export class CustomEventData extends EventTarget {
 }
 
 /** 消息分发中心 */
-export let NotifyCenter = new CustomEventData();
+export let NotifyCenter = new CustomEventTarget();

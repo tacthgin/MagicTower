@@ -1,8 +1,5 @@
-import { Component, _decorator, Node, UITransform, view, EventTouch } from "cc";
-import { ActionComponent } from "../Components/ActionComponent";
-import { DialogAction } from "../Constant/BaseConstant";
-import { BaseEvent } from "../Constant/BaseEvent";
-import { NotifyCenter } from "../Managers/NotifyCenter";
+import { Component, EventTouch, Node, UITransform, view, _decorator } from "cc";
+import { ActionComponent, DialogAction } from "../Components/ActionComponent";
 
 const { ccclass, property } = _decorator;
 
@@ -38,9 +35,6 @@ export default class BaseDialog extends Component {
     })
     protected actionType: DialogAction = DialogAction.NoneAction;
 
-    /** 动作组件 */
-    private actionComponent: ActionComponent = null;
-
     /** 处理单点或者多点触摸，保证id唯一 */
     private touchId: number = null;
 
@@ -54,26 +48,11 @@ export default class BaseDialog extends Component {
             this.touchNode.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
             this.touchNode.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
         }
-
-        if (this.actionType != DialogAction.NoneAction) {
-            this.addActionComponent(this.actionType);
-        }
-
         this.dialogContent = this.dialogContent || this.node;
+        this.addActionComponent();
     }
 
-    onEnable() {
-        this.actionComponent && this.actionComponent.executeStartAction(this.dialogContent);
-        NotifyCenter.emit(BaseEvent.SHOW_DIALOG, this.node.name);
-    }
-
-    /** 如果弹窗做成缓存，注册事件放在onEnable和onDisable */
-    onDisable() {
-        NotifyCenter.emit(BaseEvent.HIDE_DIALOG, this.node.name);
-        NotifyCenter.targetOff(this);
-    }
-
-    onTouchStart(event: EventTouch) {
+    private onTouchStart(event: EventTouch) {
         event.propagationStopped = true;
         if (this.touchId != null && this.touchId != event.getID()) {
             return;
@@ -82,11 +61,11 @@ export default class BaseDialog extends Component {
         this.touchId = event.getID(); //处理多点触摸
     }
 
-    onTouchMove(event: EventTouch) {
+    private onTouchMove(event: EventTouch) {
         event.propagationStopped = true;
     }
 
-    onTouchEnd(event: EventTouch) {
+    private onTouchEnd(event: EventTouch) {
         if (event.getID() == this.touchId) {
             this.touchId = null;
             if (this.clickBgClose) {
@@ -96,11 +75,14 @@ export default class BaseDialog extends Component {
         event.propagationStopped = true;
     }
 
-    private addActionComponent(actionType: DialogAction) {
-        let actionComponent = ActionComponent.getActionComponent(actionType);
+    private addActionComponent() {
+        let actionComponent: any = ActionComponent.getActionComponent(this.actionType);
         if (!this.getComponent(actionComponent)) {
-            this.actionComponent = this.addComponent(actionComponent);
-            this.actionComponent.EndActionCallback = this.closeCallback;
+            let component: ActionComponent = this.addComponent(actionComponent);
+            if (component) {
+                component.endActionCallback = this.closeCallback;
+                component.dialogContentNode = this.dialogContent;
+            }
         }
     }
 
@@ -115,10 +97,7 @@ export default class BaseDialog extends Component {
 
     /** 关闭弹窗 */
     protected close() {
-        if (this.actionComponent) {
-            this.actionComponent.executeEndAction(this.dialogContent);
-        } else {
-            this.closeCallback();
-        }
+        let actionComponent: any = ActionComponent.getActionComponent(this.actionType);
+        this.getComponent<ActionComponent>(actionComponent).executeEndAction();
     }
 }

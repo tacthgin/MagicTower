@@ -1,6 +1,8 @@
 import { _decorator, Component, game } from "cc";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
+import { ResourceManager } from "./ResourceManager";
+import { UIManager } from "./UIManager";
 
 const { ccclass, type } = _decorator;
 
@@ -9,11 +11,37 @@ export class GameManager extends Component {
     @type(AudioController)
     private audioController: AudioController = null;
 
+    private uiManager: UIManager = null;
+
+    private dataManager: DataManager = null;
+
+    private resourceManager: ResourceManager = null;
+
     private static instance: GameManager;
 
     /** GameManager 实例 */
     public static getInstance() {
         return GameManager.instance;
+    }
+
+    /** ui管理 */
+    public static get UI() {
+        return GameManager.instance.uiManager;
+    }
+
+    /** 数据管理 */
+    public static get DATA() {
+        return GameManager.instance.dataManager;
+    }
+
+    /** 资源管理 */
+    public static get RESOURCE() {
+        return GameManager.instance.resourceManager;
+    }
+
+    /** 声音管理 */
+    public static get AUDIO() {
+        return GameManager.instance.audioController;
     }
 
     onLoad() {
@@ -28,11 +56,10 @@ export class GameManager extends Component {
 
     /** 游戏的初始化 */
     init() {
-        //this.initPhysics();
-        //初始化管理类
-        //WXUtil.execute("init");
-        //SoundManager.init(DataManager.getMusicEnable(), DataManager.getEffectsEnable());
-        //this.registerEvent();
+        this.uiManager = new UIManager();
+        this.dataManager = new DataManager();
+        this.resourceManager = new ResourceManager();
+        this.resourceManager.loadResources();
     }
 
     /** 初始化物理相关 */
