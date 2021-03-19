@@ -1,7 +1,5 @@
-import { Component, js, Node, tween, Vec3, _decorator } from "cc";
+import { Component, js, Node, tween, Vec3 } from "cc";
 import { OverrideFunction } from "../Util/OverrideFunction";
-
-const { ccclass } = _decorator;
 
 export enum DialogAction {
     NoneAction = 1,
