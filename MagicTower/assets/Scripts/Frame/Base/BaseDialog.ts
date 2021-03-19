@@ -8,16 +8,15 @@ Enum(DialogAction);
 @ccclass("BaseDialog")
 export default class BaseDialog extends Component {
     @property({
-        type: UITransform,
         tooltip: "背景区域，用于做点击关闭，及事件屏蔽",
     })
-    private touchNode: UITransform;
+    private touchNode: UITransform = null;
 
     @property({
         type: Node,
         tooltip: "弹窗中心内容，适用于做弹窗动作，默认选择弹窗node",
     })
-    private dialogContent: Node;
+    private dialogContent: Node = null;
 
     /** 点击弹窗空白关闭 */
     @property({

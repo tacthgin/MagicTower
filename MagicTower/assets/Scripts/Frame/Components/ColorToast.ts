@@ -10,7 +10,7 @@ export enum ToastType {
 }
 
 @ccclass("ColorToast")
-export default class ColorToast extends BasePoolNode {
+export class ColorToast extends BasePoolNode {
     @property(RichText)
     toastLabel: RichText = null;
 

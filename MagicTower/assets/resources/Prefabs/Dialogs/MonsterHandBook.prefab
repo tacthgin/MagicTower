@@ -1016,6 +1016,9 @@
     "touchNode": {
       "__id__": 5
     },
+    "dialogContent": {
+      "__id__": 1
+    },
     "clickBgClose": false,
     "closeWithDestroy": true,
     "actionType": 1,

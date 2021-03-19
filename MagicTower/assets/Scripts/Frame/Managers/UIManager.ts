@@ -1,6 +1,6 @@
 import { director, instantiate, js, NodePool, Prefab, resources, UITransform, Vec3, view } from "cc";
-import ColorToast, { ToastType } from "../../Scenes/Widget/ColorToast";
 import { BasePoolNode } from "../Base/BasePoolNode";
+import { ColorToast, ToastType } from "../Components/ColorToast";
 
 /** UI管理器 */
 export class UIManager {
