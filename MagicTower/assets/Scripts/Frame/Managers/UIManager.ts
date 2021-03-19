@@ -1,44 +1,60 @@
-import { director, instantiate, path, Prefab, resources, UITransform, Vec3, NodePool } from "cc";
+import { director, instantiate, js, NodePool, Prefab, resources, UITransform, Vec3, view } from "cc";
+import ColorToast, { ToastType } from "../../Scenes/Widget/ColorToast";
 import { BasePoolNode } from "../Base/BasePoolNode";
-
-export enum ToastType {
-    NORAML,
-    RICH,
-}
 
 /** UI管理器 */
 export class UIManager {
     /** 弹窗起始优先级 */
     private DIALOG_PRIORITY: number = 255;
-
+    /** toast优先级 */
     private TOAST_PRIORITY: number = 512;
-
     /** toast预设路径 */
     private TOAST_PATH: string = `Prefabs/ColorToast`;
-
+    /** toast对象池 */
     private toastPool: NodePool = new NodePool("ColorToast");
+    private toastY: number = 0;
+    /** 弹窗缓存，避免重复打开弹窗 */
+    private dialogCache: any = {};
+
+    init() {
+        this.toastY = view.getFrameSize().height * 0.75;
+        return this;
+    }
 
     private getCanvas(): any {
         return director.getScene().getChildByName("Canvas");
     }
 
-    private createToast(prefab: Prefab, content: string) {
+    private createToast(prefab: Prefab) {
         let toast = BasePoolNode.generateNodeFromPool(this.toastPool, prefab);
-        toast.getComponent(UITransform).priority = this.TOAST_PRIORITY;
+        toast.position = new Vec3(0, this.toastY, 0);
         toast.parent = this.getCanvas();
-        let toastControl: any = toast.getComponent("ColorToast");
-        toastControl.init(content);
+        toast.getComponent(UITransform).priority = this.TOAST_PRIORITY;
+        return toast;
     }
 
-    private createDialog(prefab: Prefab, dialogName: string, ...args: any[]) {
+    private createDialog(prefab: Prefab) {
         let dialog = instantiate(prefab);
         dialog.position = Vec3.ZERO;
-        dialog.getComponent(UITransform).priority = this.DIALOG_PRIORITY;
         dialog.parent = this.getCanvas();
+        dialog.getComponent(UITransform).priority = this.DIALOG_PRIORITY;
+        return dialog;
+    }
 
-        let control: any = dialog.getComponent(dialogName);
-        control && control.init && control.init(...args);
-        return control;
+    private packagePrefabPath(path: string) {
+        return `Prefabs/${path}`;
+    }
+
+    private loadPrefab(path: string): Promise<Prefab> {
+        return new Promise((resolve) => {
+            resources.load(path, Prefab, (err, prefab: Prefab) => {
+                if (err) {
+                    console.error(err);
+                    resolve(null);
+                }
+                resolve(prefab);
+            });
+        });
     }
 
     /**
@@ -46,27 +62,20 @@ export class UIManager {
      * @param content 飘字内容
      * @param toastType normal普通飘字，color富文本飘字
      */
-    showToast(content: string = "", toastType: ToastType = ToastType.NORAML) {
+    async showToast(content: string = "", toastType: ToastType = ToastType.NORAML) {
         if (!content || content == "") {
             return;
         }
 
-        if (toastType == ToastType.NORAML) {
-            content = `<color=#ffffff>${content}</color>`;
-        }
-
         let prefab = resources.get<Prefab>(this.TOAST_PATH);
-        if (prefab) {
-            this.createToast(prefab, content);
-        } else {
-            resources.load(this.TOAST_PATH, Prefab, (err, prefab: Prefab) => {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                this.createToast(prefab, content);
-            });
+        if (!prefab) {
+            prefab = await this.loadPrefab(this.TOAST_PATH);
+            if (!prefab) {
+                return;
+            }
         }
+        let toast = this.createToast(prefab);
+        toast.getComponent(ColorToast).init(content, toastType);
     }
 
     /**
@@ -75,42 +84,33 @@ export class UIManager {
      * @param args 弹窗初始化数据
      * @returns 返回Promise 弹窗控制器
      */
-    showDialog(dialogPath: string, ...args: any[]) {
-        return new Promise((resolve, reject) => {
-            let index = dialogPath.lastIndexOf("/");
-            let dialogName = index != -1 ? dialogPath.substring(index + 1) : dialogPath;
-            let dialogNode = this.getCanvas().getChildByName(dialogName);
-            //弹窗做缓存判断
-            if (dialogNode && dialogNode.active) return;
+    async showDialog(dialogPath: string, ...args: any[]) {
+        let index = dialogPath.lastIndexOf("/");
+        let dialogName = index != -1 ? dialogPath.substring(index + 1) : dialogPath;
+        if (this.dialogCache[dialogName]) {
+            console.error(`${dialogName}弹窗正在打开`);
+            return null;
+        }
+        let dialogNode = this.getCanvas().getChildByName(dialogName);
 
-            if (!dialogNode) {
-                let createFunc = (prefab: Prefab, name: string, ...args: any[]) => {
-                    let control = this.createDialog(prefab, name, ...args);
-                    if (control) {
-                        resolve(control);
-                    } else {
-                        reject(`${dialogName}弹窗无脚本`);
-                    }
-                };
+        if (dialogNode && dialogNode.active) return;
 
-                let dialogPrefab = resources.get<Prefab>(dialogPath);
-                if (dialogPrefab) {
-                    createFunc(dialogPrefab, dialogName, ...args);
-                } else {
-                    resources.load(dialogPath, Prefab, (err, prefab: Prefab) => {
-                        if (err) {
-                            console.error(err);
-                            return;
-                        }
-                        createFunc(prefab, dialogName, ...args);
-                    });
+        if (!dialogNode) {
+            dialogPath = this.packagePrefabPath(dialogPath);
+            let dialogPrefab = resources.get<Prefab>(dialogPath);
+            if (!dialogPrefab) {
+                this.dialogCache[dialogName] = true;
+                dialogPrefab = await this.loadPrefab(dialogPath);
+                this.dialogCache[dialogName] = false;
+                if (!dialogPrefab) {
+                    return null;
                 }
-            } else if (!dialogNode.active) {
-                let control: any = dialogNode.getComponent(dialogName);
-                dialogNode.active = true;
-                control && control.init(...args);
-                resolve(control);
             }
-        });
+            dialogNode = this.createDialog(dialogPrefab);
+        }
+        dialogNode.active = true;
+        let control = dialogNode.getComponent(js.getClassByName(dialogName));
+        control && control.init && control.init(...args);
+        return control;
     }
 }

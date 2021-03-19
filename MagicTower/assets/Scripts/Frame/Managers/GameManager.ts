@@ -56,7 +56,7 @@ export class GameManager extends Component {
 
     /** 游戏的初始化 */
     init() {
-        this.uiManager = new UIManager();
+        this.uiManager = new UIManager().init();
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager();
         this.resourceManager.loadResources();

@@ -1,10 +1,11 @@
 import { Component, js, Node, tween, Vec3, _decorator } from "cc";
+import { BaseUtil } from "../Util/BaseUtil";
 
 const { ccclass } = _decorator;
 
 export enum DialogAction {
-    NoneAction = "NoneAction",
-    ScaleAction = "ScaleAction",
+    NoneAction = 1,
+    ScaleAction = 2,
 }
 
 /** 结点消失的时候动作回调 */
@@ -25,7 +26,7 @@ export abstract class ActionComponent extends Component {
     public abstract executeEndAction(): void;
 
     static getActionComponent(dialogAction: DialogAction) {
-        return js.getClassByName(dialogAction);
+        return js.getClassByName(DialogAction[dialogAction]);
     }
 
     onEnable() {
@@ -34,6 +35,7 @@ export abstract class ActionComponent extends Component {
 }
 
 /** 无弹窗动作 */
+@BaseUtil.registerClass("NoneAction")
 class NoneAction extends ActionComponent {
     public executeStartAction() {}
     public executeEndAction() {
@@ -42,6 +44,7 @@ class NoneAction extends ActionComponent {
 }
 
 /** 弹窗缩放 从小到大，从大到小 */
+@BaseUtil.registerClass("ScaleAction")
 class ScaleAction extends ActionComponent {
     public executeStartAction() {
         tween(this._dialogContentNode)

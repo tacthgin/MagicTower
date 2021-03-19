@@ -1,9 +1,16 @@
-import { _decorator, Vec2, NodePool, Prefab, instantiate, log } from "cc";
+import { log, Vec2 } from "cc";
 import { DEBUG } from "cc/env";
 
 export class Util {
-    /** 得到圆上一个点 */
+    static clamp(number: number, min: number, max: number) {
+        return Math.max(min, Math.min(number, max));
+    }
 
+    static round10(number: number) {
+        return Math.round(number * 10) / 10;
+    }
+
+    /** 得到圆上一个点 */
     static getPointOnCycle(rad: number, radius: number, center: Vec2 = Vec2.ZERO) {
         return new Vec2(1, 0).rotate(rad).multiplyScalar(radius).add(center);
     }
@@ -11,18 +18,6 @@ export class Util {
     /** 2个向量间的弧度 */
     static getVectorRad(l: Vec2, r: Vec2) {
         return Math.atan2(r.y - l.y, r.x - l.x);
-    }
-
-    /** 对象池获取预设实例 */
-    static generatePrefabFromPool(pool: NodePool, prefab: Prefab) {
-        if (!pool || !prefab) return null;
-
-        let element = null;
-        if (pool.size() == 0) {
-            element = instantiate(prefab);
-            pool.put(element); //为了都能使用reuse函数
-        }
-        return pool.get(pool);
     }
 
     /** 是不是浮点数 */
@@ -37,8 +32,8 @@ export class Util {
     }
 
     /** 整型的随机 */
-    static _random(min: number, max: number) {
-        return min + Math.round(Math.random() * (max - min));
+    static randomInt(min: number, max: number) {
+        return min + Math.floor(Math.random() * (max - min + 1));
     }
 
     /** 所有数字类型的随机 */
@@ -46,9 +41,9 @@ export class Util {
         if (this.isFloat(min) || this.isFloat(max)) {
             precision = precision || Math.max(this.getDecimalPointNum(min), this.getDecimalPointNum(max));
             let multiple = Math.pow(10, precision);
-            return this._random(min * multiple, max * multiple) / multiple;
+            return this.randomInt(min * multiple, max * multiple) / multiple;
         }
-        return this._random(min, max);
+        return this.randomInt(min, max);
     }
 
     /** 从数组中随机count个不重复 */
@@ -111,7 +106,7 @@ export class Util {
         let value = 0;
         if (precision) {
             let multiple = Math.pow(10, precision);
-            value = this._random(1, multiple) / multiple;
+            value = this.randomInt(1, multiple) / multiple;
         } else {
             value = Math.random();
         }
@@ -159,14 +154,6 @@ export class Util {
         } else if (format == "hm") {
             return `${this.formatInt(hour)}:${this.formatInt(minute)}`;
         }
-    }
-
-    static clamp(number: number, min: number, max: number) {
-        return Math.max(min, Math.min(number, max));
-    }
-
-    static round10(number: number) {
-        return Math.round(number * 10) / 10;
     }
 
     static clone(obj: any = null): any {

@@ -1,12 +1,14 @@
-import { Component, EventTouch, Node, UITransform, view, _decorator } from "cc";
+import { Component, Enum, EventTouch, Node, UITransform, view, _decorator } from "cc";
 import { ActionComponent, DialogAction } from "../Components/ActionComponent";
 
 const { ccclass, property } = _decorator;
 
+Enum(DialogAction);
+
 @ccclass("BaseDialog")
 export default class BaseDialog extends Component {
     @property({
-        type: Node,
+        type: UITransform,
         tooltip: "背景区域，用于做点击关闭，及事件屏蔽",
     })
     private touchNode: UITransform;
@@ -21,19 +23,20 @@ export default class BaseDialog extends Component {
     @property({
         tooltip: "点击弹窗空白关闭",
     })
-    protected clickBgClose: boolean = true;
+    private clickBgClose: boolean = true;
 
     /** 关闭弹窗是否摧毁 */
     @property({
         tooltip: "关闭弹窗是否摧毁",
     })
-    protected closeWithDestroy: boolean = true;
+    private closeWithDestroy: boolean = true;
 
     /** 使用弹窗动作 */
     @property({
-        tooltip: "是否使用弹窗动作，默认无动作，数值可从BaseConstant查看",
+        tooltip: "是否使用弹窗动作，默认无动作",
+        type: DialogAction,
     })
-    protected actionType: DialogAction = DialogAction.NoneAction;
+    private actionType: DialogAction = DialogAction.NoneAction;
 
     /** 处理单点或者多点触摸，保证id唯一 */
     private touchId: number = null;

@@ -1,5 +1,5 @@
-import { _decorator, Component } from "cc";
-import { ResourceManager } from "../Frame/Managers/ResourceManager";
+import { Component, _decorator } from "cc";
+import { GameManager } from "../Frame/Managers/GameManager";
 
 const { ccclass, property } = _decorator;
 
@@ -10,7 +10,14 @@ export default class LoginScene extends Component {
         //NotifyCenter.on(GameEvent.ALL_RESOURCES_LOAD_FAILED, this.allResourcesLoadFailed, this);
     }
     start() {
-        this.beginLoadResources();
+        //this.beginLoadResources();
+        GameManager.UI.showDialog("Dialogs/MonsterHandBook").then((control) => {
+            console.log(control);
+        });
+
+        GameManager.UI.showDialog("Dialogs/MonsterHandBook").then((control) => {
+            console.log(control);
+        });
     }
     allResourcesLoadSuss() {
         //this.loadLocalInfos();
@@ -20,7 +27,7 @@ export default class LoginScene extends Component {
     }
 
     beginLoadResources() {
-        ResourceManager.loadResources();
+        //ResourceManager.loadResources();
     }
 
     loadLocalInfos() {

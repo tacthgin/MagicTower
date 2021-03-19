@@ -1,9 +1,7 @@
-import { _decorator, Node } from "cc";
-const { ccclass, property } = _decorator;
-
-import Monster from "../Game/Elements/Monster";
-import { ElementManager } from "../Game/ElementManager";
+import { Node, _decorator } from "cc";
 import BaseDialog from "../../Frame/Base/BaseDialog";
+import Monster from "../Game/Elements/Monster";
+const { ccclass, property } = _decorator;
 
 @ccclass("MonsterHandBook")
 export default class MonsterHandBook extends BaseDialog {
