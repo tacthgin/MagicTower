@@ -22,7 +22,7 @@ export default class BaseDialog extends Component {
     @property({
         tooltip: "点击弹窗空白关闭",
     })
-    private clickBgClose: boolean = true;
+    private clickBgClose: boolean = false;
 
     /** 关闭弹窗是否摧毁 */
     @property({
@@ -32,7 +32,7 @@ export default class BaseDialog extends Component {
 
     /** 使用弹窗动作 */
     @property({
-        tooltip: "是否使用弹窗动作，默认无动作",
+        tooltip: "弹窗默认动作",
         type: DialogAction,
     })
     private actionType: DialogAction = DialogAction.NoneAction;
@@ -98,8 +98,12 @@ export default class BaseDialog extends Component {
     }
 
     /** 关闭弹窗 */
-    protected close() {
-        let actionComponent: any = ActionComponent.getActionComponent(this.actionType);
-        this.getComponent<ActionComponent>(actionComponent).executeEndAction();
+    protected close(useAction: boolean = true) {
+        if (useAction) {
+            let actionComponent: any = ActionComponent.getActionComponent(this.actionType);
+            this.getComponent<ActionComponent>(actionComponent).executeEndAction();
+        } else {
+            this.closeCallback();
+        }
     }
 }

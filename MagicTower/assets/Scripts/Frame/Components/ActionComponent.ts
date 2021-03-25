@@ -1,5 +1,5 @@
 import { Component, js, Node, tween, Vec3 } from "cc";
-import { OverrideFunction } from "../Util/OverrideFunction";
+import { Fn } from "../Util/Fn";
 
 export enum DialogAction {
     NoneAction = 1,
@@ -26,14 +26,10 @@ export abstract class ActionComponent extends Component {
     static getActionComponent(dialogAction: DialogAction) {
         return js.getClassByName(DialogAction[dialogAction]);
     }
-
-    onEnable() {
-        this.executeStartAction();
-    }
 }
 
 /** 无弹窗动作 */
-@OverrideFunction.registerClass("NoneAction")
+@Fn.registerClass("NoneAction")
 class NoneAction extends ActionComponent {
     public executeStartAction() {}
     public executeEndAction() {
@@ -42,7 +38,7 @@ class NoneAction extends ActionComponent {
 }
 
 /** 弹窗缩放 从小到大，从大到小 */
-@OverrideFunction.registerClass("ScaleAction")
+@Fn.registerClass("ScaleAction")
 class ScaleAction extends ActionComponent {
     public executeStartAction() {
         tween(this._dialogContentNode)

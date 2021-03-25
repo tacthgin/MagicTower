@@ -7,5 +7,6 @@
     "suppressImplicitAnyIndexErrors":true,
     "strictPropertyInitialization": false,
     "strictNullChecks": false,
+    "types": ["./project"]
   },
 }

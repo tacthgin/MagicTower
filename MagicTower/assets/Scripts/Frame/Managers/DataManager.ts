@@ -1,16 +1,24 @@
 import { js } from "cc";
+import { BaseData } from "../Base/BaseData";
+import JsonParser from "../Base/JsonParser";
+import { Fn } from "../Util/Fn";
 
 export class DataManager {
     /** 存储json解析器 */
     private jsonParserMap: any = {};
-
     /** json对应的解析器 */
-    private parserMap: any = {};
-
+    private jsonToParser: any = {};
+    /** 解析器对应的json名字 */
+    private parserToJson: any = {};
     /** 自定义数据 */
     private customDataMap: any = {};
 
-    constructor() {}
+    private getClassName(typeOrClassName: any) {
+        if (typeof typeOrClassName != "string") {
+            return js.getClassName(typeOrClassName);
+        }
+        return typeOrClassName;
+    }
 
     loadLocalStorage() {
         localStorage.length;
@@ -18,10 +26,10 @@ export class DataManager {
 
     /**
      * 设置自定义的解析器
-     * @param parserMap
+     * @param jsonToParser
      */
-    setParserMap(parserMap: any) {
-        this.parserMap = parserMap || {};
+    setParserMap(jsonToParser: any) {
+        this.jsonToParser = jsonToParser || {};
     }
 
     /**
@@ -30,7 +38,13 @@ export class DataManager {
      * @param json json资源
      */
     setJson(name: string, json: object) {
-        let parserClass = js.getClassByName(this.parserMap[name] || "JsonParser");
+        let parserName = this.jsonToParser[name];
+        if (parserName) {
+            this.parserToJson[parserName] = name;
+        } else {
+            parserName = "JsonParser";
+        }
+        let parserClass = js.getClassByName(parserName);
         if (parserClass) {
             let parser: any = new parserClass();
             parser.parseJson(json);
@@ -61,24 +75,31 @@ export class DataManager {
 
     /**
      * 如果解析器定制，直接操作解析器
-     * @param name json解析器名字
+     * @param typeOrClassName json名字或者parser构造
      */
-    getJsonParser(name: string) {
+    getJsonParser<T extends JsonParser>(typeOrClassName: Fn.Constructor<T> | string): T | null {
+        let name = null;
+        if (typeof typeOrClassName != "string") {
+            name = this.parserToJson[js.getClassName(typeOrClassName)];
+        } else {
+            name = typeOrClassName;
+        }
         return this.jsonParserMap[name] || null;
     }
 
     /**
      * 加载自定义数据
-     * @param dataName 数据名字
+     * @param typeOrClassName 数据名字或者构造函数
      * @param info 数据
      */
-    loadCustomData(dataName: string, info: any) {
-        let data = this.getCustomData(dataName);
+    loadCustomData<T extends BaseData>(typeOrClassName: Fn.Constructor<T> | string, info: any): T {
+        let data: any = this.getCustomData(typeOrClassName);
         if (!data) {
-            let dataClass = js.getClassByName(dataName);
+            let className = this.getClassName(typeOrClassName);
+            let dataClass = js.getClassByName(className);
             if (dataClass) {
                 data = new dataClass();
-                this.setCustomData(dataName, data);
+                this.setCustomData(className, data);
             }
         }
         data && data.load && data.load(info);
@@ -87,18 +108,19 @@ export class DataManager {
 
     /**
      * 缓存自定义数据到列表中
-     * @param dataName 数据名字
+     * @param className 数据名字
      * @param customData 数据
      */
-    setCustomData(dataName: string, customData: any) {
-        this.customDataMap[dataName] = customData;
+    setCustomData(className: string, customData: any) {
+        this.customDataMap[className] = customData;
     }
 
     /**
      * 获取自定义数据
-     * @param dataName 数据名字
+     * @param typeOrClassName 构造函数或者类名
      */
-    getCustomData(dataName: string) {
-        return this.customDataMap[dataName] || null;
+    getCustomData<T extends BaseData>(typeOrClassName: Fn.Constructor<T> | string): T | null {
+        let className = this.getClassName(typeOrClassName);
+        return this.customDataMap[className] || null;
     }
 }

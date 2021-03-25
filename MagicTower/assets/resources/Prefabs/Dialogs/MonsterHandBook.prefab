@@ -45,7 +45,7 @@
       }
     ],
     "_prefab": {
-      "__id__": 56
+      "__id__": 55
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -1010,9 +1010,7 @@
       "__id__": 1
     },
     "_enabled": true,
-    "__prefab": {
-      "__id__": 55
-    },
+    "__prefab": null,
     "touchNode": {
       "__id__": 5
     },
@@ -1026,10 +1024,6 @@
       "__id__": 20
     },
     "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "10k4js8vdJGY5PoXLDBja9"
   },
   {
     "__type__": "cc.PrefabInfo",
