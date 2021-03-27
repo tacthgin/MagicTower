@@ -58,7 +58,7 @@ export class GameManager extends Component {
     init() {
         this.uiManager = new UIManager().init();
         this.dataManager = new DataManager();
-        this.resourceManager = new ResourceManager();
+        this.resourceManager = new ResourceManager().init();
         this.resourceManager.loadResources();
     }
 
@@ -75,9 +75,5 @@ export class GameManager extends Component {
         //     cc.PhysicsManager.DrawBits.e_shapeBit
         //cc.director.getCollisionManager().enabled = true;
         //cc.director.getCollisionManager().enabledDebugDraw = true;
-    }
-
-    getAuidoController() {
-        return this.audioController;
     }
 }

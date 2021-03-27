@@ -1,5 +1,4 @@
 import { js } from "cc";
-import { BaseData } from "../Base/BaseData";
 import JsonParser from "../Base/JsonParser";
 import { Fn } from "../Util/Fn";
 
@@ -20,8 +19,16 @@ export class DataManager {
         return typeOrClassName;
     }
 
-    loadLocalStorage() {
-        localStorage.length;
+    private loadLocalStorage() {
+        for (let i = 0; i < localStorage.length; ++i) {
+            let key = localStorage.key(i);
+            this.loadCustomData(key, localStorage.getItem(key));
+        }
+    }
+
+    init() {
+        this.loadLocalStorage();
+        return this;
     }
 
     /**
@@ -92,7 +99,7 @@ export class DataManager {
      * @param typeOrClassName 数据名字或者构造函数
      * @param info 数据
      */
-    loadCustomData<T extends BaseData>(typeOrClassName: Fn.Constructor<T> | string, info: any): T {
+    loadCustomData<T>(typeOrClassName: Fn.Constructor<T> | string, info: any): T {
         let data: any = this.getCustomData(typeOrClassName);
         if (!data) {
             let className = this.getClassName(typeOrClassName);
@@ -119,7 +126,7 @@ export class DataManager {
      * 获取自定义数据
      * @param typeOrClassName 构造函数或者类名
      */
-    getCustomData<T extends BaseData>(typeOrClassName: Fn.Constructor<T> | string): T | null {
+    getCustomData<T>(typeOrClassName: Fn.Constructor<T> | string): T | null {
         let className = this.getClassName(typeOrClassName);
         return this.customDataMap[className] || null;
     }

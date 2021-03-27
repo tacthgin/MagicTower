@@ -20,7 +20,7 @@ export default class LoginScene extends Component {
             console.log(control);
         });
 
-        GameManager.DATA.getCustomData("GameData");
+        GameManager.DATA.getCustomData(GameData).aa();
     }
 
     allResourcesLoadSuss() {
