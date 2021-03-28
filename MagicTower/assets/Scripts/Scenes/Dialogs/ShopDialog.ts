@@ -1,12 +1,7 @@
-import { _decorator, Label, Button } from "cc";
-const { ccclass, property } = _decorator;
-
-import Npc from "../Game/Elements/Npc";
-import { NotifyCenter } from "../../Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
-import ShopInfo from "../../Data/ShopInfo";
-import { GameManager } from "../../Managers/GameManager";
+import { Button, Label, _decorator } from "cc";
 import BaseDialog from "../../Frame/Base/BaseDialog";
+import ShopInfo from "../Data/ShopInfo";
+const { ccclass, property } = _decorator;
 
 @ccclass("ShopDialog")
 export default class ShopDialog extends BaseDialog {

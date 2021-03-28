@@ -1,5 +1,5 @@
-import { _decorator } from 'cc';
-import HeroInfo from "../../../Data/HeroInfo";
+import { _decorator } from "cc";
+import HeroInfo from "../../Data/HeroInfo";
 import { Util } from "../../../Util/Util";
 
 export default class CalculateSystem {
@@ -14,16 +14,13 @@ export default class CalculateSystem {
         //if (heroAttackCount == 0) {
         //return false;
         //}
-
         //let monsterAttackCount = this.getMonsterAttackCount(heroInfo, monsterInfo);
         //if (monsterAttackCount == 0) {
         //return true;
         //}
-
         //if (heroAttackCount == monsterAttackCount) {
         //return heroFirstAttack;
         //}
-
         //return heroAttackCount < monsterAttackCount;
     }
     /**
@@ -49,7 +46,6 @@ export default class CalculateSystem {
         //if (attack <= monsterInfo.defence) {
         //return 0;
         //}
-
         //return Math.ceil(monsterInfo.hp / (attack - monsterInfo.defence));
     }
     static getHeroAttack(heroInfo: HeroInfo, monsterInfo: any) {
@@ -83,7 +79,7 @@ export default class CalculateSystem {
  */
 // import HeroInfo from "../../../Data/HeroInfo";
 // import { Util } from "../../../Util/Util";
-// 
+//
 // export default class CalculateSystem {
 //     /**
 //      * 勇士能否攻击怪物
@@ -96,19 +92,19 @@ export default class CalculateSystem {
 //         if (heroAttackCount == 0) {
 //             return false;
 //         }
-// 
+//
 //         let monsterAttackCount = this.getMonsterAttackCount(heroInfo, monsterInfo);
 //         if (monsterAttackCount == 0) {
 //             return true;
 //         }
-// 
+//
 //         if (heroAttackCount == monsterAttackCount) {
 //             return heroFirstAttack;
 //         }
-// 
+//
 //         return heroAttackCount < monsterAttackCount;
 //     }
-// 
+//
 //     /**
 //      * 怪物打死勇士的攻击次数
 //      * @param heroInfo 勇士数据
@@ -121,7 +117,7 @@ export default class CalculateSystem {
 //         }
 //         return Math.ceil(heroInfo.Hp / (monsterInfo.attack - heroInfo.Defence));
 //     }
-// 
+//
 //     /**
 //      * 勇士打死怪物的攻击次数
 //      * @param heroInfo 勇士数据
@@ -133,14 +129,14 @@ export default class CalculateSystem {
 //         if (attack <= monsterInfo.defence) {
 //             return 0;
 //         }
-// 
+//
 //         return Math.ceil(monsterInfo.hp / (attack - monsterInfo.defence));
 //     }
-// 
+//
 //     static getHeroAttack(heroInfo: HeroInfo, monsterInfo: any) {
 //         return monsterInfo.extraDamage && heroInfo.getProp(monsterInfo.extraDamage) ? heroInfo.Attack * 2 : heroInfo.Attack;
 //     }
-// 
+//
 //     /**
 //      * 怪物和勇士一次伤害值
 //      * @param heroInfo 勇士数据
@@ -153,7 +149,7 @@ export default class CalculateSystem {
 //             monsterDamage: Util.clamp(attack - monsterInfo.defence, 0, Number.MAX_VALUE)
 //         };
 //     }
-// 
+//
 //     /**
 //      * 获取总共英雄受到的伤害
 //      * @param heroInfo

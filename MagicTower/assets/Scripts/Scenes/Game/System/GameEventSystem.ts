@@ -1,10 +1,10 @@
 /**处理地图上的事件 */
 
-import { _decorator } from 'cc';
+import { _decorator } from "cc";
 import { DataManager } from "../../../Managers/DataManager";
 import { GameManager } from "../../../Managers/GameManager";
 import { NotifyCenter } from "../../../Managers/NotifyCenter";
-import { GameEvent } from "../../../Constant/GameEvent";
+import { GameEvent } from "../../Constant/GameEvent";
 import Hero from "../Hero";
 import { CommonAstar } from "../Astar";
 import { GameMap } from "../Map/GameMap";
@@ -24,11 +24,9 @@ export default class GameEventSystem {
         //this.map = map;
         //this.hero = hero;
         //this.globalConfig = DataManager.getJson("global");
-
         //if (this.eventInfo.monsterDoor) {
         //this.map.monsterDoor = this.eventInfo.monsterDoor;
         //}
-
         //return this;
     }
     executeComplete() {
@@ -93,9 +91,9 @@ export default class GameEventSystem {
         //let moveData = this.eventInfo.move[this.moveStep++];
         //let movePath = moveData.path;
         //for (let layer in movePath) {
-            //moveinfo 格式[0, 38, 5]第一个延时，第二个当前坐标，第三个终点坐标
+        //moveinfo 格式[0, 38, 5]第一个延时，第二个当前坐标，第三个终点坐标
         //let move = movePath[layer];
-            //行走类型判断
+        //行走类型判断
         //this.map.astarMoveType = layer;
         //move.forEach((moveInfo) => {
         //let path = CommonAstar.getPath(this.map, this.map.indexToTile(moveInfo[1]), this.map.indexToTile(moveInfo[2]));
@@ -136,7 +134,6 @@ export default class GameEventSystem {
         //break;
         //}
         //}
-
         //if (info.move) {
         //info.move.from.forEach((index) => {
         //let element = this.map.getElement(index, "monster");
@@ -148,7 +145,6 @@ export default class GameEventSystem {
         //.start();
         //});
         //}
-
         //this.map.scheduleOnce(() => {
         //return this.execute();
         //}, info.interval);
@@ -163,7 +159,6 @@ export default class GameEventSystem {
     }
     private appear() {
         //let appearInfo = this.eventInfo.appear[this.appearStep++];
-
         //if (appearInfo.delay) {
         //for (let layer in appearInfo.layer) {
         //let layerInfo = appearInfo.layer[layer];
@@ -190,7 +185,6 @@ export default class GameEventSystem {
         //});
         //}
         //}
-
         //this.map.scheduleOnce(() => {
         //return this.execute();
         //}, appearInfo.interval);
@@ -211,7 +205,6 @@ export default class GameEventSystem {
         //let monster = this.map.getElement(info.monster, "monster");
         //monster.beAttack();
         //}
-
         //this.map.scheduleOnce(() => {
         //return this.execute();
         //}, this.globalConfig.fadeInterval + 0.05);
@@ -220,7 +213,6 @@ export default class GameEventSystem {
         //let info = this.eventInfo.sceneAppear;
         //NotifyCenter.emit(GameEvent.SCENE_APPEAR, info[0], this.map.indexToTile(info[1]));
         //this.hero.weak();
-
         //NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
         //NotifyCenter.emit(GameEvent.REFRESH_EQUIP);
         //return this.execute();
@@ -249,44 +241,44 @@ export default class GameEventSystem {
 // import Hero from "../Hero";
 // import { CommonAstar } from "../Astar";
 // import { GameMap } from "../Map/GameMap";
-// 
+//
 // /**处理地图上的事件 */
 // export default class GameEventSystem {
 //     private eventInfo: any = null;
-// 
+//
 //     private chatStep: number = 0;
-// 
+//
 //     private appearStep: number = 0;
-// 
+//
 //     private disappearStep: number = 0;
-// 
+//
 //     private moveStep: number = 0;
-// 
+//
 //     private step: number = 0;
-// 
+//
 //     private map: GameMap = null;
-// 
+//
 //     private globalConfig: any = null;
-// 
+//
 //     private hero: Hero = null;
-// 
+//
 //     init(eventId: number | string, map: GameMap, hero: Hero) {
 //         this.eventInfo = DataManager.getJsonElement("event", eventId);
 //         this.map = map;
 //         this.hero = hero;
 //         this.globalConfig = DataManager.getJson("global");
-// 
+//
 //         if (this.eventInfo.monsterDoor) {
 //             this.map.monsterDoor = this.eventInfo.monsterDoor;
 //         }
-// 
+//
 //         return this;
 //     }
-// 
+//
 //     executeComplete() {
 //         return this.step >= this.eventInfo.step.length;
 //     }
-// 
+//
 //     execute() {
 //         if (this.step < this.eventInfo.step.length) {
 //             let stepName = this.eventInfo.step[this.step++];
@@ -333,7 +325,7 @@ export default class GameEventSystem {
 //             NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
 //         }
 //     }
-// 
+//
 //     private chat() {
 //         GameManager.getInstance()
 //             .showDialog("ChatDialog", this.eventInfo.chat[this.chatStep++], () => {
@@ -343,7 +335,7 @@ export default class GameEventSystem {
 //                 control.node.position = this.map.dialogPos;
 //             });
 //     }
-// 
+//
 //     private move() {
 //         let moveData = this.eventInfo.move[this.moveStep++];
 //         let movePath = moveData.path;
@@ -373,7 +365,7 @@ export default class GameEventSystem {
 //             return this.execute();
 //         }, moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
 //     }
-// 
+//
 //     private specialMove() {
 //         let info = this.eventInfo.specialMove;
 //         if (info.type == "spawn") {
@@ -392,7 +384,7 @@ export default class GameEventSystem {
 //                         break;
 //                 }
 //             }
-// 
+//
 //             if (info.move) {
 //                 info.move.from.forEach((index) => {
 //                     let element = this.map.getElement(index, "monster");
@@ -404,13 +396,13 @@ export default class GameEventSystem {
 //                         .start();
 //                 });
 //             }
-// 
+//
 //             this.map.scheduleOnce(() => {
 //                 return this.execute();
 //             }, info.interval);
 //         }
 //     }
-// 
+//
 //     getAppearClassName(layer) {
 //         if (layer == "wall") {
 //             return "door1006_0";
@@ -418,10 +410,10 @@ export default class GameEventSystem {
 //             return layer.charAt(0).toUpperCase() + layer.slice(1);
 //         }
 //     }
-// 
+//
 //     private appear() {
 //         let appearInfo = this.eventInfo.appear[this.appearStep++];
-// 
+//
 //         if (appearInfo.delay) {
 //             for (let layer in appearInfo.layer) {
 //                 let layerInfo = appearInfo.layer[layer];
@@ -448,12 +440,12 @@ export default class GameEventSystem {
 //                 });
 //             }
 //         }
-// 
+//
 //         this.map.scheduleOnce(() => {
 //             return this.execute();
 //         }, appearInfo.interval);
 //     }
-// 
+//
 //     private disappear() {
 //         let info = this.eventInfo.disappear[this.disappearStep++];
 //         for (let layer in info) {
@@ -463,7 +455,7 @@ export default class GameEventSystem {
 //         }
 //         return this.execute();
 //     }
-// 
+//
 //     private beAttack(info: any) {
 //         if (info.hero) {
 //             this.hero.magicLight(info.hero);
@@ -471,22 +463,22 @@ export default class GameEventSystem {
 //             let monster = this.map.getElement(info.monster, "monster");
 //             monster.beAttack();
 //         }
-// 
+//
 //         this.map.scheduleOnce(() => {
 //             return this.execute();
 //         }, this.globalConfig.fadeInterval + 0.05);
 //     }
-// 
+//
 //     private sceneAppear() {
 //         let info = this.eventInfo.sceneAppear;
 //         NotifyCenter.emit(GameEvent.SCENE_APPEAR, info[0], this.map.indexToTile(info[1]));
 //         this.hero.weak();
-// 
+//
 //         NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
 //         NotifyCenter.emit(GameEvent.REFRESH_EQUIP);
 //         return this.execute();
 //     }
-// 
+//
 //     private sceneDisappear() {
 //         cc.tween(this.map.node.parent.parent)
 //             .to(1, { opacity: 0 })
@@ -495,7 +487,7 @@ export default class GameEventSystem {
 //             })
 //             .start();
 //     }
-// 
+//
 //     clearNpcEvent() {
 //         this.map.getElement(this.eventInfo.clearNpcEvent, "npc").clearEvent();
 //         return this.execute();
