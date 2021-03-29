@@ -1,4 +1,4 @@
-import { js } from "cc";
+import { js, JsonAsset } from "cc";
 import JsonParser from "../Base/JsonParser";
 import { Fn } from "../Util/Fn";
 
@@ -19,16 +19,17 @@ export class DataManager {
         return typeOrClassName;
     }
 
-    private loadLocalStorage() {
+    loadLocalStorage() {
         for (let i = 0; i < localStorage.length; ++i) {
             let key = localStorage.key(i);
             this.loadCustomData(key, localStorage.getItem(key));
         }
     }
 
-    init() {
-        this.loadLocalStorage();
-        return this;
+    loadJsonAssets(assets: JsonAsset[]) {
+        assets.forEach((asset) => {
+            this.setJson(asset.name, asset);
+        });
     }
 
     /**
@@ -44,7 +45,7 @@ export class DataManager {
      * @param name json名字
      * @param json json资源
      */
-    setJson(name: string, json: object) {
+    private setJson(name: string, json: object) {
         let parserName = this.jsonToParser[name];
         if (parserName) {
             this.parserToJson[parserName] = name;

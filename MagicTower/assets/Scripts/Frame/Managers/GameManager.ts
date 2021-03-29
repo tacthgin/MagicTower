@@ -1,6 +1,8 @@
-import { _decorator, Component, game } from "cc";
+import { _decorator, Component, game, TiledUserNodeData } from "cc";
+import { BaseEvent } from "../Constant/BaseEvent";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
+import { NotifyCenter } from "./NotifyCenter";
 import { ResourceManager } from "./ResourceManager";
 import { UIManager } from "./UIManager";
 
@@ -54,13 +56,20 @@ export class GameManager extends Component {
         this.init();
     }
 
+    private registerEvents() {
+        NotifyCenter.on(BaseEvent.ALL_RESOURCES_LOAD_SUCCESS, this.allResourcesLoaded, this);
+    }
+
     /** 游戏的初始化 */
-    init() {
+    private init() {
         this.uiManager = new UIManager().init();
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager().init();
         this.resourceManager.loadResources();
+        this.registerEvents();
     }
+
+    private allResourcesLoaded() {}
 
     /** 初始化物理相关 */
     initPhysics() {
