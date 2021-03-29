@@ -1,5 +1,6 @@
 import { Asset, assetManager, AudioClip, JsonAsset, resources, SpriteFrame } from "cc";
 import { BaseEvent } from "../Constant/BaseEvent";
+import { Fn } from "../Util/Fn";
 import { NotifyCenter } from "./NotifyCenter";
 
 export enum ResourceType {
@@ -20,7 +21,7 @@ export class ResourceManager {
 
     init() {
         for (let type in ResourceType) {
-            this.resourcePromises.push(this.createResourcePromise(type));
+            this.resourcePromises.push(this.createResourcePromise(ResourceType[type]));
         }
         return this;
     }
@@ -39,13 +40,12 @@ export class ResourceManager {
     }
 
     private createResourcePromise(type: string) {
-        let dirName = ResourceType[type];
         return new Promise((resolve, reject) => {
-            if (resources.get(dirName)) {
+            if (resources.get(type)) {
                 resolve(type);
             } else {
                 resources.loadDir(
-                    dirName,
+                    type,
                     this.resourceAssetConfig[type],
                     (finished: number, total: number) => {
                         this.onProgress(type, finished / total);
@@ -56,7 +56,7 @@ export class ResourceManager {
                             reject(type);
                             return;
                         }
-                        this.setAsset(type, assets);
+                        this.setAssets(type, assets);
                         resolve(type);
                     }
                 );
@@ -64,8 +64,17 @@ export class ResourceManager {
         });
     }
 
-    private setAsset(type: string, assets: any) {
-        this.assets[type] = assets;
+    private setAssets(type: string, assets: Asset[]) {
+        let data = {};
+        if (type != ResourceType.JSON) {
+            assets.forEach((asset) => {
+                let assetInfo: any = resources.getAssetInfo(asset._uuid);
+                data[assetInfo.path] = asset;
+            });
+            this.assets[type] = data;
+        } else {
+            this.assets[type] = assets;
+        }
     }
 
     private onProgress(type: string, progress: number) {
@@ -81,7 +90,21 @@ export class ResourceManager {
         }
     }
 
-    getAsset(type: ResourceType) {
+    getAssets(type: ResourceType) {
         return this.assets[type] || null;
+    }
+
+    getAsset<T extends Asset>(type: ResourceType | Fn.Constructor<T>, path: string): T {
+        if (typeof type == "string") {
+            return this.assets[type][`${type}/${path}`] || null;
+        } else {
+            for (let typeName in this.resourceAssetConfig) {
+                if (this.resourceAssetConfig[typeName] instanceof type) {
+                    return this.assets[typeName][`${typeName}/${path}`] || null;
+                }
+            }
+        }
+
+        return null;
     }
 }

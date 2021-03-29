@@ -1,13 +1,15 @@
-import { Component, _decorator } from "cc";
+import { AudioClip, Component, _decorator } from "cc";
 import { GameManager } from "../Frame/Managers/GameManager";
-import { GameData } from "./GameData";
+import { NotifyCenter } from "../Frame/Managers/NotifyCenter";
+import { ResourceType } from "../Frame/Managers/ResourceManager";
+import { GameEvent } from "./Constant/GameEvent";
 
 const { ccclass, property } = _decorator;
 
 @ccclass("LoginScene")
 export default class LoginScene extends Component {
     onLoad() {
-        //NotifyCenter.on(GameEvent.ALL_RESOURCES_LOAD_SUCCESS, this.allResourcesLoadSuccess, this);
+        NotifyCenter.on(GameEvent.ALL_RESOURCES_LOAD_SUCCESS, this.allResourcesLoadSuccess, this);
         //NotifyCenter.on(GameEvent.ALL_RESOURCES_LOAD_FAILED, this.allResourcesLoadFailed, this);
     }
     start() {
@@ -19,11 +21,11 @@ export default class LoginScene extends Component {
         GameManager.UI.showDialog("Dialogs/MonsterHandBook").then((control) => {
             console.log(control);
         });
-
-        GameManager.DATA.getCustomData(GameData).aa();
     }
 
-    allResourcesLoadSuss() {
+    allResourcesLoadSuccess() {
+        let aaa = GameManager.RESOURCE.getAsset(AudioClip, "button");
+        console.log(aaa);
         //this.loadLocalInfos();
     }
     allResourcesLoadFailed() {
