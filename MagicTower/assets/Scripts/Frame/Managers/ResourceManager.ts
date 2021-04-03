@@ -1,4 +1,4 @@
-import { Asset, assetManager, AudioClip, JsonAsset, resources, SpriteFrame } from "cc";
+import { Asset, assetManager, AudioClip, JsonAsset, Prefab, resources, SpriteFrame } from "cc";
 import { BaseEvent } from "../Constant/BaseEvent";
 import { Fn } from "../Util/Fn";
 import { NotifyCenter } from "./NotifyCenter";
@@ -73,7 +73,10 @@ export class ResourceManager {
             });
             this.assets[type] = data;
         } else {
-            this.assets[type] = assets;
+            assets.forEach((asset) => {
+                data[asset.name] = asset;
+            });
+            this.assets[type] = data;
         }
     }
 
@@ -90,7 +93,7 @@ export class ResourceManager {
         }
     }
 
-    getAssets(type: ResourceType) {
+    getAssets(type: ResourceType): any {
         return this.assets[type] || null;
     }
 

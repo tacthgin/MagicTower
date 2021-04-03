@@ -41,7 +41,7 @@ export default class BaseDialog extends Component {
     private touchId: number = null;
 
     /** 加载背景按钮等初始化 */
-    onLoad() {
+    __preload() {
         if (this.touchNode) {
             this.touchNode.contentSize = view.getFrameSize();
 

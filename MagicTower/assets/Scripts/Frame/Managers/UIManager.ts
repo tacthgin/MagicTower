@@ -2,22 +2,32 @@ import { director, instantiate, js, NodePool, Prefab, resources, UITransform, Ve
 import { BasePoolNode } from "../Base/BasePoolNode";
 import { ColorToast, ToastType } from "../Components/ColorToast";
 
+enum UIPrefabPath {
+    TOAST_PATH = "Prefabs/Base/ColorToast",
+    DIALOGS_PATH = "Prefabs/Dialogs",
+}
+
 /** UI管理器 */
 export class UIManager {
     /** 弹窗起始优先级 */
     private DIALOG_PRIORITY: number = 255;
     /** toast优先级 */
     private TOAST_PRIORITY: number = 512;
-    /** toast预设路径 */
-    private TOAST_PATH: string = `Prefabs/ColorToast`;
     /** toast对象池 */
     private toastPool: NodePool = new NodePool("ColorToast");
     private toastY: number = 0;
     /** 弹窗缓存，避免重复打开弹窗 */
     private dialogCache: any = {};
+    /** 弹窗名字对应的路径 */
+    private dialogPath: any = {};
 
     init() {
         this.toastY = view.getFrameSize().height * 0.75;
+        let dirInfo = resources.getDirWithPath(UIPrefabPath.DIALOGS_PATH, Prefab);
+        dirInfo.forEach((info) => {
+            let name = info.path.substring(info.path.lastIndexOf("/") + 1);
+            this.dialogPath[name] = info.path;
+        });
         return this;
     }
 
@@ -39,10 +49,6 @@ export class UIManager {
         dialog.parent = this.getCanvas();
         dialog.getComponent(UITransform).priority = this.DIALOG_PRIORITY;
         return dialog;
-    }
-
-    private packagePrefabPath(path: string) {
-        return `Prefabs/${path}`;
     }
 
     private loadPrefab(path: string): Promise<Prefab> {
@@ -67,9 +73,9 @@ export class UIManager {
             return;
         }
 
-        let prefab = resources.get<Prefab>(this.TOAST_PATH);
+        let prefab = resources.get<Prefab>(UIPrefabPath.TOAST_PATH);
         if (!prefab) {
-            prefab = await this.loadPrefab(this.TOAST_PATH);
+            prefab = await this.loadPrefab(UIPrefabPath.TOAST_PATH);
             if (!prefab) {
                 return;
             }
@@ -80,23 +86,25 @@ export class UIManager {
 
     /**
      * 显示弹窗
-     * @param path 弹窗路径
+     * @param dialogName 弹窗名字
      * @param args 弹窗初始化数据
-     * @returns 返回Promise 弹窗控制器
+     * @returns 返回Promise弹窗节点
      */
-    async showDialog(dialogPath: string, ...args: any[]) {
-        let index = dialogPath.lastIndexOf("/");
-        let dialogName = index != -1 ? dialogPath.substring(index + 1) : dialogPath;
+    async showDialog(dialogName: string, ...args: any[]): Promise<Node> {
         if (this.dialogCache[dialogName]) {
             console.error(`${dialogName}弹窗正在打开`);
             return null;
         }
         let dialogNode = this.getCanvas().getChildByName(dialogName);
 
-        if (dialogNode && dialogNode.active) return;
+        if (dialogNode && dialogNode.active) return null;
 
         if (!dialogNode) {
-            dialogPath = this.packagePrefabPath(dialogPath);
+            let dialogPath = this.dialogPath[dialogName];
+            if (!dialogPath) {
+                console.error(`找不到${dialogName}预设`);
+                return null;
+            }
             let dialogPrefab = resources.get<Prefab>(dialogPath);
             if (!dialogPrefab) {
                 this.dialogCache[dialogName] = true;
@@ -111,6 +119,6 @@ export class UIManager {
         dialogNode.active = true;
         let control = dialogNode.getComponent(js.getClassByName(dialogName));
         control && control.init && control.init(...args);
-        return control;
+        return dialogNode;
     }
 }

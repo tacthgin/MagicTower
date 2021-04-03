@@ -1,7 +1,8 @@
-import { _decorator, Component, game, TiledUserNodeData } from "cc";
+import { Component, game, _decorator } from "cc";
 import { BaseEvent } from "../Constant/BaseEvent";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
+import { NodePoolManager } from "./NodePoolManager";
 import { NotifyCenter } from "./NotifyCenter";
 import { ResourceManager } from "./ResourceManager";
 import { UIManager } from "./UIManager";
@@ -18,6 +19,8 @@ export class GameManager extends Component {
     private dataManager: DataManager = null;
 
     private resourceManager: ResourceManager = null;
+
+    private nodePoolManager: NodePoolManager = null;
 
     private static instance: GameManager;
 
@@ -44,6 +47,10 @@ export class GameManager extends Component {
     /** 声音管理 */
     public static get AUDIO() {
         return GameManager.instance.audioController;
+    }
+
+    public static get POOL() {
+        return GameManager.instance.nodePoolManager;
     }
 
     onLoad() {
