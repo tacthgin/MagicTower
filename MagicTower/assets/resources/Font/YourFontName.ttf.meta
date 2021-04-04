@@ -1,0 +1,12 @@
+{
+  "ver": "1.0.1",
+  "importer": "ttf-font",
+  "imported": true,
+  "uuid": "aea5f106-3988-4c50-abab-08a3c9a569ba",
+  "files": [
+    "YourFontName.ttf",
+    ".json"
+  ],
+  "subMetas": {},
+  "userData": {}
+}

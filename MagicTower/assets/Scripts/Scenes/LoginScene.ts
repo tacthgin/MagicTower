@@ -1,55 +1,28 @@
 import { AudioClip, Component, _decorator } from "cc";
+import { BaseEvent } from "../Frame/Constant/BaseContant";
 import { GameManager } from "../Frame/Managers/GameManager";
 import { NotifyCenter } from "../Frame/Managers/NotifyCenter";
-import { ResourceType } from "../Frame/Managers/ResourceManager";
-import { GameEvent } from "./Constant/GameEvent";
+import { JsonParserMap } from "./Constant/JsonParserMap";
 
 const { ccclass, property } = _decorator;
 
 @ccclass("LoginScene")
 export default class LoginScene extends Component {
     onLoad() {
-        NotifyCenter.on(GameEvent.ALL_RESOURCES_LOAD_SUCCESS, this.allResourcesLoadSuccess, this);
-        //NotifyCenter.on(GameEvent.ALL_RESOURCES_LOAD_FAILED, this.allResourcesLoadFailed, this);
+        NotifyCenter.on(BaseEvent.ALL_RESOURCES_LOAD_SUCCESS, this.onAllResourcesLoadSuccess, this);
+        NotifyCenter.on(BaseEvent.RESOURCE_PROGRESS, this.onResouceProgress);
     }
+
     start() {
-        //this.beginLoadResources();
-        GameManager.UI.showDialog("Dialogs/MonsterHandBook").then((control) => {
-            console.log(control);
-        });
-
-        GameManager.UI.showDialog("Dialogs/MonsterHandBook").then((control) => {
-            console.log(control);
-        });
+        GameManager.DATA.setParserMap(JsonParserMap);
+        GameManager.RESOURCE.loadResources();
     }
 
-    allResourcesLoadSuccess() {
-        let aaa = GameManager.RESOURCE.getAsset(AudioClip, "button");
-        console.log(aaa);
-        //this.loadLocalInfos();
-    }
-    allResourcesLoadFailed() {
-        //GameManager.getInstance().showToast(ToastString.LOAD_RESOURCES_FAILED);
+    onAllResourcesLoadSuccess() {
+        this.gotoGameScene();
     }
 
-    beginLoadResources() {
-        //ResourceManager.loadResources();
-    }
-
-    loadLocalInfos() {
-        //let localInfos = {
-        //[Constant.ARCHIVE_NAME]: "GameInfo",
-        //};
-        //GameManager.getInstance()
-        //.loadAllGameInfo(localInfos)
-        //.then((results) => {
-        //this.gotoGameScene();
-        //})
-        //.catch((reason) => {
-        //cc.log(reason);
-        //this.gotoGameScene();
-        //});
-    }
+    onResouceProgress() {}
 
     gotoGameScene() {
         //ElementManager.loadRes((success: boolean) => {

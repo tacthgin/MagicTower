@@ -1,10 +1,10 @@
 import { Component, game, _decorator } from "cc";
-import { BaseEvent } from "../Constant/BaseEvent";
+import { BaseEvent } from "../Constant/BaseContant";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
 import { NodePoolManager } from "./NodePoolManager";
 import { NotifyCenter } from "./NotifyCenter";
-import { ResourceManager } from "./ResourceManager";
+import { ResourceManager, ResourceType } from "./ResourceManager";
 import { UIManager } from "./UIManager";
 
 const { ccclass, type } = _decorator;
@@ -65,7 +65,7 @@ export class GameManager extends Component {
     }
 
     private registerEvents() {
-        NotifyCenter.on(BaseEvent.ALL_RESOURCES_LOAD_SUCCESS, this.allResourcesLoaded, this);
+        NotifyCenter.on(BaseEvent.RESOURCE_COMPLETE, this.onResourceComplete, this);
     }
 
     /** 游戏的初始化 */
@@ -73,11 +73,14 @@ export class GameManager extends Component {
         this.uiManager = new UIManager().init();
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager().init();
-        this.resourceManager.loadResources();
         this.registerEvents();
     }
 
-    private allResourcesLoaded() {}
+    private onResourceComplete(type: ResourceType) {
+        if (type == ResourceType.JSON) {
+            this.dataManager.loadJsonAssets(this.resourceManager.getAssets(type));
+        }
+    }
 
     /** 初始化物理相关 */
     initPhysics() {

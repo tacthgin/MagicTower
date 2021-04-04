@@ -1,4 +1,5 @@
 import { _decorator } from "cc";
+import { Fn } from "../Util/Fn";
 
 const { ccclass } = _decorator;
 
@@ -15,7 +16,7 @@ export default class JsonParser {
      * @param clone 默认为false，如果你需要操作json元素，clone一份
      */
     getJson(clone: boolean = false) {
-        return clone ? this.clone(this.nativeAsset) : this.nativeAsset;
+        return clone ? Fn.clone(this.nativeAsset) : this.nativeAsset;
     }
 
     /**
@@ -25,38 +26,6 @@ export default class JsonParser {
      */
     getJsonElement(key: string | number, clone: boolean = false) {
         let info = this.nativeAsset[key];
-        return clone ? this.clone(info) : info;
-    }
-
-    private clone(json: object): object {
-        if (null == json || "object" != typeof json) return json;
-
-        // Handle Date
-        if (json instanceof Date) {
-            let copy = new Date();
-            copy.setTime(json.getTime());
-            return copy;
-        }
-
-        // Handle Array
-        if (json instanceof Array) {
-            let copy = [];
-            for (let i = 0, len = json.length; i < len; ++i) {
-                copy[i] = this.clone(json[i]);
-            }
-            return copy;
-        }
-
-        // Handle Object
-        if (json instanceof Object) {
-            let copy: any = {};
-            for (let attr in json) {
-                if (json.hasOwnProperty(attr)) copy[attr] = this.clone(json[attr]);
-            }
-
-            return copy;
-        }
-
-        return null;
+        return clone ? Fn.clone(info) : info;
     }
 }

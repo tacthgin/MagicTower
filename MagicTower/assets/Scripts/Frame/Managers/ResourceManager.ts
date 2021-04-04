@@ -1,5 +1,5 @@
-import { Asset, assetManager, AudioClip, JsonAsset, Prefab, resources, SpriteFrame } from "cc";
-import { BaseEvent } from "../Constant/BaseEvent";
+import { Asset, assetManager, AudioClip, JsonAsset, Prefab, resources, SpriteFrame, TiledMap } from "cc";
+import { BaseEvent } from "../Constant/BaseContant";
 import { Fn } from "../Util/Fn";
 import { NotifyCenter } from "./NotifyCenter";
 
@@ -7,6 +7,7 @@ export enum ResourceType {
     JSON = "Json",
     SPRITE = "Sprite",
     AUIDO = "Audio",
+    TILED_MAP = "TiledMap",
 }
 
 export class ResourceManager {
@@ -17,6 +18,7 @@ export class ResourceManager {
         [ResourceType.JSON]: JsonAsset,
         [ResourceType.SPRITE]: SpriteFrame,
         [ResourceType.AUIDO]: AudioClip,
+        [ResourceType.TILED_MAP]: TiledMap,
     };
 
     init() {
@@ -58,6 +60,7 @@ export class ResourceManager {
                         }
                         this.setAssets(type, assets);
                         resolve(type);
+                        NotifyCenter.emit(BaseEvent.RESOURCE_COMPLETE, type);
                     }
                 );
             }

@@ -1,4 +1,4 @@
-import { js, JsonAsset } from "cc";
+import { js } from "cc";
 import JsonParser from "../Base/JsonParser";
 import { Fn } from "../Util/Fn";
 
@@ -11,6 +11,8 @@ export class DataManager {
     private parserToJson: any = {};
     /** 自定义数据 */
     private customDataMap: any = {};
+    /** json资源 */
+    private jsonAssets: any = null;
 
     private getClassName(typeOrClassName: any) {
         if (typeof typeOrClassName != "string") {
@@ -22,14 +24,15 @@ export class DataManager {
     loadLocalStorage() {
         for (let i = 0; i < localStorage.length; ++i) {
             let key = localStorage.key(i);
-            this.loadCustomData(key, localStorage.getItem(key));
+            this.loadData(key, localStorage.getItem(key));
         }
     }
 
-    loadJsonAssets(assets: JsonAsset[]) {
-        assets.forEach((asset) => {
-            this.setJson(asset.name, asset);
-        });
+    loadJsonAssets(assets: any) {
+        for (let name in this.jsonToParser) {
+            this.setJson(name, assets[name]);
+        }
+        this.jsonAssets = assets;
     }
 
     /**
@@ -47,12 +50,14 @@ export class DataManager {
      */
     private setJson(name: string, json: object) {
         let parserName = this.jsonToParser[name];
+        let parserClass = null;
         if (parserName) {
             this.parserToJson[parserName] = name;
+            parserClass = js.getClassByName(parserName);
         } else {
-            parserName = "JsonParser";
+            parserClass = JsonParser;
         }
-        let parserClass = js.getClassByName(parserName);
+
         if (parserClass) {
             let parser: any = new parserClass();
             parser.parseJson(json);
@@ -67,7 +72,7 @@ export class DataManager {
      */
     getJson(name: string, clone: boolean = false) {
         let jsonParser = this.jsonParserMap[name];
-        return jsonParser ? jsonParser.getJson(clone) : null;
+        return jsonParser ? jsonParser.getJson(clone) : this.jsonAssets[name] || null;
     }
 
     /**
@@ -77,8 +82,16 @@ export class DataManager {
      * @param clone 返回一个副本，不会直接操作json原本,默认不克隆
      */
     getJsonElement(name: string, id: string | number, clone: boolean = false) {
-        let jsonParser = this.jsonParserMap[name];
-        return jsonParser ? jsonParser.getJsonElement(id, clone) : null;
+        let jsonParser: JsonParser = this.jsonParserMap[name];
+        if (jsonParser) {
+            return jsonParser.getJsonElement(id, clone);
+        } else {
+            let jsonData = this.jsonAssets[name];
+            if (jsonData) {
+                return clone ? Fn.clone(jsonData) : jsonData;
+            }
+        }
+        return null;
     }
 
     /**
@@ -100,14 +113,14 @@ export class DataManager {
      * @param typeOrClassName 数据名字或者构造函数
      * @param info 数据
      */
-    loadCustomData<T>(typeOrClassName: Fn.Constructor<T> | string, info: any): T {
-        let data: any = this.getCustomData(typeOrClassName);
+    loadData<T>(typeOrClassName: Fn.Constructor<T> | string, info: any): T {
+        let data: any = this.getData(typeOrClassName);
         if (!data) {
             let className = this.getClassName(typeOrClassName);
             let dataClass = js.getClassByName(className);
             if (dataClass) {
                 data = new dataClass();
-                this.setCustomData(className, data);
+                this.setData(className, data);
             }
         }
         data && data.load && data.load(info);
@@ -119,7 +132,7 @@ export class DataManager {
      * @param className 数据名字
      * @param customData 数据
      */
-    setCustomData(className: string, customData: any) {
+    setData(className: string, customData: any) {
         this.customDataMap[className] = customData;
     }
 
@@ -127,7 +140,7 @@ export class DataManager {
      * 获取自定义数据
      * @param typeOrClassName 构造函数或者类名
      */
-    getCustomData<T>(typeOrClassName: Fn.Constructor<T> | string): T | null {
+    getData<T>(typeOrClassName: Fn.Constructor<T> | string): T | null {
         let className = this.getClassName(typeOrClassName);
         return this.customDataMap[className] || null;
     }
