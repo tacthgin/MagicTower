@@ -16,18 +16,12 @@ export class NodePoolManager {
         });
     }
 
-    createCommonNode(path: string) {
-        let prefab = resources.get<Prefab>(path);
-        if (!prefab) {
-            console.error(`${path}找不到预设`);
-            return;
-        }
-        let pool = this.pool[path] || new NodePool("BasePoolNode");
-        //BasePoolNode.generateNodeFromPool();
-        return;
-    }
-
-    async createPoolNode(path: string) {
+    /**
+     * 创建对象池节点
+     * @param path 预设路径
+     * @param useCommon 是否使用通用脚本
+     */
+    async createPoolNode(path: string, useCommon: boolean) {
         let prefab = resources.get<Prefab>(path);
         if (!prefab) {
             prefab = await this.loadPrefab(path);
@@ -43,6 +37,6 @@ export class NodePoolManager {
             this.pool[path] = new NodePool(name);
         }
 
-        return BasePoolNode.generateNodeFromPool(this.pool[path], prefab);
+        return BasePoolNode.generateNodeFromPool(this.pool[path], prefab, useCommon);
     }
 }

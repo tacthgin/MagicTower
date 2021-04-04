@@ -6,12 +6,21 @@ const { ccclass } = _decorator;
 export class BasePoolNode extends Component {
     protected pool: NodePool = null;
 
-    static generateNodeFromPool(pool: NodePool, prefab: Prefab) {
+    /**
+     * 从对象池获得节点
+     * @param pool 池子
+     * @param prefab 节点预设
+     * @param common 是否使用通用脚本
+     */
+    static generateNodeFromPool(pool: NodePool, prefab: Prefab, useCommon: boolean = false) {
         if (!pool || !prefab) return null;
 
         let node: Node = null;
         if (pool.size() == 0) {
             node = instantiate(prefab);
+            if (useCommon) {
+                node.addComponent(BasePoolNode);
+            }
             pool.put(node);
         }
         return pool.get(pool);

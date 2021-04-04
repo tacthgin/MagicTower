@@ -49,6 +49,7 @@ export class GameManager extends Component {
         return GameManager.instance.audioController;
     }
 
+    /** 对象池管理 */
     public static get POOL() {
         return GameManager.instance.nodePoolManager;
     }
