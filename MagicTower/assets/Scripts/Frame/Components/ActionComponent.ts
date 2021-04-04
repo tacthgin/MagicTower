@@ -7,6 +7,8 @@ export abstract class ActionComponent extends Component {
     protected _endActionCallback: () => void = null;
 
     protected _dialogContentNode: Node = null;
+    /** 额外参与动作的节点 */
+    protected _extraNodes: Node[] = [];
 
     public set endActionCallback(callback: any) {
         this._endActionCallback = callback;
@@ -29,7 +31,7 @@ export abstract class ActionComponent extends Component {
 class NoneAction extends ActionComponent {
     public executeStartAction() {}
     public executeEndAction() {
-        this.endActionCallback();
+        this._endActionCallback();
     }
 }
 
@@ -46,7 +48,7 @@ class ScaleAction extends ActionComponent {
         tween(this._dialogContentNode)
             .stop()
             .to(0.3, { scale: new Vec3(0, 0, 0) })
-            .call(this.endActionCallback.bind(this))
+            .call(this._endActionCallback)
             .start();
     }
 }

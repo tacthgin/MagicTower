@@ -67,28 +67,32 @@ export class DataManager {
 
     /**
      * 获取json资源
-     * @param name json名字
+     * @param jsonName json名字
      * @param clone 默认为false，如果你需要操作json元素，clone一份
      */
-    getJson(name: string, clone: boolean = false) {
-        let jsonParser = this.jsonParserMap[name];
-        return jsonParser ? jsonParser.getJson(clone) : this.jsonAssets[name] || null;
+    getJson(jsonName: string, clone: boolean = false) {
+        let jsonParser = this.jsonParserMap[jsonName];
+        if (jsonParser) {
+            return jsonParser.getJson(clone);
+        } else {
+            return (clone ? Fn.clone(this.jsonAssets[jsonName]) : this.jsonAssets[jsonName]) || null;
+        }
     }
 
     /**
      * 获取json元素
-     * @param name json名字
+     * @param jsonName json名字
      * @param id 元素id或名字
      * @param clone 返回一个副本，不会直接操作json原本,默认不克隆
      */
-    getJsonElement(name: string, id: string | number, clone: boolean = false) {
-        let jsonParser: JsonParser = this.jsonParserMap[name];
+    getJsonElement(jsonName: string, id: string | number, clone: boolean = false) {
+        let jsonParser: JsonParser = this.jsonParserMap[jsonName];
         if (jsonParser) {
             return jsonParser.getJsonElement(id, clone);
         } else {
-            let jsonData = this.jsonAssets[name];
+            let jsonData = this.jsonAssets[jsonName];
             if (jsonData) {
-                return clone ? Fn.clone(jsonData) : jsonData;
+                return (clone ? Fn.clone(jsonData[id]) : jsonData[id]) || null;
             }
         }
         return null;

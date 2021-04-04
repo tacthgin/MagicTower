@@ -20,6 +20,7 @@ export class ResourceManager {
         [ResourceType.AUIDO]: AudioClip,
         [ResourceType.TILED_MAP]: TiledMap,
     };
+    private resourceCompleteCount: number = 0;
 
     init() {
         for (let type in ResourceType) {
@@ -29,6 +30,7 @@ export class ResourceManager {
     }
 
     loadResources() {
+        this.resourceCompleteCount = 0;
         if (this.resourcePromises.length > 0) {
             Promise.all(this.resourcePromises)
                 .then((results) => {
@@ -46,6 +48,7 @@ export class ResourceManager {
             if (resources.get(type)) {
                 resolve(type);
             } else {
+                let now = Date.now();
                 resources.loadDir(
                     type,
                     this.resourceAssetConfig[type],
@@ -58,6 +61,7 @@ export class ResourceManager {
                             reject(type);
                             return;
                         }
+                        console.log(`加载${type}资源: ${Date.now() - now}ms`);
                         this.setAssets(type, assets);
                         resolve(type);
                         NotifyCenter.emit(BaseEvent.RESOURCE_COMPLETE, type);
@@ -81,9 +85,12 @@ export class ResourceManager {
             });
             this.assets[type] = data;
         }
+        ++this.resourceCompleteCount;
     }
 
     private onProgress(type: string, progress: number) {
+        console.log(this.resourceCompleteCount, progress);
+        progress = this.resourceCompleteCount / this.resourcePromises.length + (1 / this.resourcePromises.length) * progress;
         NotifyCenter.emit(BaseEvent.RESOURCE_PROGRESS, type, progress);
     }
 

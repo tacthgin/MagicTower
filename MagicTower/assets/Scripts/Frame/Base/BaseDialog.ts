@@ -1,5 +1,6 @@
 import { Component, Enum, EventTouch, Node, UITransform, view, _decorator } from "cc";
-import { ActionComponent, DialogAction } from "../Components/ActionComponent";
+import { ActionComponent } from "../Components/ActionComponent";
+import { DialogAction } from "../Constant/BaseContant";
 
 const { ccclass, property } = _decorator;
 

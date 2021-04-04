@@ -18,6 +18,6 @@ export enum BaseEvent {
 }
 
 export enum DialogAction {
-    NoneAction = 1,
-    ScaleAction = 2,
+    NoneAction,
+    ScaleAction,
 }
