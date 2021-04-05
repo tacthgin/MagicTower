@@ -1,238 +1,108 @@
-import { CustomEventTarget } from "../../../Frame/Managers/NotifyCenter";
+import { BaseData } from "../../../Frame/Base/BaseData";
+import { GameManager } from "../../../Frame/Managers/GameManager";
+import { Fn } from "../../../Frame/Util/Fn";
+import { Util } from "../../../Frame/Util/Util";
 
-enum HeroAttr {
+export enum HeroAttr {
     HP,
     ATTACK,
     DEFENCE,
     GOLD,
 }
 
+export enum PropType {
+    SWARD = 5,
+    SHIELD,
+}
+
 export enum HeroEvent {
     HERO_ATTR,
 }
 
-export default class HeroData extends CustomEventTarget {
-    private heroAttr: number[] = [];
-    private animation: string[] = null;
-    private pos: number[] = null;
-    private direction: number = 0;
-    private props: any = {
-        swardId: 0,
-        shieldId: 0,
+class _HeroData {
+    public heroAttr: number[] = [];
+    public animation: string[] = null;
+    public pos: number[] = null;
+    public direction: number = 0;
+    public records: any[] = [];
+    public props = {
+        swardID: 0,
+        shieldID: 0,
         prop: {},
     };
-    private records: any[] = [];
+    load(data: any) {
+        for (let key in data) {
+            this[key] = data[key];
+        }
+    }
+}
+
+@Fn.registerClass("HeroData")
+export class HeroData extends BaseData {
+    protected data: _HeroData = this.createProxy(new _HeroData());
+
+    load(data: any = null) {
+        if (data) {
+            this.data.load(data);
+        } else {
+            this.data.load(GameManager.DATA.getJson("hero")[0]);
+        }
+    }
 
     getAttr(attr: HeroAttr) {
-        return this.heroAttr[attr];
+        return this.data.heroAttr[attr];
     }
 
     setAttrDiff(attr: HeroAttr, diff: number) {
-        this.heroAttr[attr] += diff;
-        this.emit(HeroEvent.HERO_ATTR, attr, this.heroAttr[attr]);
+        this.data.heroAttr[attr] += diff;
+        this.emit(HeroEvent.HERO_ATTR, attr, this.data.heroAttr[attr]);
     }
 
     clearEquip() {
-        //this.props.swardId = 0;
-        //this.props.shieldId = 0;
+        //this.data.props.swardID = 0;
+        //this.data.props.shieldID = 0;
     }
 
     getProp(id: number | string) {
-        //if (this.props.prop[id]) {
-        //return this.props.prop[id];
-        //}
-        //return 0;
+        if (this.data.props.prop[id]) {
+            return this.data.props.prop[id];
+        }
+        return 0;
     }
 
-    addProp(id: number | string, count: number = 1) {
-        //let prop = DataManager.getJsonElement("prop", id);
-        //if (prop.type == 5) {
-        //this.props.swardId = id;
-        //} else if (prop.type == 6) {
-        //this.props.shieldId = id;
-        //} else if (!prop.consumption) {
-        //this.props.prop[id] = Util.clamp(this.getProp(id) + count, 0, Number.MAX_VALUE);
-        //}
+    addProp(id: number, count: number = 1) {
+        let prop = GameManager.DATA.getJsonElement("prop", id);
+        switch (prop.type) {
+            case PropType.SWARD:
+                this.data.props.swardID = id;
+                break;
+            case PropType.SHIELD:
+                this.data.props.shieldID = id;
+                break;
+            default:
+                if (!prop.consumption) {
+                    this.data.props.prop[id] = Util.clamp(this.getProp(id) + count, 0, Number.MAX_VALUE);
+                }
+                break;
+        }
     }
 
     getProps() {
-        //return this.props.prop;
+        return this.data.props.prop;
     }
 
     recordTalk(npcId: number, chatStep: number | string) {
-        //if (this.props.prop[19]) {
+        //if (this.data.props.prop[19]) {
         //this.records.push({ npcId: npcId, chatStep: chatStep });
         //}
     }
 
     /** 是否拥有神圣盾，跟json绑定 */
     equipedDivineShield() {
-        //return this.props.shieldId == 17;
-    }
-
-    load(info: any = null) {
-        //if (info) {
-        //this.hp = info.hp;
-        //this.attack = info.attack;
-        //this.defence = info.defence;
-        //this.gold = info.gold;
-        //this.animation = info.animation;
-        //this.pos = info.pos;
-        //this.direction = info.direction;
-        //this.props = info.props || {};
-        //this.records = info.records || [];
-        //}
+        //return this.data.props.shieldID == 17;
     }
 
     getRecordTalk() {
         //return this.records;
     }
 }
-
-/**
- * Note: The original script has been commented out, due to the large number of changes in the script, there may be missing in the conversion, you need to convert it manually
- */
-// import { DataManager } from "../Managers/DataManager";
-// import { Util } from "../Util/Util";
-//
-// export default class HeroInfo {
-//     private hp: number = 0;
-//
-//     private attack: number = 0;
-//
-//     private defence: number = 0;
-//
-//     private gold: number = 0;
-//
-//     private animation: string[] = null;
-//
-//     private pos: number[] = null;
-//
-//     private direction: number = 0;
-//
-//     private props: any = {
-//         swardId: 0,
-//         shieldId: 0,
-//         prop: {}
-//     };
-//
-//     private records: any[] = [];
-//
-//     set Hp(value) {
-//         this.hp = value;
-//     }
-//
-//     get Hp() {
-//         return this.hp;
-//     }
-//
-//     set Attack(value) {
-//         this.attack = value;
-//     }
-//
-//     get Attack() {
-//         return this.attack;
-//     }
-//
-//     set Defence(value) {
-//         this.defence = value;
-//     }
-//
-//     get Defence() {
-//         return this.defence;
-//     }
-//
-//     set Gold(value) {
-//         this.gold = value;
-//     }
-//
-//     get Gold() {
-//         return this.gold;
-//     }
-//
-//     get Animation() {
-//         return this.animation;
-//     }
-//
-//     set Position(value) {
-//         this.pos[0] = value.x;
-//         this.pos[1] = value.y;
-//     }
-//
-//     get Position() {
-//         return cc.v2(this.pos[0], this.pos[1]);
-//     }
-//
-//     set Direction(value) {
-//         this.direction = value;
-//     }
-//
-//     get Direction() {
-//         return this.direction;
-//     }
-//
-//     get sward() {
-//         return this.props.swardId;
-//     }
-//
-//     get shield() {
-//         return this.props.shieldId;
-//     }
-//
-//     clearEquip() {
-//         this.props.swardId = 0;
-//         this.props.shieldId = 0;
-//     }
-//
-//     getProp(id: number | string) {
-//         if (this.props.prop[id]) {
-//             return this.props.prop[id];
-//         }
-//         return 0;
-//     }
-//
-//     addProp(id: number | string, count: number = 1) {
-//         let prop = DataManager.getJsonElement("prop", id);
-//         if (prop.type == 5) {
-//             this.props.swardId = id;
-//         } else if (prop.type == 6) {
-//             this.props.shieldId = id;
-//         } else if (!prop.consumption) {
-//             this.props.prop[id] = Util.clamp(this.getProp(id) + count, 0, Number.MAX_VALUE);
-//         }
-//     }
-//
-//     getProps() {
-//         return this.props.prop;
-//     }
-//
-//     recordTalk(npcId: number, chatStep: number | string) {
-//         if (this.props.prop[19]) {
-//             this.records.push({ npcId: npcId, chatStep: chatStep });
-//         }
-//     }
-//
-//     /** 是否拥有神圣盾，跟json绑定 */
-//     equipedDivineShield() {
-//         return this.props.shieldId == 17;
-//     }
-//
-//     load(info: any = null) {
-//         if (info) {
-//             this.hp = info.hp;
-//             this.attack = info.attack;
-//             this.defence = info.defence;
-//             this.gold = info.gold;
-//             this.animation = info.animation;
-//             this.pos = info.pos;
-//             this.direction = info.direction;
-//
-//             this.props = info.props || {};
-//             this.records = info.records || [];
-//         }
-//     }
-//
-//     getRecordTalk() {
-//         return this.records;
-//     }
-// }

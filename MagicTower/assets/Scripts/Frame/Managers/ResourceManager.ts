@@ -80,8 +80,8 @@ export class ResourceManager {
             });
             this.assets[type] = data;
         } else {
-            assets.forEach((asset) => {
-                data[asset.name] = asset;
+            assets.forEach((asset: any) => {
+                data[asset.name] = asset.json;
             });
             this.assets[type] = data;
         }

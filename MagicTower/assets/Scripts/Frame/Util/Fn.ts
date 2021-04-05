@@ -1,11 +1,18 @@
 import { js } from "cc";
+import { BaseData } from "../Base/BaseData";
 
 /** 功能模块 */
 export module Fn {
     export type Constructor<T = unknown> = new (...args: any[]) => T;
 
+    /** BaseData数据类集合 */
+    export const BASE_DATA_ASSEMBLE: any = {};
+
     export function registerClass(className: string) {
         return function (target: any) {
+            if (Object.getPrototypeOf(target) == BaseData) {
+                BASE_DATA_ASSEMBLE[className] = target;
+            }
             js.setClassName(className, target);
         };
     }

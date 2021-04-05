@@ -22,9 +22,15 @@ export class DataManager {
     }
 
     loadLocalStorage() {
-        for (let i = 0; i < localStorage.length; ++i) {
-            let key = localStorage.key(i);
-            this.loadData(key, localStorage.getItem(key));
+        if (localStorage.length > 0) {
+            for (let i = 0; i < localStorage.length; ++i) {
+                let key = localStorage.key(i);
+                this.loadData(key, localStorage.getItem(key));
+            }
+        } else {
+            for (let key in Fn.BASE_DATA_ASSEMBLE) {
+                this.loadData(key, null);
+            }
         }
     }
 
