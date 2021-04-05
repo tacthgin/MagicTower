@@ -7,6 +7,10 @@ enum HeroAttr {
     GOLD,
 }
 
+export enum HeroEvent {
+    HERO_ATTR,
+}
+
 export default class HeroData extends CustomEventTarget {
     private heroAttr: number[] = [];
     private animation: string[] = null;
@@ -25,6 +29,7 @@ export default class HeroData extends CustomEventTarget {
 
     setAttrDiff(attr: HeroAttr, diff: number) {
         this.heroAttr[attr] += diff;
+        this.emit(HeroEvent.HERO_ATTR, attr, this.heroAttr[attr]);
     }
 
     clearEquip() {
