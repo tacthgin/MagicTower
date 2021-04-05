@@ -27,7 +27,7 @@ export abstract class ActionComponent extends Component {
 }
 
 /** 无弹窗动作 */
-@Fn.registerClass("NoneAction")
+//@Fn.registerClass("NoneAction")
 class NoneAction extends ActionComponent {
     public executeStartAction() {}
     public executeEndAction() {
@@ -36,7 +36,7 @@ class NoneAction extends ActionComponent {
 }
 
 /** 弹窗缩放 从小到大，从大到小 */
-@Fn.registerClass("ScaleAction")
+//@Fn.registerClass("ScaleAction")
 class ScaleAction extends ActionComponent {
     public executeStartAction() {
         tween(this._dialogContentNode)
