@@ -1,13 +1,14 @@
 import { Component, Enum, EventTouch, Node, UITransform, view, _decorator } from "cc";
 import { ActionComponent } from "../Components/ActionComponent";
 import { DialogAction } from "../Constant/BaseContant";
+import { GameManager } from "../Managers/GameManager";
 
 const { ccclass, property } = _decorator;
 
 Enum(DialogAction);
 
 @ccclass("BaseDialog")
-export default class BaseDialog extends Component {
+export abstract class BaseDialog extends Component {
     @property({
         tooltip: "背景区域，用于做点击关闭，及事件屏蔽",
     })
@@ -78,9 +79,15 @@ export default class BaseDialog extends Component {
         event.propagationStopped = true;
     }
 
-    private addActionComponent() {
+    private getActionComponent() {
         let actionComponent: any = ActionComponent.getActionComponent(this.actionType);
-        if (!this.getComponent(actionComponent)) {
+        return this.getComponent<ActionComponent>(actionComponent);
+    }
+
+    private addActionComponent() {
+        let actionComponent: any = this.getActionComponent();
+        if (!actionComponent) {
+            actionComponent = ActionComponent.getActionComponent(this.actionType);
             let component: ActionComponent = this.addComponent(actionComponent);
             if (component) {
                 component.endActionCallback = this.closeCallback;
@@ -90,6 +97,7 @@ export default class BaseDialog extends Component {
     }
 
     private closeCallback() {
+        GameManager.UI.closeDialogCallback(this.node.name);
         this.unscheduleAllCallbacks();
         if (this.closeWithDestroy) {
             this.node.destroy();
@@ -101,10 +109,16 @@ export default class BaseDialog extends Component {
     /** 关闭弹窗 */
     protected close(useAction: boolean = true) {
         if (useAction) {
-            let actionComponent: any = ActionComponent.getActionComponent(this.actionType);
-            this.getComponent<ActionComponent>(actionComponent).executeEndAction();
+            this.getActionComponent().executeEndAction();
         } else {
             this.closeCallback();
         }
     }
+
+    /** 执行弹窗打开动作 */
+    executeStartAction() {
+        this.getActionComponent().executeStartAction();
+    }
+
+    abstract init(...args: any[]): void;
 }

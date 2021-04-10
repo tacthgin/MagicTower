@@ -1,4 +1,5 @@
-import { director, instantiate, js, NodePool, Prefab, resources, UITransform, Vec3, view } from "cc";
+import { director, instantiate, js, NodePool, Prefab, resources, UITransform, Vec3, view, Node } from "cc";
+import { BaseDialog } from "../Base/BaseDialog";
 import { BasePoolNode } from "../Base/BasePoolNode";
 import { ColorToast, ToastType } from "../Components/ColorToast";
 
@@ -6,6 +7,11 @@ enum UIPrefabPath {
     TOAST_PATH = "Prefabs/Base/ColorToast",
     DIALOGS_PATH = "Prefabs/Dialogs",
 }
+
+type DialogQueueInfo = {
+    dialogName: string;
+    args: any[];
+};
 
 /** UI管理器 */
 export class UIManager {
@@ -20,6 +26,8 @@ export class UIManager {
     private dialogCache: any = {};
     /** 弹窗名字对应的路径 */
     private dialogPath: any = {};
+    /** 弹窗优先级队列 */
+    private dialogQueue: DialogQueueInfo[] = [];
 
     init() {
         this.toastY = view.getFrameSize().height * 0.75;
@@ -117,8 +125,37 @@ export class UIManager {
             dialogNode = this.createDialog(dialogPrefab);
         }
         dialogNode.active = true;
-        let control = dialogNode.getComponent(js.getClassByName(dialogName));
-        control && control.init && control.init(...args);
+        let control: BaseDialog = dialogNode.getComponent(js.getClassByName(dialogName));
+        if (control) {
+            control.init(...args);
+            control.executeStartAction();
+        }
         return dialogNode;
+    }
+
+    /**
+     * 通过队列顺序显示弹窗
+     * @param dialogName 弹窗名字
+     * @param args 弹窗初始化数据
+     */
+    showDialogWithQueue(dialogName: string, ...args: any[]): void {
+        this.dialogQueue.push({
+            dialogName: dialogName,
+            args: args,
+        });
+        if (this.dialogQueue.length == 1) {
+            let queueInfo = this.dialogQueue[0];
+            this.showDialog(queueInfo.dialogName, queueInfo.args);
+        }
+    }
+
+    /** 弹窗关闭回调 */
+    closeDialogCallback(dialogName: string) {
+        let first = this.dialogQueue[0];
+        if (first && first.dialogName === dialogName) {
+            this.dialogQueue.shift();
+            first = this.dialogQueue[0];
+            first && this.showDialog(first.dialogName, first.args);
+        }
     }
 }

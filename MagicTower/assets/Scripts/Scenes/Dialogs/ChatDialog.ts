@@ -1,5 +1,5 @@
 import { _decorator, Label } from "cc";
-import BaseDialog from "../../Frame/Base/BaseDialog";
+import { BaseDialog } from "../../Frame/Base/BaseDialog";
 const { ccclass, property } = _decorator;
 
 @ccclass("ChatDialog")
@@ -32,7 +32,7 @@ export default class ChatDialog extends BaseDialog {
 /**
  * Note: The original script has been commented out, due to the large number of changes in the script, there may be missing in the conversion, you need to convert it manually
  */
-// import BaseDialog from "./BaseDialog";
+// import {BaseDialog} from "./BaseDialog";
 //
 // const { ccclass, property } = cc._decorator;
 //

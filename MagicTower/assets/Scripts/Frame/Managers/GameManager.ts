@@ -1,4 +1,4 @@
-import { Component, game, _decorator } from "cc";
+import { Component, director, game, _decorator } from "cc";
 import { BaseEvent } from "../Constant/BaseContant";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
@@ -95,5 +95,10 @@ export class GameManager extends Component {
         //     cc.PhysicsManager.DrawBits.e_shapeBit
         //cc.director.getCollisionManager().enabled = true;
         //cc.director.getCollisionManager().enabledDebugDraw = true;
+    }
+
+    loadScene(sceneName: string) {
+        this.audioController.stopMusic();
+        director.loadScene(sceneName);
     }
 }

@@ -1,5 +1,5 @@
 import { _decorator, Toggle } from "cc";
-import BaseDialog from "../../Frame/Base/BaseDialog";
+import { BaseDialog } from "../../Frame/Base/BaseDialog";
 
 const { ccclass, property } = _decorator;
 
@@ -49,7 +49,7 @@ export default class SettingDialog extends BaseDialog {
  */
 // import { DataManager } from "../../Managers/DataManager";
 // import { SoundManager } from "../../Managers/SoundManager";
-// import BaseDialog from "./BaseDialog";
+// import {BaseDialog} from "./BaseDialog";
 //
 // const { ccclass, property } = cc._decorator;
 //

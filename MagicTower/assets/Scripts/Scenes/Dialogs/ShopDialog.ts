@@ -1,5 +1,5 @@
 import { Button, Label, _decorator } from "cc";
-import BaseDialog from "../../Frame/Base/BaseDialog";
+import { BaseDialog } from "../../Frame/Base/BaseDialog";
 import ShopInfo from "../Data/ShopInfo";
 const { ccclass, property } = _decorator;
 
@@ -38,7 +38,7 @@ export default class ShopDialog extends BaseDialog {
 /**
  * Note: The original script has been commented out, due to the large number of changes in the script, there may be missing in the conversion, you need to convert it manually
  */
-// import BaseDialog from "./BaseDialog";
+// import {BaseDialog} from "./BaseDialog";
 // import Npc from "../Game/Elements/Npc";
 // import { NotifyCenter } from "../../Managers/NotifyCenter";
 // import { GameEvent } from "../../Constant/GameEvent";

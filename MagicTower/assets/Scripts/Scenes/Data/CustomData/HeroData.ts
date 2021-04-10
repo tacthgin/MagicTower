@@ -1,3 +1,4 @@
+import { js } from "cc";
 import { BaseData } from "../../../Frame/Base/BaseData";
 import { GameManager } from "../../../Frame/Managers/GameManager";
 import { Fn } from "../../../Frame/Util/Fn";

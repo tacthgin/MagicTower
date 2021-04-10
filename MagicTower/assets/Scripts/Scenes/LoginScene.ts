@@ -1,11 +1,9 @@
-import { Component, director, Label, _decorator } from "cc";
-import { BaseData } from "../Frame/Base/BaseData";
+import { Component, Label, _decorator } from "cc";
 import { BaseEvent } from "../Frame/Constant/BaseContant";
 import { GameManager } from "../Frame/Managers/GameManager";
 import { NotifyCenter } from "../Frame/Managers/NotifyCenter";
 import { ResourceType } from "../Frame/Managers/ResourceManager";
 import { JsonParserMap } from "./Constant/JsonParserMap";
-import { HeroData } from "./Data/CustomData/HeroData";
 
 const { ccclass, property } = _decorator;
 
@@ -43,6 +41,6 @@ export default class LoginScene extends Component {
         //cc.director.loadScene("GameScene");
         //});
         //});
-        director.loadScene("GameScene");
+        GameManager.getInstance().loadScene("GameScene");
     }
 }
