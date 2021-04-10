@@ -1,5 +1,5 @@
 import { js } from "cc";
-import JsonParser from "../Base/JsonParser";
+import { JsonParser } from "../Base/JsonParser";
 import { Fn } from "../Util/Fn";
 
 export class DataManager {

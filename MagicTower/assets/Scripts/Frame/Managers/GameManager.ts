@@ -81,6 +81,7 @@ export class GameManager extends Component {
             this.dataManager.loadJsonAssets(this.resourceManager.getAssets(type));
         }
     }
+<<<<<<< Updated upstream
 
     /** 初始化物理相关 */
     initPhysics() {
@@ -101,4 +102,6 @@ export class GameManager extends Component {
         this.audioController.stopMusic();
         director.loadScene(sceneName);
     }
+=======
+>>>>>>> Stashed changes
 }

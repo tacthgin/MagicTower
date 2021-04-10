@@ -4,7 +4,7 @@ import { Fn } from "../Util/Fn";
 const { ccclass } = _decorator;
 
 @ccclass("JsonParser")
-export default class JsonParser {
+export class JsonParser {
     protected nativeAsset: object = null;
 
     parseJson(jsonAsset: object) {

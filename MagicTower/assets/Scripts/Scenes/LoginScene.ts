@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import { Component, Label, _decorator } from "cc";
+=======
+import { Component, director, Label, _decorator } from "cc";
+>>>>>>> Stashed changes
 import { BaseEvent } from "../Frame/Constant/BaseContant";
 import { GameManager } from "../Frame/Managers/GameManager";
 import { NotifyCenter } from "../Frame/Managers/NotifyCenter";
@@ -28,7 +32,7 @@ export default class LoginScene extends Component {
     }
 
     onResouceProgress(type: ResourceType, progress: number) {
-        this.progressLabel.string = `资源加载中，${progress}...`;
+        this.progressLabel.string = `资源加载中，${progress * 100}%...`;
     }
 
     gotoGameScene() {
