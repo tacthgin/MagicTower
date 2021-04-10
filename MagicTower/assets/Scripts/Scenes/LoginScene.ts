@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
 import { Component, Label, _decorator } from "cc";
-=======
-import { Component, director, Label, _decorator } from "cc";
->>>>>>> Stashed changes
 import { BaseEvent } from "../Frame/Constant/BaseContant";
 import { GameManager } from "../Frame/Managers/GameManager";
 import { NotifyCenter } from "../Frame/Managers/NotifyCenter";
