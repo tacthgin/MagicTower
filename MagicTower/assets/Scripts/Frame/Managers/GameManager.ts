@@ -1,4 +1,4 @@
-import { Component, director, game, _decorator } from "cc";
+import { Component, director, game, UITransform, _decorator } from "cc";
 import { BaseEvent } from "../Constant/BaseContant";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
@@ -13,6 +13,10 @@ const { ccclass, type } = _decorator;
 export class GameManager extends Component {
     @type(AudioController)
     private audioController: AudioController = null;
+    @type(Node)
+    private dialogLayer: Node = null;
+    @type(Node)
+    private toastLayer: Node = null;
 
     private uiManager: UIManager = null;
 
@@ -61,6 +65,7 @@ export class GameManager extends Component {
         }
         GameManager.instance = this;
         game.addPersistRootNode(this.node);
+        this.node.getComponent(UITransform).priority = 1;
         this.init();
     }
 
@@ -70,7 +75,7 @@ export class GameManager extends Component {
 
     /** 游戏的初始化 */
     private init() {
-        this.uiManager = new UIManager().init();
+        this.uiManager = new UIManager().init(this.dialogLayer, this.toastLayer);
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager().init();
         this.registerEvents();
@@ -81,7 +86,6 @@ export class GameManager extends Component {
             this.dataManager.loadJsonAssets(this.resourceManager.getAssets(type));
         }
     }
-<<<<<<< Updated upstream
 
     /** 初始化物理相关 */
     initPhysics() {
@@ -102,6 +106,4 @@ export class GameManager extends Component {
         this.audioController.stopMusic();
         director.loadScene(sceneName);
     }
-=======
->>>>>>> Stashed changes
 }

@@ -15,10 +15,8 @@ type DialogQueueInfo = {
 
 /** UI管理器 */
 export class UIManager {
-    /** 弹窗起始优先级 */
-    private DIALOG_PRIORITY: number = 255;
-    /** toast优先级 */
-    private TOAST_PRIORITY: number = 512;
+    /** 弹窗层，toast层等 */
+    private layers: Node[] = [];
     /** toast对象池 */
     private toastPool: NodePool = new NodePool("ColorToast");
     private toastY: number = 0;
@@ -47,7 +45,6 @@ export class UIManager {
         let toast = BasePoolNode.generateNodeFromPool(this.toastPool, prefab);
         toast.position = new Vec3(0, this.toastY, 0);
         toast.parent = this.getCanvas();
-        toast.getComponent(UITransform).priority = this.TOAST_PRIORITY;
         return toast;
     }
 
@@ -55,7 +52,6 @@ export class UIManager {
         let dialog = instantiate(prefab);
         dialog.position = Vec3.ZERO;
         dialog.parent = this.getCanvas();
-        dialog.getComponent(UITransform).priority = this.DIALOG_PRIORITY;
         return dialog;
     }
 
