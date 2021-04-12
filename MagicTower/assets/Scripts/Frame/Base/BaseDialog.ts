@@ -1,14 +1,15 @@
-import { Component, Enum, EventTouch, Node, UITransform, view, _decorator } from "cc";
+import { Enum, EventTouch, Node, UITransform, view, _decorator } from "cc";
 import { ActionComponent } from "../Components/ActionComponent";
 import { DialogAction } from "../Constant/BaseContant";
 import { GameManager } from "../Managers/GameManager";
+import { BaseComponent } from "./BaseComponent";
 
 const { ccclass, property } = _decorator;
 
 Enum(DialogAction);
 
 @ccclass("BaseDialog")
-export class BaseDialog extends Component {
+export class BaseDialog extends BaseComponent {
     @property({
         tooltip: "背景区域，用于做点击关闭，及事件屏蔽",
     })
@@ -112,11 +113,14 @@ export class BaseDialog extends Component {
         if (useAction) {
             if (!actionComponent.actionRunning) {
                 this.getActionComponent().executeEndAction();
+                return true;
             }
         } else {
             actionComponent.resetAction();
             this.closeCallback();
+            return true;
         }
+        return false;
     }
 
     /** 执行弹窗打开动作 */

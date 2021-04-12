@@ -39,7 +39,14 @@ export class UIManager {
             let name = info.path.substring(info.path.lastIndexOf("/") + 1);
             this.dialogPath[name] = info.path;
         });
+
         this.layers = layers;
+        //初始化各个layer位置
+        let frameSize = view.getFrameSize();
+        let center = new Vec3(frameSize.width * 0.5, frameSize.height * 0.5);
+        this.layers.forEach((layer) => {
+            layer.position = center;
+        });
         return this;
     }
 

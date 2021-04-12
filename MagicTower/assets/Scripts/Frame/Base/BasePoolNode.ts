@@ -1,9 +1,10 @@
-import { Component, instantiate, Node, NodePool, Prefab, _decorator } from "cc";
+import { instantiate, Node, NodePool, Prefab, _decorator } from "cc";
+import { BaseComponent } from "./BaseComponent";
 const { ccclass } = _decorator;
 
 /** 对象池节点 */
 @ccclass("BasePoolNode")
-export class BasePoolNode extends Component {
+export class BasePoolNode extends BaseComponent {
     protected pool: NodePool = null;
 
     /**
