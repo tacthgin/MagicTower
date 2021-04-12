@@ -1,4 +1,4 @@
-import { Component, director, game, UITransform, _decorator } from "cc";
+import { Component, director, game, UITransform, _decorator, Node } from "cc";
 import { BaseEvent } from "../Constant/BaseContant";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
@@ -75,7 +75,7 @@ export class GameManager extends Component {
 
     /** 游戏的初始化 */
     private init() {
-        this.uiManager = new UIManager().init(this.dialogLayer, this.toastLayer);
+        this.uiManager = new UIManager().init([this.dialogLayer, this.toastLayer]);
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager().init();
         this.registerEvents();
@@ -104,6 +104,7 @@ export class GameManager extends Component {
 
     loadScene(sceneName: string) {
         this.audioController.stopMusic();
+        this.uiManager.clearLayers();
         director.loadScene(sceneName);
     }
 }

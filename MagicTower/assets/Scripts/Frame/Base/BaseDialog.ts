@@ -8,7 +8,7 @@ const { ccclass, property } = _decorator;
 Enum(DialogAction);
 
 @ccclass("BaseDialog")
-export abstract class BaseDialog extends Component {
+export class BaseDialog extends Component {
     @property({
         tooltip: "背景区域，用于做点击关闭，及事件屏蔽",
     })
@@ -107,10 +107,14 @@ export abstract class BaseDialog extends Component {
     }
 
     /** 关闭弹窗 */
-    protected close(useAction: boolean = true) {
+    close(useAction: boolean = true) {
+        let actionComponent = this.getActionComponent();
         if (useAction) {
-            this.getActionComponent().executeEndAction();
+            if (!actionComponent.actionRunning) {
+                this.getActionComponent().executeEndAction();
+            }
         } else {
+            actionComponent.resetAction();
             this.closeCallback();
         }
     }
@@ -120,5 +124,5 @@ export abstract class BaseDialog extends Component {
         this.getActionComponent().executeStartAction();
     }
 
-    abstract init(...args: any[]): void;
+    init(...args: any[]) {}
 }

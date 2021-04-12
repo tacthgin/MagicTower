@@ -1,4 +1,4 @@
-import { Component, js, Node, tween, Vec3 } from "cc";
+import { Component, js, Node, Tween, tween, TweenSystem, Vec3 } from "cc";
 import { DialogAction } from "../Constant/BaseContant";
 import { Fn } from "../Util/Fn";
 
@@ -18,16 +18,32 @@ export abstract class ActionComponent extends Component {
         this._dialogContentNode = node;
     }
 
+    public get actionRunning() {
+        let extraFlag = false;
+        if (this._extraNodes[0]) {
+            extraFlag = TweenSystem.instance.ActionManager.getNumberOfRunningActionsInTarget(this._extraNodes[0]) > 0;
+        }
+        let flag = TweenSystem.instance.ActionManager.getNumberOfRunningActionsInTarget(this._dialogContentNode) > 0;
+        return flag || extraFlag;
+    }
+
     public abstract executeStartAction(): void;
     public abstract executeEndAction(): void;
 
     static getActionComponent(dialogAction: DialogAction) {
         return js.getClassByName(DialogAction[dialogAction]);
     }
+
+    resetAction() {
+        for (let i = 0; i < this._extraNodes.length; i++) {
+            Tween.stopAllByTarget(this._extraNodes[i]);
+        }
+        Tween.stopAllByTarget(this.dialogContentNode);
+    }
 }
 
 /** 无弹窗动作 */
-//@Fn.registerClass("NoneAction")
+@Fn.registerClass("NoneAction")
 class NoneAction extends ActionComponent {
     public executeStartAction() {}
     public executeEndAction() {
@@ -36,7 +52,7 @@ class NoneAction extends ActionComponent {
 }
 
 /** 弹窗缩放 从小到大，从大到小 */
-//@Fn.registerClass("ScaleAction")
+@Fn.registerClass("ScaleAction")
 class ScaleAction extends ActionComponent {
     public executeStartAction() {
         tween(this._dialogContentNode)
