@@ -1,5 +1,5 @@
 import { Node, _decorator } from "cc";
-import { BaseDialog } from "../../Frame/Base/BaseDialog";
+import { BaseDialog } from "../../Framework/Base/BaseDialog";
 import Monster from "../Game/Elements/Monster";
 const { ccclass, property } = _decorator;
 

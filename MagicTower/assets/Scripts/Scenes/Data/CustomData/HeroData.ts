@@ -1,8 +1,8 @@
 import { js } from "cc";
-import { BaseData } from "../../../Frame/Base/BaseData";
-import { GameManager } from "../../../Frame/Managers/GameManager";
-import { Fn } from "../../../Frame/Util/Fn";
-import { Util } from "../../../Frame/Util/Util";
+import { BaseData } from "../../../Framework/Base/BaseData";
+import { GameManager } from "../../../Framework/Managers/GameManager";
+import { Fn } from "../../../Framework/Util/Fn";
+import { Util } from "../../../Framework/Util/Util";
 
 export enum HeroAttr {
     HP,

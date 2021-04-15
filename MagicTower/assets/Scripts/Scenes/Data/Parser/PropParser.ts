@@ -1,5 +1,5 @@
 import { _decorator } from "cc";
-import JsonParser from "../../../Frame/Base/JsonParser";
+import JsonParser from "../../../Framework/Base/JsonParser";
 
 const { ccclass } = _decorator;
 

@@ -1,7 +1,7 @@
 import { _decorator, Label, Node } from "cc";
 const { ccclass, property } = _decorator;
 
-import { BaseDialog } from "../../Frame/Base/BaseDialog";
+import { BaseDialog } from "../../Framework/Base/BaseDialog";
 import Npc from "../Game/Elements/Npc";
 import { DataManager } from "../../Managers/DataManager";
 

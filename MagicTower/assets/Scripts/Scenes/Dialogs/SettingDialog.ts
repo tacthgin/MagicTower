@@ -1,5 +1,5 @@
 import { _decorator, Toggle } from "cc";
-import { BaseDialog } from "../../Frame/Base/BaseDialog";
+import { BaseDialog } from "../../Framework/Base/BaseDialog";
 
 const { ccclass, property } = _decorator;
 

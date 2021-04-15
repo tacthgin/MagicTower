@@ -1,5 +1,5 @@
 import { Button, Label, _decorator } from "cc";
-import { BaseDialog } from "../../Frame/Base/BaseDialog";
+import { BaseDialog } from "../../Framework/Base/BaseDialog";
 import ShopInfo from "../Data/ShopInfo";
 const { ccclass, property } = _decorator;
 
