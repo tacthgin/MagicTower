@@ -6,7 +6,14 @@ const { ccclass, property } = _decorator;
 @ccclass("MonsterHandBook")
 export default class MonsterHandBook extends BaseDialog {
     @property(Node)
-    content: Node | null = null;
+    private content: Node = null;
+
+    onDisable() {
+        this.content.children.forEach((item) => {
+            item.getComponent(MonsterHandBookItem).remove();
+        });
+    }
+
     init(monsters: Monster[]) {
         //for (let i = 0; i < monsters.length; i++) {
         //let item = ElementManager.getElement("MonsterHandBookItem");
@@ -14,12 +21,6 @@ export default class MonsterHandBook extends BaseDialog {
         //item.parent = this.content;
         //item.getComponent("MonsterHandBookItem").init(monsters[i]);
         //}
-    }
-    close() {
-        //this.content.children.forEach(item => {
-        //item.getComponent("MonsterHandBookItem").recyle();
-        //});
-        //super.close();
     }
 }
 
