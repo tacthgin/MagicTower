@@ -1,5 +1,5 @@
 import { Asset, assetManager, AudioClip, JsonAsset, Prefab, resources, SpriteFrame, TiledMap } from "cc";
-import { BaseEvent } from "../Constant/BaseContant";
+import { BaseEvent } from "../Base/BaseContant";
 import { Fn } from "../Util/Fn";
 import { NotifyCenter } from "./NotifyCenter";
 
@@ -108,16 +108,23 @@ export class ResourceManager {
     }
 
     getAsset<T extends Asset>(type: ResourceType | Fn.Constructor<T>, path: string): T {
+        let asset = null;
         if (typeof type == "string") {
-            return this.assets[type][`${type}/${path}`] || null;
+            asset = this.assets[type][`${type}/${path}`];
         } else {
             for (let typeName in this.resourceAssetConfig) {
-                if (this.resourceAssetConfig[typeName] instanceof type) {
-                    return this.assets[typeName][`${typeName}/${path}`] || null;
+                if (this.resourceAssetConfig[typeName] == type) {
+                    asset = this.assets[typeName][`${typeName}/${path}`];
+                    break;
                 }
             }
         }
 
-        return null;
+        if (!asset) {
+            console.warn("找不到资源", path);
+            return null;
+        }
+
+        return asset;
     }
 }

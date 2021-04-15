@@ -1,5 +1,5 @@
 import { Component, director, game, UITransform, _decorator, Node } from "cc";
-import { BaseEvent } from "../Constant/BaseContant";
+import { BaseEvent } from "../Base/BaseContant";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
 import { NodePoolManager } from "./NodePoolManager";
@@ -22,6 +22,7 @@ export class GameManager extends Component {
     private dataManager: DataManager = null;
     private resourceManager: ResourceManager = null;
     private nodePoolManager: NodePoolManager = null;
+    private netManager: NodePoolManager = null;
     private static instance: GameManager;
 
     /** GameManager 实例 */
@@ -54,6 +55,11 @@ export class GameManager extends Component {
         return GameManager.instance.nodePoolManager;
     }
 
+    /** 对象池管理 */
+    public static get NET() {
+        return GameManager.instance.netManager;
+    }
+
     onLoad() {
         if (GameManager.instance) {
             this.node.destroy();
@@ -74,6 +80,7 @@ export class GameManager extends Component {
         this.uiManager = new UIManager().init([this.dialogLayer, this.toastLayer]);
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager().init();
+        this.nodePoolManager = new NodePoolManager();
         this.registerEvents();
     }
 
