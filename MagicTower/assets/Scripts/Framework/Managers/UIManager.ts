@@ -21,7 +21,7 @@ type DialogQueueInfo = {
 /** UI管理器 */
 export class UIManager {
     /** 弹窗层，toast层等 */
-    private layers: Node[] = [];
+    private layers: Node[] = null;
     /** toast对象池 */
     private toastPool: NodePool = new NodePool("ColorToast");
     private toastY: number = 0;

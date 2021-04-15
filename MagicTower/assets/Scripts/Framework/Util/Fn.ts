@@ -1,4 +1,5 @@
 import { js } from "cc";
+import { DEBUG } from "cc/env";
 import { BaseData } from "../Base/BaseData";
 
 /** 功能模块 */
@@ -47,5 +48,16 @@ export module Fn {
         }
 
         return null;
+    }
+
+    /** 打印堆栈 */
+    export function printCallStack() {
+        if (DEBUG) {
+            try {
+                throw new Error("");
+            } catch (e) {
+                console.log(e.stack);
+            }
+        }
     }
 }

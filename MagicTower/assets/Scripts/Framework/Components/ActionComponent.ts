@@ -1,5 +1,5 @@
 import { Component, js, Node, Tween, tween, TweenSystem, Vec3 } from "cc";
-import { DialogAction } from "../Constant/BaseContant";
+import { DialogAction } from "../Base/BaseContant";
 import { Fn } from "../Util/Fn";
 
 /** 结点消失的时候动作回调 */

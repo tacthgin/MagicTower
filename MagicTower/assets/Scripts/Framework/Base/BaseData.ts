@@ -5,6 +5,7 @@ export abstract class BaseData extends CustomEventTarget {
     /** 需要缓存到本地的数据 */
     protected data: any = {};
 
+    /** 设置代理，给数据赋值自动保存 */
     protected createProxy<T extends object>(data: T) {
         return new Proxy<T>(data, {
             set: (obj, prop, newval) => {

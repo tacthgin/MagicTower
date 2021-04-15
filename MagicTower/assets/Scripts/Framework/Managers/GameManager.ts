@@ -19,13 +19,9 @@ export class GameManager extends Component {
     private toastLayer: Node = null;
 
     private uiManager: UIManager = null;
-
     private dataManager: DataManager = null;
-
     private resourceManager: ResourceManager = null;
-
     private nodePoolManager: NodePoolManager = null;
-
     private static instance: GameManager;
 
     /** GameManager 实例 */

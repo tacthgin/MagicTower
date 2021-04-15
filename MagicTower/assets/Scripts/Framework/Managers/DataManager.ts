@@ -6,7 +6,7 @@ export class DataManager {
     /** 存储json解析器 */
     private jsonParserMap: any = {};
     /** json对应的解析器 */
-    private jsonToParser: any = {};
+    private jsonToParser: any = null;
     /** 解析器对应的json名字 */
     private parserToJson: any = {};
     /** 自定义数据 */
@@ -21,6 +21,7 @@ export class DataManager {
         return typeOrClassName;
     }
 
+    /** 加载本地缓存 */
     loadLocalStorage() {
         if (localStorage.length > 0) {
             for (let i = 0; i < localStorage.length; ++i) {
