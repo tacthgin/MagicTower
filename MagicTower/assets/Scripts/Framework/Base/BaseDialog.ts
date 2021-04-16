@@ -111,16 +111,11 @@ export class BaseDialog extends BaseComponent {
     close(useAction: boolean = true) {
         let actionComponent = this.getActionComponent();
         if (useAction) {
-            if (!actionComponent.actionRunning) {
-                this.getActionComponent().executeEndAction();
-                return true;
-            }
+            this.getActionComponent().executeEndAction();
         } else {
             actionComponent.resetAction();
             this.closeCallback();
-            return true;
         }
-        return false;
     }
 
     /** 执行弹窗打开动作 */

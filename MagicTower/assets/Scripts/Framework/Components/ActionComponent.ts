@@ -1,14 +1,15 @@
-import { Component, js, Node, Tween, tween, TweenSystem, Vec3 } from "cc";
+import { Component, js, Node, Tween, tween, Vec3 } from "cc";
 import { DialogAction } from "../Base/BaseContant";
 import { Fn } from "../Util/Fn";
 
 /** 结点消失的时候动作回调 */
 export abstract class ActionComponent extends Component {
-    protected _endActionCallback: () => void = null;
-
+    protected _endActionCallback: Function = null;
     protected _dialogContentNode: Node = null;
     /** 额外参与动作的节点 */
     protected _extraNodes: Node[] = [];
+    /** 结束动作完成 */
+    protected _isEndActionOver: boolean = true;
 
     public set endActionCallback(callback: any) {
         this._endActionCallback = callback;
@@ -18,15 +19,6 @@ export abstract class ActionComponent extends Component {
         this._dialogContentNode = node;
     }
 
-    public get actionRunning() {
-        let extraFlag = false;
-        if (this._extraNodes[0]) {
-            extraFlag = TweenSystem.instance.ActionManager.getNumberOfRunningActionsInTarget(this._extraNodes[0]) > 0;
-        }
-        let flag = TweenSystem.instance.ActionManager.getNumberOfRunningActionsInTarget(this._dialogContentNode) > 0;
-        return flag || extraFlag;
-    }
-
     public abstract executeStartAction(): void;
     public abstract executeEndAction(): void;
 
@@ -34,11 +26,13 @@ export abstract class ActionComponent extends Component {
         return js.getClassByName(DialogAction[dialogAction]);
     }
 
-    resetAction() {
-        for (let i = 0; i < this._extraNodes.length; i++) {
-            Tween.stopAllByTarget(this._extraNodes[i]);
-        }
-        Tween.stopAllByTarget(this.dialogContentNode);
+    protected executeEndActionCallback() {
+        this._endActionCallback();
+        this._isEndActionOver = true;
+    }
+
+    public resetAction() {
+        this._isEndActionOver = true;
     }
 }
 
@@ -47,7 +41,7 @@ export abstract class ActionComponent extends Component {
 class NoneAction extends ActionComponent {
     public executeStartAction() {}
     public executeEndAction() {
-        this._endActionCallback();
+        this.executeEndActionCallback();
     }
 }
 
