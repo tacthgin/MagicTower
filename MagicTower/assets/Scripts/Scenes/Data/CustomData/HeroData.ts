@@ -15,6 +15,7 @@ export enum PropType {
     SHIELD,
     /** 神圣盾 */
     DIVINE_SHIELD = 17,
+    RECORD_BOOK = 19,
 }
 
 export enum HeroEvent {
@@ -100,7 +101,7 @@ export class HeroData extends BaseData {
     }
 
     recordTalk(npcID: number, chatStep: number) {
-        if (this.data.props.prop[19]) {
+        if (this.data.props.prop[PropType.RECORD_BOOK]) {
             this.data.records.push({ npcID: npcID, chatStep: chatStep });
         }
     }
