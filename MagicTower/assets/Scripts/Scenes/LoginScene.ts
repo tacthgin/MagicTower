@@ -31,16 +31,8 @@ export default class LoginScene extends Component {
         this.progressLabel.string = `资源加载中，${progress * 100}%...`;
     }
 
-    gotoGameScene() {
-        //ElementManager.loadRes((success: boolean) => {
-        //cc.director.preloadScene("GameScene", null, (error: Error, asset: cc.SceneAsset) => {
-        //if (error) {
-        //cc.error(error.message);
-        //return;
-        //}
-        //cc.director.loadScene("GameScene");
-        //});
-        //});
+    async gotoGameScene() {
+        await GameManager.RESOURCE.loadPrefabDir("Elements");
         GameManager.getInstance().loadScene("GameScene");
     }
 }

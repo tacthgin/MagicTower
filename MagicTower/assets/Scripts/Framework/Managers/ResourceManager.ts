@@ -13,14 +13,18 @@ export enum ResourceType {
 export class ResourceManager {
     /** 所有类型资源 */
     private assets: any = {};
+    /** 预加载资源 */
     private resourcePromises: Promise<any>[] = [];
-    private resourceAssetConfig: any = {
+    private resourceAssetConfig: Readonly<any> = {
         [ResourceType.JSON]: JsonAsset,
         [ResourceType.SPRITE]: SpriteFrame,
         [ResourceType.AUIDO]: AudioClip,
         [ResourceType.TILED_MAP]: TiledMap,
     };
+    /** 预加载资源完成个数 */
     private resourceCompleteCount: number = 0;
+    /** 预加载预设 */
+    private preloadPrefabs: any = {};
 
     init() {
         for (let type in ResourceType) {
@@ -126,5 +130,29 @@ export class ResourceManager {
         }
 
         return asset;
+    }
+
+    loadPrefabDir(path: string) {
+        return new Promise((resolve, reject) => {
+            if (resources.get(path)) {
+                resolve(path);
+            } else {
+                resources.loadDir(path, Prefab, (err, assets) => {
+                    if (err) {
+                        console.error(err);
+                        reject("加载预设失败");
+                        return;
+                    }
+                    resolve(path);
+                    assets.forEach((asset) => {
+                        this.preloadPrefabs[asset.name] = asset;
+                    });
+                });
+            }
+        });
+    }
+
+    getPrefab(name: string) {
+        return this.preloadPrefabs[name] || null;
     }
 }

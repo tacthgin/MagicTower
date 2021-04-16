@@ -1,4 +1,5 @@
 import { Vec2 } from "cc";
+
 /** A*节点 */
 class AstarNode {
     private _parent: AstarNode = null;
@@ -100,18 +101,20 @@ export class Astar {
     }
 
     /** 添加进关闭列表 */
-    private addToCLose(position: Vec2) {
+    private addToClose(position: Vec2) {
         this.closeList[this.getUniqeIndex(position)] = true;
     }
 
+    /** 插入进开放列表按f值排序 */
     private addToOpen(node: AstarNode) {
-        let index = -1;
+        let index = 0;
         for (let i = 0; i < this.openList.length; i++) {
             if (node.fValue < this.openList[i].fValue) {
                 index = i;
                 break;
             }
         }
+        this.openList.splice(index, 0, node);
     }
 
     private isInCloseList(position: Vec2) {
@@ -121,7 +124,7 @@ export class Astar {
     private addSquareNode(currentNode: AstarNode, endPos: Vec2) {
         if (currentNode) {
             //走过的节点放入关闭列表
-            this.addToCLose(currentNode.position);
+            this.addToClose(currentNode.position);
 
             Astar.SquarePositions.forEach((position) => {
                 let newPos = currentNode.add(position);
@@ -130,7 +133,7 @@ export class Astar {
                     if (this.map.isEmpty(newPos, endPos) && !this.contain(this.openList, newPos)) {
                         this.addToOpen(new AstarNode(newPos, this.estimateHValue(newPos, endPos), currentNode));
                     } else {
-                        this.addToCLose(newPos);
+                        this.addToClose(newPos);
                     }
                 }
             });

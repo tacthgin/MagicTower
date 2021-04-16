@@ -1,4 +1,3 @@
-import { js } from "cc";
 import { BaseData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
@@ -14,18 +13,25 @@ export enum HeroAttr {
 export enum PropType {
     SWARD = 5,
     SHIELD,
+    /** 神圣盾 */
+    DIVINE_SHIELD = 17,
 }
 
 export enum HeroEvent {
     HERO_ATTR,
 }
 
+type TalkInfo = {
+    npcID: number;
+    chatStep: number;
+};
+
 class _HeroData {
     public heroAttr: number[] = [];
     public animation: string[] = null;
     public pos: number[] = null;
     public direction: number = 0;
-    public records: any[] = [];
+    public records: TalkInfo[] = [];
     public props = {
         swardID: 0,
         shieldID: 0,
@@ -40,7 +46,7 @@ class _HeroData {
 
 @Fn.registerClass("HeroData")
 export class HeroData extends BaseData {
-    protected data: _HeroData = this.createProxy(new _HeroData());
+    protected data: _HeroData = new _HeroData();
 
     load(data: any = null) {
         if (data) {
@@ -48,6 +54,7 @@ export class HeroData extends BaseData {
         } else {
             this.data.load(GameManager.DATA.getJson("hero")[0]);
         }
+        this.data = this.createProxy(this.data);
     }
 
     getAttr(attr: HeroAttr) {
@@ -60,8 +67,8 @@ export class HeroData extends BaseData {
     }
 
     clearEquip() {
-        //this.data.props.swardID = 0;
-        //this.data.props.shieldID = 0;
+        this.data.props.swardID = 0;
+        this.data.props.shieldID = 0;
     }
 
     getProp(id: number | string) {
@@ -92,18 +99,17 @@ export class HeroData extends BaseData {
         return this.data.props.prop;
     }
 
-    recordTalk(npcId: number, chatStep: number | string) {
-        //if (this.data.props.prop[19]) {
-        //this.records.push({ npcId: npcId, chatStep: chatStep });
-        //}
+    recordTalk(npcID: number, chatStep: number) {
+        if (this.data.props.prop[19]) {
+            this.data.records.push({ npcID: npcID, chatStep: chatStep });
+        }
     }
 
-    /** 是否拥有神圣盾，跟json绑定 */
     equipedDivineShield() {
-        //return this.data.props.shieldID == 17;
+        return this.data.props.shieldID == PropType.DIVINE_SHIELD;
     }
 
     getRecordTalk() {
-        //return this.records;
+        return this.data.records;
     }
 }

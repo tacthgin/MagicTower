@@ -91,7 +91,7 @@ export class BaseDialog extends BaseComponent {
             actionComponent = ActionComponent.getActionComponent(this.actionType);
             let component: ActionComponent = this.addComponent(actionComponent);
             if (component) {
-                component.endActionCallback = this.closeCallback;
+                component.endActionCallback = this.closeCallback.bind(this);
                 component.dialogContentNode = this.dialogContent;
             }
         }

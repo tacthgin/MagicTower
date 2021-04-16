@@ -1,5 +1,6 @@
 import { RichText, tween, UITransform, Vec3, _decorator } from "cc";
 import { BasePoolNode } from "../Base/BasePoolNode";
+
 const { ccclass, property } = _decorator;
 
 const SHORTEST_LENGTH: number = 180;
