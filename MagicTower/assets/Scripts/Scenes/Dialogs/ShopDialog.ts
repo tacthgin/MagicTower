@@ -1,6 +1,6 @@
 import { Button, Label, _decorator } from "cc";
 import { BaseDialog } from "../../Framework/Base/BaseDialog";
-import ShopInfo from "../Data/ShopInfo";
+import { ShopData } from "../Data/CustomData/ShopData";
 const { ccclass, property } = _decorator;
 
 @ccclass("ShopDialog")
@@ -11,7 +11,7 @@ export default class ShopDialog extends BaseDialog {
     attr: Label[] = [];
     private callback: (attr: string) => void = null;
     private isGoldEnough: boolean = true;
-    init(shopInfo: ShopInfo, heroGold: number, callback: (attr: string) => void) {
+    init(shopInfo: ShopData, heroGold: number, callback: (attr: string) => void) {
         //this.clickBgClose = false;
         //this.content.string = `你若给我 ${shopInfo.needGold} 个金币，\n我就替你提升以下一种能力。`;
         //this.attr[0].string = `生命力 + ${shopInfo.hp}`;

@@ -10,6 +10,7 @@ export abstract class BaseData extends CustomEventTarget {
         return new Proxy<T>(data, {
             set: (obj, prop, newval) => {
                 obj[prop] = newval;
+                console.log(prop, newval);
                 this.save();
                 return true;
             },

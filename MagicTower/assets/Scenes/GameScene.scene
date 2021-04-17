@@ -1570,6 +1570,7 @@
       "__id__": 41
     },
     "_enabled": true,
+    "__prefab": null,
     "layer": {
       "__id__": 46
     },

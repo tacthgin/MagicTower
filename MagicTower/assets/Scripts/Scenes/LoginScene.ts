@@ -1,9 +1,10 @@
-import { Component, Label, _decorator } from "cc";
+import { Component, game, Label, _decorator } from "cc";
 import { BaseEvent } from "../Framework/Base/BaseContant";
 import { GameManager } from "../Framework/Managers/GameManager";
 import { NotifyCenter } from "../Framework/Managers/NotifyCenter";
 import { ResourceType } from "../Framework/Managers/ResourceManager";
 import { JsonParserMap } from "./Constant/JsonParserMap";
+import { HeroAttr, HeroData } from "./Data/CustomData/HeroData";
 
 const { ccclass, property } = _decorator;
 
@@ -33,6 +34,8 @@ export default class LoginScene extends Component {
 
     async gotoGameScene() {
         await GameManager.RESOURCE.loadPrefabDir("Elements");
-        GameManager.getInstance().loadScene("GameScene");
+        let heroData = GameManager.DATA.getData(HeroData);
+        heroData.setAttrDiff(HeroAttr.ATTACK, 1);
+        //GameManager.getInstance().loadScene("GameScene");
     }
 }

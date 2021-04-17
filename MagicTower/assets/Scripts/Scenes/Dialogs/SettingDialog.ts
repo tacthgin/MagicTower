@@ -3,9 +3,6 @@ import { BaseDialog } from "../../Framework/Base/BaseDialog";
 
 const { ccclass, property } = _decorator;
 
-import { DataManager } from "../../Managers/DataManager";
-import { SoundManager } from "../../Managers/SoundManager";
-
 @ccclass("SettingDialog")
 export default class SettingDialog extends BaseDialog {
     @property([Toggle])

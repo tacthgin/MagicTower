@@ -1,3 +1,5 @@
+export class WXUtil {}
+
 // import { GameEvent } from "../Constant/GameEvent";
 
 // const AD_INFO = { a: 'adunit-38a5473745748ead' }

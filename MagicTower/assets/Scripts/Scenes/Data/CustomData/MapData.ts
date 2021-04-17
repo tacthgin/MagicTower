@@ -1,3 +1,10 @@
+import { BaseData } from "../../../Framework/Base/BaseData";
+import { Fn } from "../../../Framework/Util/Fn";
+
+@Fn.registerClass("MapData")
+export class MapData extends BaseData {
+    load(data: any = null) {}
+}
 // /** 地图存档 */
 // export class LevelInfo {
 //     private levelInfo: any = {};

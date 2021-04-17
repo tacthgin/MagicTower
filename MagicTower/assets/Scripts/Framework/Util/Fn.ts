@@ -14,7 +14,10 @@ export module Fn {
             if (Object.getPrototypeOf(target) == BaseData) {
                 BASE_DATA_ASSEMBLE[className] = target;
             }
-            js.setClassName(className, target);
+
+            if (!js.getClassByName(className)) {
+                js.setClassName(className, target);
+            }
         };
     }
 

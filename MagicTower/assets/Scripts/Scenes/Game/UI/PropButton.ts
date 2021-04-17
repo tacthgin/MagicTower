@@ -1,10 +1,6 @@
 import { _decorator, Component } from "cc";
 const { ccclass, property } = _decorator;
 
-import { ElementManager } from "../ElementManager";
-import { NotifyCenter } from "../../../Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
-
 @ccclass("PropButton")
 export default class PropButton extends Component {
     private propInfo: any = null;

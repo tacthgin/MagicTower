@@ -1,4 +1,5 @@
 import { BaseData } from "../../../Framework/Base/BaseData";
+import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
 
 class _ShopData {
@@ -54,6 +55,8 @@ export class ShopData extends BaseData {
     load(data: any = null) {
         if (data) {
             this.data.load(data);
+        } else {
+            this.data.load(GameManager.DATA.getJsonElement("global", "shop"));
         }
         this.data = this.createProxy(this.data);
     }

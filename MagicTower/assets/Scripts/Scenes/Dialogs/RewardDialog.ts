@@ -3,7 +3,6 @@ const { ccclass, property } = _decorator;
 
 import { BaseDialog } from "../../Framework/Base/BaseDialog";
 import Npc from "../Game/Elements/Npc";
-import { DataManager } from "../../Managers/DataManager";
 
 @ccclass("RewardDialog")
 export default class RewardDialog extends BaseDialog {
