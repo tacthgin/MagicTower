@@ -23,7 +23,7 @@ export class NodePoolManager {
      * @param path 预设路径
      * @param useCommon 是否使用通用脚本
      */
-    async createPoolNode(path: string, useCommon: boolean) {
+    async createPoolNode(path: string, useCommon: boolean = false) {
         let prefab = resources.get<Prefab>(path);
         if (!prefab) {
             prefab = await this.loadPrefab(path);
@@ -45,19 +45,21 @@ export class NodePoolManager {
     /**
      * 创建加载的预设node
      * @param name 加载的预设名字
+     * @param useCommon 是否使用通用脚本
      */
-    createPreloadPrefabNode(name: string) {
-        let prefab = GameManager.RESOURCE.getPrefab(name);
+    createPrefabNode(nameOrPrefab: string | Prefab, useCommon: boolean = false) {
+        let prefab: Prefab = typeof nameOrPrefab == "string" ? GameManager.RESOURCE.getPrefab(nameOrPrefab) : nameOrPrefab;
+
         if (!prefab) {
-            console.error(`${name}未加载`);
+            console.error(`${prefab.name}未加载`);
             return null;
         }
 
-        if (!this.pool[name]) {
-            this.pool[name] = new NodePool(name);
+        if (!this.pool[prefab.name]) {
+            this.pool[prefab.name] = new NodePool(prefab.name);
         }
 
-        return BasePoolNode.generateNodeFromPool(this.pool[name], prefab);
+        return BasePoolNode.generateNodeFromPool(this.pool[prefab.name], prefab, useCommon);
     }
 
     /**

@@ -7,7 +7,7 @@ import { NotifyCenter } from "../../../Managers/NotifyCenter";
 import { GameEvent } from "../../Constant/GameEvent";
 import { DataManager } from "../../../Managers/DataManager";
 
-export default class MonsterFightSystem {
+export class MonsterFightSystem {
     private monster: Monster = null;
     private map: GameMap = null;
     private hero: Hero = null;
@@ -69,7 +69,7 @@ export default class MonsterFightSystem {
 // import { GameEvent } from "../../../Constant/GameEvent";
 // import { DataManager } from "../../../Managers/DataManager";
 //
-// export default class MonsterFightSystem {
+// export class MonsterFightSystem {
 //     private monster: Monster = null;
 //     private map: GameMap = null;
 //     private hero: Hero = null;

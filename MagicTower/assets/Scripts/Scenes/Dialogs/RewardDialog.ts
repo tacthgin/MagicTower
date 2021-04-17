@@ -5,7 +5,7 @@ import { BaseDialog } from "../../Framework/Base/BaseDialog";
 import Npc from "../Game/Elements/Npc";
 
 @ccclass("RewardDialog")
-export default class RewardDialog extends BaseDialog {
+export class RewardDialog extends BaseDialog {
     @property(Label)
     content: Label | null = null;
     @property(Node)
@@ -45,7 +45,7 @@ export default class RewardDialog extends BaseDialog {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class RewardDialog extends BaseDialog {
+// export class RewardDialog extends BaseDialog {
 //     @property(cc.Label)
 //     content: cc.Label = null;
 //

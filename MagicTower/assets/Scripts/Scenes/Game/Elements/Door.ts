@@ -8,7 +8,7 @@ import { NotifyCenter } from "../../../Managers/NotifyCenter";
 import { GameEvent } from "../../Constant/GameEvent";
 
 @ccclass("Door")
-export default class Door extends MapElement {
+export class Door extends MapElement {
     private doorInfo: any = null;
     /** 被动的墙 */
     private _passive: boolean = false;
@@ -119,7 +119,7 @@ export default class Door extends MapElement {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class Door extends MapElement {
+// export class Door extends MapElement {
 //     private doorInfo: any = null;
 //
 //     /** 被动的墙 */

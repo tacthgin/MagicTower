@@ -4,7 +4,7 @@ import { BaseDialog } from "../../Framework/Base/BaseDialog";
 const { ccclass, property } = _decorator;
 
 @ccclass("RecordBook")
-export default class RecordBook extends BaseDialog {
+export class RecordBook extends BaseDialog {
     @property(PageView)
     pageView: PageView | null = null;
     @property(Node)
@@ -57,7 +57,7 @@ export default class RecordBook extends BaseDialog {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class RecordBook extends BaseDialog {
+// export class RecordBook extends BaseDialog {
 //     @property(cc.PageView)
 //     pageView: cc.PageView = null;
 //

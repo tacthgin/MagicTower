@@ -20,6 +20,8 @@ export enum PropType {
 
 export enum HeroEvent {
     HERO_ATTR,
+    REFRESH_PROP,
+    REFRESH_EQUIP,
 }
 
 type TalkInfo = {
@@ -53,7 +55,7 @@ export class HeroData extends BaseData {
         if (data) {
             this.data.load(data);
         } else {
-            this.data.load(GameManager.DATA.getJson("hero")[0]);
+            this.data.load(GameManager.DATA.getJsonElement("global", "hero"));
         }
         this.data = this.createProxy(this.data);
     }
@@ -64,15 +66,17 @@ export class HeroData extends BaseData {
 
     setAttrDiff(attr: HeroAttr, diff: number) {
         this.data.heroAttr[attr] += diff;
-        this.emit(HeroEvent.HERO_ATTR, attr, this.data.heroAttr[attr]);
+        this.save();
+        this.emit(HeroEvent.HERO_ATTR, attr);
     }
 
     clearEquip() {
         this.data.props.swardID = 0;
         this.data.props.shieldID = 0;
+        this.save();
     }
 
-    getProp(id: number | string) {
+    getPropNum(id: number | string): number {
         if (this.data.props.prop[id]) {
             return this.data.props.prop[id];
         }
@@ -84,25 +88,40 @@ export class HeroData extends BaseData {
         switch (prop.type) {
             case PropType.SWARD:
                 this.data.props.swardID = id;
+                this.emit(HeroEvent.REFRESH_EQUIP, PropType.SWARD);
                 break;
             case PropType.SHIELD:
                 this.data.props.shieldID = id;
+                this.emit(HeroEvent.REFRESH_EQUIP, PropType.SHIELD);
                 break;
             default:
                 if (!prop.consumption) {
-                    this.data.props.prop[id] = Util.clamp(this.getProp(id) + count, 0, Number.MAX_VALUE);
+                    this.data.props.prop[id] = Util.clamp(this.getPropNum(id) + count, 0, Number.MAX_VALUE);
+                    this.emit(HeroEvent.REFRESH_PROP, id);
                 }
                 break;
         }
+        this.save();
     }
 
     getProps() {
         return this.data.props.prop;
     }
 
+    getEquips(propType: PropType) {
+        switch (propType) {
+            case PropType.SWARD:
+                return this.data.props.swardID;
+            case PropType.SHIELD:
+                return this.data.props.shieldID;
+        }
+        return 0;
+    }
+
     recordTalk(npcID: number, chatStep: number) {
         if (this.data.props.prop[PropType.RECORD_BOOK]) {
             this.data.records.push({ npcID: npcID, chatStep: chatStep });
+            this.save();
         }
     }
 

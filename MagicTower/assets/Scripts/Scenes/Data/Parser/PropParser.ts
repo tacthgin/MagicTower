@@ -6,7 +6,7 @@ const { ccclass } = _decorator;
 const KEY_TYPE = 1;
 
 @ccclass("PropParser")
-export default class PropParser extends JsonParser {
+export class PropParser extends JsonParser {
     private doorToId: any = {};
 
     parseJson(jsonAsset: object) {

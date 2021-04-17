@@ -1,11 +1,11 @@
-import { _decorator, Vec3, v3 } from 'cc';
+import { _decorator, Vec3, v3 } from "cc";
 const { ccclass, property } = _decorator;
 
 import { DataManager } from "../../../Managers/DataManager";
 import MapElement from "./MapElement";
 
-@ccclass('Lightning')
-export default class Lightning extends MapElement {
+@ccclass("Lightning")
+export class Lightning extends MapElement {
     /** 上下左右 */
     private directionDiffs: number[] = [-11, 11, -1, 1];
     private positions: cc.Vec3[] = [v3(0, 8), v3(0, -8), v3(-8, 0), v3(8, 0)];
@@ -27,18 +27,18 @@ export default class Lightning extends MapElement {
  */
 // import { DataManager } from "../../../Managers/DataManager";
 // import MapElement from "./MapElement";
-// 
+//
 // const { ccclass, property } = cc._decorator;
-// 
+//
 // @ccclass
-// export default class Lightning extends MapElement {
+// export class Lightning extends MapElement {
 //     /** 上下左右 */
 //     private directionDiffs: number[] = [-11, 11, -1, 1];
-// 
+//
 //     private positions: cc.Vec3[] = [cc.v3(0, 8), cc.v3(0, -8), cc.v3(-8, 0), cc.v3(8, 0)];
-// 
+//
 //     private angles: number[] = [0, 180, 90, 270];
-// 
+//
 //     init(directionDiff: number) {
 //         let index = this.directionDiffs.indexOf(directionDiff);
 //         if (index != -1) {

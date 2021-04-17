@@ -2,7 +2,7 @@ import { _decorator } from "cc";
 import HeroInfo from "../../Data/HeroInfo";
 import { Util } from "../../../Util/Util";
 
-export default class CalculateSystem {
+export class CalculateSystem {
     /**
      * 勇士能否攻击怪物
      * @param heroInfo 勇士数据
@@ -49,7 +49,7 @@ export default class CalculateSystem {
         //return Math.ceil(monsterInfo.hp / (attack - monsterInfo.defence));
     }
     static getHeroAttack(heroInfo: HeroInfo, monsterInfo: any) {
-        //return monsterInfo.extraDamage && heroInfo.getProp(monsterInfo.extraDamage) ? heroInfo.Attack * 2 : heroInfo.Attack;
+        //return monsterInfo.extraDamage && heroInfo.getPropNum(monsterInfo.extraDamage) ? heroInfo.Attack * 2 : heroInfo.Attack;
     }
     /**
      * 怪物和勇士一次伤害值
@@ -80,7 +80,7 @@ export default class CalculateSystem {
 // import HeroInfo from "../../../Data/HeroInfo";
 // import { Util } from "../../../Util/Util";
 //
-// export default class CalculateSystem {
+// export class CalculateSystem {
 //     /**
 //      * 勇士能否攻击怪物
 //      * @param heroInfo 勇士数据
@@ -134,7 +134,7 @@ export default class CalculateSystem {
 //     }
 //
 //     static getHeroAttack(heroInfo: HeroInfo, monsterInfo: any) {
-//         return monsterInfo.extraDamage && heroInfo.getProp(monsterInfo.extraDamage) ? heroInfo.Attack * 2 : heroInfo.Attack;
+//         return monsterInfo.extraDamage && heroInfo.getPropNum(monsterInfo.extraDamage) ? heroInfo.Attack * 2 : heroInfo.Attack;
 //     }
 //
 //     /**

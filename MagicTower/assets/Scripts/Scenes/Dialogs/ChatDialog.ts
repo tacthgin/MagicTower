@@ -3,7 +3,7 @@ import { BaseDialog } from "../../Framework/Base/BaseDialog";
 const { ccclass, property } = _decorator;
 
 @ccclass("ChatDialog")
-export default class ChatDialog extends BaseDialog {
+export class ChatDialog extends BaseDialog {
     @property(Label)
     content: Label | null = null;
     private contentIndex: number = 0;
@@ -37,7 +37,7 @@ export default class ChatDialog extends BaseDialog {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class ChatDialog extends BaseDialog {
+// export class ChatDialog extends BaseDialog {
 //     @property(cc.Label)
 //     content: cc.Label = null;
 //

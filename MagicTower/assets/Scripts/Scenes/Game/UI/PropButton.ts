@@ -2,7 +2,7 @@ import { _decorator, Component } from "cc";
 const { ccclass, property } = _decorator;
 
 @ccclass("PropButton")
-export default class PropButton extends Component {
+export class PropButton extends Component {
     private propInfo: any = null;
     start() {}
     init(propInfo: any) {
@@ -37,7 +37,7 @@ export default class PropButton extends Component {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class PropButton extends cc.Component {
+// export class PropButton extends cc.Component {
 //     private propInfo: any = null;
 //
 //     start() {}

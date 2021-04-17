@@ -1,11 +1,11 @@
-import { _decorator, Animation } from 'cc';
+import { _decorator, Animation } from "cc";
 const { ccclass } = _decorator;
 
 import MapElement from "./MapElement";
 import { ElementManager } from "../ElementManager";
 
-@ccclass('Common')
-export default class Common extends MapElement {
+@ccclass("Common")
+export class Common extends MapElement {
     private animation: Animation | null = null;
     private elementName: string = null;
     onLoad() {
@@ -41,7 +41,6 @@ export default class Common extends MapElement {
         //clip.wrapMode = cc.WrapMode.Loop;
         //this.animation.addClip(clip);
         //}
-
         //this.animation.play(this.elementName);
     }
     isWall() {
@@ -57,19 +56,19 @@ export default class Common extends MapElement {
  */
 // import MapElement from "./MapElement";
 // import { ElementManager } from "../ElementManager";
-// 
+//
 // const { ccclass } = cc._decorator;
-// 
+//
 // @ccclass
-// export default class Common extends MapElement {
+// export class Common extends MapElement {
 //     private animation: cc.Animation = null;
-// 
+//
 //     private elementName: string = null;
-// 
+//
 //     onLoad() {
 //         this.animation = this.getComponent(cc.Animation);
 //     }
-// 
+//
 //     init(name: string) {
 //         this.elementName = name;
 //         if (this.elementName.indexOf("fire") != -1 || this.elementName.indexOf("star") != -1) {
@@ -79,13 +78,13 @@ export default class Common extends MapElement {
 //         }
 //         this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(this.elementName);
 //     }
-// 
+//
 //     remove() {
 //         super.remove(true);
 //     }
-// 
+//
 //     add() {}
-// 
+//
 //     private createAnimation() {
 //         if (!this.animation) return;
 //         if (
@@ -103,14 +102,14 @@ export default class Common extends MapElement {
 //             clip.wrapMode = cc.WrapMode.Loop;
 //             this.animation.addClip(clip);
 //         }
-// 
+//
 //         this.animation.play(this.elementName);
 //     }
-// 
+//
 //     isWall() {
 //         return this.elementName.indexOf("door") != -1;
 //     }
-// 
+//
 //     isLava() {
 //         return this.elementName.indexOf("fire") != -1;
 //     }

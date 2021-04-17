@@ -14,7 +14,7 @@ import Stair from "./Elements/Stair";
 import { GameMap } from "./Map/GameMap";
 
 @ccclass("LevelManager")
-export default class LevelManager extends Component {
+export class LevelManager extends Component {
     @property(Node)
     private layer: Node | null = null;
     private static _instance: LevelManager = null;
@@ -307,7 +307,7 @@ export default class LevelManager extends Component {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class LevelManager extends cc.Component {
+// export class LevelManager extends cc.Component {
 //     @property(cc.Node)
 //     private layer: cc.Node = null;
 //

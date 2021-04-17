@@ -21,7 +21,7 @@ export class MonsterHandBookItem extends BasePoolNode {
 
     init(monster: Monster) {
         let monsterInfo = monster.monsterInfo;
-        this.monsterNode = GameManager.POOL.createPreloadPrefabNode("Monster");
+        this.monsterNode = GameManager.POOL.createPrefabNode("Monster");
         // this.monsterNode.position = cc.v3(-120, -20);
         // this.monsterNode.parent = this.node;
         // this.monsterNode.getComponent("Monster").init(monsterInfo.id);

@@ -1,15 +1,14 @@
-import { Component, game, Label, _decorator } from "cc";
+import { Component, Label, _decorator } from "cc";
 import { BaseEvent } from "../Framework/Base/BaseContant";
 import { GameManager } from "../Framework/Managers/GameManager";
 import { NotifyCenter } from "../Framework/Managers/NotifyCenter";
 import { ResourceType } from "../Framework/Managers/ResourceManager";
 import { JsonParserMap } from "./Constant/JsonParserMap";
-import { HeroAttr, HeroData } from "./Data/CustomData/HeroData";
 
 const { ccclass, property } = _decorator;
 
 @ccclass("LoginScene")
-export default class LoginScene extends Component {
+export class LoginScene extends Component {
     @property(Label)
     private progressLabel: Label = null;
 
@@ -34,8 +33,6 @@ export default class LoginScene extends Component {
 
     async gotoGameScene() {
         await GameManager.RESOURCE.loadPrefabDir("Elements");
-        let heroData = GameManager.DATA.getData(HeroData);
-        heroData.setAttrDiff(HeroAttr.ATTACK, 1);
-        //GameManager.getInstance().loadScene("GameScene");
+        GameManager.getInstance().loadScene("GameScene");
     }
 }

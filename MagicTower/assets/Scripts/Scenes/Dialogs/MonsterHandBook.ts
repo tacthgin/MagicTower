@@ -4,7 +4,7 @@ import Monster from "../Game/Elements/Monster";
 const { ccclass, property } = _decorator;
 
 @ccclass("MonsterHandBook")
-export default class MonsterHandBook extends BaseDialog {
+export class MonsterHandBook extends BaseDialog {
     @property(Node)
     private content: Node = null;
 
@@ -34,7 +34,7 @@ export default class MonsterHandBook extends BaseDialog {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class MonsterHandBook extends BaseDialog {
+// export class MonsterHandBook extends BaseDialog {
 //     @property(cc.Node)
 //     content: cc.Node = null;
 //

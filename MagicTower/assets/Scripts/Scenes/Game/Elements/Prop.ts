@@ -1,12 +1,12 @@
-import { _decorator } from 'cc';
+import { _decorator } from "cc";
 const { ccclass } = _decorator;
 
 import { DataManager } from "../../../Managers/DataManager";
 import { ElementManager } from "../ElementManager";
 import MapElement from "./MapElement";
 
-@ccclass('Prop')
-export default class Prop extends MapElement {
+@ccclass("Prop")
+export class Prop extends MapElement {
     private _propInfo: any = null;
     get id() {
         //return this._propInfo.id;
@@ -16,7 +16,6 @@ export default class Prop extends MapElement {
     }
     init(id: number) {
         //this._propInfo = DataManager.getJsonElement("prop", id);
-
         //this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(this._propInfo.spriteId);
     }
 }
@@ -27,24 +26,24 @@ export default class Prop extends MapElement {
 // import { DataManager } from "../../../Managers/DataManager";
 // import { ElementManager } from "../ElementManager";
 // import MapElement from "./MapElement";
-// 
+//
 // const { ccclass } = cc._decorator;
-// 
+//
 // @ccclass
-// export default class Prop extends MapElement {
+// export class Prop extends MapElement {
 //     private _propInfo: any = null;
-// 
+//
 //     get id() {
 //         return this._propInfo.id;
 //     }
-// 
+//
 //     get propInfo() {
 //         return this._propInfo;
 //     }
-// 
+//
 //     init(id: number) {
 //         this._propInfo = DataManager.getJsonElement("prop", id);
-// 
+//
 //         this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(this._propInfo.spriteId);
 //     }
 // }

@@ -9,7 +9,7 @@ import Hero from "../Hero";
 import { CommonAstar } from "../Astar";
 import { GameMap } from "../Map/GameMap";
 
-export default class GameEventSystem {
+export class GameEventSystem {
     private eventInfo: any = null;
     private chatStep: number = 0;
     private appearStep: number = 0;
@@ -243,7 +243,7 @@ export default class GameEventSystem {
 // import { GameMap } from "../Map/GameMap";
 //
 // /**处理地图上的事件 */
-// export default class GameEventSystem {
+// export class GameEventSystem {
 //     private eventInfo: any = null;
 //
 //     private chatStep: number = 0;

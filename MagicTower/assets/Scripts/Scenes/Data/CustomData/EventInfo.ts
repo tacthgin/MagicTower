@@ -12,7 +12,7 @@ import { _decorator } from "cc";
 const { ccclass, property } = _decorator;
 
 @ccclass("EventInfo")
-export default class EventInfo {
+export class EventInfo {
     private levelEvent: any = {};
     put(level: number, eventId: number | string) {
         //this.levelEvent[level] = eventId;
@@ -42,7 +42,7 @@ export default class EventInfo {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class EventInfo {
+// export class EventInfo {
 //     private levelEvent: any = {};
 //
 //     put(level: number, eventId: number | string) {

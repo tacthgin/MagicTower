@@ -1,10 +1,4 @@
 export enum GameEvent {
-    /** 勇士属性变化 */
-    HERO_ATTR_CHANGED,
-
-    /** 道具UI刷新 */
-    REFRESH_PROP,
-
     /** 元素动作结束 */
     ELEMENT_ACTION_COMPLETE,
 
@@ -26,11 +20,8 @@ export enum GameEvent {
     /** 场景出现 */
     SCENE_APPEAR,
 
-    /** 刷新装备 */
-    REFRESH_EQUIP,
-
     /** 人物移动     */
-    MOVE_PA,
+    MOVE_PATH,
 
     /** 使用道具 */
     USE_PPOP,

@@ -12,7 +12,7 @@ import { NotifyCenter } from "../../Managers/NotifyCenter";
 import { GameEvent } from "../Constant/GameEvent";
 
 @ccclass("Hero")
-export default class Hero extends Component {
+export class Hero extends Component {
     @property(Node)
     attackIcon: Node | null = null;
     @property(Node)
@@ -253,7 +253,7 @@ export default class Hero extends Component {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class Hero extends cc.Component {
+// export class Hero extends cc.Component {
 //     @property(cc.Node)
 //     attackIcon: cc.Node = null;
 //

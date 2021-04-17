@@ -1,11 +1,11 @@
-import { _decorator, Component, Animation } from 'cc';
+import { _decorator, Component, Animation } from "cc";
 const { ccclass } = _decorator;
 
 import { DataManager } from "../../../Managers/DataManager";
 import { ElementManager } from "../ElementManager";
 
-@ccclass('MonsterIcon')
-export default class MonsterIcon extends Component {
+@ccclass("MonsterIcon")
+export class MonsterIcon extends Component {
     private animation: Animation | null = null;
     private monsterInfo: any = null;
     onLoad() {
@@ -35,7 +35,6 @@ export default class MonsterIcon extends Component {
         //clip.wrapMode = cc.WrapMode.Loop;
         //this.animation.addClip(clip);
         //}
-
         //this.animation.play(this.monsterInfo.spriteId);
     }
 }
@@ -45,29 +44,29 @@ export default class MonsterIcon extends Component {
  */
 // import { DataManager } from "../../../Managers/DataManager";
 // import { ElementManager } from "../ElementManager";
-// 
+//
 // const { ccclass } = cc._decorator;
-// 
+//
 // @ccclass
-// export default class MonsterIcon extends cc.Component {
+// export class MonsterIcon extends cc.Component {
 //     private animation: cc.Animation = null;
-// 
+//
 //     private monsterInfo: any = null;
-// 
+//
 //     onLoad() {
 //         this.animation = this.getComponent(cc.Animation);
 //     }
-// 
+//
 //     start() {
 //         this.createAnimation();
 //     }
-// 
+//
 //     init(id: number) {
 //         this.monsterInfo = DataManager.getJsonElement("monster", id, true);
 //         this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(`${this.monsterInfo.spriteId}_0`);
 //         this.createAnimation();
 //     }
-// 
+//
 //     private createAnimation() {
 //         if (!this.animation) return;
 //         if (
@@ -84,7 +83,7 @@ export default class MonsterIcon extends Component {
 //             clip.wrapMode = cc.WrapMode.Loop;
 //             this.animation.addClip(clip);
 //         }
-// 
+//
 //         this.animation.play(this.monsterInfo.spriteId);
 //     }
 // }

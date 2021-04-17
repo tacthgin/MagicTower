@@ -10,7 +10,6 @@ export abstract class BaseData extends CustomEventTarget {
         return new Proxy<T>(data, {
             set: (obj, prop, newval) => {
                 obj[prop] = newval;
-                console.log(prop, newval);
                 this.save();
                 return true;
             },
@@ -21,6 +20,6 @@ export abstract class BaseData extends CustomEventTarget {
 
     save() {
         let className = js.getClassName(this);
-        localStorage.setItem(className, this.data);
+        localStorage.setItem(className, JSON.stringify(this.data));
     }
 }

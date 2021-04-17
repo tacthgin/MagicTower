@@ -4,7 +4,7 @@ import { BaseDialog } from "../../Framework/Base/BaseDialog";
 const { ccclass, property } = _decorator;
 
 @ccclass("SettingDialog")
-export default class SettingDialog extends BaseDialog {
+export class SettingDialog extends BaseDialog {
     @property([Toggle])
     toogles: Toggle[] = [];
     onLoad() {
@@ -51,7 +51,7 @@ export default class SettingDialog extends BaseDialog {
 // const { ccclass, property } = cc._decorator;
 //
 // @ccclass
-// export default class SettingDialog extends BaseDialog {
+// export class SettingDialog extends BaseDialog {
 //     @property([cc.Toggle])
 //     toogles: cc.Toggle[] = [];
 //

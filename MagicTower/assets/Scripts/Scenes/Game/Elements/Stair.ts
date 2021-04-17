@@ -1,11 +1,11 @@
-import { _decorator } from 'cc';
+import { _decorator } from "cc";
 const { ccclass } = _decorator;
 
 import { ElementManager } from "../ElementManager";
 import MapElement from "./MapElement";
 
-@ccclass('Stair')
-export default class Stair extends MapElement {
+@ccclass("Stair")
+export class Stair extends MapElement {
     private _standIndex: number = 0;
     private _stairType: string = null;
     private _levelDiff: number = 1;
@@ -42,44 +42,44 @@ export default class Stair extends MapElement {
  */
 // import { ElementManager } from "../ElementManager";
 // import MapElement from "./MapElement";
-// 
+//
 // const { ccclass } = cc._decorator;
-// 
+//
 // @ccclass
-// export default class Stair extends MapElement {
+// export class Stair extends MapElement {
 //     private _standIndex: number = 0;
-// 
+//
 //     private _stairType: string = null;
-// 
+//
 //     private _levelDiff: number = 1;
-// 
+//
 //     public _hide: boolean = false;
-// 
+//
 //     public set hide(value) {
 //         this._hide = value;
 //     }
-// 
+//
 //     public get hide() {
 //         return this._hide;
 //     }
-// 
+//
 //     public get standIndex() {
 //         return this._standIndex;
 //     }
-// 
+//
 //     public get stairType() {
 //         return this._stairType;
 //     }
-// 
+//
 //     public get levelDiff() {
 //         return this._levelDiff;
 //     }
-// 
+//
 //     add() {
 //         this._hide = false;
 //         this.node.active = true;
 //     }
-// 
+//
 //     init(name: string, standIndex) {
 //         this._levelDiff = standIndex[1] || 1;
 //         this._stairType = name;

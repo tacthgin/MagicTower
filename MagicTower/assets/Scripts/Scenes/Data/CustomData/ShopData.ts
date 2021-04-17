@@ -4,11 +4,11 @@ import { Fn } from "../../../Framework/Util/Fn";
 
 class _ShopData {
     public beginGold: number = 0;
-    public beginHp: number = 0;
-    public beginAttack: number = 0;
-    public beginDefence: number = 0;
+    public hp: number = 0;
+    public attack: number = 0;
+    public defence: number = 0;
     public count: number = 0;
-    public ratioGold: number = 0;
+    public ratio: number = 0;
     public level: number = 0;
 
     load(data: any) {
@@ -23,7 +23,7 @@ export class ShopData extends BaseData {
     protected data: _ShopData = new _ShopData();
 
     get needGold() {
-        return this.data.beginGold + this.data.ratioGold * this.data.count;
+        return this.data.beginGold + this.data.ratio * this.data.count;
     }
 
     get buyCount() {
@@ -35,15 +35,15 @@ export class ShopData extends BaseData {
     }
 
     get hp() {
-        return (this.data.count + 1) * this.data.beginHp;
+        return (this.data.count + 1) * this.data.hp;
     }
 
-    get attackValue() {
-        return (this.data.level + 1) * this.data.beginAttack;
+    get attack() {
+        return (this.data.level + 1) * this.data.attack;
     }
 
-    get defenceValue() {
-        return (this.data.level + 1) * this.data.beginDefence;
+    get defence() {
+        return (this.data.level + 1) * this.data.defence;
     }
 
     buy() {

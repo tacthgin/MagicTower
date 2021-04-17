@@ -1,11 +1,11 @@
-import { _decorator, Animation } from 'cc';
+import { _decorator, Animation } from "cc";
 const { ccclass, property } = _decorator;
 
 import { ElementManager } from "../ElementManager";
 import MapElement from "./MapElement";
 
-@ccclass('Shop')
-export default class Shop extends MapElement {
+@ccclass("Shop")
+export class Shop extends MapElement {
     private animation: Animation | null = null;
     onLoad() {
         //this.animation = this.getComponent(cc.Animation);
@@ -30,18 +30,18 @@ export default class Shop extends MapElement {
  */
 // import { ElementManager } from "../ElementManager";
 // import MapElement from "./MapElement";
-// 
+//
 // const { ccclass, property } = cc._decorator;
-// 
+//
 // @ccclass
-// export default class Shop extends MapElement {
+// export class Shop extends MapElement {
 //     private animation: cc.Animation = null;
-// 
+//
 //     onLoad() {
 //         this.animation = this.getComponent(cc.Animation);
 //         this.createAnimation();
 //     }
-// 
+//
 //     private createAnimation() {
 //         let spriteFrames = [];
 //         for (let i = 0; i < 2; i++) {
@@ -53,6 +53,6 @@ export default class Shop extends MapElement {
 //         this.animation.addClip(clip);
 //         this.animation.play(clip.name);
 //     }
-// 
+//
 //     init() {}
 // }

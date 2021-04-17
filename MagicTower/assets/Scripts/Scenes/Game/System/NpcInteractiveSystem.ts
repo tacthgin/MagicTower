@@ -7,7 +7,7 @@ import { NotifyCenter } from "../../../Managers/NotifyCenter";
 import { GameEvent } from "../../Constant/GameEvent";
 import { CommonAstar } from "../Astar";
 
-export default class NpcInteractiveSystem {
+export class NpcInteractiveSystem {
     private npc: Npc = null;
     private map: GameMap = null;
     private hero: Hero = null;
@@ -73,7 +73,7 @@ export default class NpcInteractiveSystem {
         //if (npcPropInfo.prop) {
         //for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
         //如果没有物品就不能卖
-        //if (npcPropInfo.prop[i + 1] < 0 && heroInfo.getProp(npcPropInfo.prop[i]) <= 0) {
+        //if (npcPropInfo.prop[i + 1] < 0 && heroInfo.getPropNum(npcPropInfo.prop[i]) <= 0) {
         //tradeSuccess = false;
         //continue;
         //}
@@ -146,7 +146,7 @@ export default class NpcInteractiveSystem {
 // import { GameEvent } from "../../../Constant/GameEvent";
 // import { CommonAstar } from "../Astar";
 //
-// export default class NpcInteractiveSystem {
+// export class NpcInteractiveSystem {
 //     private npc: Npc = null;
 //     private map: GameMap = null;
 //     private hero: Hero = null;
@@ -220,7 +220,7 @@ export default class NpcInteractiveSystem {
 //             if (npcPropInfo.prop) {
 //                 for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
 //                     //如果没有物品就不能卖
-//                     if (npcPropInfo.prop[i + 1] < 0 && heroInfo.getProp(npcPropInfo.prop[i]) <= 0) {
+//                     if (npcPropInfo.prop[i + 1] < 0 && heroInfo.getPropNum(npcPropInfo.prop[i]) <= 0) {
 //                         tradeSuccess = false;
 //                         continue;
 //                     }

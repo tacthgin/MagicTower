@@ -132,6 +132,10 @@ export class ResourceManager {
         return asset;
     }
 
+    getSpriteFrame(path: string) {
+        return this.assets[ResourceType.SPRITE][`${ResourceType.SPRITE}/${path}`] || null;
+    }
+
     loadPrefabDir(path: string) {
         return new Promise((resolve, reject) => {
             if (resources.get(path)) {

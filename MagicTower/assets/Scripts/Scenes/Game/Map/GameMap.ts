@@ -576,7 +576,7 @@
 //     }
 //     private monsterDie(monster: Monster, index: number, magic: boolean) {
 //         //幸运金币
-//         //let ratio = this.hero.HeroInfo.getProp(27) ? 2 : 1;
+//         //let ratio = this.hero.HeroInfo.getPropNum(27) ? 2 : 1;
 //         //this.hero.HeroInfo.Gold += monster.monsterInfo.gold * ratio;
 //         //this.removeElement(index, "monster");
 //         //this.removeMonsterDoor();
@@ -712,7 +712,7 @@
 //         //return true;
 //         //} else if (!element.hide && !element.passive) {
 //         //let keyId = this.propParser.getKeyByDoor(element.id);
-//         //if (keyId && this.hero.HeroInfo.getProp(keyId) > 0) {
+//         //if (keyId && this.hero.HeroInfo.getPropNum(keyId) > 0) {
 //         //this.hero.removeProp(keyId);
 //         //this.removeElement(index, "door");
 //         //this.disappearDoorEventTrigger(index);
@@ -757,10 +757,10 @@
 //         //this.hero.HeroInfo.Hp += this.shopInfo.hp;
 //         //break;
 //         //case "attack":
-//         //this.hero.HeroInfo.Attack += this.shopInfo.attackValue;
+//         //this.hero.HeroInfo.Attack += this.shopInfo.attack;
 //         //break;
 //         //case "defence":
-//         //this.hero.HeroInfo.Defence += this.shopInfo.defenceValue;
+//         //this.hero.HeroInfo.Defence += this.shopInfo.defence;
 //         //break;
 //         //default:
 //         //break;
@@ -1608,7 +1608,7 @@
 // //
 // //     private monsterDie(monster: Monster, index: number, magic: boolean) {
 // //         //幸运金币
-// //         let ratio = this.hero.HeroInfo.getProp(27) ? 2 : 1;
+// //         let ratio = this.hero.HeroInfo.getPropNum(27) ? 2 : 1;
 // //         this.hero.HeroInfo.Gold += monster.monsterInfo.gold * ratio;
 // //         this.removeElement(index, "monster");
 // //         this.removeMonsterDoor();
@@ -1748,7 +1748,7 @@
 // //             return true;
 // //         } else if (!element.hide && !element.passive) {
 // //             let keyId = this.propParser.getKeyByDoor(element.id);
-// //             if (keyId && this.hero.HeroInfo.getProp(keyId) > 0) {
+// //             if (keyId && this.hero.HeroInfo.getPropNum(keyId) > 0) {
 // //                 this.hero.removeProp(keyId);
 // //                 this.removeElement(index, "door");
 // //                 this.disappearDoorEventTrigger(index);
@@ -1796,10 +1796,10 @@
 // //                         this.hero.HeroInfo.Hp += this.shopInfo.hp;
 // //                         break;
 // //                     case "attack":
-// //                         this.hero.HeroInfo.Attack += this.shopInfo.attackValue;
+// //                         this.hero.HeroInfo.Attack += this.shopInfo.attack;
 // //                         break;
 // //                     case "defence":
-// //                         this.hero.HeroInfo.Defence += this.shopInfo.defenceValue;
+// //                         this.hero.HeroInfo.Defence += this.shopInfo.defence;
 // //                         break;
 // //                     default:
 // //                         break;
