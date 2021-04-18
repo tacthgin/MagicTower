@@ -1,49 +1,19 @@
-import { _decorator } from "cc";
+import { Sprite, _decorator } from "cc";
+import { GameManager } from "../../../Framework/Managers/GameManager";
+import { MapElement } from "./MapElement";
 const { ccclass } = _decorator;
-
-import { DataManager } from "../../../Managers/DataManager";
-import { ElementManager } from "../ElementManager";
-import MapElement from "./MapElement";
 
 @ccclass("Prop")
 export class Prop extends MapElement {
     private _propInfo: any = null;
     get id() {
-        //return this._propInfo.id;
+        return this._propInfo.id;
     }
     get propInfo() {
-        //return this._propInfo;
+        return this._propInfo;
     }
     init(id: number) {
-        //this._propInfo = GameManager.DATA.getJsonElement("prop", id);
-        //this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(this._propInfo.spriteId);
+        this._propInfo = GameManager.DATA.getJsonElement("prop", id);
+        this.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(this._propInfo.spriteId);
     }
 }
-
-/**
- * Note: The original script has been commented out, due to the large number of changes in the script, there may be missing in the conversion, you need to convert it manually
- */
-// import { DataManager } from "../../../Managers/DataManager";
-// import { ElementManager } from "../ElementManager";
-// import MapElement from "./MapElement";
-//
-// const { ccclass } = cc._decorator;
-//
-// @ccclass
-// export class Prop extends MapElement {
-//     private _propInfo: any = null;
-//
-//     get id() {
-//         return this._propInfo.id;
-//     }
-//
-//     get propInfo() {
-//         return this._propInfo;
-//     }
-//
-//     init(id: number) {
-//         this._propInfo = GameManager.DATA.getJsonElement("prop", id);
-//
-//         this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(this._propInfo.spriteId);
-//     }
-// }

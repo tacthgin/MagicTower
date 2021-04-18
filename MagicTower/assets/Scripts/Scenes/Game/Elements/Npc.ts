@@ -8,7 +8,6 @@ export class Npc extends MapElement {
     private _npcInfo: any = null;
     private stepIndex: number = 0;
     private moveIndex: number = 0;
-    private animation: Animation | null = null;
     private globalInfo: any = null;
 
     get npcInfo() {

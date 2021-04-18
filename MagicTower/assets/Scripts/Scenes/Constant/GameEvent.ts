@@ -24,7 +24,7 @@ export enum GameEvent {
     MOVE_PATH,
 
     /** 使用道具 */
-    USE_PPOP,
+    USE_PROP,
 
     /** 怪物死亡 */
     MONSTER_DIE,

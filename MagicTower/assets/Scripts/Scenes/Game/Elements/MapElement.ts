@@ -4,7 +4,7 @@ import { BasePoolNode } from "../../../Framework/Base/BasePoolNode";
 export abstract class MapElement extends BasePoolNode {
     protected animation: Animation = null;
 
-    protected createAnimationClip(reverse: boolean): SpriteFrame[] {
+    protected createAnimationClip(reverse: boolean = false): SpriteFrame[] {
         return null;
     }
 
