@@ -1,22 +1,10 @@
 import { _decorator, Component, Node, Touch, Vec2 } from "cc";
 const { ccclass, property } = _decorator;
 
-import { ElementManager } from "./ElementManager";
-import Hero from "./Hero";
-import { Astar } from "./Astar";
-import { DataManager } from "../../Managers/DataManager";
-import GameInfo from "../Data/GameInfo";
-import { GameManager } from "../../Managers/GameManager";
-import { ToastString } from "../Constant/ToastString";
-import { NotifyCenter } from "../../Managers/NotifyCenter";
-import { GameEvent } from "../Constant/GameEvent";
-import Stair from "./Elements/Stair";
-import { GameMap } from "./Map/GameMap";
-
 @ccclass("LevelManager")
 export class LevelManager extends Component {
     @property(Node)
-    private layer: Node | null = null;
+    private layer: Node = null;
     private static _instance: LevelManager = null;
     static get instance() {
         //return LevelManager._instance;
@@ -97,7 +85,7 @@ export class LevelManager extends Component {
         //NotifyCenter.emit(GameEvent.REFRESH_LEVEL, this.level);
         //return this.currentMap;
     }
-    private showHero(tile: Vec2 | null = null) {
+    private showHero(tile: Vec2 = null) {
         //if (!this.hero) {
         //let hero = ElementManager.getElement("Hero");
         //this.hero = hero.getComponent("Hero");
@@ -285,7 +273,7 @@ export class LevelManager extends Component {
         //}
     }
     getMap(level: number): GameMap {
-        //return this.maps[level] || null;
+        //return this.maps[level] ;
     }
 }
 
@@ -621,6 +609,6 @@ export class LevelManager extends Component {
 //     }
 //
 //     getMap(level: number): GameMap {
-//         return this.maps[level] || null;
+//         return this.maps[level] ;
 //     }
 // }
