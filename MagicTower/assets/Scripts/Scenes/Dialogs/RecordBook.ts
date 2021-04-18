@@ -19,7 +19,7 @@ export class RecordBook extends BaseDialog {
         //let texts = [];
         //let records = DataManager.getCustomData("GameInfo").HeroInfo.getRecordTalk();
         //records.forEach(record => {
-        //let npc = DataManager.getJsonElement("npc", record.npcId);
+        //let npc = GameManager.DATA.getJsonElement("npc", record.npcId);
         //texts.push(npc.talk[record.chatStep]);
         //});
         //if (texts.length > 0) {
@@ -78,7 +78,7 @@ export class RecordBook extends BaseDialog {
 //
 //         let records = DataManager.getCustomData("GameInfo").HeroInfo.getRecordTalk();
 //         records.forEach(record => {
-//             let npc = DataManager.getJsonElement("npc", record.npcId);
+//             let npc = GameManager.DATA.getJsonElement("npc", record.npcId);
 //             texts.push(npc.talk[record.chatStep]);
 //         });
 //

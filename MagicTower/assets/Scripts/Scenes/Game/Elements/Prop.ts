@@ -15,8 +15,8 @@ export class Prop extends MapElement {
         //return this._propInfo;
     }
     init(id: number) {
-        //this._propInfo = DataManager.getJsonElement("prop", id);
-        //this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(this._propInfo.spriteId);
+        //this._propInfo = GameManager.DATA.getJsonElement("prop", id);
+        //this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(this._propInfo.spriteId);
     }
 }
 
@@ -42,8 +42,8 @@ export class Prop extends MapElement {
 //     }
 //
 //     init(id: number) {
-//         this._propInfo = DataManager.getJsonElement("prop", id);
+//         this._propInfo = GameManager.DATA.getJsonElement("prop", id);
 //
-//         this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(this._propInfo.spriteId);
+//         this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(this._propInfo.spriteId);
 //     }
 // }

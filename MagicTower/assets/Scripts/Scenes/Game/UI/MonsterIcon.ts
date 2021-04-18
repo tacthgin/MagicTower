@@ -15,8 +15,8 @@ export class MonsterIcon extends Component {
         //this.createAnimation();
     }
     init(id: number) {
-        //this.monsterInfo = DataManager.getJsonElement("monster", id, true);
-        //this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(`${this.monsterInfo.spriteId}_0`);
+        //this.monsterInfo = GameManager.DATA.getJsonElement("monster", id, true);
+        //this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this.monsterInfo.spriteId}_0`);
         //this.createAnimation();
     }
     private createAnimation() {
@@ -28,7 +28,7 @@ export class MonsterIcon extends Component {
         //) {
         //let spriteFrames = [];
         //for (let i = 0; i < 2; i++) {
-        //spriteFrames.push(ElementManager.getSpriteFrame(`${this.monsterInfo.spriteId}_${i}`));
+        //spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${this.monsterInfo.spriteId}_${i}`));
         //}
         //let clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 8);
         //clip.name = this.monsterInfo.spriteId;
@@ -62,8 +62,8 @@ export class MonsterIcon extends Component {
 //     }
 //
 //     init(id: number) {
-//         this.monsterInfo = DataManager.getJsonElement("monster", id, true);
-//         this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(`${this.monsterInfo.spriteId}_0`);
+//         this.monsterInfo = GameManager.DATA.getJsonElement("monster", id, true);
+//         this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this.monsterInfo.spriteId}_0`);
 //         this.createAnimation();
 //     }
 //
@@ -76,7 +76,7 @@ export class MonsterIcon extends Component {
 //         ) {
 //             let spriteFrames = [];
 //             for (let i = 0; i < 2; i++) {
-//                 spriteFrames.push(ElementManager.getSpriteFrame(`${this.monsterInfo.spriteId}_${i}`));
+//                 spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${this.monsterInfo.spriteId}_${i}`));
 //             }
 //             let clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 8);
 //             clip.name = this.monsterInfo.spriteId;

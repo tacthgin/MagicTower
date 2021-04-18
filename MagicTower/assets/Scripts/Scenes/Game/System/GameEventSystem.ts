@@ -20,10 +20,10 @@ export class GameEventSystem {
     private globalConfig: any = null;
     private hero: Hero = null;
     init(eventId: number | string, map: GameMap, hero: Hero) {
-        //this.eventInfo = DataManager.getJsonElement("event", eventId);
+        //this.eventInfo = GameManager.DATA.getJsonElement("event", eventId);
         //this.map = map;
         //this.hero = hero;
-        //this.globalConfig = DataManager.getJson("global");
+        //this.globalConfig = GameManager.DATA.getJson("global");
         //if (this.eventInfo.monsterDoor) {
         //this.map.monsterDoor = this.eventInfo.monsterDoor;
         //}
@@ -263,10 +263,10 @@ export class GameEventSystem {
 //     private hero: Hero = null;
 //
 //     init(eventId: number | string, map: GameMap, hero: Hero) {
-//         this.eventInfo = DataManager.getJsonElement("event", eventId);
+//         this.eventInfo = GameManager.DATA.getJsonElement("event", eventId);
 //         this.map = map;
 //         this.hero = hero;
-//         this.globalConfig = DataManager.getJson("global");
+//         this.globalConfig = GameManager.DATA.getJson("global");
 //
 //         if (this.eventInfo.monsterDoor) {
 //             this.map.monsterDoor = this.eventInfo.monsterDoor;

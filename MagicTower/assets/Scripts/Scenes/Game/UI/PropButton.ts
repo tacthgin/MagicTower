@@ -7,7 +7,7 @@ export class PropButton extends Component {
     start() {}
     init(propInfo: any) {
         //this.propInfo = propInfo;
-        //this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(propInfo.spriteId);
+        //this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(propInfo.spriteId);
     }
     onPropButtonClick() {
         //let info = null;
@@ -44,7 +44,7 @@ export class PropButton extends Component {
 //
 //     init(propInfo: any) {
 //         this.propInfo = propInfo;
-//         this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(propInfo.spriteId);
+//         this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(propInfo.spriteId);
 //     }
 //
 //     onPropButtonClick() {

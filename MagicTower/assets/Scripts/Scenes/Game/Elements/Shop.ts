@@ -14,7 +14,7 @@ export class Shop extends MapElement {
     private createAnimation() {
         //let spriteFrames = [];
         //for (let i = 0; i < 2; i++) {
-        //spriteFrames.push(ElementManager.getSpriteFrame(`pb_m_${i}`));
+        //spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`pb_m_${i}`));
         //}
         //let clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 8);
         //clip.wrapMode = cc.WrapMode.Loop;
@@ -45,7 +45,7 @@ export class Shop extends MapElement {
 //     private createAnimation() {
 //         let spriteFrames = [];
 //         for (let i = 0; i < 2; i++) {
-//             spriteFrames.push(ElementManager.getSpriteFrame(`pb_m_${i}`));
+//             spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`pb_m_${i}`));
 //         }
 //         let clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 8);
 //         clip.wrapMode = cc.WrapMode.Loop;

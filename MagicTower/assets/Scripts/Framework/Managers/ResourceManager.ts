@@ -132,8 +132,13 @@ export class ResourceManager {
         return asset;
     }
 
-    getSpriteFrame(path: string) {
-        return this.assets[ResourceType.SPRITE][`${ResourceType.SPRITE}/${path}`] || null;
+    getSpriteFrame(path: string): SpriteFrame {
+        let spriteFrame = this.assets[ResourceType.SPRITE][`${ResourceType.SPRITE}/${path}`];
+        if (!spriteFrame) {
+            console.warn("找不到资源", path);
+            return null;
+        }
+        return spriteFrame;
     }
 
     loadPrefabDir(path: string) {

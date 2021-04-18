@@ -29,7 +29,7 @@ export class Hero extends Component {
     onLoad() {
         //this.animation = this.heroNode.getComponent(cc.Animation);
         //this.animation.on("finished", this.onFinished, this);
-        //this.globalInfo = DataManager.getJson("global");
+        //this.globalInfo = GameManager.DATA.getJson("global");
         //this.heroInfo = DataManager.getCustomData("GameInfo").heroInfo;
         //this.propParser = DataManager.getJsonParser("prop");
     }
@@ -74,7 +74,7 @@ export class Hero extends Component {
         //this.heroInfo.Animation.forEach(animationName => {
         //let spriteFrames = [];
         //for (let i = 1; i < 3; i++) {
-        //spriteFrames.push(ElementManager.getSpriteFrame(`${animationName}_${i}`));
+        //spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${animationName}_${i}`));
         //}
         //let clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 4);
         //clip.name = animationName;
@@ -100,7 +100,7 @@ export class Hero extends Component {
     }
     /** 设置人物方向贴图 */
     setDirectionTexture() {
-        //this.heroNode.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(`${this.heroInfo.Animation[this.heroInfo.Direction]}_0`);
+        //this.heroNode.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this.heroInfo.Animation[this.heroInfo.Direction]}_0`);
     }
     /** 根据方向播放行走动画 */
     playMoveAnimation() {
@@ -192,7 +192,7 @@ export class Hero extends Component {
         //NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
     }
     weak() {
-        //let info = DataManager.getJsonElement("global", "weakenAttr");
+        //let info = GameManager.DATA.getJsonElement("global", "weakenAttr");
         //this.heroInfo.Attack = info.attack;
         //this.heroInfo.Defence = info.defence;
         //this.heroInfo.Hp = info.hp;
@@ -279,7 +279,7 @@ export class Hero extends Component {
 //     onLoad() {
 //         this.animation = this.heroNode.getComponent(cc.Animation);
 //         this.animation.on("finished", this.onFinished, this);
-//         this.globalInfo = DataManager.getJson("global");
+//         this.globalInfo = GameManager.DATA.getJson("global");
 //         this.heroInfo = DataManager.getCustomData("GameInfo").heroInfo;
 //         this.propParser = DataManager.getJsonParser("prop");
 //     }
@@ -332,7 +332,7 @@ export class Hero extends Component {
 //         this.heroInfo.Animation.forEach(animationName => {
 //             let spriteFrames = [];
 //             for (let i = 1; i < 3; i++) {
-//                 spriteFrames.push(ElementManager.getSpriteFrame(`${animationName}_${i}`));
+//                 spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${animationName}_${i}`));
 //             }
 //             let clip = cc.AnimationClip.createWithSpriteFrames(spriteFrames, 4);
 //             clip.name = animationName;
@@ -361,7 +361,7 @@ export class Hero extends Component {
 //
 //     /** 设置人物方向贴图 */
 //     setDirectionTexture() {
-//         this.heroNode.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(`${this.heroInfo.Animation[this.heroInfo.Direction]}_0`);
+//         this.heroNode.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this.heroInfo.Animation[this.heroInfo.Direction]}_0`);
 //     }
 //
 //     /** 根据方向播放行走动画 */
@@ -472,7 +472,7 @@ export class Hero extends Component {
 //     }
 //
 //     weak() {
-//         let info = DataManager.getJsonElement("global", "weakenAttr");
+//         let info = GameManager.DATA.getJsonElement("global", "weakenAttr");
 //         this.heroInfo.Attack = info.attack;
 //         this.heroInfo.Defence = info.defence;
 //         this.heroInfo.Hp = info.hp;

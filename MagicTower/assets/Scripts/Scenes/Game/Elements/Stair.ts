@@ -32,7 +32,7 @@ export class Stair extends MapElement {
     init(name: string, standIndex) {
         //this._levelDiff = standIndex[1] || 1;
         //this._stairType = name;
-        //this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(`stair_${name}`);
+        //this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`stair_${name}`);
         //this._standIndex = standIndex[0];
     }
 }
@@ -83,7 +83,7 @@ export class Stair extends MapElement {
 //     init(name: string, standIndex) {
 //         this._levelDiff = standIndex[1] || 1;
 //         this._stairType = name;
-//         this.getComponent(cc.Sprite).spriteFrame = ElementManager.getSpriteFrame(`stair_${name}`);
+//         this.getComponent(cc.Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`stair_${name}`);
 //         this._standIndex = standIndex[0];
 //     }
 // }

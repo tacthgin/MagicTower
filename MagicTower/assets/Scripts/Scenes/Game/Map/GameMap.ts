@@ -778,7 +778,7 @@
 //         //});
 //     }
 //     eventCollision(eventId: number | string) {
-//         //let eventInfo = DataManager.getJsonElement("event", eventId);
+//         //let eventInfo = GameManager.DATA.getJsonElement("event", eventId);
 //         //if (!eventInfo.save || eventInfo.save == this.mapData.level) {
 //         //this.excuteEvent(eventId);
 //         //} else {
@@ -1818,7 +1818,7 @@
 // //     }
 // //
 // //     eventCollision(eventId: number | string) {
-// //         let eventInfo = DataManager.getJsonElement("event", eventId);
+// //         let eventInfo = GameManager.DATA.getJsonElement("event", eventId);
 // //         if (!eventInfo.save || eventInfo.save == this.mapData.level) {
 // //             this.excuteEvent(eventId);
 // //         } else {

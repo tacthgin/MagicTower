@@ -51,7 +51,7 @@ export class LevelManager extends Component {
         //NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
         //NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
         //NotifyCenter.on(GameEvent.USE_PROP, this.useProp, this);
-        //this.mapInfo = DataManager.getJson("map");
+        //this.mapInfo = GameManager.DATA.getJson("map");
         //this.gameInfo = DataManager.getCustomData("GameInfo");
         //更新下无障碍a*地图
         //this.loadArchive();
@@ -359,7 +359,7 @@ export class LevelManager extends Component {
 //         NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
 //         NotifyCenter.on(GameEvent.USE_PROP, this.useProp, this);
 //
-//         this.mapInfo = DataManager.getJson("map");
+//         this.mapInfo = GameManager.DATA.getJson("map");
 //         this.gameInfo = DataManager.getCustomData("GameInfo");
 //         //更新下无障碍a*地图
 //         this.loadArchive();

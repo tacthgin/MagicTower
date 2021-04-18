@@ -19,7 +19,7 @@ export class MonsterFightSystem {
         //this.hero = hero;
         //this.map = map;
         //this.index = tileIndex;
-        //this.globalConfig = DataManager.getJson("global");
+        //this.globalConfig = GameManager.DATA.getJson("global");
         //return this;
     }
     /**
@@ -83,7 +83,7 @@ export class MonsterFightSystem {
 //         this.hero = hero;
 //         this.map = map;
 //         this.index = tileIndex;
-//         this.globalConfig = DataManager.getJson("global");
+//         this.globalConfig = GameManager.DATA.getJson("global");
 //         return this;
 //     }
 //
