@@ -45,16 +45,8 @@ export class Monster extends MapElement {
         this._firstAttack = this._monsterInfo.firstAttack;
         this.node.getComponent(UITransform).anchorY = this._monsterInfo.big ? 0.15 : 0.5;
         this.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._monsterInfo.spriteId}_0`);
-        this.createAnimation(this._monsterInfo.spriteId);
+        this.createAnimation(this._monsterInfo.spriteId, this._monsterInfo.spriteId, 2);
         this.animation.play(this._monsterInfo.spriteId);
-    }
-
-    protected createAnimationClip(): SpriteFrame[] {
-        let spriteFrames = [];
-        for (let i = 0; i < 2; i++) {
-            spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${this._monsterInfo.spriteId}_${i}`));
-        }
-        return spriteFrames;
     }
 
     hurt(damage: number) {

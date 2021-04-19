@@ -26,18 +26,10 @@ export class Npc extends MapElement {
     init(id: number) {
         this._npcInfo = GameManager.DATA.getJsonElement("npc", id, true);
         this.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._npcInfo.spriteId}_0`);
-        this.createAnimation(this._npcInfo.spriteId);
+        this.createAnimation(this._npcInfo.spriteId, this._npcInfo.spriteId, 2);
         this.stepIndex = 0;
         this.moveIndex = 0;
         this.animation.play(this._npcInfo.spriteId);
-    }
-
-    protected createAnimationClip(reverse: boolean): SpriteFrame[] {
-        let spriteFrames = [];
-        for (let i = 0; i < 2; i++) {
-            spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${this._npcInfo.spriteId}_${i}`));
-        }
-        return spriteFrames;
     }
 
     talk() {

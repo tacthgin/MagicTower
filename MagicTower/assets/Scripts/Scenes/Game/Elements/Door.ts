@@ -67,6 +67,8 @@ export class Door extends MapElement {
         this._hide = false;
         this.doorInfo = GameManager.DATA.getJsonElement("door", id);
         this.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this.doorInfo.spriteId}_0`);
+        this.createAnimation(this.doorInfo.spriteId, this.doorInfo.spriteId, 4, AnimationClip.WrapMode.Normal, false, 17);
+        this.createAnimation(`${this.doorInfo.spriteId}_reverse`, this.doorInfo.spriteId, 4, AnimationClip.WrapMode.Normal, true, 17);
     }
 
     private onFinished() {
@@ -81,20 +83,8 @@ export class Door extends MapElement {
         }
     }
 
-    protected createAnimationClip(reverse: boolean): SpriteFrame[] {
-        let spriteFrames = [];
-        for (let i = 0; i < 4; i++) {
-            spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${this.doorInfo.spriteId}_${i}`));
-        }
-        if (reverse) {
-            spriteFrames.reverse();
-        }
-        return spriteFrames;
-    }
-
     private playAnimation(reverse: boolean) {
         let name = reverse ? `${this.doorInfo.spriteId}_reverse` : this.doorInfo.spriteId;
-        this.createAnimation(name, AnimationClip.WrapMode.Normal, reverse, 17);
         this.animation.play(name);
     }
 

@@ -1,5 +1,4 @@
-import { _decorator, Animation } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
+import { Animation, _decorator } from "cc";
 import { MapElement } from "./MapElement";
 const { ccclass, property } = _decorator;
 
@@ -7,15 +6,7 @@ const { ccclass, property } = _decorator;
 export class Shop extends MapElement {
     onLoad() {
         this.animation = this.getComponent(Animation);
-        this.createAnimation("shop");
+        this.createAnimation("shop", "pb_m", 2);
         this.animation.play("shop");
-    }
-
-    protected createAnimationClip() {
-        let spriteFrames = [];
-        for (let i = 0; i < 2; i++) {
-            spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`pb_m_${i}`));
-        }
-        return spriteFrames;
     }
 }
