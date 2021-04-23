@@ -17,7 +17,7 @@ export class RecordBook extends BaseDialog {
     currentPage: Label | null = null;
     init() {
         //let texts = [];
-        //let records = DataManager.getCustomData("GameInfo").HeroInfo.getRecordTalk();
+        //let records = DataManager.getCustomData("GameInfo").HeroData.getRecordTalk();
         //records.forEach(record => {
         //let npc = GameManager.DATA.getJsonElement("npc", record.npcId);
         //texts.push(npc.talk[record.chatStep]);
@@ -76,7 +76,7 @@ export class RecordBook extends BaseDialog {
 //     init() {
 //         let texts = [];
 //
-//         let records = DataManager.getCustomData("GameInfo").HeroInfo.getRecordTalk();
+//         let records = DataManager.getCustomData("GameInfo").HeroData.getRecordTalk();
 //         records.forEach(record => {
 //             let npc = GameManager.DATA.getJsonElement("npc", record.npcId);
 //             texts.push(npc.talk[record.chatStep]);

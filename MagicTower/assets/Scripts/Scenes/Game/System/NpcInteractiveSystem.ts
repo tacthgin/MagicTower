@@ -1,11 +1,11 @@
 import { _decorator } from "cc";
 import Npc from "../Elements/Npc";
 import { GameMap } from "../Map/GameMap";
-import Hero from "../Hero";
+import Hero from "../Map/Hero";
 import { GameManager } from "../../../Managers/GameManager";
 import { NotifyCenter } from "../../../Managers/NotifyCenter";
 import { GameEvent } from "../../Constant/GameEvent";
-import { CommonAstar } from "../Astar";
+import { CommonAstar } from "../AI/Astar";
 
 export class NpcInteractiveSystem {
     private npc: Npc = null;
@@ -34,7 +34,7 @@ export class NpcInteractiveSystem {
         //} else {
         //let info = this.npc.talk();
         //this.npc.nextTalk();
-        //this.hero.HeroInfo.recordTalk(this.npc.npcInfo.id, info.index);
+        //this.hero.HeroData.recordTalk(this.npc.npcInfo.id, info.index);
         //let npcInfo = this.npc.npcInfo;
         //this.map.showDialog("ChatDialog", info.talk, () => {
         //小偷
@@ -53,27 +53,27 @@ export class NpcInteractiveSystem {
         //}
     }
     private npcTrade() {
-        //let heroInfo = this.hero.HeroInfo;
+        //let heroData = this.hero.HeroData;
         //let npcPropInfo = this.npc.npcInfo.value;
-        //heroInfo.Gold += npcPropInfo.gold || 0;
+        //heroData.Gold += npcPropInfo.gold || 0;
         //if (npcPropInfo.attack) {
-        //heroInfo.Attack += npcPropInfo.attack >= 1 ? npcPropInfo.attack : heroInfo.Attack * npcPropInfo.attack;
+        //heroData.Attack += npcPropInfo.attack >= 1 ? npcPropInfo.attack : heroData.Attack * npcPropInfo.attack;
         //}
         //if (npcPropInfo.defence) {
-        //heroInfo.Defence += npcPropInfo.defence >= 1 ? npcPropInfo.defence : heroInfo.Defence * npcPropInfo.defence;
+        //heroData.Defence += npcPropInfo.defence >= 1 ? npcPropInfo.defence : heroData.Defence * npcPropInfo.defence;
         //}
         //商人交易
         //if (npcPropInfo.propGold) {
-        //if (heroInfo.Gold + npcPropInfo.propGold < 0) {
+        //if (heroData.Gold + npcPropInfo.propGold < 0) {
         //GameManager.getInstance().showToast("你的钱不够");
         //return;
         //}
-        //heroInfo.Hp += npcPropInfo.hp || 0;
+        //heroData.Hp += npcPropInfo.hp || 0;
         //let tradeSuccess = true;
         //if (npcPropInfo.prop) {
         //for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
         //如果没有物品就不能卖
-        //if (npcPropInfo.prop[i + 1] < 0 && heroInfo.getPropNum(npcPropInfo.prop[i]) <= 0) {
+        //if (npcPropInfo.prop[i + 1] < 0 && heroData.getPropNum(npcPropInfo.prop[i]) <= 0) {
         //tradeSuccess = false;
         //continue;
         //}
@@ -81,7 +81,7 @@ export class NpcInteractiveSystem {
         //}
         //}
         //if (tradeSuccess) {
-        //heroInfo.Gold += npcPropInfo.propGold;
+        //heroData.Gold += npcPropInfo.propGold;
         //this.npc.consumeProp();
         //} else {
         //GameManager.getInstance().showToast("物品数量不够");
@@ -176,7 +176,7 @@ export class NpcInteractiveSystem {
 //         } else {
 //             let info = this.npc.talk();
 //             this.npc.nextTalk();
-//             this.hero.HeroInfo.recordTalk(this.npc.npcInfo.id, info.index);
+//             this.hero.HeroData.recordTalk(this.npc.npcInfo.id, info.index);
 //             let npcInfo = this.npc.npcInfo;
 //             this.map.showDialog("ChatDialog", info.talk, () => {
 //                 //小偷
@@ -196,31 +196,31 @@ export class NpcInteractiveSystem {
 //     }
 //
 //     private npcTrade() {
-//         let heroInfo = this.hero.HeroInfo;
+//         let heroData = this.hero.HeroData;
 //         let npcPropInfo = this.npc.npcInfo.value;
-//         heroInfo.Gold += npcPropInfo.gold || 0;
+//         heroData.Gold += npcPropInfo.gold || 0;
 //
 //         if (npcPropInfo.attack) {
-//             heroInfo.Attack += npcPropInfo.attack >= 1 ? npcPropInfo.attack : heroInfo.Attack * npcPropInfo.attack;
+//             heroData.Attack += npcPropInfo.attack >= 1 ? npcPropInfo.attack : heroData.Attack * npcPropInfo.attack;
 //         }
 //
 //         if (npcPropInfo.defence) {
-//             heroInfo.Defence += npcPropInfo.defence >= 1 ? npcPropInfo.defence : heroInfo.Defence * npcPropInfo.defence;
+//             heroData.Defence += npcPropInfo.defence >= 1 ? npcPropInfo.defence : heroData.Defence * npcPropInfo.defence;
 //         }
 //
 //         //商人交易
 //         if (npcPropInfo.propGold) {
-//             if (heroInfo.Gold + npcPropInfo.propGold < 0) {
+//             if (heroData.Gold + npcPropInfo.propGold < 0) {
 //                 GameManager.getInstance().showToast("你的钱不够");
 //                 return;
 //             }
 //
-//             heroInfo.Hp += npcPropInfo.hp || 0;
+//             heroData.Hp += npcPropInfo.hp || 0;
 //             let tradeSuccess = true;
 //             if (npcPropInfo.prop) {
 //                 for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
 //                     //如果没有物品就不能卖
-//                     if (npcPropInfo.prop[i + 1] < 0 && heroInfo.getPropNum(npcPropInfo.prop[i]) <= 0) {
+//                     if (npcPropInfo.prop[i + 1] < 0 && heroData.getPropNum(npcPropInfo.prop[i]) <= 0) {
 //                         tradeSuccess = false;
 //                         continue;
 //                     }
@@ -229,7 +229,7 @@ export class NpcInteractiveSystem {
 //             }
 //
 //             if (tradeSuccess) {
-//                 heroInfo.Gold += npcPropInfo.propGold;
+//                 heroData.Gold += npcPropInfo.propGold;
 //                 this.npc.consumeProp();
 //             } else {
 //                 GameManager.getInstance().showToast("物品数量不够");

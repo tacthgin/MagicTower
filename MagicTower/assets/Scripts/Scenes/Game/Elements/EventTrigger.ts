@@ -1,5 +1,5 @@
 import { _decorator } from "cc";
-import { MapElement } from "./MapElement";
+import { MapElement } from "./Base/MapElement";
 const { ccclass, property } = _decorator;
 
 @ccclass("EventTrigger")

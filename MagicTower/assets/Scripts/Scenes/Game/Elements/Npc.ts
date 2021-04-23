@@ -1,14 +1,14 @@
-import { _decorator, Animation, Vec2, Sprite, SpriteFrame } from "cc";
+import { Animation, Sprite, _decorator } from "cc";
 import { GameManager } from "../../../Framework/Managers/GameManager";
-import { MapElement } from "./MapElement";
+import { Actor } from "./Base/Actor";
+
 const { ccclass } = _decorator;
 
 @ccclass("Npc")
-export class Npc extends MapElement {
+export class Npc extends Actor {
     private _npcInfo: any = null;
     private stepIndex: number = 0;
     private moveIndex: number = 0;
-    private globalInfo: any = null;
 
     get npcInfo() {
         return this._npcInfo;
@@ -20,7 +20,6 @@ export class Npc extends MapElement {
 
     onLoad() {
         this.animation = this.getComponent(Animation);
-        this.globalInfo = GameManager.DATA.getJson("global");
     }
 
     init(id: number) {
@@ -50,21 +49,6 @@ export class Npc extends MapElement {
             return this._npcInfo.move[this.moveIndex++] || null;
         }
         return null;
-    }
-
-    movePath(path: Vec2[]) {
-        return new Promise((resolve) => {
-            let moveActions = [];
-            path.forEach((position) => {
-                moveActions.push(cc.moveTo(this.globalInfo.npcSpeed, position));
-            });
-            moveActions.push(
-                cc.callFunc(() => {
-                    resolve();
-                })
-            );
-            this.node.runAction(cc.sequence(moveActions));
-        });
     }
 
     getWallIndex() {

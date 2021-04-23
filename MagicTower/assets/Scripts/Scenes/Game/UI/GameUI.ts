@@ -1,12 +1,12 @@
 import { _decorator, Component, Label, Sprite, SpriteFrame, Prefab, Node, NodePool, UITransform, Vec3 } from "cc";
-import { BasePoolNode } from "../../Framework/Base/BasePoolNode";
-import { GameManager } from "../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../Framework/Managers/NotifyCenter";
-import { Util } from "../../Framework/Util/Util";
-import { GameEvent } from "../Constant/GameEvent";
-import { HeroAttr, HeroData, HeroEvent, PropType } from "../Data/CustomData/HeroData";
-import { MonsterIcon } from "./UI/MonsterIcon";
-import { PropButton } from "./UI/PropButton";
+import { BasePoolNode } from "../../../Framework/Base/BasePoolNode";
+import { GameManager } from "../../../Framework/Managers/GameManager";
+import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
+import { Util } from "../../../Framework/Util/Util";
+import { GameEvent } from "../../Constant/GameEvent";
+import { HeroAttr, HeroData, HeroEvent, PropType } from "../../Data/CustomData/HeroData";
+import { MonsterIcon } from "./MonsterIcon";
+import { PropButton } from "./PropButton";
 
 const { ccclass, property } = _decorator;
 

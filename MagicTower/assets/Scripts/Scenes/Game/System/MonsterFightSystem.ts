@@ -1,7 +1,7 @@
 import { _decorator } from "cc";
 import Monster from "../Elements/Monster";
 import { GameMap } from "../Map/GameMap";
-import Hero from "../Hero";
+import Hero from "../Map/Hero";
 import CalculateSystem from "./CalculateSystem";
 import { NotifyCenter } from "../../../Managers/NotifyCenter";
 import { GameEvent } from "../../Constant/GameEvent";
@@ -27,8 +27,8 @@ export class MonsterFightSystem {
      * @param magic 是否后续还有模仿伤害
      */
     execute(magic: boolean) {
-        //let count = CalculateSystem.getHeroAttackCount(this.hero.HeroInfo, this.monster.monsterInfo);
-        //let damageInfo = CalculateSystem.perAttackDamage(this.hero.HeroInfo, this.monster.monsterInfo);
+        //let count = CalculateSystem.getHeroAttackCount(this.hero.HeroData, this.monster.monsterInfo);
+        //let damageInfo = CalculateSystem.perAttackDamage(this.hero.HeroData, this.monster.monsterInfo);
         //谁先攻击 0英雄先攻击
         //let i = this.monster.firstAttack ? 1 : 0;
         //let scheduleCount = i == 0 ? count * 2 - 1 : count * 2;
@@ -92,8 +92,8 @@ export class MonsterFightSystem {
 //      * @param magic 是否后续还有模仿伤害
 //      */
 //     execute(magic: boolean) {
-//         let count = CalculateSystem.getHeroAttackCount(this.hero.HeroInfo, this.monster.monsterInfo);
-//         let damageInfo = CalculateSystem.perAttackDamage(this.hero.HeroInfo, this.monster.monsterInfo);
+//         let count = CalculateSystem.getHeroAttackCount(this.hero.HeroData, this.monster.monsterInfo);
+//         let damageInfo = CalculateSystem.perAttackDamage(this.hero.HeroData, this.monster.monsterInfo);
 //
 //         //谁先攻击 0英雄先攻击
 //         let i = this.monster.firstAttack ? 1 : 0;
