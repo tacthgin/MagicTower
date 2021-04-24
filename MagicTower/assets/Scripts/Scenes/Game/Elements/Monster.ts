@@ -1,12 +1,12 @@
-import { _decorator, Node, Animation, Vec2, tween, Sprite, UITransform, SpriteFrame, AnimationClip, Vec3, Tween } from "cc";
+import { Animation, Node, Sprite, tween, UITransform, Vec2, Vec3, _decorator } from "cc";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Util } from "../../../Framework/Util/Util";
-import { MapElement } from "./MapElement";
+import { Actor } from "./Base/Actor";
 
 const { ccclass, property } = _decorator;
 
 @ccclass("Monster")
-export class Monster extends MapElement {
+export class Monster extends Actor {
     @property(Node)
     lightning: Node = null;
 
@@ -52,26 +52,6 @@ export class Monster extends MapElement {
     hurt(damage: number) {
         this._monsterInfo.hp = Util.clamp(this._monsterInfo.hp - damage, 0, Number.MAX_VALUE);
         return this._monsterInfo.hp == 0;
-    }
-
-    movePath(path: Vec2[], speed: number = 1) {
-        return new Promise((resolve) => {
-            let moveActions: Tween<Node>[] = [];
-            path.forEach((position) => {
-                moveActions.push(tween(this.node).to(this.globalInfo.npcSpeed * speed, { position: new Vec3(position.x, position.y) }));
-            });
-            moveActions.push(
-                tween(this.node).call(() => {
-                    resolve(0);
-                })
-            );
-            tween(this.node)
-                .sequence(moveActions)
-                .call(() => {
-                    resolve(0);
-                })
-                .start();
-        });
     }
 
     beAttack() {

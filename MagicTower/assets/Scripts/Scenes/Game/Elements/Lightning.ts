@@ -1,5 +1,5 @@
 import { _decorator, Vec3, v3 } from "cc";
-import { MapElement } from "./MapElement";
+import { MapElement } from "./Base/MapElement";
 const { ccclass, property } = _decorator;
 
 @ccclass("Lightning")

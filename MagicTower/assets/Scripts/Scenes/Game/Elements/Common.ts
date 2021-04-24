@@ -1,6 +1,6 @@
 import { _decorator, Animation, Sprite, SpriteFrame } from "cc";
 import { GameManager } from "../../../Framework/Managers/GameManager";
-import { MapElement } from "./MapElement";
+import { MapElement } from "./Base/MapElement";
 
 const { ccclass } = _decorator;
 

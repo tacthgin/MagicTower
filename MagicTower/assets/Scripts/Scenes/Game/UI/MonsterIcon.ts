@@ -1,6 +1,6 @@
 import { _decorator, Component, Animation, SpriteFrame, Sprite } from "cc";
 import { GameManager } from "../../../Framework/Managers/GameManager";
-import { MapElement } from "../Elements/MapElement";
+import { MapElement } from "../Elements/Base/MapElement";
 const { ccclass } = _decorator;
 
 @ccclass("MonsterIcon")

@@ -91,7 +91,7 @@ export class LevelManager extends Component {
         //let endTile = this.currentMap.nodeSpaceARToTile(this.node.convertToNodeSpaceAR(touchPos));
         //还原英雄行走
         //this.currentMap.astarMoveType = "hero";
-        //let path = this.astar.getPath(this.currentMap, this.hero.HeroInfo.Position, endTile);
+        //let path = this.astar.getPath(this.currentMap, this.hero.HeroData.Position, endTile);
         //if (path) {
         //this.printPath(path);
         //let canEndMove = this.currentMap.canEndTileMove(endTile);
@@ -233,7 +233,7 @@ export class LevelManager extends Component {
         //break;
         //case 15:
         //{
-        //this.hero.HeroInfo.Hp += this.hero.HeroInfo.Attack + this.hero.HeroInfo.Defence;
+        //this.hero.HeroData.Hp += this.hero.HeroData.Attack + this.hero.HeroData.Defence;
         //NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
         //this.consumptionProp(propInfo);
         //}
@@ -260,7 +260,7 @@ export class LevelManager extends Component {
     }
     consumptionProp(propInfo) {
         //if (!propInfo.permanent) {
-        //this.hero.HeroInfo.addProp(propInfo.id, -1);
+        //this.hero.HeroData.addProp(propInfo.id, -1);
         //NotifyCenter.emit(GameEvent.REFRESH_PROP, propInfo, -1);
         //}
     }

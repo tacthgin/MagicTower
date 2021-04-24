@@ -1,13 +1,13 @@
-import Hero from "./Hero";
+import { Hero } from "./Hero";
 
-export interface State {
+export interface HeroState {
     hero: Hero;
     enter(hero: Hero): void;
     exit(): void;
     update(): void;
 }
 
-export class IdleState implements State {
+export class IdleState implements HeroState {
     hero: Hero;
 
     enter(hero: Hero) {
@@ -20,7 +20,7 @@ export class IdleState implements State {
     update() {}
 }
 
-export class MoveState implements State {
+export class MoveState implements HeroState {
     hero: Hero;
 
     enter(hero: Hero) {
