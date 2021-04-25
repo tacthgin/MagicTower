@@ -1,10 +1,11 @@
-import { _decorator, Component, Node, Animation, Vec2, Sprite } from "cc";
+import { _decorator, Component, Node, Animation, Vec2, Sprite, AnimationClip } from "cc";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../Constant/GameEvent";
 import { HeroData } from "../../Data/CustomData/HeroData";
 import { PropParser } from "../../Data/Parser/PropParser";
-import { HeroState, IdleState } from "./HeroState";
+import { GameMap } from "./GameMap";
+import { HeroState, IdleState, MoveState } from "./HeroState";
 
 const { ccclass, property } = _decorator;
 
@@ -76,46 +77,52 @@ export class Hero extends Component {
             return yy < 0 ? 0 : 2;
         }
     }
+
     private createAnimation() {
-        this.heroData.Animation.forEach((animationName) => {
+        this.heroData.get("animation").forEach((animationName: any) => {
             let spriteFrames = [];
             for (let i = 1; i < 3; i++) {
                 spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${animationName}_${i}`));
             }
             let clip = AnimationClip.createWithSpriteFrames(spriteFrames, 4);
             clip.name = animationName;
-            clip.wrapMode = WrapMode.Loop;
-            this.animation.addClip(clip);
+            clip.wrapMode = AnimationClip.WrapMode.Loop;
+            this.animation.clips.push(clip);
             clip = AnimationClip.createWithSpriteFrames(spriteFrames, 8);
             clip.name = `${animationName}_once`;
-            clip.wrapMode = WrapMode.Normal;
-            this.animation.addClip(clip);
+            clip.wrapMode = AnimationClip.WrapMode.Normal;
+            this.animation.clips.push(clip);
         });
     }
+
     /**
      * 人物朝向
      * @param info info为vec2，人物朝向的点，info为nubmer直接传入方向
      */
     toward(info: Vec2 | number) {
         if (typeof info == "number") {
-            this.heroData.Direction = info;
+            this.heroData.set("direction", info);
         } else {
-            this.heroData.Direction = this.getDirection(info.sub(this.heroData.Position));
+            let result = new Vec2();
+            Vec2.subtract(result, info, this.heroData.get("position"));
+            this.heroData.set("direction", this.getDirection(result));
         }
         this.setDirectionTexture();
     }
 
     /** 设置人物方向贴图 */
     setDirectionTexture() {
-        this.heroNode.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this.heroData.Animation[this.heroData.Direction]}_0`);
+        this.heroNode.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(
+            `${this.heroData.get("animation")[this.heroData.get("direction")]}_0`
+        );
     }
 
     /** 根据方向播放行走动画 */
     playMoveAnimation() {
-        let animationName = this.heroData.Animation[this.heroData.Direction];
-        if (this.animation.currentClip) {
-            let state = this.animation.getAnimationState(this.animation.currentClip.name);
-            if (state.isPlaying && this.animation.currentClip.name == animationName) {
+        let animationName = this.heroData.get("animation")[this.heroData.get("direction")];
+        if (this.animation.defaultClip) {
+            let state = this.animation.getAnimationState(this.animation.defaultClip.name);
+            if (state.isPlaying && this.animation.defaultClip.name == animationName) {
                 return;
             }
         }
@@ -123,11 +130,11 @@ export class Hero extends Component {
     }
 
     stopMoveAnimation() {
-        if (this.animation.currentClip.name.indexOf("once") == -1) this.animation.stop();
+        if (this.animation.defaultClip.name.indexOf("once") == -1) this.animation.stop();
     }
 
     /** 默认状态之间无条件限制 */
-    changeState(newState: State) {
+    changeState(newState: HeroState) {
         if (this.currentState != null && !(newState instanceof MoveState && this.currentState instanceof MoveState)) {
             this.currentState.exit();
         }
@@ -141,15 +148,15 @@ export class Hero extends Component {
         let moveAction = (position: Vec2, end: boolean = false) => {
             return sequence(
                 callFunc(() => {
-                    this.heroData.Direction = this.getDirection(position.sub(this.heroData.Position));
+                    this.heroData.get("direction") = this.getDirection(position.sub(this.heroData.Position));
                     if (!stop) {
-                        动作停止callFunc依然会调用一次;
+                        //动作停止callFunc依然会调用一次;
                         this.changeState(new MoveState());
                     }
                 }),
                 moveTo(this.globalInfo.heroSpeed, this.map.tileToNodeSpaceAR(position)),
                 callFunc(() => {
-                    this.heroData.Position = position;
+                    this.heroData.set("position", position);
                     stop = moveCallback(position, end);
                 })
             );
@@ -197,7 +204,7 @@ export class Hero extends Component {
 
     magicDamage(monsterIndexs: number[], damage: number) {
         this.magicLight(monsterIndexs);
-        let animationName = this.heroData.Animation[this.heroData.Direction];
+        let animationName = this.heroData.get("animation")[this.heroData.get("direction")];
         this.animation.play(`${animationName}_once`);
         if (damage < 1) {
             this.heroData.Hp = Math.ceil(this.heroData.Hp * damage);
