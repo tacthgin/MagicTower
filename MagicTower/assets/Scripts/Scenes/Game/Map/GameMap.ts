@@ -7,10 +7,10 @@ let INDEX_DIFFS = [1, 11];
 
 /** 地块4个方向 */
 let DIRECTION_INDEX_DIFFS = {
-    "-1": Vec2.RIGHT,
-    "1": Vec2.RIGHT.clone().negate(),
-    "-11": Vec2.UP.clone().negate(),
-    "11": Vec2.UP,
+    "-1": v2(1, 0),
+    "1": v2(-1, 0),
+    "-11": v2(0, -1),
+    "11": v2(0, 1),
 };
 
 /** 英雄面朝方向上，右，下，左 */
