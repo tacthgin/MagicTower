@@ -1,6 +1,5 @@
 import { Enum, EventTouch, Node, UITransform, view, _decorator } from "cc";
-import { ActionComponent } from "../Components/ActionComponent";
-import { DialogAction } from "./BaseContant";
+import { ActionComponent, DialogAction } from "../Components/ActionComponent";
 import { GameManager } from "../Managers/GameManager";
 import { BaseComponent } from "./BaseComponent";
 

@@ -23,15 +23,17 @@ export class DataManager {
 
     /** 加载本地缓存 */
     loadLocalStorage() {
-        if (localStorage.length > 0) {
-            for (let i = 0; i < localStorage.length; ++i) {
-                let key = localStorage.key(i);
-                this.loadData(key, localStorage.getItem(key));
+        for (let key in Fn.BASE_DATA_ASSEMBLE) {
+            let data = localStorage.getItem(key);
+            if (data) {
+                try {
+                    data = JSON.parse(data);
+                } catch {
+                    console.error(`解析本地存储${key}失败`);
+                    data = null;
+                }
             }
-        } else {
-            for (let key in Fn.BASE_DATA_ASSEMBLE) {
-                this.loadData(key, null);
-            }
+            this.loadData(key, data);
         }
     }
 

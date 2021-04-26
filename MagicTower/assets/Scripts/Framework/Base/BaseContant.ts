@@ -16,8 +16,3 @@ export enum BaseEvent {
     /** 资源加载失败 */
     ALL_RESOURCES_LOAD_FAILED = "ALL_RESOURCES_LOAD_FAILED",
 }
-
-export enum DialogAction {
-    NoneAction,
-    ScaleAction,
-}
