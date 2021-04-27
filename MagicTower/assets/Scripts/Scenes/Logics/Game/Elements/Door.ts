@@ -1,7 +1,7 @@
 import { _decorator, Animation, SpriteFrame, Sprite, AnimationClip } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
+import { GameManager } from "../../../../Framework/Managers/GameManager";
+import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { GameEvent } from "../../../Constant/GameEvent";
 import { MapElement } from "./Base/MapElement";
 
 const { ccclass, property } = _decorator;

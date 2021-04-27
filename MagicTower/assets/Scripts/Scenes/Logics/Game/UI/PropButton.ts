@@ -1,7 +1,7 @@
 import { _decorator, Component, Label, Sprite } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
+import { GameManager } from "../../../../Framework/Managers/GameManager";
+import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { GameEvent } from "../../../Constant/GameEvent";
 const { ccclass, property } = _decorator;
 
 @ccclass("PropButton")

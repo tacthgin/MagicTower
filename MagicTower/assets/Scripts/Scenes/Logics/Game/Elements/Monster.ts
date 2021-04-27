@@ -1,6 +1,6 @@
 import { Animation, Node, Sprite, tween, UITransform, Vec2, Vec3, _decorator } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
-import { Util } from "../../../Framework/Util/Util";
+import { GameManager } from "../../../../Framework/Managers/GameManager";
+import { Util } from "../../../../Framework/Util/Util";
 import { Actor } from "./Base/Actor";
 
 const { ccclass, property } = _decorator;

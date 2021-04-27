@@ -1,6 +1,6 @@
 import { _decorator } from "cc";
-import { Util } from "../../../Framework/Util/Util";
-import { HeroAttr, HeroData } from "../../Data/CustomData/HeroData";
+import { Util } from "../../../../Framework/Util/Util";
+import { HeroAttr, HeroData } from "../../../Data/CustomData/HeroData";
 
 export class CalculateSystem {
     /**

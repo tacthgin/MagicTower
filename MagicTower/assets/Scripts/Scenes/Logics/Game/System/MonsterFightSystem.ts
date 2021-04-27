@@ -4,7 +4,7 @@ import { GameMap } from "../Map/GameMap";
 import Hero from "../Map/Hero";
 import CalculateSystem from "./CalculateSystem";
 import { NotifyCenter } from "../../../Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
+import { GameEvent } from "../../../Constant/GameEvent";
 import { DataManager } from "../../../Managers/DataManager";
 
 export class MonsterFightSystem {

@@ -1,9 +1,9 @@
 import { _decorator, Component, Node, Animation, Vec2, Sprite } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
-import { HeroData } from "../../Data/CustomData/HeroData";
-import { PropParser } from "../../Data/Parser/PropParser";
+import { GameManager } from "../../../../Framework/Managers/GameManager";
+import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { GameEvent } from "../../../Constant/GameEvent";
+import { HeroData } from "../../../Data/CustomData/HeroData";
+import { PropParser } from "../../../Data/Parser/PropParser";
 import { HeroState, IdleState } from "./HeroState";
 
 const { ccclass, property } = _decorator;

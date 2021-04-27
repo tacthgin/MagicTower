@@ -1,5 +1,5 @@
 import { Sprite, _decorator } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
+import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { MapElement } from "./Base/MapElement";
 const { ccclass } = _decorator;
 

@@ -1,5 +1,5 @@
 import { Animation, Sprite, _decorator } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
+import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { Actor } from "./Base/Actor";
 
 const { ccclass } = _decorator;

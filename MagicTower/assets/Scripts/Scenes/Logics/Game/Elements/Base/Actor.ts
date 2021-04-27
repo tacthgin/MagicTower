@@ -1,5 +1,5 @@
 import { tween, Tween, Vec3, Node } from "cc";
-import { GameManager } from "../../../../Framework/Managers/GameManager";
+import { GameManager } from "../../../../../Framework/Managers/GameManager";
 import { MapElement } from "./MapElement";
 
 export class Actor extends MapElement {

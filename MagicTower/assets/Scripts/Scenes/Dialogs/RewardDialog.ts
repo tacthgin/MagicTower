@@ -2,7 +2,7 @@ import { _decorator, Label, Node } from "cc";
 const { ccclass, property } = _decorator;
 
 import { BaseDialog } from "../../Framework/Base/BaseDialog";
-import Npc from "../Game/Elements/Npc";
+import Npc from "../Logics/Game/Elements/Npc";
 
 @ccclass("RewardDialog")
 export class RewardDialog extends BaseDialog {
