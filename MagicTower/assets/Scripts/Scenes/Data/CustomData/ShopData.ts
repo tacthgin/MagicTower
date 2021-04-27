@@ -10,12 +10,6 @@ class _ShopData {
     public count: number = 0;
     public ratio: number = 0;
     public level: number = 0;
-
-    load(data: any) {
-        for (let key in data) {
-            this[key] = data[key];
-        }
-    }
 }
 
 @Fn.registerClass("ShopData")
@@ -53,11 +47,7 @@ export class ShopData extends BaseData {
     }
 
     load(data: any = null) {
-        if (data) {
-            this.data.load(data);
-        } else {
-            this.data.load(GameManager.DATA.getJsonElement("global", "shop"));
-        }
-        this.data = this.createProxy(this.data);
+        this.loadData(data || GameManager.DATA.getJsonElement("global", "shop"));
+        this.setProxy();
     }
 }

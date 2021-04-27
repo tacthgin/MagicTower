@@ -1,6 +1,10 @@
 import { Component, js, Node, Tween, tween, Vec3 } from "cc";
-import { DialogAction } from "../Base/BaseContant";
 import { Fn } from "../Util/Fn";
+
+export enum DialogAction {
+    NoneAction,
+    ScaleAction,
+}
 
 /** 结点消失的时候动作回调 */
 export abstract class ActionComponent extends Component {

@@ -40,11 +40,6 @@ class _HeroData {
         shieldID: 0,
         prop: {},
     };
-    load(data: any) {
-        for (let key in data) {
-            this[key] = data[key];
-        }
-    }
 }
 
 @Fn.registerClass("HeroData")
@@ -52,12 +47,8 @@ export class HeroData extends BaseData {
     protected data: _HeroData = new _HeroData();
 
     load(data: any = null) {
-        if (data) {
-            this.data.load(data);
-        } else {
-            this.data.load(GameManager.DATA.getJsonElement("global", "hero"));
-        }
-        this.data = this.createProxy(this.data);
+        this.loadData(data || GameManager.DATA.getJsonElement("global", "hero"));
+        this.setProxy();
     }
 
     getAttr(attr: HeroAttr) {

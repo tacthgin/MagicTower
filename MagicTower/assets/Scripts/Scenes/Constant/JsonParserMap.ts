@@ -1,1 +1,3 @@
-export const JsonParserMap = {};
+export const JsonParserMap = {
+    prop: "PropParser",
+};
