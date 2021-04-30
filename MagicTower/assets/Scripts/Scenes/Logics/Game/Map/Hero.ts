@@ -1,11 +1,11 @@
 import { _decorator, Component, Node, Animation, Vec2, Sprite, AnimationClip } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
-import { HeroData } from "../../Data/CustomData/HeroData";
-import { PropParser } from "../../Data/Parser/PropParser";
+import { GameManager } from "../../../../Framework/Managers/GameManager";
+import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { GameEvent } from "../../../Constant/GameEvent";
+import { HeroData } from "../../../Data/CustomData/HeroData";
+import { PropParser } from "../../../Data/Parser/PropParser";
 import { GameMap } from "./GameMap";
-import { HeroState, IdleState, MoveState } from "./HeroState";
+import { HeroState, IdleState } from "./HeroState";
 
 const { ccclass, property } = _decorator;
 
@@ -215,11 +215,7 @@ export class Hero extends Component {
     }
 
     weak() {
-        let info = GameManager.DATA.getJsonElement("global", "weakenAttr");
-        this.heroData.Attack = info.attack;
-        this.heroData.Defence = info.defence;
-        this.heroData.Hp = info.hp;
-        this.heroData.clearEquip();
+        this.heroData.weak();
     }
 
     addProp(id: string, count: number = 1) {

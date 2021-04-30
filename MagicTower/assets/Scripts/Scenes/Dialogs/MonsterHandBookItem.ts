@@ -2,7 +2,7 @@ import { _decorator, Component, Label, NodePool } from "cc";
 import { BasePoolNode } from "../../Framework/Base/BasePoolNode";
 import { GameManager } from "../../Framework/Managers/GameManager";
 import { HeroData } from "../Data/CustomData/HeroData";
-import Monster from "../Game/Elements/Monster";
+import Monster from "../Logics/Game/Elements/Monster";
 
 const { ccclass, property } = _decorator;
 

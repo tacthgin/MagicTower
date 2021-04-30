@@ -4,7 +4,7 @@ import { GameMap } from "../Map/GameMap";
 import Hero from "../Map/Hero";
 import { GameManager } from "../../../Managers/GameManager";
 import { NotifyCenter } from "../../../Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
+import { GameEvent } from "../../../Constant/GameEvent";
 import { CommonAstar } from "../AI/Astar";
 
 export class NpcInteractiveSystem {

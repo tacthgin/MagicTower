@@ -1,9 +1,9 @@
 import { Component, Label, _decorator } from "cc";
-import { BaseEvent } from "../../Framework/Base/BaseContant";
-import { GameManager } from "../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../Framework/Managers/NotifyCenter";
-import { ResourceType } from "../../Framework/Managers/ResourceManager";
-import { JsonParserMap } from "../Constant/JsonParserMap";
+import { BaseEvent } from "../../../Framework/Base/BaseContant";
+import { GameManager } from "../../../Framework/Managers/GameManager";
+import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
+import { ResourceType } from "../../../Framework/Managers/ResourceManager";
+import { JsonParserMap } from "../../Constant/JsonParserMap";
 
 const { ccclass, property } = _decorator;
 

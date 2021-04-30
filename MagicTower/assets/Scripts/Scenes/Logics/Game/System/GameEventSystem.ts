@@ -4,7 +4,7 @@ import { _decorator } from "cc";
 import { DataManager } from "../../../Managers/DataManager";
 import { GameManager } from "../../../Managers/GameManager";
 import { NotifyCenter } from "../../../Managers/NotifyCenter";
-import { GameEvent } from "../../Constant/GameEvent";
+import { GameEvent } from "../../../Constant/GameEvent";
 import Hero from "../Map/Hero";
 import { CommonAstar } from "../AI/Astar";
 import { GameMap } from "../Map/GameMap";

@@ -11,6 +11,9 @@ export enum HeroAttr {
 }
 
 export enum PropType {
+    HEALING_SALVE = 2,
+    ATTACK_GEM,
+    DEFENCE_GEM,
     SWARD = 5,
     SHIELD,
     /** 神圣盾 */
@@ -61,7 +64,11 @@ export class HeroData extends BaseData {
         this.emit(HeroEvent.HERO_ATTR, attr);
     }
 
-    clearEquip() {
+    weak() {
+        let info = GameManager.DATA.getJsonElement("global", "weakenAttr");
+        this.data.heroAttr[HeroAttr.ATTACK] = info.attack;
+        this.data.heroAttr[HeroAttr.DEFENCE] = info.defence;
+        this.data.heroAttr[HeroAttr.HP] = info.hp;
         this.data.props.swardID = 0;
         this.data.props.shieldID = 0;
         this.save();

@@ -1,6 +1,6 @@
 import { tween, UIOpacity, Animation, AnimationClip, SpriteFrame } from "cc";
-import { BasePoolNode } from "../../../../Framework/Base/BasePoolNode";
-import { GameManager } from "../../../../Framework/Managers/GameManager";
+import { BasePoolNode } from "../../../../../Framework/Base/BasePoolNode";
+import { GameManager } from "../../../../../Framework/Managers/GameManager";
 
 export abstract class MapElement extends BasePoolNode {
     protected animation: Animation = null;
