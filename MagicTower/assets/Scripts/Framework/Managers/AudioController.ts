@@ -3,14 +3,17 @@ const { ccclass, type } = _decorator;
 
 const AUDIO_PATH = "Audio";
 
+export enum AudioType {
+    MUSIC,
+    EFFECT,
+}
+
 @ccclass("AudioController")
 export class AudioController extends Component {
     @type(AudioSource)
-    private music: AudioSource = null;
+    private audioSource: AudioSource[] = [];
 
     private audioEnabled: boolean[] = [true, true];
-
-    private effectClips: AudioClip[] = [];
 
     public set musicEnabled(value: boolean) {
         this.audioEnabled[0] = value;
@@ -27,22 +30,6 @@ export class AudioController extends Component {
     public get effectEnabled() {
         return this.audioEnabled[1];
     }
-
-    public set musicVolume(value: number) {
-        if (value >= 0 && value <= 1) {
-            this.music.volume = value;
-        }
-    }
-
-    onLoad() {
-        //如果需要停止全部音效
-        //this.node.on("ended", this.audioEnded, this);
-    }
-
-    // private audioEnded(audioClip: AudioClip) {
-    //     let index = this.effectClips.indexOf(audioClip)
-    //     index != -1 && this.effectClips.splice(index, 1)
-    // }
 
     private getAudioClip(audioPath: string) {
         audioPath = path.join(AUDIO_PATH, audioPath);
@@ -64,44 +51,60 @@ export class AudioController extends Component {
         });
     }
 
-    playMusic(audioPath: string, loop: boolean) {
-        if (!this.musicEnabled) return;
+    /**
+     * 播放音乐、音效
+     * @param type 播放类型
+     * @param audioPath 音乐片段路径
+     * @param loop 是否循环
+     * @param volume 音量
+     * @returns
+     */
+    private play(type: AudioType, audioPath: string, loop: boolean = true, volume: number = 1) {
+        if (!this.audioEnabled[type]) return;
         this.getAudioClip(audioPath).then((audioClip: any) => {
-            if (this.music.clip != audioClip) {
-                this.music.clip = audioClip;
-                this.music.loop = loop;
-                this.music.play();
-            } else {
+            let audioSource = this.audioSource[type];
+            if (type == AudioType.MUSIC && audioSource.clip != audioClip) {
                 console.warn("音效资源相同", audioPath);
+                return;
             }
+            audioSource.clip = audioClip;
+            audioSource.loop = loop;
+            audioSource.volume = volume;
+            audioSource.play();
         });
+    }
+
+    private stop(type: AudioType) {
+        this.audioSource[type].stop();
     }
 
     stopMusic() {
-        this.music.stop();
+        this.audioSource[AudioType.MUSIC].stop();
     }
 
-    playEffect(audioPath: string, loop: boolean) {
-        if (!this.effectEnabled) return;
-        this.getAudioClip(audioPath).then((audioClip: any) => {
-            if (loop) {
-                audioClip.setLoop(loop);
-                audioClip.play();
-            } else {
-                audioClip.playOneShot(1);
-            }
+    stopEffect() {
+        this.audioSource[AudioType.EFFECT].stop();
+    }
+
+    stopAll() {
+        this.audioSource.forEach((audioSource) => {
+            audioSource.stop();
         });
     }
 
-    stopEffect(audioPath: string) {
-        this.getAudioClip(audioPath).then((audioClip: any) => {
-            audioClip.stop();
-        });
+    playMusic(audioPath: string, loop: boolean = true, volume: number = 1) {
+        this.play(AudioType.MUSIC, audioPath, loop, volume);
     }
 
-    stopAllEffects() {
-        this.effectClips.forEach((effectClip) => {
-            effectClip.stop();
+    playEffect(audioPath: string, loop: boolean = false, volume: number = 1) {
+        this.play(AudioType.EFFECT, audioPath, loop, volume);
+    }
+
+    /** 对音乐特效进行一次播放 */
+    playOneShot(audioPath: string, volume: number = 1) {
+        if (!this.effectEnabled[AudioType.EFFECT]) return;
+        this.getAudioClip(audioPath).then((audioClip: any) => {
+            this.audioSource[AudioType.EFFECT].playOneShot(audioClip, volume);
         });
     }
 }

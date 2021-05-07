@@ -67,7 +67,7 @@ export class GameManager extends Component {
         }
         GameManager.instance = this;
         game.addPersistRootNode(this.node);
-        this.node.getComponent(UITransform).priority = 1;
+        this.node.setSiblingIndex(10);
         this.init();
     }
 
@@ -106,7 +106,7 @@ export class GameManager extends Component {
     }
 
     loadScene(sceneName: string) {
-        this.audioController.stopMusic();
+        this.audioController.stopAll();
         this.uiManager.clearLayers();
         director.loadScene(sceneName);
     }
