@@ -36,6 +36,10 @@ export abstract class MapElement extends BasePoolNode {
         }
     }
 
+    protected getSpriteFramePath(name: string) {
+        return `${name}`
+    }
+
     remove(immediately: boolean = false) {
         if (immediately) {
             super.remove();

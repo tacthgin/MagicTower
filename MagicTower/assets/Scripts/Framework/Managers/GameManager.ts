@@ -67,8 +67,11 @@ export class GameManager extends Component {
         }
         GameManager.instance = this;
         game.addPersistRootNode(this.node);
-        this.node.setSiblingIndex(10);
         this.init();
+    }
+
+    start() {
+        this.node.setSiblingIndex(10);
     }
 
     private registerEvents() {
