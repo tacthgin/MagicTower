@@ -1,4 +1,4 @@
-import { _decorator, Vec2, Component, v2 } from "cc";
+import { _decorator, Vec2, Component, v2, TiledMapAsset, TiledMap } from "cc";
 import { AstarMap } from "../AI/Astar";
 const { ccclass } = _decorator;
 
@@ -17,7 +17,7 @@ let DIRECTION_INDEX_DIFFS = {
 let HERO_FACE_DIRECTION = [-11, 1, 11, -1];
 
 @ccclass("GameMap")
-export class GameMap extends Component implements AstarMap {
+export class GameMap extends TiledMap implements AstarMap {
     /** 地图层 */
     private layers = {};
     /** 地图数据 */
@@ -137,7 +137,7 @@ export class GameMap extends Component implements AstarMap {
     inBoundary(tileCoord: Vec2) {
         //return tileCoord.x >= 0 && tileCoord.x < this.mapData.column && tileCoord.y >= 0 && tileCoord.y < this.mapData.row;
     }
-    init(data: any, levelInfo: LevelInfo) {
+    init(data: any, levelInfo: LevelInfo, tiledMapAsset: TiledMapAsset) {
         //if (!data) return false;
         //this.mapData = data;
         //this.mapHalfSize = cc.v2(this.mapData.mapWidth / 2, this.mapData.mapHeight / 2);
@@ -161,6 +161,12 @@ export class GameMap extends Component implements AstarMap {
         //         node.position = cc.v3(pos.x, pos.y - 16);
         //     }
         // }
+
+        if (!tiledMapAsset.isValid) {
+            console.error(`${tiledMapAsset.name}不合法`);
+            return;
+        }
+        this.tmxAsset = tiledMapAsset;
     }
     private parseLayer(layerName: string, info: any) {
         //this.layers[layerName] = {};
