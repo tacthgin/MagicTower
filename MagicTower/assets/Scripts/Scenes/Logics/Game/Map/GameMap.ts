@@ -18,16 +18,9 @@ let HERO_FACE_DIRECTION = [-11, 1, 11, -1];
 
 @ccclass("GameMap")
 export class GameMap extends TiledMap implements AstarMap {
-    /** 地图层 */
-    private layers = {};
-    /** 地图数据 */
-    private mapData = null;
-    /** 地图一半大小 */
-    private mapHalfSize: Vec2 | null = null;
     private propParser: PropParser = null;
     /** 终点可以走的地块 */
     private canEndMoveTiles: string[] = ["prop", "stair", "event"];
-    private hero: Hero = null;
     private shopInfo: ShopInfo = null;
     private eventInfo: any = null;
     private maxIndex: number = 0;
@@ -44,15 +37,15 @@ export class GameMap extends TiledMap implements AstarMap {
      */
     private monsterInfo: any = {};
     private gameEventSystem: GameEventSystem = null;
+
     public set astarMoveType(value) {
-        //this._astarMoveType = value;
+        this._astarMoveType = value;
     }
+
     public set monsterDoor(value) {
         //this.doorInfo.monsterDoor = value;
     }
-    get dialogPos() {
-        //return this._dialogPos;
-    }
+
     get level() {
         //return this.mapData.level;
     }
@@ -101,7 +94,7 @@ export class GameMap extends TiledMap implements AstarMap {
     inBoundary(tileCoord: Vec2) {
         //return tileCoord.x >= 0 && tileCoord.x < this.mapData.column && tileCoord.y >= 0 && tileCoord.y < this.mapData.row;
     }
-    init(data: any, levelInfo: LevelInfo, tiledMapAsset: TiledMapAsset) {
+    init(tiledMapAsset: TiledMapAsset) {
         //if (!data) return false;
         //this.mapData = data;
         //this.mapHalfSize = cc.v2(this.mapData.mapWidth / 2, this.mapData.mapHeight / 2);
@@ -271,7 +264,7 @@ export class GameMap extends TiledMap implements AstarMap {
         //for (let diff in DIRECTION_INDEX_DIFFS) {
         //let coord = this.indexToTile(index).add(DIRECTION_INDEX_DIFFS[diff]);
         //if (this.inBoundary(coord)) {
-        //let { tileType } = this.getTileInfo(coord);
+        //let { tileType } = this.getTileLayer(coord);
         //if (tileType == "floor" || tileType == "door") {
         //indexs.push(index + parseInt(diff));
         //}
@@ -309,7 +302,7 @@ export class GameMap extends TiledMap implements AstarMap {
      * @returns -1不能走，0可走但提留在前一格，1可走
      */
     canEndTileMove(tile: Vec2) {
-        //let { tileType, element, index } = this.getTileInfo(tile);
+        //let { tileType, element, index } = this.getTileLayer(tile);
         //switch (tileType) {
         //case "floor":
         //return this.hero.HeroData.Hp > this.getWizardMagicDamage(index);
@@ -321,8 +314,12 @@ export class GameMap extends TiledMap implements AstarMap {
         //return this.canEndMoveTiles.indexOf(tileType) != -1;
     }
     private heroMoveJudge(tile: Vec2, endTile: Vec2) {
-        let { tileType, index } = this.getTileInfo(tile);
-        if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
+        let { tileType, index } = this.getTileLayer(tile);
+        if (
+            (this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) ||
+            this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)
+        )
+            return false;
         if (tile.equals(endTile)) {
             //假设终点都可以走，然后在门和npc这种类型停在寻路前一格
             return true;
@@ -332,7 +329,7 @@ export class GameMap extends TiledMap implements AstarMap {
         }
     }
     private elementMoveJudge(tile: Vec2) {
-        let { tileType } = this.getTileInfo(tile);
+        let { tileType } = this.getTileLayer(tile);
         return tileType == "floor" || tileType == "monster" || tileType == "event" || tileType == "stair";
     }
 
@@ -355,19 +352,17 @@ export class GameMap extends TiledMap implements AstarMap {
         //}
         //return false;
     }
-    /**
-     * 得到tile信息
-     * @param tile tile坐标
-     */
-    getTileInfo(tile: Vec2) {
+
+    getTileLayer(tile: Vec2) {
         let layers = this.getLayers();
-        let layerName = null;
+        let layer = null;
         for (let i = 0; i < layers.length; i++) {
             if (layers[i].getTileGIDAt(tile.x, tile.y) != 0) {
-                layerName = layers[i].getLayerName();
+                layer = layers[i];
             }
         }
-        return layerName;
+
+        return layer;
     }
 
     /**
@@ -390,7 +385,7 @@ export class GameMap extends TiledMap implements AstarMap {
      * @param tile tile坐标
      */
     collision(tile: Vec2) {
-        //let { tileType, element, index } = this.getTileInfo(tile);
+        //let { tileType, element, index } = this.getTileLayer(tile);
         //switch (tileType) {
         //case "prop":
         //SoundManager.playEffect("eat");
@@ -714,13 +709,7 @@ export class GameMap extends TiledMap implements AstarMap {
         //}
         //return null;
     }
-    showDialog(name: string, ...args) {
-        //GameManager.getInstance()
-        //.showDialog(name, ...args)
-        //.then((control: any) => {
-        //control.node.position = cc.Vec3.ZERO;
-        //});
-    }
+
     private elementActionComplete() {
         //NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
     }

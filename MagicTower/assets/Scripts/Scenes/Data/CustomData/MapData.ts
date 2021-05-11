@@ -1,34 +1,38 @@
 import { BaseData } from "../../../Framework/Base/BaseData";
+import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
+
+export enum MapEvent {
+    ADD_ELEMENT,
+    REMOVE_ELELEMENT,
+}
 
 /** 地图存档 */
 @Fn.registerClass("MapData")
 export class MapData extends BaseData {
-    private currentLevel: number = 1;
-
-    private maps: any = {};
+    protected data: any = {
+        currentLevel: 1,
+        maps: {},
+    };
 
     set level(value) {
-        this.currentLevel = value;
+        this.data.currentLevel = value;
     }
 
     get level() {
-        return this.currentLevel;
+        return this.data.currentLevel;
     }
 
-    getLevelInfo(level: number) {
-        if (!this.maps[level]) {
-            this.maps[level] = new LevelData();
-        }
-        return this.maps[level];
+    getLevelData(level: number): LevelData {
+        return this.data.maps[level] || null;
     }
 
     load(info: any = null) {
         if (info) {
-            this.currentLevel = info.currentLevel;
+            this.data.currentLevel = info.currentLevel;
             for (let level in info.maps) {
-                this.maps[level] = new LevelData();
-                this.maps[level].load(info.maps[level]);
+                this.data.maps[level] = new LevelData();
+                this.data.maps[level].load(info.maps[level]);
             }
         }
     }
@@ -37,8 +41,17 @@ export class MapData extends BaseData {
 export class LevelData {
     private levelInfo: any = {};
 
+    private emitEvent(layerName: string, index: number, info: any = null) {
+        let mapData = GameManager.DATA.getData(MapData);
+        mapData.emit(MapEvent.ADD_ELEMENT, this.levelInfo.level, layerName, index, info);
+    }
+
     loadInfo(info: any) {
         this.levelInfo = info;
+    }
+
+    setLevel(level: number) {
+        this.levelInfo.level = level;
     }
 
     setAppear(layerName: string, index: number, info: any = null) {
@@ -47,7 +60,9 @@ export class LevelData {
                 appear: {},
             };
         }
-        this.levelInfo["appear"][index] = info || 1;
+        let appearInfo = this.levelInfo[layerName].appear;
+        appearInfo[index] = info || 1;
+        this.emitEvent(layerName, index, info);
     }
 
     setDisappear(layerName: string, index: number, info: any = null) {
@@ -56,6 +71,8 @@ export class LevelData {
                 disappear: {},
             };
         }
-        this.levelInfo["disappear"][index] = info || 1;
+        let disappearInfo = this.levelInfo[layerName].disappear;
+        disappearInfo[index] = info || 1;
+        this.emitEvent(layerName, index, info);
     }
 }

@@ -1,4 +1,4 @@
-import { Asset, assetManager, AudioClip, JsonAsset, Prefab, resources, SpriteFrame, TiledMap } from "cc";
+import { Asset, assetManager, AudioClip, JsonAsset, Prefab, resources, SpriteFrame, TiledMapAsset } from "cc";
 import { BaseEvent } from "../Base/BaseContant";
 import { Fn } from "../Util/Fn";
 import { NotifyCenter } from "./NotifyCenter";
@@ -19,7 +19,7 @@ export class ResourceManager {
         [ResourceType.JSON]: JsonAsset,
         [ResourceType.SPRITE]: SpriteFrame,
         [ResourceType.AUIDO]: AudioClip,
-        [ResourceType.TILED_MAP]: TiledMap,
+        [ResourceType.TILED_MAP]: TiledMapAsset,
     };
     /** 预加载资源完成个数 */
     private resourceCompleteCount: number = 0;

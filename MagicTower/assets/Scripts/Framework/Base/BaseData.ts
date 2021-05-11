@@ -26,7 +26,7 @@ export abstract class BaseData extends CustomEventTarget {
         }
     }
 
-    protected save() {
+    save() {
         let className = js.getClassName(this);
         localStorage.setItem(className, JSON.stringify(this.data));
     }
