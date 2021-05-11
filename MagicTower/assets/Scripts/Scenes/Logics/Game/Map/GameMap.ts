@@ -70,6 +70,7 @@ export class GameMap extends TiledMap implements AstarMap {
     onDisable() {
         //NotifyCenter.targetOff(this);
     }
+
     show() {
         //跨层事件
         //let eventId = this.eventInfo.get(this.mapData.level);
@@ -78,52 +79,15 @@ export class GameMap extends TiledMap implements AstarMap {
         //this.eventInfo.clear(this.mapData.level);
         //}
     }
-    /**
-     * tile坐标转换为nodeAR坐标
-     * @param tileCoord tile坐标
-     * @param pivot 默认指定tile格子的中心
-     */
-    tileToNodeSpaceAR(tileCoord: Vec2 | null, pivot: Vec2 | null = null) {
-        //pivot = pivot || cc.v2(0.5, 0.5);
-        //let temp = tileCoord.add(pivot);
-        //return cc.v2(temp.x * this.mapData.tileWidth - this.mapHalfSize.x, this.mapHalfSize.y - temp.y * this.mapData.tileHeight);
-    }
-    /**
-     * nodeAR转换为tile坐标
-     * @param nodeCoord nodeAR坐标
-     */
-    nodeSpaceARToTile(nodeCoord: Vec2) {
-        //let screenCoord = cc.v2(nodeCoord.x, -nodeCoord.y).addSelf(this.mapHalfSize);
-        //return cc.v2(Math.floor(screenCoord.x / this.mapData.tileWidth), Math.floor(screenCoord.y / this.mapData.tileHeight));
-    }
-    /**
-     * tile坐标转索引
-     * @param tileCoord tile坐标
-     */
-    tileToIndex(tileCoord: Vec2) {
-        //return tileCoord.y * this.mapData.row + tileCoord.x;
-    }
-    /**
-     * 索引转tile坐标
-     * @param index 索引
-     */
-    indexToTile(index: number) {
-        //return cc.v2(index % this.mapData.row, Math.floor(index / this.mapData.row));
-    }
-    /**
-     * 索引转node坐标
-     * @param index 索引
-     */
-    indexToNodeSpaceAR(index: number) {
-        //return this.tileToNodeSpaceAR(this.indexToTile(index));
-    }
+
     /** 地图行格子个数 */
     getRow() {
-        //return this.mapData.row;
+        return this.getMapSize().height;
     }
+
     /** 地图列格子个数 */
     getColumn() {
-        //return this.mapData.column;
+        return this.getMapSize().width;
     }
     /** 在地图上设置英雄 */
     setHero(hero: Hero) {
@@ -213,11 +177,7 @@ export class GameMap extends TiledMap implements AstarMap {
         //});
         //}
     }
-    private parseTile(layerName: string, info, className: string) {
-        //info.forEach((elementInfo) => {
-        //this.addElement(elementInfo[0], layerName, className, elementInfo[1]);
-        //});
-    }
+
     private parseDoor(layerName: string, info: any) {
         //info.tile.forEach((elementInfo) => {
         //this.addElement(elementInfo[0], layerName, "Door", elementInfo[1]).node.zIndex = 2;
@@ -361,28 +321,29 @@ export class GameMap extends TiledMap implements AstarMap {
         //return this.canEndMoveTiles.indexOf(tileType) != -1;
     }
     private heroMoveJudge(tile: Vec2, endTile: Vec2) {
-        //let { tileType, index } = this.getTileInfo(tile);
-        //if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
-        //if (tile.equals(endTile)) {
-        //假设终点都可以走，然后在门和npc这种类型停在寻路前一格
-        //return true;
-        //} else {
-        //中途过程遇到事件也可以走
-        //return tileType == "floor" || tileType == "event" || tileType == "prop";
-        //}
+        let { tileType, index } = this.getTileInfo(tile);
+        if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
+        if (tile.equals(endTile)) {
+            //假设终点都可以走，然后在门和npc这种类型停在寻路前一格
+            return true;
+        } else {
+            //中途过程遇到事件也可以走
+            return tileType == "floor" || tileType == "event" || tileType == "prop";
+        }
     }
     private elementMoveJudge(tile: Vec2) {
-        //let { tileType } = this.getTileInfo(tile);
-        //return tileType == "floor" || tileType == "monster" || tileType == "event" || tileType == "stair";
+        let { tileType } = this.getTileInfo(tile);
+        return tileType == "floor" || tileType == "monster" || tileType == "event" || tileType == "stair";
     }
+
     /** astar判断是否可行走 */
     isEmpty(tile: Vec2, endTile: Vec2) {
-        //switch (this._astarMoveType) {
-        //case "hero":
-        //return this.heroMoveJudge(tile, endTile);
-        //default:
-        //return this.elementMoveJudge(tile);
-        //}
+        switch (this._astarMoveType) {
+            case "hero":
+                return this.heroMoveJudge(tile, endTile);
+            default:
+                return this.elementMoveJudge(tile);
+        }
     }
     /** 勇士在楼梯旁边 */
     isHeroNextToStair() {
@@ -399,63 +360,16 @@ export class GameMap extends TiledMap implements AstarMap {
      * @param tile tile坐标
      */
     getTileInfo(tile: Vec2) {
-        //let index = this.tileToIndex(tile);
-        //let result = {
-        //tileType: "floor",
-        //element: null,
-        //index: index,
-        //};
-        //for (let layerName in this.layers) {
-        //if (this.layers[layerName][index]) {
-        //result.tileType = layerName;
-        //result.element = this.layers[layerName][index];
-        //return result;
-        //}
-        //}
-        //return result;
+        let layers = this.getLayers();
+        let layerName = null;
+        for (let i = 0; i < layers.length; i++) {
+            if (layers[i].getTileGIDAt(tile.x, tile.y) != 0) {
+                layerName = layers[i].getLayerName();
+            }
+        }
+        return layerName;
     }
-    /**
-     * 获取地图元素
-     * @param index tileIndex
-     * @param layerName 层名
-     */
-    getElement(index: number | string, layerName?: string) {
-        //if (layerName) {
-        //let layer = this.layers[layerName];
-        //return layer ? layer[index] : null;
-        //} else {
-        //for (let layer in this.layers) {
-        //if (this.layers[layer][index]) {
-        //return this.layers[layer][index];
-        //}
-        //}
-        //}
-        //return null;
-    }
-    /**
-     * 地图上添加元素
-     * @param index tileIndex
-     * @param layerName 层名
-     * @param info 数据
-     */
-    addElement(index: number, layerName: string, className: string, ...info) {
-        //let element = null;
-        //if (layerName == "wall") {
-        //element = ElementManager.getCommon(className);
-        //className = "Common";
-        //} else {
-        //if (layerName == "event") {
-        //className = "EventTrigger";
-        //}
-        //element = ElementManager.getElement(className);
-        //}
-        //element.position = this.indexToNodeSpaceAR(index);
-        //element.parent = this.node;
-        //let control = element.getComponent(className);
-        //control && control.init(...info);
-        //this.layers[layerName][index] = control;
-        //return this.layers[layerName][index];
-    }
+
     /**
      * 地图上转移元素
      * @param srcIndex 原始位置
@@ -470,25 +384,7 @@ export class GameMap extends TiledMap implements AstarMap {
         //layer[dstIndex] = control;
         //}
     }
-    /**
-     * 删除地图上元素
-     * @param index tileIndex
-     * @param layerName 层名
-     */
-    removeElement(index: number | string, layerName: string, remove: boolean = true) {
-        //let layer = this.layers[layerName];
-        //if (layer) {
-        //let element = layer[index];
-        //if (element) {
-        //if (remove) {
-        //element.remove();
-        //}
-        //delete layer[index];
-        //} else {
-        //cc.warn(`removeElement index:${index} no element`);
-        //}
-        //}
-    }
+
     /**
      * 勇士和地块之间的交互，返回为false，表示交互有延迟，是异步的，true表示交互完成
      * @param tile tile坐标

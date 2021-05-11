@@ -1,11 +1,12 @@
-import { _decorator, Component, Node, Animation, Vec2, Sprite, AnimationClip } from "cc";
+import { _decorator, Component, Node, Animation, Vec2, Sprite, AnimationClip, tween, v3 } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { Util } from "../../../../Framework/Util/Util";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroData } from "../../../Data/CustomData/HeroData";
 import { PropParser } from "../../../Data/Parser/PropParser";
 import { GameMap } from "./GameMap";
-import { HeroState, IdleState } from "./HeroState";
+import { HeroState, IdleState, MoveState } from "./HeroState";
 
 const { ccclass, property } = _decorator;
 
@@ -17,22 +18,22 @@ export class Hero extends Component {
     @property(Node)
     private heroNode: Node = null;
 
-    private heroData: HeroData = null;
+    private _heroData: HeroData = null;
     private animation: Animation = null;
     private currentState: HeroState = null;
     private globalInfo: any = null;
     private map: GameMap = null;
     private propParser: PropParser = null;
 
-    get HeroData() {
-        return this.heroData;
+    get heroData() {
+        return this._heroData;
     }
 
     onLoad() {
         this.animation = this.heroNode.getComponent(Animation);
         this.animation.on(Animation.EventType.FINISHED, this.onFinished, this);
         this.globalInfo = GameManager.DATA.getJson("global");
-        this.heroData = GameManager.DATA.getData(HeroData);
+        this._heroData = GameManager.DATA.getData(HeroData);
         this.propParser = GameManager.DATA.getJsonParser(PropParser);
     }
 
@@ -79,7 +80,7 @@ export class Hero extends Component {
     }
 
     private createAnimation() {
-        this.heroData.get("animation").forEach((animationName: any) => {
+        this._heroData.get("animation").forEach((animationName: any) => {
             let spriteFrames = [];
             for (let i = 1; i < 3; i++) {
                 spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${animationName}_${i}`));
@@ -101,25 +102,23 @@ export class Hero extends Component {
      */
     toward(info: Vec2 | number) {
         if (typeof info == "number") {
-            this.heroData.set("direction", info);
+            this._heroData.set("direction", info);
         } else {
             let result = new Vec2();
-            Vec2.subtract(result, info, this.heroData.get("position"));
-            this.heroData.set("direction", this.getDirection(result));
+            Vec2.subtract(result, info, this._heroData.get("position"));
+            this._heroData.set("direction", this.getDirection(result));
         }
         this.setDirectionTexture();
     }
 
     /** 设置人物方向贴图 */
     setDirectionTexture() {
-        this.heroNode.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(
-            `${this.heroData.get("animation")[this.heroData.get("direction")]}_0`
-        );
+        this.heroNode.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._heroData.get("animation")[this._heroData.get("direction")]}_0`);
     }
 
     /** 根据方向播放行走动画 */
     playMoveAnimation() {
-        let animationName = this.heroData.get("animation")[this.heroData.get("direction")];
+        let animationName = this._heroData.get("animation")[this._heroData.get("direction")];
         if (this.animation.defaultClip) {
             let state = this.animation.getAnimationState(this.animation.defaultClip.name);
             if (state.isPlaying && this.animation.defaultClip.name == animationName) {
@@ -148,7 +147,7 @@ export class Hero extends Component {
         let moveAction = (position: Vec2, end: boolean = false) => {
             return sequence(
                 callFunc(() => {
-                    this.heroData.get("direction") = this.getDirection(position.sub(this.heroData.Position));
+                    this._heroData.get("direction") = this.getDirection(position.sub(this._heroData.Position));
                     if (!stop) {
                         //动作停止callFunc依然会调用一次;
                         this.changeState(new MoveState());
@@ -156,7 +155,7 @@ export class Hero extends Component {
                 }),
                 moveTo(this.globalInfo.heroSpeed, this.map.tileToNodeSpaceAR(position)),
                 callFunc(() => {
-                    this.heroData.set("position", position);
+                    this._heroData.set("position", position);
                     stop = moveCallback(position, end);
                 })
             );
@@ -178,8 +177,8 @@ export class Hero extends Component {
     }
 
     location(tile: Vec2 = null) {
-        this.heroData.Position = tile || this.heroData.Position;
-        let position = this.map.tileToNodeSpaceAR(this.heroData.Position);
+        this._heroData.Position = tile || this._heroData.Position;
+        let position = this.map.tileToNodeSpaceAR(this._heroData.Position);
         this.node.position = v3(position.x, position.y, 0);
         this.toward(2);
     }
@@ -190,11 +189,11 @@ export class Hero extends Component {
     }
 
     hurt(damage: number) {
-        this.heroData.Hp = Util.clamp(this.heroData.Hp - damage, 0, Number.MAX_VALUE);
+        this._heroData.Hp = Util.clamp(this._heroData.Hp - damage, 0, Number.MAX_VALUE);
     }
 
     magicLight(monsterIndexs: number[]) {
-        let heroIndex = this.map.tileToIndex(this.heroData.Position);
+        let heroIndex = this.map.tileToIndex(this._heroData.Position);
         monsterIndexs.forEach((index) => {
             let lightning = ElementManager.getElement("Lightning");
             lightning.parent = this.node;
@@ -204,18 +203,17 @@ export class Hero extends Component {
 
     magicDamage(monsterIndexs: number[], damage: number) {
         this.magicLight(monsterIndexs);
-        let animationName = this.heroData.get("animation")[this.heroData.get("direction")];
+        let animationName = this._heroData.get("animation")[this._heroData.get("direction")];
         this.animation.play(`${animationName}_once`);
         if (damage < 1) {
-            this.heroData.Hp = Math.ceil(this.heroData.Hp * damage);
+            this._heroData.Hp = Math.ceil(this._heroData.Hp * damage);
         } else {
-            this.heroData.Hp -= damage;
+            this._heroData.Hp -= damage;
         }
-        NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
     }
 
     weak() {
-        this.heroData.weak();
+        this._heroData.weak();
     }
 
     addProp(id: string, count: number = 1) {
@@ -224,33 +222,33 @@ export class Hero extends Component {
             switch (propInfo.type) {
                 case 2:
                     //加血量
-                    this.heroData.Hp += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
+                    this._heroData.Hp += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
                     break;
                 case 3:
                     //加攻击
-                    this.heroData.Attack += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
+                    this._heroData.Attack += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
                     break;
                 case 4:
                     //加防御
-                    this.heroData.Defence += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
+                    this._heroData.Defence += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
                     break;
                 case 5:
                     //装备剑
-                    this.heroData.Attack += propInfo.value;
+                    this._heroData.Attack += propInfo.value;
                     break;
                 case 6:
                     //装备盾
-                    this.heroData.Defence += propInfo.value;
+                    this._heroData.Defence += propInfo.value;
                     break;
             }
         }
-        this.heroData.addProp(propInfo.id, count);
+        this._heroData.addProp(propInfo.id, count);
     }
 
     removeProp(id: string, count: number = 1) {
         let propInfo = this.propParser.getJsonElement(id);
         if (!propInfo.consumption) {
-            this.heroData.addProp(propInfo.id, -count);
+            this._heroData.addProp(propInfo.id, -count);
         }
     }
 }
