@@ -1,4 +1,4 @@
-import { BaseData } from "../../../Framework/Base/BaseData";
+import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
 
@@ -38,41 +38,37 @@ export class MapData extends BaseData {
     }
 }
 
-export class LevelData {
-    private levelInfo: any = {};
+export class LevelData extends BaseLoadData {
+    private level: number = 0;
+    /** 出现的tile */
+    private appearTile: any = {};
+    /** 消失的tile */
+    private disappearTile: any = {};
 
     private emitEvent(layerName: string, index: number, info: any = null) {
         let mapData = GameManager.DATA.getData(MapData);
-        mapData.emit(MapEvent.ADD_ELEMENT, this.levelInfo.level, layerName, index, info);
+        mapData.emit(MapEvent.ADD_ELEMENT, this.level, layerName, index, info);
     }
 
-    loadInfo(info: any) {
-        this.levelInfo = info;
+    load(info: any) {
+        this.loadData(info);
     }
 
     setLevel(level: number) {
-        this.levelInfo.level = level;
+        this.level = level;
     }
 
-    setAppear(layerName: string, index: number, info: any = null) {
-        if (!this.levelInfo[layerName]) {
-            this.levelInfo[layerName] = {
-                appear: {},
-            };
+    setAppear(layerName: string, index: number, gid: number) {
+        if (!this.appearTile[layerName]) {
+            this.appearTile[layerName] = {};
         }
-        let appearInfo = this.levelInfo[layerName].appear;
-        appearInfo[index] = info || 1;
-        this.emitEvent(layerName, index, info);
+        this.appearTile[layerName][index] = gid;
     }
 
-    setDisappear(layerName: string, index: number, info: any = null) {
-        if (!this.levelInfo[layerName]) {
-            this.levelInfo[layerName] = {
-                disappear: {},
-            };
+    setDisappear(layerName: string, index: number) {
+        if (!this.disappearTile[layerName]) {
+            this.disappearTile[layerName] = [];
         }
-        let disappearInfo = this.levelInfo[layerName].disappear;
-        disappearInfo[index] = info || 1;
-        this.emitEvent(layerName, index, info);
+        this.disappearTile[layerName].push(index);
     }
 }

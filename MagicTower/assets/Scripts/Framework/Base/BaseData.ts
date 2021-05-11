@@ -1,6 +1,7 @@
 import { js } from "cc";
 import { CustomEventTarget } from "../Managers/NotifyCenter";
 
+/** 存储本地数据基类 */
 export abstract class BaseData extends CustomEventTarget {
     /** 需要缓存到本地的数据 */
     protected data: any = {};
@@ -38,5 +39,17 @@ export abstract class BaseData extends CustomEventTarget {
 
     get(key: string) {
         return this.data[key];
+    }
+}
+
+/** 加载数据基类 */
+export abstract class BaseLoadData {
+    abstract load(data: any): void;
+
+    /** 按key赋值 */
+    protected loadData(data: any) {
+        for (let key in data) {
+            this[key] = data[key];
+        }
     }
 }
