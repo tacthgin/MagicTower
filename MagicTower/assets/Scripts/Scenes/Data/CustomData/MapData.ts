@@ -28,6 +28,7 @@ export class MapData extends BaseData {
         this.data.currentLevel += diff;
         if (this.data.currentLevel > 50 || this.data.currentLevel < 0) {
             console.error(`level${this.data.currentLevel}不合法`);
+            return;
         }
         this.emit(MapEvent.SWITCH_LEVEL);
     }
