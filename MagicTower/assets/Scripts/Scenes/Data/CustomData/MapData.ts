@@ -27,6 +27,13 @@ export class MapData extends BaseData {
         return this.data.maps[level] || null;
     }
 
+    createLevelData(level: number, properties: any) {
+        let levelData = new LevelData();
+        levelData.setLevel(level);
+        levelData.loadProperties(properties);
+        this.data.maps[level] = levelData;
+    }
+
     load(info: any = null) {
         if (info) {
             this.data.currentLevel = info.currentLevel;
@@ -53,6 +60,8 @@ export class LevelData extends BaseLoadData {
     load(info: any) {
         this.loadData(info);
     }
+
+    loadProperties(properties: any) {}
 
     setLevel(level: number) {
         this.level = level;

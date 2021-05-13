@@ -1,7 +1,8 @@
-import { _decorator, Component, Node, Touch, Vec2 } from "cc";
+import { _decorator, Component, Node, Touch, Vec2, Prefab, instantiate, TiledMapAsset, v3 } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
+import { MapData } from "../../../Data/CustomData/MapData";
 import { Astar } from "../AI/Astar";
 import { GameMap } from "./GameMap";
 import { Hero } from "./Hero";
@@ -9,10 +10,16 @@ const { ccclass, property } = _decorator;
 
 @ccclass("LevelManager")
 export class LevelManager extends Component {
+    /** 地图层 */
     @property(Node)
     private layer: Node = null;
-    /** 当前层数 */
-    private level: number = 1;
+    /** 地图预设 */
+    @property(Prefab)
+    private mapPrefab: Prefab = null;
+    /** 英雄预设 */
+    @property(Prefab)
+    private heroPrefab: Prefab = null;
+
     private maps: any = {};
     /** 当前地图 */
     private currentMap: GameMap = null;
@@ -21,23 +28,23 @@ export class LevelManager extends Component {
     /** 勇士正在移动中 */
     private heroMoving: boolean = false;
     /** 地图数据 */
-    private mapInfo: any = null;
+    private mapData: MapData = null;
     /** 触摸id */
     private touchId: number = null;
     private astar: Astar = new Astar();
 
     onLoad() {
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
-        this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
         NotifyCenter.on(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
         NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
         NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
         NotifyCenter.on(GameEvent.USE_PROP, this.useProp, this);
-        this.mapInfo = GameManager.DATA.getJson("map");
-        this.gameInfo = DataManager.getCustomData("GameInfo");
-        //更新下无障碍a * 地图;
+        this.mapData = GameManager.DATA.getData(MapData);
+    }
+
+    start() {
         this.loadArchive();
     }
 
@@ -49,30 +56,30 @@ export class LevelManager extends Component {
         //处理多点触摸;
         this.moveHero(event.getLocation());
     }
-    onTouchMove(event: Touch) {
-        if (event.getID() != this.touchId) return;
-    }
+
     onTouchEnd(event: Touch) {
         if (event.getID() == this.touchId) {
             this.touchId = null;
         }
     }
     private loadArchive() {
-        this.level = this.gameInfo.MapInfo.level;
-        this.showMap();
+        let gameMap = this.createMap(this.mapData.level);
         this.showHero();
         NotifyCenter.emit(GameEvent.REFRESH_ARCHIVE);
     }
-    private createMap(level: number) {
+
+    private createMap(level: number): GameMap {
         if (!this.maps[level]) {
-            let map = new Node();
-            map.parent = this.layer;
-            let mapComponent = map.addComponent(GameMap);
-            mapComponent.init(this.mapInfo[level], this.gameInfo.MapInfo.getLevelInfo(level));
-            this.maps[level] = mapComponent;
+            let mapNode = instantiate(this.mapPrefab);
+            mapNode.position = v3(0, 0, 0);
+            mapNode.parent = this.layer;
+            let gameMap = mapNode.getComponent(GameMap);
+            gameMap.init(GameManager.RESOURCE.getAsset(TiledMapAsset, `${level}`));
+            this.maps[level] = gameMap;
         }
         return this.maps[level];
     }
+
     private showMap() {
         let newMap = this.createMap(this.level);
         if (!newMap) return null;
@@ -92,6 +99,7 @@ export class LevelManager extends Component {
         this.hero.init(this.currentMap, tile);
         this.currentMap.setHero(this.hero);
     }
+
     private moveHero(touchPos: Vec2) {
         if (this.canHeroMove()) {
             let endTile = this.currentMap.nodeSpaceARToTile(this.node.convertToNodeSpaceAR(touchPos));
