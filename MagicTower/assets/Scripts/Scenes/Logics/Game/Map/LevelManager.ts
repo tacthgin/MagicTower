@@ -62,10 +62,16 @@ export class LevelManager extends Component {
             this.touchId = null;
         }
     }
+
     private loadArchive() {
         let gameMap = this.createMap(this.mapData.level);
+        let levelData = this.mapData.getLevelData(this.mapData.level);
+        if (levelData) {
+            gameMap.loadLevelData(levelData);
+        } else {
+            this.mapData.createLevelData(this.mapData.level, gameMap.getProperties());
+        }
         this.showHero();
-        NotifyCenter.emit(GameEvent.REFRESH_ARCHIVE);
     }
 
     private createMap(level: number): GameMap {

@@ -5,6 +5,7 @@ import { Fn } from "../../../Framework/Util/Fn";
 export enum MapEvent {
     ADD_ELEMENT,
     REMOVE_ELELEMENT,
+    SWITCH_LEVEL,
 }
 
 /** 地图存档 */
@@ -21,6 +22,14 @@ export class MapData extends BaseData {
 
     get level() {
         return this.data.currentLevel;
+    }
+
+    setLevelDiff(diff: number) {
+        this.data.currentLevel += diff;
+        if (this.data.currentLevel > 50 || this.data.currentLevel < 0) {
+            console.error(`level${this.data.currentLevel}不合法`);
+        }
+        this.emit(MapEvent.SWITCH_LEVEL);
     }
 
     getLevelData(level: number): LevelData {
