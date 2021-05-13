@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Touch, Vec2 } from "cc";
+import { _decorator, Component, Node, Touch, Vec2, Prefab, instantiate, TiledMapAsset, v3 } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
@@ -10,35 +10,37 @@ const { ccclass, type } = _decorator;
 
 @ccclass("LevelManager")
 export class LevelManager extends Component {
-    // @property(Node)
-    // private layer: Node = null;
-    // /** 当前层数 */
-    // private level: number = 1;
-    // private maps: any = {};
-    // /** 当前地图 */
-    // private currentMap: GameMap = null;
-    // /** 勇士 */
-    // private hero: Hero = null;
-    // /** 勇士正在移动中 */
-    // private heroMoving: boolean = false;
-    // /** 地图数据 */
-    // private mapInfo: any = null;
-    // /** 触摸id */
-    // private touchId: number = null;
-    // private astar: Astar = new Astar();
+    /** 地图层 */
+    @type(Node)
+    private layer: Node = null;
+    /** 地图预设 */
+    @type(Prefab)
+    private mapPrefab: Prefab = null;
+    /** 英雄预设 */
+    @type(Prefab)
+    private heroPrefab: Prefab = null;
+
+    private maps: any = {};
+    /** 当前地图 */
+    private currentMap: GameMap = null;
+    /** 勇士 */
+    private hero: Hero = null;
+    /** 勇士正在移动中 */
+    private heroMoving: boolean = false;
+    /** 地图数据 */
     private mapData: MapData = null;
+    /** 触摸id */
+    private touchId: number = null;
+    private astar: Astar = new Astar();
 
     onLoad() {
-        // this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
-        // this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
-        // this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
-        // this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
+        this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
+        this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
+        this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
         // NotifyCenter.on(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
         // NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
         // NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
         // NotifyCenter.on(GameEvent.USE_PROP, this.useProp, this);
-        // this.mapInfo = GameManager.DATA.getJson("map");
-        // this.gameInfo = DataManager.getCustomData("GameInfo");
         this.mapData = GameManager.DATA.getData(MapData);
     }
 
@@ -46,46 +48,64 @@ export class LevelManager extends Component {
         this.loadArchive();
     }
 
-    // onTouchStart(event: Touch) {
-    //     if (this.touchId != null && this.touchId != event.getID()) {
-    //         return;
-    //     }
-    //     this.touchId = event.getID();
-    //     //处理多点触摸;
-    //     this.moveHero(event.getLocation());
-    // }
-    // onTouchMove(event: Touch) {
-    //     if (event.getID() != this.touchId) return;
-    // }
-    // onTouchEnd(event: Touch) {
-    //     if (event.getID() == this.touchId) {
-    //         this.touchId = null;
-    //     }
-    // }
-    private loadArchive() {
-        this.mapData.level;
+    onTouchStart(event: Touch) {
+        if (this.touchId != null && this.touchId != event.getID()) {
+            return;
+        }
+        this.touchId = event.getID();
+        //处理多点触摸;
+        //this.moveHero(event.getLocation());
     }
 
-    private createMap(level: number) {}
-    private showMap() {
-        // let newMap = this.createMap(this.level);
-        // if (!newMap) return null;
-        // if (this.currentMap) this.currentMap.node.active = false;
-        // this.currentMap = newMap;
-        // this.currentMap.node.active = true;
-        // this.currentMap.show();
-        // NotifyCenter.emit(GameEvent.REFRESH_LEVEL, this.level);
-        // return this.currentMap;
+    onTouchEnd(event: Touch) {
+        if (event.getID() == this.touchId) {
+            this.touchId = null;
+        }
     }
-    // private showHero(tile: Vec2 = null) {
-    //     if (!this.hero) {
-    //         let hero = ElementManager.getElement("Hero");
-    //         this.hero = hero.getComponent("Hero");
-    //     }
-    //     this.hero.node.parent = this.currentMap.node;
-    //     this.hero.init(this.currentMap, tile);
-    //     this.currentMap.setHero(this.hero);
+
+    private loadArchive() {
+        let gameMap = this.createMap(this.mapData.level);
+        let levelData = this.mapData.getLevelData(this.mapData.level);
+        if (levelData) {
+            gameMap.loadLevelData(levelData);
+        } else {
+            this.mapData.createLevelData(this.mapData.level, gameMap.getProperties());
+        }
+        this.showHero();
+    }
+
+    private createMap(level: number): GameMap {
+        if (!this.maps[level]) {
+            let mapNode = instantiate(this.mapPrefab);
+            mapNode.position = v3(0, 0, 0);
+            mapNode.parent = this.layer;
+            let gameMap = mapNode.getComponent(GameMap);
+            gameMap.init(GameManager.RESOURCE.getAsset(TiledMapAsset, `${level}`));
+            this.maps[level] = gameMap;
+        }
+        return this.maps[level];
+    }
+
+    // private showMap() {
+    //     let newMap = this.createMap(this.level);
+    //     if (!newMap) return null;
+    //     if (this.currentMap) this.currentMap.node.active = false;
+    //     this.currentMap = newMap;
+    //     this.currentMap.node.active = true;
+    //     this.currentMap.show();
+    //     NotifyCenter.emit(GameEvent.REFRESH_LEVEL, this.level);
+    //     return this.currentMap;
     // }
+
+    private showHero(tile: Vec2 = null) {
+        if (!this.hero) {
+            let heroNode = instantiate(this.heroPrefab);
+            this.hero = heroNode.getComponent(Hero);
+        }
+        this.hero.node.parent = this.currentMap.node;
+        this.hero.init(this.currentMap, tile);
+    }
+
     // private moveHero(touchPos: Vec2) {
     //     if (this.canHeroMove()) {
     //         let endTile = this.currentMap.nodeSpaceARToTile(this.node.convertToNodeSpaceAR(touchPos));
