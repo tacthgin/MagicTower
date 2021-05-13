@@ -1,4 +1,4 @@
-import { Vec2 } from "cc";
+import { math, Vec2 } from "cc";
 
 /** A*节点 */
 class AstarNode {
@@ -49,8 +49,7 @@ class AstarNode {
 }
 
 export interface AstarMap {
-    getRow(): number;
-    getColumn(): number;
+    getMapSize(): math.Size;
     isEmpty(tile: Vec2, endTile: Vec2): boolean;
 }
 
@@ -92,12 +91,13 @@ export class Astar {
 
     /** 获取地块唯一id **/
     private getUniqeIndex(position: Vec2) {
-        return position.y * this.map.getColumn() + position.x;
+        return position.y * this.map.getMapSize().width + position.x;
     }
 
     /** 边界判断 */
     private inBoundary(position: Vec2) {
-        return position.x >= 0 && position.x < this.map.getColumn() && position.y >= 0 && position.y < this.map.getRow();
+        let size = this.map.getMapSize();
+        return position.x >= 0 && position.x < size.width && position.y >= 0 && position.y < size.height;
     }
 
     /** 添加进关闭列表 */

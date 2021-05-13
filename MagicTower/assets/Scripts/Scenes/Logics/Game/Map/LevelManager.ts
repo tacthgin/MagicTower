@@ -21,8 +21,7 @@ export class LevelManager extends Component {
     private heroPrefab: Prefab = null;
 
     private maps: any = {};
-    /** 当前地图 */
-    private currentMap: GameMap = null;
+    private currentLevel: number = 0;
     /** 勇士 */
     private hero: Hero = null;
     /** 勇士正在移动中 */
@@ -48,7 +47,7 @@ export class LevelManager extends Component {
         this.loadArchive();
     }
 
-    onTouchStart(event: Touch) {
+    private onTouchStart(event: Touch) {
         if (this.touchId != null && this.touchId != event.getID()) {
             return;
         }
@@ -57,19 +56,20 @@ export class LevelManager extends Component {
         //this.moveHero(event.getLocation());
     }
 
-    onTouchEnd(event: Touch) {
+    private onTouchEnd(event: Touch) {
         if (event.getID() == this.touchId) {
             this.touchId = null;
         }
     }
 
     private loadArchive() {
-        let gameMap = this.createMap(this.mapData.level);
-        let levelData = this.mapData.getLevelData(this.mapData.level);
+        this.currentLevel = this.mapData.level;
+        let gameMap = this.createMap(this.currentLevel);
+        let levelData = this.mapData.getLevelData(this.currentLevel);
         if (levelData) {
             gameMap.loadLevelData(levelData);
         } else {
-            this.mapData.createLevelData(this.mapData.level, gameMap.getProperties());
+            this.mapData.createLevelData(this.currentLevel, gameMap.getLayersProperties());
         }
         this.showHero();
     }
@@ -85,6 +85,8 @@ export class LevelManager extends Component {
         }
         return this.maps[level];
     }
+
+    private a() {}
 
     // private showMap() {
     //     let newMap = this.createMap(this.level);
@@ -102,8 +104,8 @@ export class LevelManager extends Component {
             let heroNode = instantiate(this.heroPrefab);
             this.hero = heroNode.getComponent(Hero);
         }
-        this.hero.node.parent = this.currentMap.node;
-        this.hero.init(this.currentMap, tile);
+        this.hero.node.parent = this.maps[this.currentLevel].node;
+        this.hero.init(tile);
     }
 
     // private moveHero(touchPos: Vec2) {

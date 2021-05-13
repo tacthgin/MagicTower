@@ -1,3 +1,4 @@
+import { Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
@@ -39,10 +40,12 @@ export class MapData extends BaseData {
 
     createLevelData(level: number, properties: any) {
         let levelData = new LevelData();
-        levelData.setLevel(level);
+        levelData.level = level;
         levelData.loadProperties(properties);
         this.data.maps[level] = levelData;
     }
+
+    getElement(tile: Vec2, gid: number) {}
 
     load(info: any = null) {
         if (info) {
@@ -56,15 +59,31 @@ export class MapData extends BaseData {
 }
 
 export class LevelData extends BaseLoadData {
-    private level: number = 0;
+    private _level: number = 0;
     /** 出现的tile */
-    private appearTile: any = {};
+    private _appearTile: any = {};
     /** 消失的tile */
-    private disappearTile: any = {};
+    private _disappearTile: any = {};
+
+    public set level(value: number) {
+        this._level = value;
+    }
+
+    public get level() {
+        return this._level;
+    }
+
+    public get appearTile() {
+        return this._appearTile;
+    }
+
+    public get disappearTile() {
+        return this._disappearTile;
+    }
 
     private emitEvent(layerName: string, index: number, info: any = null) {
         let mapData = GameManager.DATA.getData(MapData);
-        mapData.emit(MapEvent.ADD_ELEMENT, this.level, layerName, index, info);
+        mapData.emit(MapEvent.ADD_ELEMENT, this._level, layerName, index, info);
     }
 
     load(info: any) {
@@ -73,21 +92,22 @@ export class LevelData extends BaseLoadData {
 
     loadProperties(properties: any) {}
 
-    setLevel(level: number) {
-        this.level = level;
-    }
-
     setAppear(layerName: string, index: number, gid: number) {
-        if (!this.appearTile[layerName]) {
-            this.appearTile[layerName] = {};
+        if (!this._appearTile[layerName]) {
+            this._appearTile[layerName] = {};
         }
-        this.appearTile[layerName][index] = gid;
+        this._appearTile[layerName][index] = gid;
     }
 
     setDisappear(layerName: string, index: number) {
-        if (!this.disappearTile[layerName]) {
-            this.disappearTile[layerName] = [];
+        if (!this._disappearTile[layerName]) {
+            this._disappearTile[layerName] = [];
         }
-        this.disappearTile[layerName].push(index);
+        this._disappearTile[layerName].push(index);
+    }
+
+    canHeroMove(tile: Vec2) {
+        //if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
+        return true;
     }
 }

@@ -10,6 +10,7 @@ export enum ResourceType {
     TILED_MAP = "TiledMap",
 }
 
+/** resources资源加载管理 */
 export class ResourceManager {
     /** 所有类型资源 */
     private assets: any = {};
