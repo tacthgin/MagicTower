@@ -11,11 +11,13 @@ export enum HeroAttr {
 }
 
 export enum PropType {
+    KEY = 1,
     HEALING_SALVE = 2,
     ATTACK_GEM,
     DEFENCE_GEM,
     SWARD = 5,
     SHIELD,
+    FEATHER = 9,
     /** 神圣盾 */
     DIVINE_SHIELD = 17,
     RECORD_BOOK = 19,
@@ -58,6 +60,12 @@ export class HeroData extends BaseData {
         return this.data.heroAttr[attr];
     }
 
+    setAttr(attr: HeroAttr, value: number) {
+        this.data.heroAttr[attr] = value;
+        this.save();
+        this.emit(HeroEvent.HERO_ATTR, attr);
+    }
+
     setAttrDiff(attr: HeroAttr, diff: number) {
         this.data.heroAttr[attr] += diff;
         this.save();
@@ -81,25 +89,33 @@ export class HeroData extends BaseData {
         return 0;
     }
 
-    addProp(id: number, count: number = 1) {
+    addProp(id: number, mapLevel: number, count: number = 1) {
         let prop = GameManager.DATA.getJsonElement("prop", id);
+
         switch (prop.type) {
             case PropType.SWARD:
                 this.data.props.swardID = id;
+                this.setAttrDiff(HeroAttr.ATTACK, prop.value);
                 this.emit(HeroEvent.REFRESH_EQUIP, PropType.SWARD);
                 break;
             case PropType.SHIELD:
                 this.data.props.shieldID = id;
+                this.setAttrDiff(HeroAttr.DEFENCE, prop.value);
                 this.emit(HeroEvent.REFRESH_EQUIP, PropType.SHIELD);
                 break;
             default:
                 if (!prop.consumption) {
                     this.data.props.prop[id] = Util.clamp(this.getPropNum(id) + count, 0, Number.MAX_VALUE);
+                    this.save();
                     this.emit(HeroEvent.REFRESH_PROP, id);
+                } else {
+                    if (prop.type >= PropType.HEALING_SALVE && prop.type <= PropType.DEFENCE_GEM) {
+                        let value = prop.value + Math.floor((mapLevel - 1) / 10 + 1);
+                        this.setAttrDiff(prop.type - PropType.HEALING_SALVE + HeroAttr.HP, value);
+                    }
                 }
                 break;
         }
-        this.save();
     }
 
     getProps() {

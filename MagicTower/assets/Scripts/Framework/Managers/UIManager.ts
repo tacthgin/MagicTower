@@ -2,6 +2,7 @@ import { director, instantiate, js, Node, NodePool, Prefab, resources, Vec3, vie
 import { BaseDialog } from "../Base/BaseDialog";
 import { BasePoolNode } from "../Base/BasePoolNode";
 import { ColorToast, ToastType } from "../Components/ColorToast";
+import { GameManager } from "./GameManager";
 
 enum UIPrefabPath {
     TOAST_PATH = "Prefabs/Base/ColorToast",
@@ -68,18 +69,6 @@ export class UIManager {
         return dialog;
     }
 
-    private loadPrefab(path: string): Promise<Prefab> {
-        return new Promise((resolve) => {
-            resources.load(path, Prefab, (err, prefab: Prefab) => {
-                if (err) {
-                    console.error(err);
-                    resolve(null);
-                }
-                resolve(prefab);
-            });
-        });
-    }
-
     clearLayers() {
         this.layers[UILayerIndex.DIALOG_LAYER].children.forEach((dialogNode) => {
             dialogNode.getComponent(BaseDialog).close(false);
@@ -102,7 +91,7 @@ export class UIManager {
 
         let prefab = resources.get<Prefab>(UIPrefabPath.TOAST_PATH);
         if (!prefab) {
-            prefab = await this.loadPrefab(UIPrefabPath.TOAST_PATH);
+            prefab = await GameManager.RESOURCE.loadPrefab(UIPrefabPath.TOAST_PATH);
             if (!prefab) {
                 return;
             }
@@ -135,7 +124,7 @@ export class UIManager {
             let dialogPrefab = resources.get<Prefab>(dialogPath);
             if (!dialogPrefab) {
                 this.dialogCache[dialogName] = true;
-                dialogPrefab = await this.loadPrefab(dialogPath);
+                dialogPrefab = await GameManager.RESOURCE.loadPrefab(dialogPath);
                 this.dialogCache[dialogName] = false;
                 if (!dialogPrefab) {
                     return null;

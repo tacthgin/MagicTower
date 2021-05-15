@@ -1,10 +1,11 @@
-import { _decorator, Component, Node, Animation, Vec2, Sprite, AnimationClip, tween, v3 } from "cc";
+import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, v3, Vec2, _decorator } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { Util } from "../../../../Framework/Util/Util";
 import { GameEvent } from "../../../Constant/GameEvent";
-import { HeroData } from "../../../Data/CustomData/HeroData";
-import { PropParser } from "../../../Data/Parser/PropParser";
+import { HeroAttr, HeroData } from "../../../Data/CustomData/HeroData";
+import { Actor } from "../Elements/Base/Actor";
+import { Lightning } from "../Elements/Lightning";
 import { GameMap } from "./GameMap";
 import { HeroState, IdleState, MoveState } from "./HeroState";
 
@@ -23,7 +24,6 @@ export class Hero extends Component {
     private currentState: HeroState = null;
     private globalInfo: any = null;
     private map: GameMap = null;
-    private propParser: PropParser = null;
 
     get heroData() {
         return this._heroData;
@@ -34,7 +34,6 @@ export class Hero extends Component {
         this.animation.on(Animation.EventType.FINISHED, this.onFinished, this);
         this.globalInfo = GameManager.DATA.getJson("global");
         this._heroData = GameManager.DATA.getData(HeroData);
-        this.propParser = GameManager.DATA.getJsonParser(PropParser);
     }
 
     onFinished() {
@@ -142,34 +141,32 @@ export class Hero extends Component {
     }
 
     movePath(path: Vec2[], moveCallback: (tile: Vec2, end: boolean) => boolean) {
-        let moveActions = [];
+        let moveActions: Tween<Node>[] = [];
         let stop = false;
-        let moveAction = (position: Vec2, end: boolean = false) => {
-            return sequence(
-                callFunc(() => {
-                    this._heroData.get("direction") = this.getDirection(position.sub(this._heroData.Position));
+        let moveAction = (tile: Vec2, end: boolean = false) => {
+            let position = this.map.getPositionAt(tile);
+            return tween()
+                .call(() => {
+                    this._heroData.set("direction", this.getDirection(tile.subtract(this._heroData.get("position"))));
                     if (!stop) {
                         //动作停止callFunc依然会调用一次;
                         this.changeState(new MoveState());
                     }
-                }),
-                moveTo(this.globalInfo.heroSpeed, this.map.tileToNodeSpaceAR(position)),
-                callFunc(() => {
+                })
+                .to(this.globalInfo.heroSpeed, { position: v3(position.x, position.y) })
+                .call(() => {
                     this._heroData.set("position", position);
                     stop = moveCallback(position, end);
-                })
-            );
+                });
         };
         for (let i = 0; i < path.length - 1; i++) {
             moveActions.push(moveAction(path[i]));
         }
         moveActions.push(moveAction(path[path.length - 1], true));
-        moveActions.push(
-            callFunc(() => {
-                this.stand();
-            })
-        );
-        tween(this.node).sequence(moveActions).start();
+        moveActions.push(tween().call(this.stand.bind(this)));
+        tween(this.node)
+            .sequence(...moveActions)
+            .start();
     }
 
     stand() {
@@ -177,9 +174,11 @@ export class Hero extends Component {
     }
 
     location(tile: Vec2 = null) {
-        this._heroData.Position = tile || this._heroData.Position;
-        let position = this.map.tileToNodeSpaceAR(this._heroData.Position);
-        this.node.position = v3(position.x, position.y, 0);
+        if (tile) {
+            this._heroData.set("position", tile);
+        }
+        let position = this.map.getPositionAt(this._heroData.get("position"));
+        this.node.position = v3(position.x, position.y);
         this.toward(2);
     }
 
@@ -189,15 +188,15 @@ export class Hero extends Component {
     }
 
     hurt(damage: number) {
-        this._heroData.Hp = Util.clamp(this._heroData.Hp - damage, 0, Number.MAX_VALUE);
+        this._heroData.setAttrDiff(HeroAttr.HP, Util.clamp(this._heroData.getAttr(HeroAttr.HP) - damage, 0, Number.MAX_VALUE));
     }
 
     magicLight(monsterIndexs: number[]) {
-        let heroIndex = this.map.tileToIndex(this._heroData.Position);
+        let heroIndex = this.map.getTileIndex(this._heroData.get("position"));
         monsterIndexs.forEach((index) => {
-            let lightning = ElementManager.getElement("Lightning");
+            let lightning = GameManager.POOL.createPrefabNode("Lightning");
             lightning.parent = this.node;
-            lightning.getComponent("Lightning").init(index - heroIndex);
+            lightning.getComponent(Lightning).init(index - heroIndex);
         });
     }
 
@@ -206,49 +205,13 @@ export class Hero extends Component {
         let animationName = this._heroData.get("animation")[this._heroData.get("direction")];
         this.animation.play(`${animationName}_once`);
         if (damage < 1) {
-            this._heroData.Hp = Math.ceil(this._heroData.Hp * damage);
+            this._heroData.setAttr(HeroAttr.HP, Math.ceil(this._heroData.getAttr(HeroAttr.HP) * damage));
         } else {
-            this._heroData.Hp -= damage;
+            this._heroData.setAttrDiff(HeroAttr.HP, -damage);
         }
     }
 
     weak() {
         this._heroData.weak();
-    }
-
-    addProp(id: string, count: number = 1) {
-        let propInfo = this.propParser.getJsonElement(id);
-        if (propInfo.consumption) {
-            switch (propInfo.type) {
-                case 2:
-                    //加血量
-                    this._heroData.Hp += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
-                    break;
-                case 3:
-                    //加攻击
-                    this._heroData.Attack += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
-                    break;
-                case 4:
-                    //加防御
-                    this._heroData.Defence += propInfo.value * Math.floor((this.map.level - 1) / 10 + 1);
-                    break;
-                case 5:
-                    //装备剑
-                    this._heroData.Attack += propInfo.value;
-                    break;
-                case 6:
-                    //装备盾
-                    this._heroData.Defence += propInfo.value;
-                    break;
-            }
-        }
-        this._heroData.addProp(propInfo.id, count);
-    }
-
-    removeProp(id: string, count: number = 1) {
-        let propInfo = this.propParser.getJsonElement(id);
-        if (!propInfo.consumption) {
-            this._heroData.addProp(propInfo.id, -count);
-        }
     }
 }

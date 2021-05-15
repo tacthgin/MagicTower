@@ -47,6 +47,15 @@ export class GameMap extends TiledMap implements AstarMap {
         return new Vec2(index % size.width, Math.floor(index / size.width));
     }
 
+    getPositionAt(tile: Vec2) {
+        let layers = this.getLayers();
+        if (layers[0]) {
+            return layers[0].getPositionAt(tile);
+        } else {
+            return null;
+        }
+    }
+
     getTileInfo(tile: Vec2) {
         let layers = this.getLayers();
         let layerName: string = null;
@@ -169,11 +178,7 @@ export class GameMap extends TiledMap implements AstarMap {
         for (let layerName in this.animationTiles) {
             for (let index in this.animationTiles[layerName]) {
                 tileIndex = parseInt(index);
-                this.getLayer(layerName).setTileGIDAt(
-                    this.animationTiles[layerName][index] + gidDiff,
-                    tileIndex % size.width,
-                    Math.floor(tileIndex / size.width)
-                );
+                this.getLayer(layerName).setTileGIDAt(this.animationTiles[layerName][index] + gidDiff, tileIndex % size.width, Math.floor(tileIndex / size.width));
             }
         }
     }

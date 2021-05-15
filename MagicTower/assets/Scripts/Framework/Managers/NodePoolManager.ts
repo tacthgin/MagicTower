@@ -6,37 +6,28 @@ import { GameManager } from "./GameManager";
 export class NodePoolManager {
     private pool: any = {};
 
-    private loadPrefab(path: string): Promise<Prefab> {
-        return new Promise((resolve) => {
-            resources.load(path, Prefab, (err, prefab: Prefab) => {
-                if (err) {
-                    console.error(err);
-                    resolve(null);
-                }
-                resolve(prefab);
-            });
-        });
-    }
-
     /**
      * 创建对象池节点
      * @param path 预设路径
+     * @param extName 扩展名用来区分一种类型不同名字的对象池
      * @param useCommon 是否使用通用脚本
      */
-    async createPoolNode(path: string, useCommon: boolean = false) {
+    async createPoolNode(path: string, extName: string | number = null, useCommon: boolean = false) {
         let prefab = resources.get<Prefab>(path);
         if (!prefab) {
-            prefab = await this.loadPrefab(path);
+            prefab = await GameManager.RESOURCE.loadPrefab(path);
             if (!prefab) {
                 console.error(`找不到${path}预设`);
                 return null;
             }
         }
 
-        if (!this.pool[path]) {
-            let index = path.lastIndexOf("/");
-            let name = index == -1 ? path : path.substring(index + 1);
-            this.pool[path] = new NodePool(name);
+        let index = path.lastIndexOf("/");
+        let name = index == -1 ? path : path.substring(index + 1);
+        let poolName = extName ? name + extName : name;
+
+        if (!this.pool[poolName]) {
+            this.pool[poolName] = new NodePool(name);
         }
 
         return BasePoolNode.generateNodeFromPool(this.pool[path], prefab, useCommon);
@@ -45,9 +36,10 @@ export class NodePoolManager {
     /**
      * 创建加载的预设node
      * @param name 加载的预设名字
+     * @param extName 扩展名用来区分一种类型不同名字的对象池
      * @param useCommon 是否使用通用脚本
      */
-    createPrefabNode(nameOrPrefab: string | Prefab, useCommon: boolean = false) {
+    createPrefabNode(nameOrPrefab: string | Prefab, extName: string | number = null, useCommon: boolean = false) {
         let prefab: Prefab = typeof nameOrPrefab == "string" ? GameManager.RESOURCE.getPrefab(nameOrPrefab) : nameOrPrefab;
 
         if (!prefab) {
@@ -55,11 +47,13 @@ export class NodePoolManager {
             return null;
         }
 
-        if (!this.pool[prefab.name]) {
-            this.pool[prefab.name] = new NodePool(prefab.name);
+        let poolName = extName ? prefab.name + extName : prefab.name;
+
+        if (!this.pool[poolName]) {
+            this.pool[poolName] = new NodePool(prefab.name);
         }
 
-        return BasePoolNode.generateNodeFromPool(this.pool[prefab.name], prefab, useCommon);
+        return BasePoolNode.generateNodeFromPool(this.pool[poolName], prefab, useCommon);
     }
 
     /**
@@ -69,7 +63,7 @@ export class NodePoolManager {
      * @param completeCallback 播放完成调用回调
      */
     async createEffectNode(path: string, loop: boolean = false, completeCallback: (...any: any[]) => void = null) {
-        let effectNode = await this.createPoolNode(path, true);
+        let effectNode = await this.createPoolNode(path, null, true);
         if (!effectNode) {
             console.error("找不到特效节点", path);
             return null;

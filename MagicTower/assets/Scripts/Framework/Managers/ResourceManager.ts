@@ -137,6 +137,18 @@ export class ResourceManager {
         return this.getAsset(ResourceType.SPRITE, path);
     }
 
+    loadPrefab(path: string): Promise<Prefab> {
+        return new Promise((resolve) => {
+            resources.load(path, Prefab, (err, prefab: Prefab) => {
+                if (err) {
+                    console.error(err);
+                    resolve(null);
+                }
+                resolve(prefab);
+            });
+        });
+    }
+
     loadPrefabDir(path: string) {
         return new Promise((resolve, reject) => {
             if (resources.get(path)) {

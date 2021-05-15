@@ -78,7 +78,7 @@ export class GameUI extends Component {
                 this.equipLabels[index].string = propInfo.name;
                 this.equipSprites[index].spriteFrame = GameManager.RESOURCE.getSpriteFrame(propInfo.spriteId);
                 break;
-            case 1:
+            case PropType.KEY:
                 //钥匙
                 if (count < 0) {
                     for (let i = 0; i < -count; i++) {
@@ -95,7 +95,7 @@ export class GameUI extends Component {
                     }
                 }
                 break;
-            case 9:
+            case PropType.FEATHER:
                 let jsonData = GameManager.DATA.getJsonElement("prop", propInfo.id);
                 //up
                 let button = this.createPropButton(jsonData, 1);
@@ -134,7 +134,6 @@ export class GameUI extends Component {
     refreshArchive() {
         this.refreshHeroAttr();
         let props = this.heroData.getProps();
-        let prop = null;
         for (let id in props) {
             this.refreshProp(parseInt(id), props[id]);
         }
@@ -144,7 +143,7 @@ export class GameUI extends Component {
 
     refreshHeroAttr() {
         for (let key in HeroAttr) {
-            this.heroAttrChanged(HeroAttr[key]);
+            this.heroAttrChanged(HeroAttr[key] as any as HeroAttr);
         }
     }
 
@@ -181,9 +180,9 @@ export class GameUI extends Component {
 
     createKey(propInfo: any) {
         let index = propInfo.id - 1;
-        let key = GameManager.POOL.createPrefabNode(this.keyPrefab, true);
+        let key = GameManager.POOL.createPrefabNode(this.keyPrefab, null, true);
         key.getComponent(Sprite).spriteFrame = this.keySpriteFrames[index];
-        key.getComponent(UITransform).priority = this.keySpriteFrames.length - index;
+        key.setSiblingIndex(this.keySpriteFrames.length - index);
         key.parent = this.keyLayout;
         this.keys[index].push(key);
         return key;

@@ -1,11 +1,9 @@
-import { Component, Label, TiledMapAsset, _decorator } from "cc";
+import { Component, Label, _decorator } from "cc";
 import { BaseEvent } from "../../../Framework/Base/BaseContant";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
 import { ResourceType } from "../../../Framework/Managers/ResourceManager";
 import { JsonParserMap } from "../../Constant/JsonParserMap";
-import { Door } from "../../Data/CustomData/Element";
-import { GameMap } from "../Game/Map/GameMap";
 
 const { ccclass, property } = _decorator;
 
@@ -34,9 +32,7 @@ export class LoginScene extends Component {
     }
 
     async gotoGameScene() {
-        //await GameManager.RESOURCE.loadPrefabDir("Elements");
-        //GameManager.getInstance().loadScene("GameScene");
-        let map = new GameMap();
-        map.init(GameManager.RESOURCE.getAsset(TiledMapAsset, "1"));
+        await GameManager.RESOURCE.loadPrefabDir("Elements");
+        GameManager.getInstance().loadScene("GameScene");
     }
 }
