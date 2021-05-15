@@ -4,7 +4,6 @@ import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { Util } from "../../../../Framework/Util/Util";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroAttr, HeroData } from "../../../Data/CustomData/HeroData";
-import { Actor } from "../Elements/Base/Actor";
 import { Lightning } from "../Elements/Lightning";
 import { GameMap } from "./GameMap";
 import { HeroState, IdleState, MoveState } from "./HeroState";
@@ -46,9 +45,9 @@ export class Hero extends Component {
         this.changeState(new IdleState());
     }
 
-    init(map: GameMap, tile: Vec2 = null) {
+    init(map: GameMap) {
         this.setOwnerMap(map);
-        this.location(tile);
+        this.location();
     }
 
     setOwnerMap(map: GameMap) {
@@ -119,7 +118,7 @@ export class Hero extends Component {
     playMoveAnimation() {
         let animationName = this._heroData.get("animation")[this._heroData.get("direction")];
         if (this.animation.defaultClip) {
-            let state = this.animation.getAnimationState(this.animation.defaultClip.name);
+            let state = this.animation.getState(this.animation.defaultClip.name);
             if (state.isPlaying && this.animation.defaultClip.name == animationName) {
                 return;
             }
@@ -173,10 +172,7 @@ export class Hero extends Component {
         this.changeState(new IdleState());
     }
 
-    location(tile: Vec2 = null) {
-        if (tile) {
-            this._heroData.set("position", tile);
-        }
+    location() {
         let position = this.map.getPositionAt(this._heroData.get("position"));
         this.node.position = v3(position.x, position.y);
         this.toward(2);

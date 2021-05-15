@@ -1,7 +1,8 @@
 import { BaseLoadData } from "../../../Framework/Base/BaseData";
 
-class Element extends BaseLoadData {
+export class Element extends BaseLoadData {
     private _gid: number = 0;
+    private _id: number = 0;
 
     set gid(value: number) {
         this._gid = value;
@@ -10,6 +11,15 @@ class Element extends BaseLoadData {
     /** tile唯一id */
     get gid() {
         return this._gid;
+    }
+
+    set id(value: number) {
+        this._id = value;
+    }
+
+    /** 唯一id */
+    get id() {
+        return this._id;
     }
 }
 
@@ -47,10 +57,46 @@ export class Door extends Element {
 }
 
 export class Stair extends Element {
-    /** 楼梯旁站立的坐标索引 */
     private _standLocation: number = 0;
-    /** 跳转的等级差 */
     private _levelDiff: number = 1;
-    /** 隐藏的楼梯 */
     private _hide: boolean = false;
+
+    set standLocation(value: number) {
+        this._standLocation = value;
+    }
+
+    /** 楼梯旁站立的坐标索引 */
+    get standLocation() {
+        return this._standLocation;
+    }
+
+    set levelDiff(value: number) {
+        this._levelDiff = value;
+    }
+
+    /** 跳转的等级差 */
+    get levelDiff() {
+        return this._levelDiff;
+    }
+
+    set hide(value: boolean) {
+        this._hide = value;
+    }
+
+    /** 隐藏的楼梯 */
+    get hide() {
+        return this._hide;
+    }
+}
+
+export class EventInfo extends Element {
+    private _monsters: string[] = null;
+
+    set monsters(value: string[]) {
+        this._monsters = value;
+    }
+
+    get mosnters() {
+        return this._monsters;
+    }
 }

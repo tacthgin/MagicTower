@@ -28,7 +28,7 @@ export class LoginScene extends Component {
     }
 
     onResouceProgress(type: ResourceType, progress: number) {
-        this.progressLabel.string = `资源加载中，${progress * 100}%...`;
+        this.progressLabel.string = `资源加载中，${(progress * 100).toFixed(2)}%...`;
     }
 
     async gotoGameScene() {

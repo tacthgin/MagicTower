@@ -1,8 +1,6 @@
-import { _decorator, Component, Node, Touch, Vec2, Prefab, instantiate, TiledMapAsset, v3 } from "cc";
+import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, v3, Vec2, _decorator } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
-import { GameEvent } from "../../../Constant/GameEvent";
-import { MapData } from "../../../Data/CustomData/MapData";
+import { MapData, StairType } from "../../../Data/CustomData/MapData";
 import { Astar } from "../AI/Astar";
 import { GameMap } from "./GameMap";
 import { Hero } from "./Hero";
@@ -37,7 +35,7 @@ export class LevelManager extends Component {
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
         // NotifyCenter.on(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
-        // NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
+         NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
         // NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
         // NotifyCenter.on(GameEvent.USE_PROP, this.useProp, this);
         this.mapData = GameManager.DATA.getData(MapData);
@@ -86,7 +84,12 @@ export class LevelManager extends Component {
         return this.maps[level];
     }
 
-    private a() {}
+    private switchLevel(type: StairType) {
+        let levelData = this.mapData.getLevelData(this.currentLevel);
+        let stair = levelData.getStair(type)
+        let levelDiff = type == StairType.Down ? -stair.levelDiff : stair.levelDiff
+        if (this.maps[])
+    }
 
     // private showMap() {
     //     let newMap = this.createMap(this.level);
@@ -105,7 +108,7 @@ export class LevelManager extends Component {
             this.hero = heroNode.getComponent(Hero);
         }
         this.hero.node.parent = this.maps[this.currentLevel].node;
-        this.hero.init(tile);
+        this.hero.init(this.maps[this.currentLevel]);
     }
 
     // private moveHero(touchPos: Vec2) {
