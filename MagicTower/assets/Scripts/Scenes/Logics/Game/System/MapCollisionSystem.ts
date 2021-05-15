@@ -37,9 +37,9 @@ export class MapCollisionSystem {
      * @returns true表示交互结束，false表示交互正在进行
      */
     collision(tile: Vec2) {
-        let layer = this.gameMap.getTileLayer(tile);
+        let layerName = this.gameMap.getTileInfo(tile);
 
-        switch (layer.getLayerName()) {
+        switch (layerName) {
             case "prop":
                 GameManager.AUDIO.playEffect("eat");
                 this.hero.addProp(element.propInfo.id);
@@ -48,9 +48,7 @@ export class MapCollisionSystem {
             case "door":
                 return this.doorCollision(index, element);
             case "stair":
-                if (!element.hide) {
-                    NotifyCenter.emit(GameEvent.SWITCH_LEVEl, element);
-                }
+                NotifyCenter.emit(GameEvent.SWITCH_LEVEl, element);
                 return true;
             case "monster":
                 {

@@ -88,6 +88,7 @@ export class LevelManager extends Component {
         let levelData = this.mapData.getLevelData(this.currentLevel);
         let stair = levelData.getStair(type)
         let levelDiff = type == StairType.Down ? -stair.levelDiff : stair.levelDiff
+        let new
         if (this.maps[])
     }
 
