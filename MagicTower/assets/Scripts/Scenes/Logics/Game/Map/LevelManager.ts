@@ -1,5 +1,7 @@
 import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, v3, Vec2, _decorator } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
+import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { GameEvent } from "../../../Constant/GameEvent";
 import { MapData, StairType } from "../../../Data/CustomData/MapData";
 import { Astar } from "../AI/Astar";
 import { GameMap } from "./GameMap";
@@ -19,7 +21,6 @@ export class LevelManager extends Component {
     private heroPrefab: Prefab = null;
 
     private maps: any = {};
-    private currentLevel: number = 0;
     /** 勇士 */
     private hero: Hero = null;
     /** 勇士正在移动中 */
@@ -61,13 +62,13 @@ export class LevelManager extends Component {
     }
 
     private loadArchive() {
-        this.currentLevel = this.mapData.level;
-        let gameMap = this.createMap(this.currentLevel);
-        let levelData = this.mapData.getLevelData(this.currentLevel);
+        let currentLevel = this.mapData.level;
+        let gameMap = this.createMap(currentLevel);
+        let levelData = this.mapData.getLevelData(currentLevel);
         if (levelData) {
             gameMap.loadLevelData(levelData);
         } else {
-            this.mapData.createLevelData(this.currentLevel, gameMap.getLayersProperties());
+            this.mapData.createLevelData(currentLevel, gameMap.getLayersProperties());
         }
         this.showHero();
     }
@@ -85,31 +86,20 @@ export class LevelManager extends Component {
     }
 
     private switchLevel(type: StairType) {
-        let levelData = this.mapData.getLevelData(this.currentLevel);
+        let levelData = this.mapData.getLevelData(currentLevel);
         let stair = levelData.getStair(type)
         let levelDiff = type == StairType.Down ? -stair.levelDiff : stair.levelDiff
-        let new
+        let newLevel = currentLevel 
         if (this.maps[])
     }
-
-    // private showMap() {
-    //     let newMap = this.createMap(this.level);
-    //     if (!newMap) return null;
-    //     if (this.currentMap) this.currentMap.node.active = false;
-    //     this.currentMap = newMap;
-    //     this.currentMap.node.active = true;
-    //     this.currentMap.show();
-    //     NotifyCenter.emit(GameEvent.REFRESH_LEVEL, this.level);
-    //     return this.currentMap;
-    // }
 
     private showHero(tile: Vec2 = null) {
         if (!this.hero) {
             let heroNode = instantiate(this.heroPrefab);
             this.hero = heroNode.getComponent(Hero);
         }
-        this.hero.node.parent = this.maps[this.currentLevel].node;
-        this.hero.init(this.maps[this.currentLevel]);
+        this.hero.node.parent = this.maps[currentLevel].node;
+        this.hero.init(this.maps[currentLevel]);
     }
 
     // private moveHero(touchPos: Vec2) {
