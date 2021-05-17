@@ -36,7 +36,7 @@ export class LevelManager extends Component {
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
         // NotifyCenter.on(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
-         NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
+        NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
         // NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
         // NotifyCenter.on(GameEvent.USE_PROP, this.useProp, this);
         this.mapData = GameManager.DATA.getData(MapData);
@@ -86,11 +86,11 @@ export class LevelManager extends Component {
     }
 
     private switchLevel(type: StairType) {
-        let levelData = this.mapData.getLevelData(currentLevel);
-        let stair = levelData.getStair(type)
-        let levelDiff = type == StairType.Down ? -stair.levelDiff : stair.levelDiff
-        let newLevel = currentLevel 
-        if (this.maps[])
+        // let levelData = this.mapData.getLevelData(currentLevel);
+        // let stair = levelData.getStair(type)
+        // let levelDiff = type == StairType.Down ? -stair.levelDiff : stair.levelDiff
+        // let newLevel = currentLevel
+        // if (this.maps[])
     }
 
     private showHero(tile: Vec2 = null) {
@@ -98,8 +98,9 @@ export class LevelManager extends Component {
             let heroNode = instantiate(this.heroPrefab);
             this.hero = heroNode.getComponent(Hero);
         }
-        this.hero.node.parent = this.maps[currentLevel].node;
-        this.hero.init(this.maps[currentLevel]);
+        let map = this.maps[this.mapData.level];
+        this.hero.node.parent = map.node;
+        this.hero.init(map);
     }
 
     // private moveHero(touchPos: Vec2) {

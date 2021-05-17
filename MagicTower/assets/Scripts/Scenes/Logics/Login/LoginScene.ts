@@ -33,6 +33,6 @@ export class LoginScene extends Component {
 
     async gotoGameScene() {
         await GameManager.RESOURCE.loadPrefabDir("Elements");
-        GameManager.getInstance().loadScene("GameScene");
+        //GameManager.getInstance().loadScene("GameScene");
     }
 }
