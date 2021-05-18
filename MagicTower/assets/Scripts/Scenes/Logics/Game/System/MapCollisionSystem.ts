@@ -37,7 +37,7 @@ export class MapCollisionSystem {
      * @returns true表示交互结束，false表示交互正在进行
      */
     collision(tile: Vec2) {
-        let layerName = this.gameMap.getTileInfo(tile);
+        let { layerName } = this.gameMap.getTileInfo(tile);
 
         switch (layerName) {
             case "prop":

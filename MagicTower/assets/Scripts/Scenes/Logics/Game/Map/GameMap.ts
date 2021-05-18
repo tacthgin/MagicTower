@@ -56,15 +56,26 @@ export class GameMap extends TiledMap implements AstarMap {
         }
     }
 
-    getTileInfo(tile: Vec2) {
-        let layers = this.getLayers();
-        let layerName: string = null;
-        layers.forEach((layer) => {
-            if (layer.getTileGIDAt(tile.x, tile.y) != 0) {
-                layerName = layer.getLayerName();
-            }
-        });
-        return layerName;
+    getTileInfo(tile: Vec2, layerName?: string) {
+        let layer = null;
+        if (layerName) {
+            layer = this.getLayer(layerName);
+        } else {
+            this.getLayers().forEach((tiledLayer) => {
+                if (tiledLayer.getTileGIDAt(tile.x, tile.y) != 0) {
+                    layer = tiledLayer;
+                }
+            });
+        }
+
+        if (!layer) {
+            return {
+                layerName: layer.getLayerName(),
+                spriteFrame: layer.getTexture(this.getTileIndex(tile)),
+            };
+        }
+
+        return null;
     }
 
     setTileGIDAt(layerName: string, tile: Vec2, gid: number) {
@@ -201,7 +212,7 @@ export class GameMap extends TiledMap implements AstarMap {
     }
 
     isEmpty(tile: Vec2, endTile: Vec2): boolean {
-        let layerName = this.getTileInfo(tile);
+        let { layerName } = this.getTileInfo(tile);
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
