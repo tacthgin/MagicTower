@@ -90,7 +90,7 @@ export class Stair extends Element {
 }
 
 export class EventInfo extends Element {
-    private _monsters: string[] = null;
+    private _monsters: string[] | null = null;
 
     set monsters(value: string[]) {
         this._monsters = value;

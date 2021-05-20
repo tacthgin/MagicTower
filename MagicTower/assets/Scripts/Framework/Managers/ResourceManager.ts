@@ -77,7 +77,7 @@ export class ResourceManager {
     }
 
     private setAssets(type: string, assets: Asset[]) {
-        let data = {};
+        let data: any = {};
         if (type != ResourceType.JSON) {
             assets.forEach((asset) => {
                 let assetInfo: any = resources.getAssetInfo(asset._uuid);
@@ -112,7 +112,7 @@ export class ResourceManager {
         return this.assets[type] || null;
     }
 
-    getAsset<T extends Asset>(type: ResourceType | Fn.Constructor<T>, path: string): T {
+    getAsset<T extends Asset>(type: ResourceType | Fn.Constructor<T>, path: string): T | null {
         let asset = null;
         if (typeof type == "string") {
             asset = this.assets[type][`${type}/${path}`];
@@ -133,11 +133,11 @@ export class ResourceManager {
         return asset;
     }
 
-    getSpriteFrame(path: string): SpriteFrame {
+    getSpriteFrame(path: string): SpriteFrame | null {
         return this.getAsset(ResourceType.SPRITE, path);
     }
 
-    loadPrefab(path: string): Promise<Prefab> {
+    loadPrefab(path: string): Promise<Prefab | null> {
         return new Promise((resolve) => {
             resources.load(path, Prefab, (err, prefab: Prefab) => {
                 if (err) {
@@ -169,7 +169,7 @@ export class ResourceManager {
         });
     }
 
-    getPrefab(name: string) {
+    getPrefab(name: string): Prefab {
         return this.preloadPrefabs[name] || null;
     }
 }

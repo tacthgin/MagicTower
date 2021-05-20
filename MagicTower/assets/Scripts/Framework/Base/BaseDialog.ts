@@ -12,13 +12,13 @@ export class BaseDialog extends BaseComponent {
     @property({
         tooltip: "背景区域，用于做点击关闭，及事件屏蔽",
     })
-    private touchNode: UITransform = null;
+    private touchNode: UITransform = null!;
 
     @property({
         type: Node,
         tooltip: "弹窗中心内容，适用于做弹窗动作，默认选择弹窗node",
     })
-    private dialogContent: Node = null;
+    private dialogContent: Node = null!;
 
     /** 点击弹窗空白关闭 */
     @property({
@@ -40,7 +40,7 @@ export class BaseDialog extends BaseComponent {
     private actionType: DialogAction = DialogAction.NoneAction;
 
     /** 处理单点或者多点触摸，保证id唯一 */
-    private touchId: number = null;
+    private touchId: number | null = null;
 
     /** 加载背景按钮等初始化 */
     __preload() {
@@ -88,7 +88,7 @@ export class BaseDialog extends BaseComponent {
         let actionComponent: any = this.getActionComponent();
         if (!actionComponent) {
             actionComponent = ActionComponent.getActionComponent(this.actionType);
-            let component: ActionComponent = this.addComponent(actionComponent);
+            let component: ActionComponent | null = this.addComponent(actionComponent);
             if (component) {
                 component.endActionCallback = this.closeCallback.bind(this);
                 component.dialogContentNode = this.dialogContent;
@@ -110,16 +110,16 @@ export class BaseDialog extends BaseComponent {
     close(useAction: boolean = true) {
         let actionComponent = this.getActionComponent();
         if (useAction) {
-            this.getActionComponent().executeEndAction();
+            this.getActionComponent()?.executeEndAction();
         } else {
-            actionComponent.resetAction();
+            actionComponent?.resetAction();
             this.closeCallback();
         }
     }
 
     /** 执行弹窗打开动作 */
     executeStartAction() {
-        this.getActionComponent().executeStartAction();
+        this.getActionComponent()?.executeStartAction();
     }
 
     init(...args: any[]) {}

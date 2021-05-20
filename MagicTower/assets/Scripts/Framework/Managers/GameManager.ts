@@ -12,18 +12,18 @@ const { ccclass, type } = _decorator;
 @ccclass("GameManager")
 export class GameManager extends Component {
     @type(AudioController)
-    private audioController: AudioController = null;
+    private audioController: AudioController = null!;
     @type(Node)
-    private dialogLayer: Node = null;
+    private dialogLayer: Node = null!;
     @type(Node)
-    private toastLayer: Node = null;
+    private toastLayer: Node = null!;
 
-    private uiManager: UIManager = null;
-    private dataManager: DataManager = null;
-    private resourceManager: ResourceManager = null;
-    private nodePoolManager: NodePoolManager = null;
-    private netManager: NodePoolManager = null;
-    private static instance: GameManager;
+    private uiManager: UIManager = null!;
+    private dataManager: DataManager = null!;
+    private resourceManager: ResourceManager = null!;
+    private nodePoolManager: NodePoolManager = null!;
+    private netManager: NodePoolManager = null!;
+    private static instance: GameManager = null!;
 
     /** GameManager 实例 */
     public static getInstance() {

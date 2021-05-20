@@ -22,7 +22,7 @@ type DialogQueueInfo = {
 /** UI管理器 */
 export class UIManager {
     /** 弹窗层，toast层等 */
-    private layers: Node[] = null;
+    private layers: Node[] = null!;
     /** toast对象池 */
     private toastPool: NodePool = new NodePool("ColorToast");
     private toastY: number = 0;
@@ -52,13 +52,15 @@ export class UIManager {
     }
 
     private getCanvas(): any {
-        return director.getScene().getChildByName("Canvas");
+        return director.getScene()!.getChildByName("Canvas");
     }
 
     private createToast(prefab: Prefab) {
         let toast = BasePoolNode.generateNodeFromPool(this.toastPool, prefab);
-        toast.position = new Vec3(0, this.toastY, 0);
-        toast.parent = this.layers[UILayerIndex.TOSAT_LAYER];
+        if (toast) {
+            toast.position = new Vec3(0, this.toastY, 0);
+            toast.parent = this.layers[UILayerIndex.TOSAT_LAYER];
+        }
         return toast;
     }
 
@@ -71,11 +73,11 @@ export class UIManager {
 
     clearLayers() {
         this.layers[UILayerIndex.DIALOG_LAYER].children.forEach((dialogNode) => {
-            dialogNode.getComponent(BaseDialog).close(false);
+            dialogNode.getComponent(BaseDialog)?.close(false);
         });
 
         this.layers[UILayerIndex.TOSAT_LAYER].children.forEach((toast) => {
-            toast.getComponent(ColorToast).remove();
+            toast.getComponent(ColorToast)?.remove();
         });
     }
 
@@ -97,7 +99,7 @@ export class UIManager {
             }
         }
         let toast = this.createToast(prefab);
-        toast.getComponent(ColorToast).init(content, toastType);
+        toast?.getComponent(ColorToast)?.init(content, toastType);
     }
 
     /**
@@ -106,7 +108,7 @@ export class UIManager {
      * @param args 弹窗初始化数据
      * @returns 返回Promise弹窗节点
      */
-    async showDialog(dialogName: string, ...args: any[]): Promise<Node> {
+    async showDialog(dialogName: string, ...args: any[]): Promise<Node | null> {
         if (this.dialogCache[dialogName]) {
             console.error(`${dialogName}弹窗正在打开`);
             return null;
@@ -147,6 +149,13 @@ export class UIManager {
      * @param args 弹窗初始化数据
      */
     showDialogWithQueue(dialogName: string, ...args: any[]): void {
+        let index = this.dialogQueue.findIndex((info) => {
+            return info.dialogName == dialogName;
+        });
+        if (index != -1) {
+            console.error(`${dialogName}已经在队列中`);
+            return;
+        }
         this.dialogQueue.push({
             dialogName: dialogName,
             args: args,

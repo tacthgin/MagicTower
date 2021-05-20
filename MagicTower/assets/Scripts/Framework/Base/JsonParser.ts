@@ -5,7 +5,7 @@ const { ccclass } = _decorator;
 
 @ccclass("JsonParser")
 export class JsonParser {
-    protected nativeAsset: object = null;
+    protected nativeAsset: object | null = null;
 
     parseJson(jsonAsset: object) {
         this.nativeAsset = jsonAsset;

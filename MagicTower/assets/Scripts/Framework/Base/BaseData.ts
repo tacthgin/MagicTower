@@ -12,7 +12,7 @@ export abstract class BaseData extends CustomEventTarget {
     /** data设置代理，给数据赋值自动保存 */
     protected setProxy<T extends object>() {
         this.data = new Proxy<T>(this.data, {
-            set: (obj, prop, newval) => {
+            set: (obj: any, prop, newval) => {
                 obj[prop] = newval;
                 this.save();
                 return true;
@@ -51,7 +51,7 @@ export abstract class BaseLoadData {
     /** 按key赋值 */
     protected loadData(data: any) {
         for (let key in data) {
-            this[key] = data[key];
+            (this as any)[key] = data[key];
         }
     }
 }

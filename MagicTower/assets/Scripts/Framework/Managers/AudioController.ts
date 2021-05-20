@@ -102,7 +102,7 @@ export class AudioController extends Component {
 
     /** 对音乐特效进行一次播放 */
     playOneShot(audioPath: string, volume: number = 1) {
-        if (!this.effectEnabled[AudioType.EFFECT]) return;
+        if (!this.effectEnabled) return;
         this.getAudioClip(audioPath).then((audioClip: any) => {
             this.audioSource[AudioType.EFFECT].playOneShot(audioClip, volume);
         });

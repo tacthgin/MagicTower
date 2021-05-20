@@ -5,7 +5,7 @@ const { ccclass } = _decorator;
 /** 对象池节点 */
 @ccclass("BasePoolNode")
 export class BasePoolNode extends BaseComponent {
-    protected pool: NodePool = null;
+    protected pool: NodePool | null = null;
 
     /**
      * 从对象池获得节点
@@ -16,7 +16,7 @@ export class BasePoolNode extends BaseComponent {
     static generateNodeFromPool(pool: NodePool, prefab: Prefab, useCommon: boolean = false) {
         if (!pool || !prefab) return null;
 
-        let node: Node = null;
+        let node: Node | null = null;
         if (pool.size() == 0) {
             node = instantiate(prefab);
             if (useCommon) {

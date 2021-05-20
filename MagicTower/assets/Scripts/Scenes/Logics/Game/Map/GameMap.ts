@@ -1,4 +1,4 @@
-import { director, js, TiledMap, TiledMapAsset, Vec2, _decorator } from "cc";
+import { director, js, TiledLayer, TiledMap, TiledMapAsset, Vec2, _decorator } from "cc";
 import { LevelData } from "../../../Data/CustomData/MapData";
 import { Astar, AstarMap } from "../AI/Astar";
 
@@ -19,7 +19,7 @@ export class GameMap extends TiledMap implements AstarMap {
     private animationCount: number = 0;
     /** a*行走方式 */
     private _astarMoveType: AstarMoveType = AstarMoveType.HERO;
-    private levelData: LevelData = null;
+    private levelData: LevelData | null = null;
 
     public set astarMoveType(value: AstarMoveType) {
         this._astarMoveType = value;
@@ -57,7 +57,7 @@ export class GameMap extends TiledMap implements AstarMap {
     }
 
     getTileInfo(tile: Vec2, layerName?: string) {
-        let layer = null;
+        let layer: TiledLayer | null = null;
         if (layerName) {
             layer = this.getLayer(layerName);
         } else {
@@ -68,14 +68,14 @@ export class GameMap extends TiledMap implements AstarMap {
             });
         }
 
-        if (!layer) {
+        if (layer) {
             return {
                 layerName: layer.getLayerName(),
                 spriteFrame: layer.getTexture(this.getTileIndex(tile)),
             };
         }
 
-        return null;
+        return { layerName: null, spriteFrame: null };
     }
 
     setTileGIDAt(layerName: string, tile: Vec2, gid: number) {
@@ -108,7 +108,7 @@ export class GameMap extends TiledMap implements AstarMap {
 
     getLayersProperties(): any {
         let layers = this.getLayers();
-        let layersProperties = {};
+        let layersProperties = {} as { [key: string]: any };
         let properties = null;
         layers.forEach((layer) => {
             properties = layer.getProperties();
@@ -143,13 +143,13 @@ export class GameMap extends TiledMap implements AstarMap {
     }
 
     private getAnimationTiles(layerNames: string[]) {
-        let tiles = {};
+        let tiles = {} as { [key: string]: any };
         for (let i = 0; i < layerNames.length; i++) {
             let layer = this.getLayer(layerNames[i]);
             if (!layer) {
                 continue;
             }
-            let gidInfos = {};
+            let gidInfos = {} as { [key: number]: number };
             let gid = 0;
             for (let j = 0; j < layer.tiles.length; j++) {
                 gid = layer.tiles[j];
@@ -189,7 +189,11 @@ export class GameMap extends TiledMap implements AstarMap {
         for (let layerName in this.animationTiles) {
             for (let index in this.animationTiles[layerName]) {
                 tileIndex = parseInt(index);
-                this.getLayer(layerName).setTileGIDAt(this.animationTiles[layerName][index] + gidDiff, tileIndex % size.width, Math.floor(tileIndex / size.width));
+                this.getLayer(layerName)?.setTileGIDAt(
+                    this.animationTiles[layerName][index] + gidDiff,
+                    tileIndex % size.width,
+                    Math.floor(tileIndex / size.width)
+                );
             }
         }
     }
@@ -216,7 +220,7 @@ export class GameMap extends TiledMap implements AstarMap {
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
-                    if (!this.levelData.canHeroMove(tile)) return false;
+                    if (!this.levelData?.canHeroMove(tile)) return false;
 
                     if (!tile.equals(endTile)) {
                         //中途过程遇到事件也可以走
