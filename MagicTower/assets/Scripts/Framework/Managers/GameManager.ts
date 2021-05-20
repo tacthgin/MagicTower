@@ -1,4 +1,4 @@
-import { Component, director, game, UITransform, _decorator, Node } from "cc";
+import { Component, director, game, _decorator, Node } from "cc";
 import { BaseEvent } from "../Base/BaseContant";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";

@@ -12,7 +12,7 @@ export class NodePoolManager {
      * @param extName 扩展名用来区分一种类型不同名字的对象池
      * @param useCommon 是否使用通用脚本
      */
-    async createPoolNode(path: string, extName: string | number = null, useCommon: boolean = false) {
+    async createPoolNode(path: string, extName: string | number | null = null, useCommon: boolean = false) {
         let prefab = resources.get<Prefab>(path);
         if (!prefab) {
             prefab = await GameManager.RESOURCE.loadPrefab(path);
@@ -39,11 +39,11 @@ export class NodePoolManager {
      * @param extName 扩展名用来区分一种类型不同名字的对象池
      * @param useCommon 是否使用通用脚本
      */
-    createPrefabNode(nameOrPrefab: string | Prefab, extName: string | number = null, useCommon: boolean = false) {
+    createPrefabNode(nameOrPrefab: string | Prefab, extName: string | number | null = null, useCommon: boolean = false) {
         let prefab: Prefab = typeof nameOrPrefab == "string" ? GameManager.RESOURCE.getPrefab(nameOrPrefab) : nameOrPrefab;
 
         if (!prefab) {
-            console.error(`${prefab.name}未加载`);
+            console.error(`${(prefab as Prefab).name}未加载`);
             return null;
         }
 
@@ -62,7 +62,7 @@ export class NodePoolManager {
      * @param loop 是否循环播放
      * @param completeCallback 播放完成调用回调
      */
-    async createEffectNode(path: string, loop: boolean = false, completeCallback: (...any: any[]) => void = null) {
+    async createEffectNode(path: string, loop: boolean = false, completeCallback: Function | null = null) {
         let effectNode = await this.createPoolNode(path, null, true);
         if (!effectNode) {
             console.error("找不到特效节点", path);
@@ -72,7 +72,7 @@ export class NodePoolManager {
         let animation = effectNode.getComponent(Animation);
         if (!animation) {
             console.error("找不到动画组件", path);
-            effectNode.getComponent(BasePoolNode).remove();
+            effectNode.getComponent(BasePoolNode)?.remove();
             return null;
         }
         let clip = animation.defaultClip || animation.clips[0];
@@ -84,7 +84,7 @@ export class NodePoolManager {
                     Animation.EventType.FINISHED,
                     () => {
                         completeCallback();
-                        effectNode.getComponent(BasePoolNode).remove();
+                        effectNode!.getComponent(BasePoolNode)?.remove();
                     },
                     null,
                     true

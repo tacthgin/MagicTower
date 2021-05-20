@@ -21,30 +21,30 @@ export module Fn {
         };
     }
 
-    export function clone(json: object): object {
-        if (null == json || "object" != typeof json) return json;
+    export function clone(obj: Object | null | undefined): Object | null | undefined {
+        if (null == obj || "object" != typeof obj) return obj;
 
         // Handle Date
-        if (json instanceof Date) {
+        if (obj instanceof Date) {
             let copy = new Date();
-            copy.setTime(json.getTime());
+            copy.setTime(obj.getTime());
             return copy;
         }
 
         // Handle Array
-        if (json instanceof Array) {
+        if (obj instanceof Array) {
             let copy = [];
-            for (let i = 0, len = json.length; i < len; ++i) {
-                copy[i] = Fn.clone(json[i]);
+            for (let i = 0, len = obj.length; i < len; ++i) {
+                copy[i] = Fn.clone(obj[i]);
             }
             return copy;
         }
 
         // Handle Object
-        if (json instanceof Object) {
+        if (obj instanceof Object) {
             let copy: any = {};
-            for (let attr in json) {
-                if (json.hasOwnProperty(attr)) copy[attr] = Fn.clone(json[attr]);
+            for (let attr in obj) {
+                if (obj.hasOwnProperty(attr)) copy[attr] = Fn.clone((obj as any)[attr]);
             }
 
             return copy;

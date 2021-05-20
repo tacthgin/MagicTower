@@ -5,9 +5,9 @@ const { ccclass } = _decorator;
 
 @ccclass("JsonParser")
 export class JsonParser {
-    protected nativeAsset: object | null = null;
+    protected nativeAsset: Object | null = null;
 
-    parseJson(jsonAsset: object) {
+    parseJson(jsonAsset: Object | null) {
         this.nativeAsset = jsonAsset;
     }
 
@@ -25,7 +25,9 @@ export class JsonParser {
      * @param clone 返回一个副本，不要直接操作json原本
      */
     getJsonElement(key: string | number, clone: boolean = false) {
-        let info = this.nativeAsset[key];
-        return clone ? Fn.clone(info) : info;
+        if (this.nativeAsset) {
+            let info = (this.nativeAsset as any)[key];
+            return clone ? Fn.clone(info) : info;
+        }
     }
 }

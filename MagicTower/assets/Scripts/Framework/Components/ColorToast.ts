@@ -13,15 +13,15 @@ export enum ToastType {
 @ccclass("ColorToast")
 export class ColorToast extends BasePoolNode {
     @property(RichText)
-    toastLabel: RichText = null;
+    toastLabel: RichText = null!;
 
     init(content: string, toastType: ToastType) {
         if (toastType == ToastType.NORAML) {
             content = `<color=#ffffff>${content}</color>`;
         }
         this.toastLabel.string = content;
-        let transform = this.node.getComponent(UITransform);
-        let labelTransform = this.toastLabel.node.getComponent(UITransform);
+        let transform = this.node.getComponent(UITransform)!;
+        let labelTransform = this.toastLabel.node.getComponent(UITransform)!;
         if (labelTransform.width > SHORTEST_LENGTH) {
             transform.width = labelTransform.width + 50;
         } else {

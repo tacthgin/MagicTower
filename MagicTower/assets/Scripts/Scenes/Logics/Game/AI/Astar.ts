@@ -2,13 +2,13 @@ import { math, Vec2 } from "cc";
 
 /** A*节点 */
 class AstarNode {
-    private _parent: AstarNode = null;
+    private _parent: AstarNode | null = null;
 
-    private _position: Vec2 = null;
+    private _position: Vec2 = null!;
     /** 当前结点离起始点的路程 */
-    private _gValue: number = null;
+    private _gValue: number = 0;
     /** 该结点的总路程，f = g + h */
-    private _fValue: number = null;
+    private _fValue: number = 0;
 
     /**
      *
@@ -16,7 +16,7 @@ class AstarNode {
      * @param hValue 预估值
      * @param parentNode 父结点
      */
-    constructor(position: Vec2, hValue: number, parentNode: AstarNode = null) {
+    constructor(position: Vec2, hValue: number, parentNode: AstarNode | null = null) {
         this._parent = parentNode;
         this._position = position;
         this._gValue = parentNode ? parentNode.gValue + 1 : 0;
@@ -40,11 +40,11 @@ class AstarNode {
     }
 
     equals(position: Vec2) {
-        return this._position.equals(position);
+        return this._position?.equals(position);
     }
 
     add(position: Vec2) {
-        return this._position.add(position);
+        return this._position?.add(position);
     }
 }
 
@@ -60,12 +60,14 @@ export class Astar {
     /** 从开放列表取估值最小的路径来行走 */
     private openList: AstarNode[] = [];
 
-    private map: AstarMap = null;
+    private map: AstarMap = null!;
     /** 4方向 */
     static SquarePositions: Readonly<Vec2[]> = [new Vec2(0, 1), new Vec2(0, -1), new Vec2(1, 0), new Vec2(-1, 0)];
 
-    constructor(map: AstarMap = null) {
-        this.setMap(map);
+    constructor(map: AstarMap | null = null) {
+        if (map) {
+            this.setMap(map);
+        }
     }
 
     setMap(map: AstarMap) {
@@ -148,12 +150,12 @@ export class Astar {
         this.closeList = {};
 
         //起点
-        let node = new AstarNode(beginPos, hValue, null);
+        let node: AstarNode = new AstarNode(beginPos, hValue, null);
         this.openList.push(node);
 
         let last = null;
         while (this.openList.length > 0) {
-            node = this.openList.shift();
+            node = this.openList.shift()!;
             if (node.equals(endPos)) {
                 last = node;
                 break;

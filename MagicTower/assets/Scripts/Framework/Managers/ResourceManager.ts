@@ -29,7 +29,7 @@ export class ResourceManager {
 
     init() {
         for (let type in ResourceType) {
-            this.resourcePromises.push(this.createResourcePromise(ResourceType[type]));
+            this.resourcePromises.push(this.createResourcePromise((ResourceType as any)[type]));
         }
         return this;
     }

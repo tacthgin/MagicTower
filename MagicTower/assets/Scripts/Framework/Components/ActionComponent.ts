@@ -8,8 +8,8 @@ export enum DialogAction {
 
 /** 结点消失的时候动作回调 */
 export abstract class ActionComponent extends Component {
-    protected _endActionCallback: Function = null;
-    protected _dialogContentNode: Node = null;
+    protected _endActionCallback: Function = null!;
+    protected _dialogContentNode: Node = null!;
     /** 额外参与动作的节点 */
     protected _extraNodes: Node[] = [];
     /** 结束动作完成 */
