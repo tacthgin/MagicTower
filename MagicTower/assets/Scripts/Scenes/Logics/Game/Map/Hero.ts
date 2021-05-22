@@ -13,26 +13,26 @@ const { ccclass, property } = _decorator;
 @ccclass("Hero")
 export class Hero extends Component {
     @property(Node)
-    private attackIcon: Node = null;
+    private attackIcon: Node = null!;
 
     @property(Node)
-    private heroNode: Node = null;
+    private heroNode: Node = null!;
 
-    private _heroData: HeroData = null;
-    private animation: Animation = null;
-    private currentState: HeroState = null;
+    private _heroData: HeroData = null!;
+    private animation: Animation = null!;
+    private currentState: HeroState | null = null;
     private globalInfo: any = null;
-    private map: GameMap = null;
+    private map: GameMap = null!;
 
     get heroData() {
         return this._heroData;
     }
 
     onLoad() {
-        this.animation = this.heroNode.getComponent(Animation);
+        this.animation = this.heroNode.getComponent(Animation)!;
         this.animation.on(Animation.EventType.FINISHED, this.onFinished, this);
         this.globalInfo = GameManager.DATA.getJson("global");
-        this._heroData = GameManager.DATA.getData(HeroData);
+        this._heroData = GameManager.DATA.getData(HeroData)!;
     }
 
     onFinished() {
@@ -59,7 +59,7 @@ export class Hero extends Component {
      * @param x 如果x是vec2，就使用x
      * @param y
      */
-    getDirection(x: Vec2 | number, y: number = null) {
+    getDirection(x: Vec2 | number, y: number | null = null) {
         let xx = 0;
         let yy = 0;
         if (x instanceof Vec2) {
@@ -67,7 +67,7 @@ export class Hero extends Component {
             yy = x.y;
         } else {
             xx = x;
-            yy = y;
+            yy = y ?? 0;
         }
         if (xx != 0) {
             return xx < 0 ? 3 : 1;
@@ -81,16 +81,21 @@ export class Hero extends Component {
         this._heroData.get("animation").forEach((animationName: any) => {
             let spriteFrames = [];
             for (let i = 1; i < 3; i++) {
-                spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${animationName}_${i}`));
+                spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${animationName}_${i}`)!);
             }
             let clip = AnimationClip.createWithSpriteFrames(spriteFrames, 4);
-            clip.name = animationName;
-            clip.wrapMode = AnimationClip.WrapMode.Loop;
-            this.animation.clips.push(clip);
+            if (clip) {
+                clip.name = animationName;
+                clip.wrapMode = AnimationClip.WrapMode.Loop;
+                this.animation.clips.push(clip);
+            }
+
             clip = AnimationClip.createWithSpriteFrames(spriteFrames, 8);
-            clip.name = `${animationName}_once`;
-            clip.wrapMode = AnimationClip.WrapMode.Normal;
-            this.animation.clips.push(clip);
+            if (clip) {
+                clip.name = `${animationName}_once`;
+                clip.wrapMode = AnimationClip.WrapMode.Normal;
+                this.animation.clips.push(clip);
+            }
         });
     }
 
@@ -111,7 +116,9 @@ export class Hero extends Component {
 
     /** 设置人物方向贴图 */
     setDirectionTexture() {
-        this.heroNode.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._heroData.get("animation")[this._heroData.get("direction")]}_0`);
+        this.heroNode.getComponent(Sprite)!.spriteFrame = GameManager.RESOURCE.getSpriteFrame(
+            `${this._heroData.get("animation")[this._heroData.get("direction")]}_0`
+        );
     }
 
     /** 根据方向播放行走动画 */
@@ -127,7 +134,7 @@ export class Hero extends Component {
     }
 
     stopMoveAnimation() {
-        if (this.animation.defaultClip.name.indexOf("once") == -1) this.animation.stop();
+        if (this.animation.defaultClip?.name.indexOf("once") == -1) this.animation.stop();
     }
 
     /** 默认状态之间无条件限制 */
@@ -143,7 +150,7 @@ export class Hero extends Component {
         let moveActions: Tween<Node>[] = [];
         let stop = false;
         let moveAction = (tile: Vec2, end: boolean = false) => {
-            let position = this.map.getPositionAt(tile);
+            let position = this.map.getPositionAt(tile) || Vec2.ZERO;
             return tween()
                 .call(() => {
                     this._heroData.set("direction", this.getDirection(tile.subtract(this._heroData.get("position"))));
@@ -173,7 +180,7 @@ export class Hero extends Component {
     }
 
     location() {
-        let position = this.map.getPositionAt(this._heroData.get("position"));
+        let position = this.map.getPositionAt(this._heroData.get("position")) || Vec2.ZERO;
         this.node.position = v3(position.x, position.y);
         this.toward(2);
     }
@@ -190,9 +197,9 @@ export class Hero extends Component {
     magicLight(monsterIndexs: number[]) {
         let heroIndex = this.map.getTileIndex(this._heroData.get("position"));
         monsterIndexs.forEach((index) => {
-            let lightning = GameManager.POOL.createPrefabNode("Lightning");
+            let lightning = GameManager.POOL.createPrefabNode("Lightning")!;
             lightning.parent = this.node;
-            lightning.getComponent(Lightning).init(index - heroIndex);
+            lightning.getComponent(Lightning)?.init(index - heroIndex);
         });
     }
 

@@ -1,14 +1,14 @@
 import { Hero } from "./Hero";
 
 export interface HeroState {
-    hero: Hero;
+    hero: Hero | null;
     enter(hero: Hero): void;
     exit(): void;
     update(): void;
 }
 
 export class IdleState implements HeroState {
-    hero: Hero;
+    hero: Hero | null = null;
 
     enter(hero: Hero) {
         this.hero = hero;
@@ -21,7 +21,7 @@ export class IdleState implements HeroState {
 }
 
 export class MoveState implements HeroState {
-    hero: Hero;
+    hero: Hero | null = null;
 
     enter(hero: Hero) {
         this.hero = hero;
@@ -29,7 +29,7 @@ export class MoveState implements HeroState {
     }
 
     exit() {
-        this.hero.stopMoveAnimation();
+        this.hero?.stopMoveAnimation();
     }
 
     update() {}

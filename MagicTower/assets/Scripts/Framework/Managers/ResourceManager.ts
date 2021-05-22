@@ -28,9 +28,10 @@ export class ResourceManager {
     private preloadPrefabs: any = {};
 
     init() {
-        for (let type in ResourceType) {
-            this.resourcePromises.push(this.createResourcePromise((ResourceType as any)[type]));
-        }
+        // for (let type in ResourceType) {
+        //     this.resourcePromises.push(this.createResourcePromise((ResourceType as any)[type]));
+        // }
+        this.resourcePromises.push(this.createResourcePromise(ResourceType.TILED_MAP));
         return this;
     }
 
@@ -94,7 +95,7 @@ export class ResourceManager {
     }
 
     private onProgress(type: string, progress: number) {
-        console.log(this.resourceCompleteCount, progress);
+        //console.log(this.resourceCompleteCount, progress);
         progress = this.resourceCompleteCount / this.resourcePromises.length + (1 / this.resourcePromises.length) * progress;
         NotifyCenter.emit(BaseEvent.RESOURCE_PROGRESS, type, progress);
     }

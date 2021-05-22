@@ -3,12 +3,12 @@ import { BasePoolNode } from "../../../../../Framework/Base/BasePoolNode";
 import { GameManager } from "../../../../../Framework/Managers/GameManager";
 
 export abstract class MapElement extends BasePoolNode {
-    protected animation: Animation = null;
+    protected animation: Animation | null = null;
 
     protected createAnimationClip(spriteFrameName: string, count: number, reverse: boolean = false): SpriteFrame[] {
         let spriteFrames = [];
         for (let i = 0; i < count; i++) {
-            spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${spriteFrameName}_${i}`));
+            spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${spriteFrameName}_${i}`)!);
         }
         if (reverse) {
             spriteFrames.reverse();
@@ -26,18 +26,20 @@ export abstract class MapElement extends BasePoolNode {
     ) {
         if (!this.animation) return;
         let index = this.animation.clips.findIndex((clip) => {
-            return clip.name == name;
+            return clip?.name == name;
         });
         if (index == -1) {
             let clip = AnimationClip.createWithSpriteFrames(this.createAnimationClip(spriteFrameName, count, reverse), sample);
-            clip.name = name;
-            clip.wrapMode = wrapMode;
-            this.animation.clips.push(clip);
+            if (clip) {
+                clip.name = name;
+                clip.wrapMode = wrapMode;
+                this.animation.clips.push(clip);
+            }
         }
     }
 
     protected getSpriteFramePath(name: string) {
-        return `${name}`
+        return `${name}`;
     }
 
     remove(immediately: boolean = false) {

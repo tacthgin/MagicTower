@@ -29,9 +29,9 @@ export class GameMap extends TiledMap implements AstarMap {
         this.openTileAnimation(["obstacle", "monster", "npc"]);
     }
 
-    init(tiledMapAsset: TiledMapAsset) {
-        if (!tiledMapAsset.isValid) {
-            console.error(`${tiledMapAsset.name}不合法`);
+    init(tiledMapAsset: TiledMapAsset | null) {
+        if (!tiledMapAsset || !tiledMapAsset.isValid) {
+            console.error(`${tiledMapAsset ? tiledMapAsset.name : "地图"}不合法`);
             return;
         }
         this.tmxAsset = tiledMapAsset;
