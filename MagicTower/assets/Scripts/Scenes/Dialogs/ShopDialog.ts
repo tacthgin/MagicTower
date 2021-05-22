@@ -9,7 +9,7 @@ const { ccclass, property } = _decorator;
 @ccclass("ShopDialog")
 export class ShopDialog extends BaseDialog {
     @property(Label)
-    content: Label = null;
+    content: Label = null!;
 
     @property(Label)
     attr: Label[] = [];

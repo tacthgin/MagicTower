@@ -91,7 +91,7 @@ export class LevelData extends BaseLoadData {
 
     private emitEvent(layerName: string, index: number, info: any = null) {
         let mapData = GameManager.DATA.getData(MapData);
-        mapData.emit(MapEvent.ADD_ELEMENT, this._level, layerName, index, info);
+        mapData?.emit(MapEvent.ADD_ELEMENT, this._level, layerName, index, info);
     }
 
     load(info: any) {
@@ -127,7 +127,7 @@ export class LevelData extends BaseLoadData {
                 case "monster":
                     break;
                 case "event":
-                    let eventInfo = {};
+                    let eventInfo: { [key: string]: Element } = {};
                     for (let index in propertiesInfo) {
                         let element = new Element();
                         element.id = parseInt(propertiesInfo[index]);

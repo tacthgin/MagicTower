@@ -36,14 +36,14 @@ type TalkInfo = {
 
 class _HeroData {
     public heroAttr: number[] = [];
-    public animation: string[] = null;
-    public pos: number[] = null;
+    public animation: string[] | null = null;
+    public pos: number[] | null = null;
     public direction: number = 0;
     public records: TalkInfo[] = [];
     public props = {
         swardID: 0,
         shieldID: 0,
-        prop: {},
+        prop: {} as { [key: string]: any },
     };
 }
 
