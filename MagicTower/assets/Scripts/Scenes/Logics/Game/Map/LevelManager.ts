@@ -12,23 +12,23 @@ const { ccclass, type } = _decorator;
 export class LevelManager extends Component {
     /** 地图层 */
     @type(Node)
-    private layer: Node = null;
+    private layer: Node = null!;
     /** 地图预设 */
     @type(Prefab)
-    private mapPrefab: Prefab = null;
+    private mapPrefab: Prefab = null!;
     /** 英雄预设 */
     @type(Prefab)
-    private heroPrefab: Prefab = null;
+    private heroPrefab: Prefab = null!;
 
     private maps: any = {};
     /** 勇士 */
-    private hero: Hero = null;
+    private hero: Hero = null!;
     /** 勇士正在移动中 */
     private heroMoving: boolean = false;
     /** 地图数据 */
-    private mapData: MapData = null;
+    private mapData: MapData = null!;
     /** 触摸id */
-    private touchId: number = null;
+    private touchId: number | null = null;
     private astar: Astar = new Astar();
 
     onLoad() {
@@ -39,7 +39,7 @@ export class LevelManager extends Component {
         NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
         // NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
         // NotifyCenter.on(GameEvent.USE_PROP, this.useProp, this);
-        this.mapData = GameManager.DATA.getData(MapData);
+        this.mapData = GameManager.DATA.getData(MapData)!;
     }
 
     start() {
@@ -78,7 +78,7 @@ export class LevelManager extends Component {
             let mapNode = instantiate(this.mapPrefab);
             mapNode.position = v3(0, 0, 0);
             mapNode.parent = this.layer;
-            let gameMap = mapNode.getComponent(GameMap);
+            let gameMap = mapNode.getComponent(GameMap)!;
             gameMap.init(GameManager.RESOURCE.getAsset(TiledMapAsset, `${level}`));
             this.maps[level] = gameMap;
         }
@@ -93,10 +93,10 @@ export class LevelManager extends Component {
         // if (this.maps[])
     }
 
-    private showHero(tile: Vec2 = null) {
+    private showHero(tile: Vec2 | null = null) {
         if (!this.hero) {
             let heroNode = instantiate(this.heroPrefab);
-            this.hero = heroNode.getComponent(Hero);
+            this.hero = heroNode.getComponent(Hero)!;
         }
         let map = this.maps[this.mapData.level];
         this.hero.node.parent = map.node;

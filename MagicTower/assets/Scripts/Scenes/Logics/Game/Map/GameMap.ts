@@ -29,9 +29,9 @@ export class GameMap extends TiledMap implements AstarMap {
         this.openTileAnimation(["obstacle", "monster", "npc"]);
     }
 
-    init(tiledMapAsset: TiledMapAsset) {
-        if (!tiledMapAsset.isValid) {
-            console.error(`${tiledMapAsset.name}不合法`);
+    init(tiledMapAsset: TiledMapAsset | null) {
+        if (!tiledMapAsset || !tiledMapAsset.isValid) {
+            console.error(`${tiledMapAsset ? tiledMapAsset.name : "空的资源"}不合法`);
             return;
         }
         this.tmxAsset = tiledMapAsset;
@@ -189,11 +189,7 @@ export class GameMap extends TiledMap implements AstarMap {
         for (let layerName in this.animationTiles) {
             for (let index in this.animationTiles[layerName]) {
                 tileIndex = parseInt(index);
-                this.getLayer(layerName)?.setTileGIDAt(
-                    this.animationTiles[layerName][index] + gidDiff,
-                    tileIndex % size.width,
-                    Math.floor(tileIndex / size.width)
-                );
+                this.getLayer(layerName)?.setTileGIDAt(this.animationTiles[layerName][index] + gidDiff, tileIndex % size.width, Math.floor(tileIndex / size.width));
             }
         }
     }
