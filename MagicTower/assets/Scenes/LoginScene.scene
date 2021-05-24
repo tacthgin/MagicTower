@@ -393,6 +393,7 @@
       "__id__": 2
     },
     "_enabled": true,
+    "__prefab": null,
     "audioController": {
       "__id__": 8
     },
@@ -826,6 +827,7 @@
       "__id__": 14
     },
     "_enabled": true,
+    "__prefab": null,
     "progressLabel": {
       "__id__": 22
     },

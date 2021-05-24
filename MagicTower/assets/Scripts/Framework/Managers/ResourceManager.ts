@@ -44,7 +44,7 @@ export class ResourceManager {
                 })
                 .catch((type: ResourceType) => {
                     console.error(`加载资源类型${type}失败`);
-                    BaseEvent.ALL_RESOURCES_LOAD_FAILED;
+                    NotifyCenter.emit(BaseEvent.ALL_RESOURCES_LOAD_FAILED);
                 });
         }
     }

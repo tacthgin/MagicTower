@@ -10,7 +10,7 @@ const { ccclass, property } = _decorator;
 @ccclass("LoginScene")
 export class LoginScene extends Component {
     @property(Label)
-    private progressLabel: Label = null;
+    private progressLabel: Label = null!;
 
     onLoad() {
         NotifyCenter.on(BaseEvent.ALL_RESOURCES_LOAD_SUCCESS, this.onAllResourcesLoadSuccess, this);
