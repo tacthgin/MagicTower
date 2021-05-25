@@ -23,8 +23,8 @@ let DIRECTION_INDEX_DIFFS = {
 let HERO_FACE_DIRECTION = [-11, 1, 11, -1];
 
 export class MapCollisionSystem {
-    private gameMap: GameMap = null;
-    private hero: Hero = null;
+    private gameMap: GameMap = null!;
+    private hero: Hero = null!;
 
     init(gameMap: GameMap, hero: Hero) {
         this.gameMap = gameMap;
@@ -318,10 +318,15 @@ export class MapCollisionSystem {
         //return element.hide;
         //}
         //return this.canEndMoveTiles.indexOf(tileType) != -1;
+        return true;
     }
     private heroMoveJudge(tile: Vec2, endTile: Vec2) {
         let { tileType, index } = this.getTileLayer(tile);
-        if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
+        if (
+            (this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) ||
+            this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)
+        )
+            return false;
         if (tile.equals(endTile)) {
             //假设终点都可以走，然后在门和npc这种类型停在寻路前一格
             return true;

@@ -1,10 +1,11 @@
-import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, v3, Vec2, _decorator } from "cc";
+import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, Tween, TweenSystem, UITransform, v2, v3, Vec2, _decorator } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { MapData, StairType } from "../../../Data/CustomData/MapData";
 import { Astar } from "../AI/Astar";
-import { GameMap } from "./GameMap";
+import { MapCollisionSystem } from "../System/MapCollisionSystem";
+import { AstarMoveType, GameMap } from "./GameMap";
 import { Hero } from "./Hero";
 const { ccclass, type } = _decorator;
 
@@ -22,7 +23,7 @@ export class LevelManager extends Component {
 
     private maps: any = {};
     /** 勇士 */
-    private hero: Hero | null = null;
+    private hero: Hero = null!;
     /** 勇士正在移动中 */
     private heroMoving: boolean = false;
     /** 地图数据 */
@@ -30,6 +31,7 @@ export class LevelManager extends Component {
     /** 触摸id */
     private touchId: number | null = null;
     private astar: Astar = new Astar();
+    private collisionSystem: MapCollisionSystem = new MapCollisionSystem();
 
     onLoad() {
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
@@ -85,6 +87,10 @@ export class LevelManager extends Component {
         return this.maps[level];
     }
 
+    private getCurrentMap(): GameMap | null {
+        return this.maps[this.mapData.level] || null;
+    }
+
     private switchLevel(type: StairType) {
         // let levelData = this.mapData.getLevelData(currentLevel);
         // let stair = levelData.getStair(type)
@@ -93,77 +99,84 @@ export class LevelManager extends Component {
         // if (this.maps[])
     }
 
-    private showHero(tile: Vec2 = null) {
+    private showHero(tile: Vec2 | null = null) {
         if (!this.hero) {
             let heroNode = instantiate(this.heroPrefab);
-            this.hero = heroNode.getComponent(Hero);
+            this.hero = heroNode.getComponent(Hero)!;
         }
         let map = this.maps[this.mapData.level];
         this.hero.node.parent = map.node;
         this.hero.init(map);
     }
 
-    // private moveHero(touchPos: Vec2) {
-    //     if (this.canHeroMove()) {
-    //         let endTile = this.currentMap.nodeSpaceARToTile(this.node.convertToNodeSpaceAR(touchPos));
-    //         //还原英雄行走;
-    //         this.currentMap.astarMoveType = "hero";
-    //         let path = this.astar.getPath(this.currentMap, this.hero.HeroData.Position, endTile);
-    //         if (path) {
-    //             this.printPath(path);
-    //             let canEndMove = this.currentMap.canEndTileMove(endTile);
-    //             if (!canEndMove) {
-    //                 path.pop();
-    //             }
-    //             let moveComplete = () => {
-    //                 if (!canEndMove) {
-    //                     this.hero.toward(endTile);
-    //                 }
-    //                 this.heroMoving = !this.currentMap.collision(endTile);
-    //             };
-    //             this.heroMoving = true;
-    //             if (path.length == 0) {
-    //                 moveComplete();
-    //             } else {
-    //                 this.hero.movePath(path, (tile: Vec2, end: boolean) => {
-    //                     if (end) {
-    //                         moveComplete();
-    //                     } else if (!this.currentMap.collision(tile)) {
-    //                         //碰到区块处理事件停止;
-    //                         this.hero.node.stopAllActions();
-    //                         this.hero.stand();
-    //                         return true;
-    //                     }
-    //                     return false;
-    //                 });
-    //             }
-    //             NotifyCenter.emit(GameEvent.MOVE_PATH);
-    //         } else {
-    //             GameManager.UI.showToast(ToastString.ERROR_PARH);
-    //         }
-    //     }
-    // }
-    // private printPath(path) {
-    //     path.forEach((element) => {
-    //         console.log(element.x, element.y);
-    //     });
-    //     console.log("********************");
-    // }
-    // private canHeroMove() {
-    //     return this.currentMap != null && !this.heroMoving;
-    // }
-    // /** 碰撞结束 */
-    // private collisionComplete() {
-    //     this.heroMoving = false;
-    // }
+    private moveHero(touchPos: Vec2) {
+        if (this.canHeroMove()) {
+            let currentMap: GameMap | null = this.getCurrentMap();
+            if (!currentMap) {
+                console.error("当前移动没有地图");
+                return;
+            }
+            let localPos = this.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(touchPos.x, touchPos.y));
+            let endTile = currentMap.toTile(v2(localPos?.x, localPos?.y));
+            //还原英雄行走;
+            currentMap.astarMoveType = AstarMoveType.HERO;
+            let path = this.astar.getPath(currentMap, this.hero.heroData.get("position"), endTile);
+            if (path) {
+                this.printPath(path);
+                let canEndMove = this.collisionSystem.canEndTileMove(endTile);
+                if (!canEndMove) {
+                    path.pop();
+                }
+                let moveComplete = () => {
+                    if (!canEndMove) {
+                        this.hero.toward(endTile);
+                    }
+                    this.heroMoving = !this.collisionSystem.collision(endTile);
+                };
+                this.heroMoving = true;
+                if (path.length == 0) {
+                    moveComplete();
+                } else {
+                    this.hero.movePath(path, (tile: Vec2, end: boolean) => {
+                        if (end) {
+                            moveComplete();
+                        } else if (!this.collisionSystem.collision(tile)) {
+                            //碰到区块处理事件停止;
+                            Tween.stopAllByTarget(this.hero.node);
+                            this.hero.stand();
+                            return true;
+                        }
+                        return false;
+                    });
+                }
+                NotifyCenter.emit(GameEvent.MOVE_PATH);
+            } else {
+                GameManager.UI.showToast("路径错误");
+            }
+        }
+    }
+    private printPath(path: Vec2[]) {
+        path.forEach((element) => {
+            console.log(element.x, element.y);
+        });
+        console.log("********************");
+    }
+    private canHeroMove() {
+        return this.getCurrentMap() != null && !this.heroMoving;
+    }
+    /** 碰撞结束 */
+    private collisionComplete() {
+        this.heroMoving = false;
+    }
+
     // getSwitchLevel(stair: Stair) {
     //     let symbol = stair.stairType == "up" ? 1 : -1;
     //     return this.level + symbol * stair.levelDiff;
     // }
     // switchLevelHero(stairType: string) {
     //     if (this.showMap()) {
-    //         let standIndex = this.currentMap.getStair(stairType).standIndex;
-    //         this.showHero(this.currentMap.indexToTile(standIndex));
+    //         let standIndex = currentMap.getStair(stairType).standIndex;
+    //         this.showHero(currentMap.indexToTile(standIndex));
     //     }
     // }
     // private switchLevel(stair: Stair) {
@@ -191,22 +204,22 @@ export class LevelManager extends Component {
     //     return false;
     // }
     // private useProp(propInfo: any, extraInfo: any) {
-    //     if (!this.currentMap) return;
+    //     if (!currentMap) return;
     //     switch (propInfo.type) {
     //         case 7:
-    //             this.currentMap.showDialog("MonsterHandBook", this.currentMap.getMonsters());
+    //             currentMap.showDialog("MonsterHandBook", currentMap.getMonsters());
     //             break;
     //         case 8:
-    //             this.currentMap.showDialog("RecordBook");
+    //             currentMap.showDialog("RecordBook");
     //             break;
     //         case 9:
     //             {
     //                 //飞行魔杖
-    //                 if (this.currentMap.isHeroNextToStair()) {
+    //                 if (currentMap.isHeroNextToStair()) {
     //                     if (this.switchLevelTip(extraInfo)) {
     //                         return;
     //                     }
-    //                     let stair = this.currentMap.getStair(extraInfo);
+    //                     let stair = currentMap.getStair(extraInfo);
     //                     if (this.maps[this.getSwitchLevel(stair)]) {
     //                         this.switchLevel(stair);
     //                     }
@@ -217,33 +230,33 @@ export class LevelManager extends Component {
     //             break;
     //         case 10:
     //             {
-    //                 if (this.currentMap.removeHeroFaceWall()) {
+    //                 if (currentMap.removeHeroFaceWall()) {
     //                     this.consumptionProp(propInfo);
     //                 }
     //             }
     //             break;
     //         case 11:
     //             {
-    //                 if (this.currentMap.removeAllWalls()) {
+    //                 if (currentMap.removeAllWalls()) {
     //                     this.consumptionProp(propInfo);
     //                 }
     //             }
     //             break;
     //         case 12:
     //             {
-    //                 this.currentMap.removeLava();
+    //                 currentMap.removeLava();
     //             }
     //             break;
     //         case 13:
     //             {
-    //                 if (this.currentMap.bomb()) {
+    //                 if (currentMap.bomb()) {
     //                     this.consumptionProp(propInfo);
     //                 }
     //             }
     //             break;
     //         case 14:
     //             {
-    //                 if (this.currentMap.removeYellowDoors()) {
+    //                 if (currentMap.removeYellowDoors()) {
     //                     this.consumptionProp(propInfo);
     //                 }
     //             }
@@ -268,7 +281,7 @@ export class LevelManager extends Component {
     //         case 19:
     //             {
     //                 //中心对称飞行棋
-    //                 if (this.currentMap.centrosymmetricFly()) {
+    //                 if (currentMap.centrosymmetricFly()) {
     //                     this.consumptionProp(propInfo);
     //                 }
     //             }
