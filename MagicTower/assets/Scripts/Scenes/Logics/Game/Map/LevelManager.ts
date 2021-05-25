@@ -1,10 +1,11 @@
-import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, v3, Vec2, _decorator } from "cc";
+import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, UITransform, v2, v3, Vec2, _decorator } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { MapData, StairType } from "../../../Data/CustomData/MapData";
 import { Astar } from "../AI/Astar";
-import { GameMap } from "./GameMap";
+import { MapCollisionSystem } from "../System/MapCollisionSystem";
+import { AstarMoveType, GameMap } from "./GameMap";
 import { Hero } from "./Hero";
 const { ccclass, type } = _decorator;
 
@@ -30,6 +31,7 @@ export class LevelManager extends Component {
     /** 触摸id */
     private touchId: number | null = null;
     private astar: Astar = new Astar();
+    private collisionSystem: MapCollisionSystem = new MapCollisionSystem();
 
     onLoad() {
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
@@ -109,15 +111,16 @@ export class LevelManager extends Component {
 
     private moveHero(touchPos: Vec2) {
         if (this.canHeroMove()) {
-            let currentMap = this.getCurrentMap()!;
-            if (currentMap) {
+            let currentMap: GameMap | null = this.getCurrentMap();
+            if (!currentMap) {
                 console.error("当前移动没有地图");
                 return;
             }
-            let endTile = currentMap.nodeSpaceARToTile(this.node.convertToNodeSpaceAR(touchPos));
+            let localPos = this.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(touchPos.x, touchPos.y));
+            let endTile = currentMap.toTile(v2(localPos?.x, localPos?.y));
             //还原英雄行走;
-            currentMap.astarMoveType = "hero";
-            let path = this.astar.getPath(currentMap, this.hero.HeroData.Position, endTile);
+            currentMap.astarMoveType = AstarMoveType.HERO;
+            let path = this.astar.getPath(currentMap, this.hero.heroData.get("position"), endTile);
             if (path) {
                 this.printPath(path);
                 let canEndMove = currentMap.canEndTileMove(endTile);
@@ -148,7 +151,7 @@ export class LevelManager extends Component {
                 }
                 NotifyCenter.emit(GameEvent.MOVE_PATH);
             } else {
-                GameManager.UI.showToast(ToastString.ERROR_PARH);
+                GameManager.UI.showToast("路径错误");
             }
         }
     }
@@ -159,7 +162,7 @@ export class LevelManager extends Component {
         console.log("********************");
     }
     private canHeroMove() {
-        return currentMap != null && !this.heroMoving;
+        return this.getCurrentMap() != null && !this.heroMoving;
     }
     /** 碰撞结束 */
     private collisionComplete() {

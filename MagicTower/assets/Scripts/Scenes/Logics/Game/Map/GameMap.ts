@@ -1,4 +1,4 @@
-import { director, js, TiledLayer, TiledMap, TiledMapAsset, Vec2, _decorator } from "cc";
+import { director, js, TiledLayer, TiledMap, TiledMapAsset, v2, Vec2, _decorator } from "cc";
 import { LevelData } from "../../../Data/CustomData/MapData";
 import { Astar, AstarMap } from "../AI/Astar";
 
@@ -38,13 +38,18 @@ export class GameMap extends TiledMap implements AstarMap {
     }
 
     /** tile索引 */
-    getTileIndex(pos: Vec2) {
-        return Math.floor(pos.y) * this.getMapSize().width + Math.floor(pos.x);
+    getTileIndex(tile: Vec2) {
+        return Math.floor(tile.y) * this.getMapSize().width + Math.floor(tile.x);
     }
 
     getTile(index: number) {
         let size = this.getMapSize();
         return new Vec2(index % size.width, Math.floor(index / size.width));
+    }
+
+    toTile(position: Vec2) {
+        let size = this.getMapSize();
+        return v2(Math.floor(position.x / size.x), Math.floor(position.y / size.y));
     }
 
     getPositionAt(tile: Vec2) {
