@@ -1,13 +1,14 @@
-import { _decorator } from "cc";
+import { js, _decorator } from "cc";
 import { Fn } from "../Util/Fn";
 
 const { ccclass } = _decorator;
 
 @ccclass("JsonParser")
 export class JsonParser {
-    protected nativeAsset: Object | null = null;
+    protected nativeAsset: Fn.JsonType = null!;
+    protected keyData: Fn.JsonType = {};
 
-    parseJson(jsonAsset: Object | null) {
+    parseJson(jsonAsset: Fn.JsonType) {
         this.nativeAsset = jsonAsset;
     }
 
@@ -25,9 +26,28 @@ export class JsonParser {
      * @param clone 返回一个副本，不要直接操作json原本
      */
     getJsonElement(key: string | number, clone: boolean = false) {
-        if (this.nativeAsset) {
-            let info = (this.nativeAsset as any)[key];
-            return clone ? Fn.clone(info) : info;
+        let info = this.nativeAsset[key];
+        return clone ? Fn.clone(info) : info;
+    }
+
+    /**
+     * json的某一个字段取json数据
+     * @param jsonKey 字段名字
+     * @param value
+     * @returns
+     */
+    getJsonElementByKey(jsonKey: string, value: string | number) {
+        let keyData = this.keyData[jsonKey];
+        if (!keyData) {
+            keyData = {};
+            let object: any = null;
+            for (let key in this.nativeAsset) {
+                object = this.nativeAsset[key];
+                keyData[object[jsonKey]] = object;
+            }
+            this.keyData[jsonKey] = keyData;
         }
+
+        return keyData[value] || null;
     }
 }

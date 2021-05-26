@@ -2,6 +2,7 @@ import { v2, Vec2 } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
+import { MapData } from "../../../Data/CustomData/MapData";
 import { GameMap } from "../Map/GameMap";
 import { Hero } from "../Map/Hero";
 import { CalculateSystem } from "./CalculateSystem";
@@ -37,13 +38,15 @@ export class MapCollisionSystem {
      * @returns true表示交互结束，false表示交互正在进行
      */
     collision(tile: Vec2) {
-        let { layerName } = this.gameMap.getTileInfo(tile);
-
+        let { layerName, spriteFrame } = this.gameMap.getTileInfo(tile);
+        if (!layerName) return true;
+        let jsonData = this.getJsonData(layerName, spriteFrame!.name);
+        let mapData = GameManager.DATA.getData(MapData);
         switch (layerName) {
             case "prop":
                 GameManager.AUDIO.playEffect("eat");
-                this.hero.addProp(element.propInfo.id);
-                this.removeElement(index, tileType);
+                this.hero.heroData.addProp(jsonData.id, mapData?.level);
+                this.gameMap.setTileGIDAt(layerName, tile, 0);
                 return true;
             case "door":
                 return this.doorCollision(index, element);
@@ -52,7 +55,7 @@ export class MapCollisionSystem {
                 return true;
             case "monster":
                 {
-                    if (!CalculateSystem.canHeroAttack(this.hero.HeroData, element.monsterInfo, !element.firstAttack)) {
+                    if (!CalculateSystem.canHeroAttack(this.hero.heroData, element.monsterInfo, !element.firstAttack)) {
                         GameManager.getInstance().showToast(`你打不过${element.monsterInfo.name}`);
                         return true;
                     }
@@ -76,50 +79,14 @@ export class MapCollisionSystem {
         return false;
     }
 
-    // private propParser: PropParser = null;
-    // /** 终点可以走的地块 */
-    // private canEndMoveTiles: string[] = ["prop", "stair", "event"];
-    // private shopInfo: ShopInfo = null;
-    // private eventInfo: any = null;
-    // private maxIndex: number = 0;
-    // /** 弹窗调整位置*/
-    // private _dialogPos: cc.Vec2 = v2(0, 50);
-    // /** a*寻路isEmpty判断类型 */
-    // private _astarMoveType: string = "hero";
-    // /* 怪物门 事件们等*/
-    // private doorInfo: any = {};
-    // /**
-    //  * @member bigMonster 大boss占有的区域
-    //  * @member monsterEvent 怪物死亡事件
-    //  * @member magicHurt 魔法伤害地块
-    //  */
-    // private monsterInfo: any = {};
-    // private gameEventSystem: GameEventSystem = null;
-
-    // public set astarMoveType(value) {
-    //     this._astarMoveType = value;
-    // }
-
-    // public set monsterDoor(value) {
-    //     //this.doorInfo.monsterDoor = value;
-    // }
-
-    // get level() {
-    //     //return this.mapData.level;
-    // }
-    onLoad() {
-        //this.propParser = DataManager.getJsonParser("prop");
-        //let gameInfo = DataManager.getCustomData("GameInfo");
-        //this.shopInfo = gameInfo.shopInfo;
-        //this.eventInfo = gameInfo.eventInfo;
-        //this._dialogPos = cc.Canvas.instance.node.convertToNodeSpaceAR(this.node.convertToWorldSpaceAR(this._dialogPos));
-    }
-    onEnable() {
-        //NotifyCenter.on(GameEvent.ELEMENT_ACTION_COMPLETE, this.elementActionComplete, this);
-        //NotifyCenter.on(GameEvent.MONSTER_DIE, this.monsterDie, this);
-    }
-    onDisable() {
-        //NotifyCenter.targetOff(this);
+    getJsonData(layerName: string, spriteFrameName: string) {
+        if (!spriteFrameName) return null;
+        let name = spriteFrameName.split("_")[0];
+        switch (layerName) {
+            case "prop":
+            case "monster":
+                return GameManager.DATA.getJsonParser("prop")?.getJsonElementByKey("spriteID", name);
+        }
     }
 
     show() {
@@ -799,4 +766,133 @@ export class MapCollisionSystem {
         //}
         //return false;
     }
+
+    // getSwitchLevel(stair: Stair) {
+    //     let symbol = stair.stairType == "up" ? 1 : -1;
+    //     return this.level + symbol * stair.levelDiff;
+    // }
+    // switchLevelHero(stairType: string) {
+    //     if (this.showMap()) {
+    //         let standIndex = currentMap.getStair(stairType).standIndex;
+    //         this.showHero(currentMap.indexToTile(standIndex));
+    //     }
+    // }
+    // private switchLevel(stair: Stair) {
+    //     this.level = this.getSwitchLevel(stair);
+    //     //上了楼，勇士站在下楼梯的旁边
+    //     this.switchLevelHero(stair.stairType == "up" ? "down" : "up");
+    // }
+    // private sceneAppear(level: number, tile: Vec2) {
+    //     this.node.opacity = 255;
+    //     this.level = level;
+    //     this.showMap();
+    //     this.showHero(tile);
+    // }
+    // switchLevelTip(swtichType: string) {
+    //     let tip = null;
+    //     if (swtichType == "down" && this.level == 1) {
+    //         tip = "你已经到最下面一层了";
+    //     } else if (swtichType == "up" && this.level == 50) {
+    //         tip = "你已经到最上面一层了";
+    //     }
+    //     if (tip) {
+    //         GameManager.UI.showToast(tip);
+    //         return true;
+    //     }
+    //     return false;
+    // }
+    // private useProp(propInfo: any, extraInfo: any) {
+    //     if (!currentMap) return;
+    //     switch (propInfo.type) {
+    //         case 7:
+    //             currentMap.showDialog("MonsterHandBook", currentMap.getMonsters());
+    //             break;
+    //         case 8:
+    //             currentMap.showDialog("RecordBook");
+    //             break;
+    //         case 9:
+    //             {
+    //                 //飞行魔杖
+    //                 if (currentMap.isHeroNextToStair()) {
+    //                     if (this.switchLevelTip(extraInfo)) {
+    //                         return;
+    //                     }
+    //                     let stair = currentMap.getStair(extraInfo);
+    //                     if (this.maps[this.getSwitchLevel(stair)]) {
+    //                         this.switchLevel(stair);
+    //                     }
+    //                 } else {
+    //                     GameManager.UI.showToast("在楼梯旁边才可以使用");
+    //                 }
+    //             }
+    //             break;
+    //         case 10:
+    //             {
+    //                 if (currentMap.removeHeroFaceWall()) {
+    //                     this.consumptionProp(propInfo);
+    //                 }
+    //             }
+    //             break;
+    //         case 11:
+    //             {
+    //                 if (currentMap.removeAllWalls()) {
+    //                     this.consumptionProp(propInfo);
+    //                 }
+    //             }
+    //             break;
+    //         case 12:
+    //             {
+    //                 currentMap.removeLava();
+    //             }
+    //             break;
+    //         case 13:
+    //             {
+    //                 if (currentMap.bomb()) {
+    //                     this.consumptionProp(propInfo);
+    //                 }
+    //             }
+    //             break;
+    //         case 14:
+    //             {
+    //                 if (currentMap.removeYellowDoors()) {
+    //                     this.consumptionProp(propInfo);
+    //                 }
+    //             }
+    //             break;
+    //         case 15:
+    //             {
+    //                 this.hero.HeroData.Hp += this.hero.HeroData.Attack + this.hero.HeroData.Defence;
+    //                 NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
+    //                 this.consumptionProp(propInfo);
+    //             }
+    //             break;
+    //         case 18:
+    //             {
+    //                 if (this.switchLevelTip(propInfo.value == 1 ? "up" : "down")) {
+    //                     return;
+    //                 }
+    //                 this.level = this.level + propInfo.value;
+    //                 this.switchLevelHero(propInfo.value == 1 ? "down" : "up");
+    //                 this.consumptionProp(propInfo);
+    //             }
+    //             break;
+    //         case 19:
+    //             {
+    //                 //中心对称飞行棋
+    //                 if (currentMap.centrosymmetricFly()) {
+    //                     this.consumptionProp(propInfo);
+    //                 }
+    //             }
+    //             break;
+    //     }
+    // }
+    // consumptionProp(propInfo) {
+    //     if (!propInfo.permanent) {
+    //         this.hero.HeroData.addProp(propInfo.id, -1);
+    //         NotifyCenter.emit(GameEvent.REFRESH_PROP, propInfo, -1);
+    //     }
+    // }
+    // getMap(level: number): GameMap {
+    //     return this.maps[level];
+    // }
 }

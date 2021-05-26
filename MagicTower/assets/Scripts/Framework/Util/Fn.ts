@@ -6,6 +6,8 @@ import { BaseData } from "../Base/BaseData";
 export module Fn {
     export type Constructor<T = unknown> = new (...args: any[]) => T;
 
+    export type JsonType = { [key: string]: any };
+
     /** BaseData数据类集合 */
     export const BASE_DATA_ASSEMBLE: any = {};
 
