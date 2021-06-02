@@ -27,6 +27,7 @@ export class Door extends Element {
     private _passive: boolean = false;
     private _appear: boolean = false;
     private _hide: boolean = false;
+    private _condition: boolean = false;
 
     set passive(value: boolean) {
         this._passive = value;
@@ -53,6 +54,19 @@ export class Door extends Element {
     /** 隐藏的墙 */
     get hide() {
         return this._hide;
+    }
+
+    set condition(value: boolean) {
+        this._condition = value;
+    }
+
+    /** 开门条件 */
+    get condition() {
+        return this._condition;
+    }
+
+    canWallOpen() {
+        return !this._passive && this.doorInfo.id == 1006 && !this._appear && !this._condition;
     }
 }
 
