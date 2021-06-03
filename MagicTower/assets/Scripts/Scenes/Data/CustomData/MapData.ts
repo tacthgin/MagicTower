@@ -109,7 +109,7 @@ export class LevelData extends BaseLoadData {
                         switch (key) {
                             case "passive":
                             case "appear":
-                                propertiesInfo[key].forEach((info: any) => {});
+                                propertiesInfo[key].forEach((index: number) => {});
                                 break;
                         }
                     }
