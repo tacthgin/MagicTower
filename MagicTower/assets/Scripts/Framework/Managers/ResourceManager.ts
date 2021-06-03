@@ -31,6 +31,7 @@ export class ResourceManager {
         // for (let type in ResourceType) {
         //     this.resourcePromises.push(this.createResourcePromise((ResourceType as any)[type]));
         // }
+        this.resourcePromises.push(this.createResourcePromise(ResourceType.JSON));
         this.resourcePromises.push(this.createResourcePromise(ResourceType.TILED_MAP));
         return this;
     }

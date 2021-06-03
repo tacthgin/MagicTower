@@ -2,7 +2,7 @@ import { Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
-import { Element, Stair } from "./Element";
+import { Door, Element, Stair } from "./Element";
 
 export enum MapEvent {
     ADD_ELEMENT,
@@ -104,12 +104,31 @@ export class LevelData extends BaseLoadData {
             propertiesInfo = properties[layerName];
             switch (layerName) {
                 case "door":
-                    let doorInfos: { [key: number]: any } = {};
+                    let doorInfos: any = {};
                     for (let key in propertiesInfo) {
                         switch (key) {
                             case "passive":
                             case "appear":
-                                propertiesInfo[key].forEach((index: number) => {});
+                                propertiesInfo[key].forEach((index: number) => {
+                                    let door = new Door();
+                                    (door as any)[key] = true;
+                                    doorInfos[index] = door;
+                                });
+                                break;
+                            case "hide":
+                                {
+                                    let door = new Door();
+                                    door.hide = true;
+                                    doorInfos[propertiesInfo[key]] = door;
+                                }
+                                break;
+                            case "monsterCondtion":
+                                {
+                                    let indexes: string[] = (propertiesInfo[key] as string).split(":");
+                                    let door = new Door();
+                                    door.condition = true;
+                                    doorInfos[indexes[0]] = door;
+                                }
                                 break;
                         }
                     }

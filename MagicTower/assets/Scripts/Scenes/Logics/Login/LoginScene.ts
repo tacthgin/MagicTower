@@ -4,6 +4,7 @@ import { GameManager } from "../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
 import { ResourceType } from "../../../Framework/Managers/ResourceManager";
 import { JsonParserMap } from "../../Constant/JsonParserMap";
+import { Door } from "../../Data/CustomData/Element";
 
 const { ccclass, property } = _decorator;
 
@@ -33,6 +34,9 @@ export class LoginScene extends Component {
 
     async gotoGameScene() {
         await GameManager.RESOURCE.loadPrefabDir("Elements");
+        let door = new Door();
+        (door as any)["passive"] = true;
+        console.log(door);
         //GameManager.getInstance().loadScene("GameScene");
     }
 }
