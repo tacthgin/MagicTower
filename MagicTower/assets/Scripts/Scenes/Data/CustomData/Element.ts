@@ -1,8 +1,8 @@
 import { BaseLoadData } from "../../../Framework/Base/BaseData";
 
 export class Element extends BaseLoadData {
-    private _gid: number = 0;
-    private _id: number = 0;
+    protected _gid: number = 0;
+    protected _id: number = 0;
 
     set gid(value: number) {
         this._gid = value;
@@ -21,6 +21,11 @@ export class Element extends BaseLoadData {
     get id() {
         return this._id;
     }
+}
+
+export enum DoorType {
+    YELLOW = 1001,
+    WALL = 1006,
 }
 
 export class Door extends Element {
@@ -66,7 +71,11 @@ export class Door extends Element {
     }
 
     canWallOpen() {
-        return !this._passive && this.doorInfo.id == 1006 && !this._appear && !this._condition;
+        return !this._passive && this._id == DoorType.WALL && !this._appear && !this._condition;
+    }
+
+    isYellow() {
+        return this._id == DoorType.YELLOW;
     }
 }
 

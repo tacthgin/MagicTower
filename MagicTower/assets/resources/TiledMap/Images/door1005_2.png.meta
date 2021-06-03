@@ -30,11 +30,45 @@
         ".json"
       ],
       "subMetas": {}
+    },
+    "f9941": {
+      "importer": "sprite-frame",
+      "uuid": "2496b22c-64ff-4eda-ad59-921120684c50@f9941",
+      "displayName": "door1005_2",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "trimType": "auto",
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 0,
+        "offsetY": -10.5,
+        "trimX": 2,
+        "trimY": 21,
+        "width": 28,
+        "height": 11,
+        "rawWidth": 32,
+        "rawHeight": 32,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "2496b22c-64ff-4eda-ad59-921120684c50@6c48a",
+        "atlasUuid": ""
+      },
+      "ver": "1.0.9",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
     }
   },
   "userData": {
     "hasAlpha": true,
-    "type": "texture",
-    "redirect": "2496b22c-64ff-4eda-ad59-921120684c50@6c48a"
+    "type": "sprite-frame",
+    "redirect": "2496b22c-64ff-4eda-ad59-921120684c50@f9941"
   }
 }

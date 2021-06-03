@@ -1,4 +1,4 @@
-import { js, _decorator } from "cc";
+import { _decorator } from "cc";
 import { Fn } from "../Util/Fn";
 
 const { ccclass } = _decorator;

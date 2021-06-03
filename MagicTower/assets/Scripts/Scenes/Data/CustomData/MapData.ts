@@ -104,6 +104,16 @@ export class LevelData extends BaseLoadData {
             propertiesInfo = properties[layerName];
             switch (layerName) {
                 case "door":
+                    let doorInfos: { [key: number]: any } = {};
+                    for (let key in propertiesInfo) {
+                        switch (key) {
+                            case "passive":
+                            case "appear":
+                                propertiesInfo[key].forEach((info: any) => {});
+                                break;
+                        }
+                    }
+                    this.layerInfo[layerName] = doorInfos;
                     break;
                 case "stair":
                     let stairs: Stair[] = [];
@@ -118,7 +128,6 @@ export class LevelData extends BaseLoadData {
                             stairs[i] = stair;
                         }
                     }
-
                     if (propertiesInfo["hide"]) {
                         stairs[0].hide = true;
                     }

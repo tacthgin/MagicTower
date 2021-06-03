@@ -85,7 +85,7 @@ export class MapCollisionSystem {
         switch (layerName) {
             case "prop":
             case "monster":
-                return GameManager.DATA.getJsonParser("prop")?.getJsonElementByKey("spriteID", name);
+                return GameManager.DATA.getJsonParser(layerName)?.getJsonElementByKey("spriteID", name);
         }
     }
 
