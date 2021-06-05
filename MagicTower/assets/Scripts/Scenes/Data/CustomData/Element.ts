@@ -28,7 +28,16 @@ export enum DoorType {
     WALL = 1006,
 }
 
+export enum DoorState {
+    NONE,
+    PASSIVE,
+    APPEAR,
+    HIDE,
+    CONDITION,
+}
+
 export class Door extends Element {
+    private _doorState: DoorState = DoorState.NONE;
     private _passive: boolean = false;
     private _appear: boolean = false;
     private _hide: boolean = false;
@@ -36,6 +45,7 @@ export class Door extends Element {
 
     set passive(value: boolean) {
         this._passive = value;
+        this._doorState = DoorState.PASSIVE;
     }
 
     /** 被动的墙 */
@@ -45,6 +55,7 @@ export class Door extends Element {
 
     set appear(value: boolean) {
         this._appear = value;
+        this._doorState = DoorState.APPEAR;
     }
 
     /** 点击出现的墙 */
@@ -54,6 +65,7 @@ export class Door extends Element {
 
     set hide(value: boolean) {
         this._hide = value;
+        this._doorState = DoorState.HIDE;
     }
 
     /** 隐藏的墙 */
@@ -63,6 +75,7 @@ export class Door extends Element {
 
     set condition(value: boolean) {
         this._condition = value;
+        this._doorState = DoorState.CONDITION;
     }
 
     /** 开门条件 */

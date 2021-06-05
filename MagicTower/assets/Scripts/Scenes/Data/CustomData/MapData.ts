@@ -130,6 +130,11 @@ export class LevelData extends BaseLoadData {
                                     doorInfos[indexes[0]] = door;
                                 }
                                 break;
+                            case "appearEvent":
+                                {
+                                    
+                                }
+                                break;
                         }
                     }
                     this.layerInfo[layerName] = doorInfos;
