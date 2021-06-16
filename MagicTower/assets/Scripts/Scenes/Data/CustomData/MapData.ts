@@ -2,7 +2,7 @@ import { Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
-import { Door, Element, Stair } from "./Element";
+import { Door, DoorState, Element, Stair } from "./Element";
 
 export enum MapEvent {
     ADD_ELEMENT,
@@ -105,34 +105,42 @@ export class LevelData extends BaseLoadData {
             switch (layerName) {
                 case "door":
                     let doorInfos: any = {};
+                    let propertiesValue: string = null!;
                     for (let key in propertiesInfo) {
+                        propertiesValue = propertiesInfo[key];
                         switch (key) {
-                            case "passive":
-                            case "appear":
-                                propertiesInfo[key].forEach((index: number) => {
-                                    let door = new Door();
-                                    (door as any)[key] = true;
-                                    doorInfos[index] = door;
-                                });
-                                break;
-                            case "hide":
-                                {
-                                    let door = new Door();
-                                    door.hide = true;
-                                    doorInfos[propertiesInfo[key]] = door;
-                                }
-                                break;
                             case "monsterCondtion":
                                 {
-                                    let indexes: string[] = (propertiesInfo[key] as string).split(":");
+                                    let indexes: string[] = (propertiesValue as string).split(":");
                                     let door = new Door();
-                                    door.condition = true;
+                                    door.doorState = DoorState.CONDITION;
+                                    door.value = parseInt(indexes[1]);
                                     doorInfos[indexes[0]] = door;
                                 }
                                 break;
                             case "appearEvent":
                                 {
-                                    
+                                    doorInfos["event"] = parseInt(propertiesValue);
+                                }
+                                break;
+                            case "disappearEvent":
+                                {
+                                }
+                                break;
+                            default:
+                                {
+                                    let door = new Door();
+                                    switch (key) {
+                                        case "passive":
+                                            door.doorState = DoorState.PASSIVE;
+                                            break;
+                                        case "appear":
+                                            door.doorState = DoorState.APPEAR;
+                                        case "hide":
+                                            door.doorState = DoorState.HIDE;
+                                            break;
+                                    }
+                                    doorInfos[propertiesValue] = door;
                                 }
                                 break;
                         }

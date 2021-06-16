@@ -38,53 +38,28 @@ export enum DoorState {
 
 export class Door extends Element {
     private _doorState: DoorState = DoorState.NONE;
-    private _passive: boolean = false;
-    private _appear: boolean = false;
-    private _hide: boolean = false;
-    private _condition: boolean = false;
+    private _value: any = null;
 
-    set passive(value: boolean) {
-        this._passive = value;
-        this._doorState = DoorState.PASSIVE;
+    static cantOpenConditionArray: Readonly<DoorState[]> = [DoorState.PASSIVE, DoorState.APPEAR, DoorState.CONDITION];
+
+    set doorState(value: DoorState) {
+        this._doorState = value;
     }
 
-    /** 被动的墙 */
-    get passive() {
-        return this._passive;
+    get doorState() {
+        return this._doorState;
     }
 
-    set appear(value: boolean) {
-        this._appear = value;
-        this._doorState = DoorState.APPEAR;
+    set value(value: any) {
+        this._value = value;
     }
 
-    /** 点击出现的墙 */
-    get appear() {
-        return this._appear;
-    }
-
-    set hide(value: boolean) {
-        this._hide = value;
-        this._doorState = DoorState.HIDE;
-    }
-
-    /** 隐藏的墙 */
-    get hide() {
-        return this._hide;
-    }
-
-    set condition(value: boolean) {
-        this._condition = value;
-        this._doorState = DoorState.CONDITION;
-    }
-
-    /** 开门条件 */
-    get condition() {
-        return this._condition;
+    get value() {
+        return this._value;
     }
 
     canWallOpen() {
-        return !this._passive && this._id == DoorType.WALL && !this._appear && !this._condition;
+        return !Door.cantOpenConditionArray.includes(this._doorState) && this._id == DoorType.WALL;
     }
 
     isYellow() {
