@@ -32,3 +32,5 @@ export class QuatTree<T extends QuatEntity> {
 
     insert(entity: T) {}
 }
+
+
