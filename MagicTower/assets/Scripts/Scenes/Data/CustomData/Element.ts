@@ -34,6 +34,8 @@ export enum DoorState {
     APPEAR,
     HIDE,
     CONDITION,
+    APPEAR_EVENT,
+    DISAPPEAR_EVENT,
 }
 
 export class Door extends Element {

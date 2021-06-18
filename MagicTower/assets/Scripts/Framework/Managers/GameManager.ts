@@ -55,7 +55,7 @@ export class GameManager extends Component {
         return GameManager.instance.nodePoolManager;
     }
 
-    /** 对象池管理 */
+    /** 网络管理 */
     public static get NET() {
         return GameManager.instance.netManager;
     }

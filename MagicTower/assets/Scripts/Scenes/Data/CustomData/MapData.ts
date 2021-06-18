@@ -120,11 +120,29 @@ export class LevelData extends BaseLoadData {
                                 break;
                             case "appearEvent":
                                 {
-                                    doorInfos["event"] = parseInt(propertiesValue);
+                                    let door = new Door();
+                                    door.doorState = DoorState.APPEAR_EVENT;
+                                    //事件id
+                                    door.value = parseInt(propertiesValue);
+                                    doorInfos["event"] = door;
                                 }
                                 break;
                             case "disappearEvent":
                                 {
+                                    let infos = propertiesValue.split(":");
+                                    let data = {
+                                        doorTiles: infos[0].split(",").map((tile) => {
+                                            return parseInt(tile);
+                                        }),
+                                        eventID: parseInt(infos[1]),
+                                        monsterTiles: infos[2].split(",").map((tile) => {
+                                            return parseInt(tile);
+                                        }),
+                                    };
+                                    let door = new Door();
+                                    door.doorState = DoorState.DISAPPEAR_EVENT;
+                                    door.value = data;
+                                    doorInfos["event"] = door;
                                 }
                                 break;
                             default:
