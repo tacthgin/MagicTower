@@ -15,7 +15,7 @@ export class NodePoolManager {
     async createPoolNode(path: string, extName: string | number | null = null, useCommon: boolean = false) {
         let prefab = resources.get<Prefab>(path);
         if (!prefab) {
-            prefab = await GameManager.RESOURCE.loadPrefab(path);
+            prefab = await GameManager.RESOURCE.loadAsset(path, Prefab);
             if (!prefab) {
                 console.error(`找不到${path}预设`);
                 return null;
@@ -35,7 +35,7 @@ export class NodePoolManager {
 
     /**
      * 创建加载的预设node
-     * @param name 加载的预设名字
+     * @param nameOrPrefab 加载的预设名字或者预设
      * @param extName 扩展名用来区分一种类型不同名字的对象池
      * @param useCommon 是否使用通用脚本
      */

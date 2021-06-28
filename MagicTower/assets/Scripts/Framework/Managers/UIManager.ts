@@ -32,6 +32,8 @@ export class UIManager {
     private dialogPath: any = {};
     /** 弹窗优先级队列 */
     private dialogQueue: DialogQueueInfo[] = [];
+    /** 展示的所有弹窗 */
+    private dialogs: any = {};
 
     init(layers: Node[]) {
         this.toastY = view.getFrameSize().height * 0.75;
@@ -93,7 +95,7 @@ export class UIManager {
 
         let prefab = resources.get<Prefab>(UIPrefabPath.TOAST_PATH);
         if (!prefab) {
-            prefab = await GameManager.RESOURCE.loadPrefab(UIPrefabPath.TOAST_PATH);
+            prefab = await GameManager.RESOURCE.loadAsset(UIPrefabPath.TOAST_PATH, Prefab);
             if (!prefab) {
                 return;
             }
@@ -126,7 +128,7 @@ export class UIManager {
             let dialogPrefab = resources.get<Prefab>(dialogPath);
             if (!dialogPrefab) {
                 this.dialogCache[dialogName] = true;
-                dialogPrefab = await GameManager.RESOURCE.loadPrefab(dialogPath);
+                dialogPrefab = await GameManager.RESOURCE.loadAsset(dialogPath, Prefab);
                 this.dialogCache[dialogName] = false;
                 if (!dialogPrefab) {
                     return null;
@@ -135,7 +137,8 @@ export class UIManager {
             dialogNode = this.createDialog(dialogPrefab);
         }
         dialogNode.active = true;
-        let control: BaseDialog = dialogNode.getComponent(js.getClassByName(dialogName));
+        this.dialogs[dialogName] = dialogNode;
+        let control: BaseDialog = dialogNode.getComponent(dialogName);
         if (control) {
             control.init(...args);
             control.executeStartAction();
@@ -173,6 +176,17 @@ export class UIManager {
             this.dialogQueue.shift();
             first = this.dialogQueue[0];
             first && this.showDialog(first.dialogName, first.args);
+        }
+    }
+
+    closeDialog(dialogName: string, useAction: boolean = true) {
+        let dialog = this.getCanvas()?.getChildByName(dialogName);
+        dialog && dialog.getComponent(BaseDialog)?.close(useAction);
+    }
+
+    closeDialogs() {
+        for (let dialogName in this.dialogs) {
+            this.closeDialog(dialogName);
         }
     }
 }

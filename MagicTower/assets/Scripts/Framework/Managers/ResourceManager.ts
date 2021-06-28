@@ -139,14 +139,14 @@ export class ResourceManager {
         return this.getAsset(ResourceType.SPRITE, path);
     }
 
-    loadPrefab(path: string): Promise<Prefab | null> {
+    loadAsset<T extends Asset>(path: string, type?: Fn.Constructor<T>): Promise<T | null> {
         return new Promise((resolve) => {
-            resources.load(path, Prefab, (err, prefab: Prefab) => {
+            resources.load(path, type as any, (err, asset: T) => {
                 if (err) {
                     console.error(err);
                     resolve(null);
                 }
-                resolve(prefab);
+                resolve(asset);
             });
         });
     }
