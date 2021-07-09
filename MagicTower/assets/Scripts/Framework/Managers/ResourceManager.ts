@@ -162,10 +162,11 @@ export class ResourceManager {
                         reject("加载预设失败");
                         return;
                     }
-                    resolve(path);
+
                     assets.forEach((asset) => {
                         this.preloadPrefabs[asset.name] = asset;
                     });
+                    resolve(path);
                 });
             }
         });
