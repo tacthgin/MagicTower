@@ -1,4 +1,4 @@
-import { js } from "cc";
+import { assetManager, isValid, js, Sprite, SpriteFrame, Texture2D } from "cc";
 import { DEBUG } from "cc/env";
 import { BaseData } from "../Base/BaseData";
 

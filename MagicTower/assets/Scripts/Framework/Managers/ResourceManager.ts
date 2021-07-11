@@ -1,4 +1,4 @@
-import { Asset, assetManager, AudioClip, JsonAsset, Prefab, resources, SpriteFrame, TiledMapAsset } from "cc";
+import { Asset, assetManager, AudioClip, ImageAsset, isValid, JsonAsset, Prefab, resources, Sprite, SpriteFrame, Texture2D, TiledMapAsset } from "cc";
 import { BaseEvent } from "../Base/BaseContant";
 import { Fn } from "../Util/Fn";
 import { NotifyCenter } from "./NotifyCenter";
@@ -26,6 +26,8 @@ export class ResourceManager {
     private resourceCompleteCount: number = 0;
     /** 预加载预设 */
     private preloadPrefabs: any = {};
+    /** 远程图片集合 */
+    private remoteImages: { [key: string]: SpriteFrame } = {};
 
     init() {
         // for (let type in ResourceType) {
@@ -174,5 +176,36 @@ export class ResourceManager {
 
     getPrefab(name: string): Prefab {
         return this.preloadPrefabs[name] || null;
+    }
+
+    async loadRemoteImage(url: string) {
+        if (!url) {
+            return null;
+        }
+
+        if (!this.remoteImages[url]) {
+            let loadFunc = () => {
+                return new Promise((resolve, reject) => {
+                    assetManager.loadRemote(url, (err: Error, texture: ImageAsset) => {
+                        if (err) {
+                            console.error(err);
+                            reject(null);
+                            return;
+                        } else {
+                            resolve(texture);
+                        }
+                    });
+                });
+            };
+
+            let texture = await loadFunc();
+            if (texture) {
+                this.remoteImages[url] = SpriteFrame.createWithImage(texture as any);
+            } else {
+                return null;
+            }
+        }
+
+        return this.remoteImages[url];
     }
 }

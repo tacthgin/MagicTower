@@ -1,4 +1,4 @@
-import { Component, Label, _decorator } from "cc";
+import { Canvas, Component, director, Director, Label, RenderTexture, Sprite, _decorator } from "cc";
 import { BaseEvent } from "../../../Framework/Base/BaseContant";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
@@ -12,6 +12,12 @@ const { ccclass, property } = _decorator;
 export class LoginScene extends Component {
     @property(Label)
     private progressLabel: Label = null!;
+
+    @property(Sprite)
+    private sprite1: Sprite = null!;
+
+    @property(Sprite)
+    private sprite2: Sprite = null!;
 
     onLoad() {
         NotifyCenter.on(BaseEvent.ALL_RESOURCES_LOAD_SUCCESS, this.onAllResourcesLoadSuccess, this);
@@ -34,9 +40,19 @@ export class LoginScene extends Component {
 
     async gotoGameScene() {
         await GameManager.RESOURCE.loadPrefabDir("Elements");
-        let door = new Door();
-        (door as any)["passive"] = true;
-        console.log(door);
+        let spriteFrame = await GameManager.RESOURCE.loadRemoteImage("https://img.gmz88.com:4433/uploadimg/image/20190614/20190614091735_49858.jpg");
+        if (spriteFrame) {
+            this.sprite1.spriteFrame = spriteFrame;
+            let texture= this.sprite1.spriteFrame.texture
+            console.log(texture._nativeAsset, texture)
+
+            
+            let canvas = director.getScene()?.getChildByName("Canvas")?.getComponent(Canvas)
+            if (canvas) {
+                let rt = new RenderTexture()
+                canvas.cameraComponent!.targetTexture = rt!;
+            }
+        }
         //GameManager.getInstance().loadScene("GameScene");
     }
 }
