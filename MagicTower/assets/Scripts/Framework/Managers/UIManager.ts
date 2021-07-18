@@ -189,4 +189,8 @@ export class UIManager {
             this.closeDialog(dialogName);
         }
     }
+
+    isDialogExist(dialogName: string) {
+        return !!this.dialogs[dialogName];
+    }
 }

@@ -1,5 +1,6 @@
-import { NodePool, Prefab, resources, Animation, AnimationClip } from "cc";
+import { NodePool, Prefab, resources, Animation, AnimationClip, Node } from "cc";
 import { BasePoolNode } from "../Base/BasePoolNode";
+import { Fn } from "../Util/Fn";
 import { GameManager } from "./GameManager";
 
 /** 对象池管理，可获取对象池节点，特效节点等 */
@@ -95,5 +96,14 @@ export class NodePoolManager {
         }
 
         return effectNode;
+    }
+
+    recyle<T extends BasePoolNode>(node: Node, control: Fn.Constructor<T> | null = null) {
+        if (!node) return;
+        let children = node.children;
+        let nodeControl = control || BasePoolNode;
+        for (let i = children.length - 1; i >= 0; --i) {
+            children[i].getComponent(nodeControl)?.remove();
+        }
     }
 }
