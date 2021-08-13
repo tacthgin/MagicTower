@@ -142,16 +142,28 @@ export class Util {
         return number.toString();
     }
 
-    static formatInterval(timeInterval: number, format: string = "hms") {
-        let hour = Math.floor(timeInterval / 3600);
-        let minute = Math.floor((timeInterval % 3600) / 60);
-        let second = Math.floor(timeInterval - hour * 3600 - minute * 60);
-        if (format == "hms") {
-            return `${this.formatInt(hour)}:${this.formatInt(minute)}:${this.formatInt(second)}`;
-        } else if (format == "ms") {
-            return `${this.formatInt(minute)}:${this.formatInt(second)}`;
-        } else if (format == "hm") {
-            return `${this.formatInt(hour)}:${this.formatInt(minute)}`;
+    static getDateFormat(timestamp: number, format: string) {
+        let date = new Date(timestamp);
+        let dateFormat: any = {
+            "M+": date.getMonth() + 1,
+            "d+": date.getDate(),
+            "h+": date.getHours(),
+            "m+": date.getMinutes(),
+            "s+": date.getSeconds(),
+            "q+": Math.floor((date.getMonth() + 3) / 3),
+            "S+": date.getMilliseconds(),
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (date.getFullYear() + "").substr(4 - RegExp.$1.length));
         }
+        for (let k in dateFormat) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(
+                    RegExp.$1,
+                    RegExp.$1.length == 1 ? dateFormat[k] : ("00" + dateFormat[k]).substr(("" + dateFormat[k]).length)
+                );
+            }
+        }
+        return format;
     }
 }

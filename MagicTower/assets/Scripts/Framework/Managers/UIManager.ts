@@ -1,4 +1,4 @@
-import { director, instantiate, js, Node, NodePool, Prefab, resources, Vec3, view } from "cc";
+import { instantiate, Node, NodePool, Prefab, resources, Vec3, view } from "cc";
 import { BaseDialog } from "../Base/BaseDialog";
 import { BasePoolNode } from "../Base/BasePoolNode";
 import { ColorToast, ToastType } from "../Components/ColorToast";
@@ -36,7 +36,7 @@ export class UIManager {
     private dialogs: any = {};
 
     init(layers: Node[]) {
-        this.toastY = view.getFrameSize().height * 0.75;
+        this.toastY = view.getVisibleSize().height * 0.75;
         let dirInfo = resources.getDirWithPath(UIPrefabPath.DIALOGS_PATH, Prefab);
         dirInfo.forEach((info) => {
             let name = info.path.substring(info.path.lastIndexOf("/") + 1);
@@ -44,17 +44,7 @@ export class UIManager {
         });
 
         this.layers = layers;
-        //初始化各个layer位置
-        let frameSize = view.getFrameSize();
-        let center = new Vec3(frameSize.width * 0.5, frameSize.height * 0.5);
-        this.layers.forEach((layer) => {
-            layer.position = center;
-        });
         return this;
-    }
-
-    private getCanvas(): any {
-        return director.getScene()!.getChildByName("Canvas");
     }
 
     private createToast(prefab: Prefab) {
@@ -115,7 +105,7 @@ export class UIManager {
             console.error(`${dialogName}弹窗正在打开`);
             return null;
         }
-        let dialogNode = this.getCanvas().getChildByName(dialogName);
+        let dialogNode = this.layers[UILayerIndex.DIALOG_LAYER].getChildByName(dialogName);
 
         if (dialogNode && dialogNode.active) return null;
 
@@ -137,8 +127,10 @@ export class UIManager {
             dialogNode = this.createDialog(dialogPrefab);
         }
         dialogNode.active = true;
+        let dialogIndex = Object.keys(this.dialogs).length;
+        dialogNode.setSiblingIndex(dialogIndex);
         this.dialogs[dialogName] = dialogNode;
-        let control: BaseDialog = dialogNode.getComponent(dialogName);
+        let control: BaseDialog = dialogNode.getComponent(dialogName) as BaseDialog;
         if (control) {
             control.init(...args);
             control.executeStartAction();
@@ -180,7 +172,7 @@ export class UIManager {
     }
 
     closeDialog(dialogName: string, useAction: boolean = true) {
-        let dialog = this.getCanvas()?.getChildByName(dialogName);
+        let dialog = this.layers[UILayerIndex.DIALOG_LAYER].getChildByName(dialogName);
         dialog && dialog.getComponent(BaseDialog)?.close(useAction);
     }
 

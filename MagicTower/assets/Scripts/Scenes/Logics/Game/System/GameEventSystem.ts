@@ -6,7 +6,6 @@ import { GameManager } from "../../../Managers/GameManager";
 import { NotifyCenter } from "../../../Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
 import Hero from "../Map/Hero";
-import { CommonAstar } from "../AI/Astar";
 import { GameMap } from "../Map/GameMap";
 
 export class GameEventSystem {

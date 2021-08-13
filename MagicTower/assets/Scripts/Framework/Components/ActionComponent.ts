@@ -1,4 +1,4 @@
-import { Component, js, Node, Tween, tween, Vec3 } from "cc";
+import { Component, js, Node, tween, Vec3 } from "cc";
 import { Fn } from "../Util/Fn";
 
 export enum DialogAction {

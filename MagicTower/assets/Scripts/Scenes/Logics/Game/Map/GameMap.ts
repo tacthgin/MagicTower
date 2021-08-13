@@ -1,6 +1,6 @@
 import { director, js, TiledLayer, TiledMap, TiledMapAsset, v2, Vec2, _decorator } from "cc";
+import { AstarMap } from "../../../../Framework/Lib/AI/Astar";
 import { LevelData } from "../../../Data/CustomData/MapData";
-import { Astar, AstarMap } from "../AI/Astar";
 
 const { ccclass } = _decorator;
 

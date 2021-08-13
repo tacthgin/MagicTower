@@ -1,4 +1,4 @@
-import { Component, director, game, _decorator, Node } from "cc";
+import { Component, director, game, Node, UITransform, Vec3, view, _decorator } from "cc";
 import { BaseEvent } from "../Base/BaseContant";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
@@ -80,11 +80,20 @@ export class GameManager extends Component {
 
     /** 游戏的初始化 */
     private init() {
+        this.initGameSize();
         this.uiManager = new UIManager().init([this.dialogLayer, this.toastLayer]);
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager().init();
         this.nodePoolManager = new NodePoolManager();
         this.registerEvents();
+    }
+
+    private initGameSize() {
+        let transform = this.getComponent(UITransform);
+        if (transform) {
+            transform.contentSize = view.getVisibleSize();
+            this.node.position = new Vec3(transform.contentSize.width * 0.5, transform.contentSize.height * 0.5);
+        }
     }
 
     private onResourceComplete(type: ResourceType) {

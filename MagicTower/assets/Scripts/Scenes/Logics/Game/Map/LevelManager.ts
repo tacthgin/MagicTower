@@ -1,9 +1,9 @@
 import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, Tween, TweenSystem, UITransform, v2, v3, Vec2, _decorator } from "cc";
+import { Astar } from "../../../../Framework/Lib/AI/Astar";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { MapData, StairType } from "../../../Data/CustomData/MapData";
-import { Astar } from "../AI/Astar";
 import { MapCollisionSystem } from "../System/MapCollisionSystem";
 import { AstarMoveType, GameMap } from "./GameMap";
 import { Hero } from "./Hero";
