@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, Graphics, view, rect, Rect } from "cc";
-import { QuadTree } from "../Scripts/Framework/Lib/AI/QuadTree";
+import { QuadTree } from "../Scripts/Framework/Lib/Custom/QuadTree";
 const { ccclass, property } = _decorator;
 
 @ccclass("Test")

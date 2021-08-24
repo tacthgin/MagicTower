@@ -104,16 +104,25 @@ export class QuadTree<T extends QuadEntity> {
     }
 
     insert(entity: T) {
-        let leafNodes = this.root?.getLeafNodes();
-        if (leafNodes) {
-
-        } else {
-            this.root?.insert(entity);
-        }
+        this.insertToLeaf(entity, this.root!);
     }
 
     insertToLeaf(entity: T, node: QuadTreeNode<T>) {
-        
+        let leafNodes = node?.getLeafNodes();
+        let isInsertToLeaf = false;
+        if (leafNodes) {
+            for (let i = 0; i < leafNodes.length; i++) {
+                if (leafNodes[i].getRegion().containsRect(entity.getRegion())) {
+                    this.insertToLeaf(entity, leafNodes[i]);
+                    isInsertToLeaf = true;
+                    break;
+                }
+            }
+        }
+
+        if (!isInsertToLeaf) {
+            node?.insert(entity);
+        }
     }
 
     draw(graphics: Graphics) {

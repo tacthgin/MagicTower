@@ -2,7 +2,7 @@ import { Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
-import { Door, DoorState, Element, Stair } from "./Element";
+import { Door, DoorState, Element, Stair, StairType } from "./Element";
 
 export enum MapEvent {
     ADD_ELEMENT,
@@ -27,12 +27,18 @@ export class MapData extends BaseData {
     }
 
     setLevelDiff(diff: number) {
-        this.data.currentLevel += diff;
-        if (this.data.currentLevel > 50 || this.data.currentLevel < 0) {
-            console.error(`level${this.data.currentLevel}不合法`);
+        let newLevel = this.data.currentLevel + diff;
+        if (newLevel > 50 || newLevel < 0) {
+            console.error(`level${newLevel}不合法`);
             return;
         }
-        this.emit(MapEvent.SWITCH_LEVEL);
+        let currentLevel = this.data.currentLevel;
+        this.data.currentLevel = newLevel;
+        this.emit(MapEvent.SWITCH_LEVEL, currentLevel);
+    }
+
+    getCurrentLevelData(): LevelData {
+        return this.data.maps[this.data.currentLevel];
     }
 
     getLevelData(level: number): LevelData {
@@ -44,6 +50,7 @@ export class MapData extends BaseData {
         levelData.level = level;
         levelData.loadProperties(properties);
         this.data.maps[level] = levelData;
+        return levelData;
     }
 
     getElement(tile: Vec2, gid: number) {}
@@ -57,11 +64,6 @@ export class MapData extends BaseData {
             }
         }
     }
-}
-
-export enum StairType {
-    UP,
-    Down,
 }
 
 export class LevelData extends BaseLoadData {
@@ -104,66 +106,7 @@ export class LevelData extends BaseLoadData {
             propertiesInfo = properties[layerName];
             switch (layerName) {
                 case "door":
-                    let doorInfos: any = {};
-                    let propertiesValue: string = null!;
-                    for (let key in propertiesInfo) {
-                        propertiesValue = propertiesInfo[key];
-                        switch (key) {
-                            case "monsterCondtion":
-                                {
-                                    let indexes: string[] = (propertiesValue as string).split(":");
-                                    let door = new Door();
-                                    door.doorState = DoorState.CONDITION;
-                                    door.value = parseInt(indexes[1]);
-                                    doorInfos[indexes[0]] = door;
-                                }
-                                break;
-                            case "appearEvent":
-                                {
-                                    let door = new Door();
-                                    door.doorState = DoorState.APPEAR_EVENT;
-                                    //事件id
-                                    door.value = parseInt(propertiesValue);
-                                    doorInfos["event"] = door;
-                                }
-                                break;
-                            case "disappearEvent":
-                                {
-                                    let infos = propertiesValue.split(":");
-                                    let data = {
-                                        doorTiles: infos[0].split(",").map((tile) => {
-                                            return parseInt(tile);
-                                        }),
-                                        eventID: parseInt(infos[1]),
-                                        monsterTiles: infos[2].split(",").map((tile) => {
-                                            return parseInt(tile);
-                                        }),
-                                    };
-                                    let door = new Door();
-                                    door.doorState = DoorState.DISAPPEAR_EVENT;
-                                    door.value = data;
-                                    doorInfos["event"] = door;
-                                }
-                                break;
-                            default:
-                                {
-                                    let door = new Door();
-                                    switch (key) {
-                                        case "passive":
-                                            door.doorState = DoorState.PASSIVE;
-                                            break;
-                                        case "appear":
-                                            door.doorState = DoorState.APPEAR;
-                                        case "hide":
-                                            door.doorState = DoorState.HIDE;
-                                            break;
-                                    }
-                                    doorInfos[propertiesValue] = door;
-                                }
-                                break;
-                        }
-                    }
-                    this.layerInfo[layerName] = doorInfos;
+                    this.parseDoor(propertiesInfo);
                     break;
                 case "stair":
                     let stairs: Stair[] = [];
@@ -197,6 +140,69 @@ export class LevelData extends BaseLoadData {
         }
     }
 
+    private parseDoor(propertiesInfo: any) {
+        let doorInfos: any = {};
+        let propertiesValue: string = null!;
+        for (let key in propertiesInfo) {
+            propertiesValue = propertiesInfo[key];
+            switch (key) {
+                case "monsterCondtion":
+                    {
+                        let indexes: string[] = (propertiesValue as string).split(":");
+                        let door = new Door();
+                        door.doorState = DoorState.CONDITION;
+                        door.value = parseInt(indexes[1]);
+                        doorInfos[indexes[0]] = door;
+                    }
+                    break;
+                case "appearEvent":
+                    {
+                        let door = new Door();
+                        door.doorState = DoorState.APPEAR_EVENT;
+                        //事件id
+                        door.value = parseInt(propertiesValue);
+                        doorInfos["event"] = door;
+                    }
+                    break;
+                case "disappearEvent":
+                    {
+                        let infos = propertiesValue.split(":");
+                        let data = {
+                            doorTiles: infos[0].split(",").map((tile) => {
+                                return parseInt(tile);
+                            }),
+                            eventID: parseInt(infos[1]),
+                            monsterTiles: infos[2].split(",").map((tile) => {
+                                return parseInt(tile);
+                            }),
+                        };
+                        let door = new Door();
+                        door.doorState = DoorState.DISAPPEAR_EVENT;
+                        door.value = data;
+                        doorInfos["event"] = door;
+                    }
+                    break;
+                default:
+                    {
+                        let door = new Door();
+                        switch (key) {
+                            case "passive":
+                                door.doorState = DoorState.PASSIVE;
+                                break;
+                            case "appear":
+                                door.doorState = DoorState.APPEAR;
+                            case "hide":
+                                door.doorState = DoorState.HIDE;
+                                break;
+                        }
+                        doorInfos[propertiesValue] = door;
+                    }
+                    break;
+            }
+        }
+        this.layerInfo["door"] = doorInfos;
+    }
+
     setAppear(layerName: string, index: number, gid: number) {
         if (!this._appearTile[layerName]) {
             this._appearTile[layerName] = {};
@@ -216,7 +222,7 @@ export class LevelData extends BaseLoadData {
         return true;
     }
 
-    getStair(type: StairType) {
+    getStair(type: StairType): Stair {
         return this.layerInfo["stair"][type] || null;
     }
 }

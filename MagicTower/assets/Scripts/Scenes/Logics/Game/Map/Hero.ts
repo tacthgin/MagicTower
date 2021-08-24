@@ -1,12 +1,14 @@
 import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, v3, Vec2, _decorator } from "cc";
+import { Astar } from "../../../../Framework/Lib/Custom/Astar";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { Util } from "../../../../Framework/Util/Util";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroAttr, HeroData } from "../../../Data/CustomData/HeroData";
 import { Lightning } from "../Elements/Lightning";
-import { GameMap } from "./GameMap";
-import { HeroState, IdleState, MoveState } from "./HeroState";
+import { MapCollisionSystem } from "../System/MapCollisionSystem";
+import { AstarMoveType, GameMap } from "./GameMap";
+import { HeroState, HeroStateMachine } from "./HeroState";
 
 const { ccclass, property } = _decorator;
 
@@ -14,18 +16,28 @@ const { ccclass, property } = _decorator;
 export class Hero extends Component {
     @property(Node)
     private attackIcon: Node = null!;
-
     @property(Node)
     private heroNode: Node = null!;
 
     private _heroData: HeroData = null!;
     private animation: Animation = null!;
-    private currentState: HeroState | null = null;
+    private heroFSM: HeroStateMachine = new HeroStateMachine(this);
     private globalInfo: any = null;
     private map: GameMap = null!;
+    private astar: Astar = new Astar();
+    private isHeroMoving: boolean = false;
+    private collisionSystem: MapCollisionSystem = new MapCollisionSystem();
 
     get heroData() {
         return this._heroData;
+    }
+
+    set heroMoving(value: boolean) {
+        this.isHeroMoving = value;
+    }
+
+    get heroMoving() {
+        return this.isHeroMoving;
     }
 
     onLoad() {
@@ -37,12 +49,11 @@ export class Hero extends Component {
 
     onFinished() {
         this.setDirectionTexture();
-        NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
     }
 
     start() {
         this.createAnimation();
-        this.changeState(new IdleState());
+        this.heroFSM.changeState(HeroState.IDLE);
     }
 
     init(map: GameMap) {
@@ -137,13 +148,40 @@ export class Hero extends Component {
         if (this.animation.defaultClip?.name.indexOf("once") == -1) this.animation.stop();
     }
 
-    /** 默认状态之间无条件限制 */
-    changeState(newState: HeroState) {
-        if (this.currentState != null && !(newState instanceof MoveState && this.currentState instanceof MoveState)) {
-            this.currentState.exit();
+    autoMove(endTile: Vec2) {
+        this.map.astarMoveType = AstarMoveType.HERO;
+        let path = this.astar.getPath(this.map, this._heroData.get("position"), endTile);
+        if (path) {
+            let canEndMove = this.collisionSystem.canEndTileMove(endTile);
+            if (!canEndMove) {
+                path.pop();
+            }
+            let moveComplete = () => {
+                if (!canEndMove) {
+                    this.toward(endTile);
+                }
+                this.isHeroMoving = !this.collisionSystem.collision(endTile);
+            };
+            this.isHeroMoving = true;
+            if (path.length == 0) {
+                moveComplete();
+            } else {
+                this.movePath(path, (tile: Vec2, end: boolean) => {
+                    if (end) {
+                        moveComplete();
+                    } else if (!this.collisionSystem.collision(tile)) {
+                        //碰到区块处理事件停止;
+                        Tween.stopAllByTarget(this.node);
+                        this.stand();
+                        return true;
+                    }
+                    return false;
+                });
+            }
+            NotifyCenter.emit(GameEvent.MOVE_PATH);
+        } else {
+            GameManager.UI.showToast("路径错误");
         }
-        this.currentState = newState;
-        this.currentState.enter(this);
     }
 
     movePath(path: Vec2[], moveCallback: (tile: Vec2, end: boolean) => boolean) {
@@ -156,7 +194,7 @@ export class Hero extends Component {
                     this._heroData.set("direction", this.getDirection(tile.subtract(this._heroData.get("position"))));
                     if (!stop) {
                         //动作停止callFunc依然会调用一次;
-                        this.changeState(new MoveState());
+                        this.heroFSM.changeState(HeroState.MOVE);
                     }
                 })
                 .to(this.globalInfo.heroSpeed, { position: v3(position.x, position.y) })
@@ -176,7 +214,7 @@ export class Hero extends Component {
     }
 
     stand() {
-        this.changeState(new IdleState());
+        this.heroFSM.changeState(HeroState.IDLE);
     }
 
     location() {

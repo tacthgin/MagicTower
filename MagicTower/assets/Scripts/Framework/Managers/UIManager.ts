@@ -1,6 +1,5 @@
 import { instantiate, Node, NodePool, Prefab, resources, Vec3, view } from "cc";
 import { BaseDialog } from "../Base/BaseDialog";
-import { BasePoolNode } from "../Base/BasePoolNode";
 import { ColorToast, ToastType } from "../Components/ColorToast";
 import { GameManager } from "./GameManager";
 
@@ -23,8 +22,6 @@ type DialogQueueInfo = {
 export class UIManager {
     /** 弹窗层，toast层等 */
     private layers: Node[] = null!;
-    /** toast对象池 */
-    private toastPool: NodePool = new NodePool("ColorToast");
     private toastY: number = 0;
     /** 弹窗缓存，避免重复打开弹窗 */
     private dialogCache: any = {};
@@ -48,7 +45,7 @@ export class UIManager {
     }
 
     private createToast(prefab: Prefab) {
-        let toast = BasePoolNode.generateNodeFromPool(this.toastPool, prefab);
+        let toast = GameManager.POOL.createPrefabNode(prefab);
         if (toast) {
             toast.position = new Vec3(0, this.toastY, 0);
             toast.parent = this.layers[UILayerIndex.TOSAT_LAYER];

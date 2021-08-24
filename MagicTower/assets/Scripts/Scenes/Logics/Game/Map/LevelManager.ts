@@ -1,11 +1,10 @@
-import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, Tween, TweenSystem, UITransform, v2, v3, Vec2, _decorator } from "cc";
-import { Astar } from "../../../../Framework/Lib/AI/Astar";
+import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, UITransform, v2, v3, Vec2, _decorator } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
-import { MapData, StairType } from "../../../Data/CustomData/MapData";
-import { MapCollisionSystem } from "../System/MapCollisionSystem";
-import { AstarMoveType, GameMap } from "./GameMap";
+import { StairType } from "../../../Data/CustomData/Element";
+import { MapData, MapEvent } from "../../../Data/CustomData/MapData";
+import { GameMap } from "./GameMap";
 import { Hero } from "./Hero";
 const { ccclass, type } = _decorator;
 
@@ -21,28 +20,25 @@ export class LevelManager extends Component {
     @type(Prefab)
     private heroPrefab: Prefab = null!;
 
-    private maps: any = {};
+    private maps: { [key: number]: GameMap } = {};
     /** 勇士 */
     private hero: Hero = null!;
-    /** 勇士正在移动中 */
-    private heroMoving: boolean = false;
     /** 地图数据 */
     private mapData: MapData = null!;
     /** 触摸id */
     private touchId: number | null = null;
-    private astar: Astar = new Astar();
-    private collisionSystem: MapCollisionSystem = new MapCollisionSystem();
 
     onLoad() {
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
 
+        this.mapData = GameManager.DATA.getData(MapData)!;
+
         NotifyCenter.on(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
-        NotifyCenter.on(GameEvent.SWITCH_LEVEl, this.switchLevel, this);
+        this.mapData.on(MapEvent.SWITCH_LEVEL, this.onSwitchLevel, this);
         // NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
         // NotifyCenter.on(GameEvent.USE_PROP, this.useProp, this);
-        this.mapData = GameManager.DATA.getData(MapData)!;
     }
 
     start() {
@@ -55,7 +51,7 @@ export class LevelManager extends Component {
         }
         this.touchId = event.getID();
         //处理多点触摸;
-        //this.moveHero(event.getLocation());
+        this.moveHero(event.getLocation());
     }
 
     private onTouchEnd(event: Touch) {
@@ -67,12 +63,11 @@ export class LevelManager extends Component {
     private loadArchive() {
         let currentLevel = this.mapData.level;
         let gameMap = this.createMap(currentLevel);
-        let levelData = this.mapData.getLevelData(currentLevel);
-        if (levelData) {
-            gameMap.loadLevelData(levelData);
-        } else {
-            this.mapData.createLevelData(currentLevel, gameMap.getLayersProperties());
+        let levelData = this.mapData.getCurrentLevelData();
+        if (!levelData) {
+            levelData = this.mapData.createLevelData(currentLevel, gameMap.getLayersProperties());
         }
+        gameMap.loadLevelData(levelData);
         this.showHero();
     }
 
@@ -92,12 +87,11 @@ export class LevelManager extends Component {
         return this.maps[this.mapData.level] || null;
     }
 
-    private switchLevel(type: StairType) {
-        // let levelData = this.mapData.getLevelData(currentLevel);
-        // let stair = levelData.getStair(type)
-        // let levelDiff = type == StairType.Down ? -stair.levelDiff : stair.levelDiff
-        // let newLevel = currentLevel
-        // if (this.maps[])
+    private onSwitchLevel(oldLevel: number, type: StairType) {
+        this.maps[oldLevel].node.active = false;
+        let newMap = this.createMap(this.mapData.level);
+        newMap.node.active = true;
+        this.showHero();
     }
 
     private showHero(tile: Vec2 | null = null) {
@@ -111,49 +105,15 @@ export class LevelManager extends Component {
     }
 
     private moveHero(touchPos: Vec2) {
-        if (this.canHeroMove()) {
-            let currentMap: GameMap | null = this.getCurrentMap();
-            if (!currentMap) {
-                console.error("当前移动没有地图");
-                return;
-            }
+        let currentMap: GameMap | null = this.getCurrentMap();
+        if (!currentMap) {
+            console.error("当前移动没有地图");
+            return;
+        }
+        if (!this.hero.heroMoving) {
             let localPos = this.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(touchPos.x, touchPos.y));
             let endTile = currentMap.toTile(v2(localPos?.x, localPos?.y));
-            //还原英雄行走;
-            currentMap.astarMoveType = AstarMoveType.HERO;
-            let path = this.astar.getPath(currentMap, this.hero.heroData.get("position"), endTile);
-            if (path) {
-                this.printPath(path);
-                let canEndMove = this.collisionSystem.canEndTileMove(endTile);
-                if (!canEndMove) {
-                    path.pop();
-                }
-                let moveComplete = () => {
-                    if (!canEndMove) {
-                        this.hero.toward(endTile);
-                    }
-                    this.heroMoving = !this.collisionSystem.collision(endTile);
-                };
-                this.heroMoving = true;
-                if (path.length == 0) {
-                    moveComplete();
-                } else {
-                    this.hero.movePath(path, (tile: Vec2, end: boolean) => {
-                        if (end) {
-                            moveComplete();
-                        } else if (!this.collisionSystem.collision(tile)) {
-                            //碰到区块处理事件停止;
-                            Tween.stopAllByTarget(this.hero.node);
-                            this.hero.stand();
-                            return true;
-                        }
-                        return false;
-                    });
-                }
-                NotifyCenter.emit(GameEvent.MOVE_PATH);
-            } else {
-                GameManager.UI.showToast("路径错误");
-            }
+            this.hero.autoMove(endTile);
         }
     }
 
@@ -164,12 +124,8 @@ export class LevelManager extends Component {
         console.log("********************");
     }
 
-    private canHeroMove() {
-        return this.getCurrentMap() != null && !this.heroMoving;
-    }
-
     /** 碰撞结束 */
     private collisionComplete() {
-        this.heroMoving = false;
+        this.hero.heroMoving = false;
     }
 }

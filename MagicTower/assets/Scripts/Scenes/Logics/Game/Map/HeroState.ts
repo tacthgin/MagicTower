@@ -1,17 +1,19 @@
 import { Hero } from "./Hero";
 
-export interface HeroState {
-    hero: Hero | null;
-    enter(hero: Hero): void;
+interface HeroStateBase {
+    readonly hero: Hero;
+    enter(): void;
     exit(): void;
     update(): void;
 }
 
-export class IdleState implements HeroState {
-    hero: Hero | null = null;
-
-    enter(hero: Hero) {
+class IdleState implements HeroStateBase {
+    hero: Hero = null!;
+    constructor(hero: Hero) {
         this.hero = hero;
+    }
+
+    enter() {
         this.hero.setDirectionTexture();
     }
 
@@ -20,11 +22,13 @@ export class IdleState implements HeroState {
     update() {}
 }
 
-export class MoveState implements HeroState {
-    hero: Hero | null = null;
-
-    enter(hero: Hero) {
+class MoveState implements HeroStateBase {
+    hero: Hero = null!;
+    constructor(hero: Hero) {
         this.hero = hero;
+    }
+
+    enter() {
         this.hero.playMoveAnimation();
     }
 
@@ -33,4 +37,45 @@ export class MoveState implements HeroState {
     }
 
     update() {}
+}
+
+export enum HeroState {
+    NONE,
+    IDLE,
+    MOVE,
+}
+
+export class HeroStateMachine {
+    private state: HeroState = HeroState.NONE;
+    private currentState: HeroStateBase | null = null;
+    private states: { [key: number]: HeroStateBase } = {};
+    private hero: Hero = null!;
+
+    constructor(hero: Hero) {
+        this.hero = hero;
+    }
+
+    static createState(state: HeroState, hero: Hero) {
+        switch (state) {
+            case HeroState.IDLE:
+                return new IdleState(hero);
+            case HeroState.MOVE:
+                return new MoveState(hero);
+            default:
+                return null;
+        }
+    }
+
+    changeState(state: HeroState) {
+        let newState: any = this.states[state];
+        if (!newState) {
+            newState = HeroStateMachine.createState(state, this.hero);
+        }
+        if (this.currentState != null && !(state == HeroState.MOVE && this.state == state)) {
+            this.currentState.exit();
+        }
+        this.currentState = newState;
+        this.state = state;
+        this.currentState?.enter();
+    }
 }

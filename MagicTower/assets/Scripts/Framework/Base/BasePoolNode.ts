@@ -1,4 +1,4 @@
-import { instantiate, Node, NodePool, Prefab, _decorator } from "cc";
+import { instantiate, IPoolHandlerComponent, Node, NodePool, Prefab, _decorator } from "cc";
 import { BaseComponent } from "./BaseComponent";
 const { ccclass } = _decorator;
 
@@ -19,12 +19,20 @@ export class BasePoolNode extends BaseComponent {
         let node: Node | null = null;
         if (pool.size() == 0) {
             node = instantiate(prefab);
+            let handler: any = null;
             if (useCommon) {
-                node.addComponent(BasePoolNode);
+                handler = node.addComponent(BasePoolNode);
+            } else if (pool.poolHandlerComp) {
+                handler = node.getComponent(pool.poolHandlerComp as any);
             }
-            pool.put(node);
+
+            if (handler && handler.reuse) {
+                handler.reuse(pool);
+            }
+            return node;
+        } else {
+            return pool.get(pool);
         }
-        return pool.get(pool);
     }
 
     reuse(pool: NodePool) {

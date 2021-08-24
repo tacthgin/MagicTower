@@ -28,10 +28,10 @@ export class NodePoolManager {
         let poolName = extName ? name + extName : name;
 
         if (!this.pool[poolName]) {
-            this.pool[poolName] = new NodePool(name);
+            this.pool[poolName] = new NodePool(useCommon ? "BasePoolNode" : name);
         }
 
-        return BasePoolNode.generateNodeFromPool(this.pool[path], prefab, useCommon);
+        return BasePoolNode.generateNodeFromPool(this.pool[poolName], prefab, useCommon);
     }
 
     /**
@@ -51,7 +51,7 @@ export class NodePoolManager {
         let poolName = extName ? prefab.name + extName : prefab.name;
 
         if (!this.pool[poolName]) {
-            this.pool[poolName] = new NodePool(prefab.name);
+            this.pool[poolName] = new NodePool(useCommon ? "BasePoolNode" : prefab.name);
         }
 
         return BasePoolNode.generateNodeFromPool(this.pool[poolName], prefab, useCommon);

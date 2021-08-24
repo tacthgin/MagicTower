@@ -69,6 +69,11 @@ export class Door extends Element {
     }
 }
 
+export enum StairType {
+    UP,
+    Down,
+}
+
 export class Stair extends Element {
     private _standLocation: number = 0;
     private _levelDiff: number = 1;

@@ -1,8 +1,8 @@
-import { Component, Label, Sprite, UITransform, _decorator } from "cc";
+import { Component, Label, Sprite, _decorator } from "cc";
 import { BaseEvent } from "../../../Framework/Base/BaseContant";
+import { BasePoolNode } from "../../../Framework/Base/BasePoolNode";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
-import { ResourceType } from "../../../Framework/Managers/ResourceManager";
 import { JsonParserMap } from "../../Constant/JsonParserMap";
 
 const { ccclass, property } = _decorator;
@@ -33,12 +33,24 @@ export class LoginScene extends Component {
         this.gotoGameScene();
     }
 
-    onResouceProgress(type: ResourceType, progress: number) {
+    onResouceProgress(type: string, progress: number) {
         this.progressLabel.string = `资源加载中，${(progress * 100).toFixed(2)}%...`;
     }
 
     async gotoGameScene() {
         await GameManager.RESOURCE.loadPrefabDir("Elements");
+        let test = await GameManager.POOL.createPoolNode("Prefabs/Elements/Test", null, true);
+        if (test) {
+            test.parent = this.node;
+            test.getComponent(BasePoolNode)?.remove();
+            this.scheduleOnce(async () => {
+                test = await GameManager.POOL.createPoolNode("Prefabs/Elements/Test", null, true);
+                if (test) {
+                    test.parent = this.node;
+                }
+            }, 1);
+        }
+
         //GameManager.getInstance().loadScene("GameScene");
     }
 }
