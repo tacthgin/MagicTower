@@ -3565,6 +3565,10 @@
     "monsterNode": {
       "__id__": 77
     },
+    "monsterIconPrefab": {
+      "__uuid__": "166abebd-716f-450e-8252-15769b1a8c58",
+      "__expectedType__": "cc.Prefab"
+    },
     "_id": "61mKZh1lFN1bxvl6F41hgR"
   },
   {
@@ -3634,7 +3638,8 @@
       "__type__": "cc.Vec2",
       "x": 512,
       "y": 512
-    }
+    },
+    "_saturation": 0.2980392156862745
   },
   {
     "__type__": "cc.SkyboxInfo",

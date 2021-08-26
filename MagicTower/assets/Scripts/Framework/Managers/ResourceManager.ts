@@ -5,7 +5,7 @@ import { NotifyCenter } from "./NotifyCenter";
 
 export enum ResourceType {
     JSON = "Json",
-    SPRITE = "Sprite",
+    SPRITE = "Sprites",
     AUIDO = "Audio",
     TILED_MAP = "TiledMap",
 }
@@ -30,11 +30,9 @@ export class ResourceManager {
     private remoteImages: { [key: string]: SpriteFrame } = {};
 
     init() {
-        // for (let type in ResourceType) {
-        //     this.resourcePromises.push(this.createResourcePromise((ResourceType as any)[type]));
-        // }
-        this.resourcePromises.push(this.createResourcePromise(ResourceType.JSON));
-        this.resourcePromises.push(this.createResourcePromise(ResourceType.TILED_MAP));
+        for (let type in ResourceType) {
+            this.resourcePromises.push(this.createResourcePromise((ResourceType as any)[type]));
+        }
         return this;
     }
 
@@ -83,10 +81,17 @@ export class ResourceManager {
     private setAssets(type: string, assets: Asset[]) {
         let data: any = {};
         if (type != ResourceType.JSON) {
-            assets.forEach((asset) => {
-                let assetInfo: any = resources.getAssetInfo(asset._uuid);
-                data[assetInfo.path] = asset;
-            });
+            if (type == ResourceType.SPRITE) {
+                assets.forEach((asset) => {
+                    let assetInfo: any = resources.getAssetInfo(asset._uuid);
+                    data[assetInfo.path.replace("/spriteFrame", "")] = asset;
+                });
+            } else {
+                assets.forEach((asset) => {
+                    let assetInfo: any = resources.getAssetInfo(asset._uuid);
+                    data[assetInfo.path] = asset;
+                });
+            }
             this.assets[type] = data;
         } else {
             assets.forEach((asset: any) => {

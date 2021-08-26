@@ -38,6 +38,7 @@ export class MapCollisionSystem {
      * @returns true表示交互结束，false表示交互正在进行
      */
     collision(tile: Vec2) {
+        return true;
         let { layerName, spriteFrame } = this.gameMap.getTileInfo(tile);
         if (!layerName) return true;
         let jsonData = this.getJsonData(layerName, spriteFrame!.name);
@@ -49,30 +50,31 @@ export class MapCollisionSystem {
                 this.gameMap.setTileGIDAt(layerName, tile, 0);
                 return true;
             case "door":
-                return this.doorCollision(index, element);
+                //return this.doorCollision(index, element);
+                return true;
             case "stair":
-                NotifyCenter.emit(GameEvent.SWITCH_LEVEl, element);
+                //NotifyCenter.emit(GameEvent.SWITCH_LEVEl, element);
                 return true;
             case "monster":
                 {
-                    if (!CalculateSystem.canHeroAttack(this.hero.heroData, element.monsterInfo, !element.firstAttack)) {
-                        GameManager.getInstance().showToast(`你打不过${element.monsterInfo.name}`);
-                        return true;
-                    }
-                    new MonsterFightSystem().init(index, element, this, this.hero).execute(this.haveMagicHurt(index));
+                    // if (!CalculateSystem.canHeroAttack(this.hero.heroData, element.monsterInfo, !element.firstAttack)) {
+                    //     GameManager.UI.showToast(`你打不过${element.monsterInfo.name}`);
+                    //     return true;
+                    // }
+                    // new MonsterFightSystem().init(index, element, this, this.hero).execute(this.haveMagicHurt(index));
                 }
                 break;
             case "npc":
-                new NpcInteractiveSystem().init(index, element, this, this.hero).execute();
+                //new NpcInteractiveSystem().init(index, element, this, this.hero).execute();
                 break;
             case "building":
                 this.gotoShop();
                 break;
             case "event":
-                this.eventCollision(element.id);
+                //this.eventCollision(element.id);
                 break;
             case "floor":
-                return this.floorCollision(index);
+            //return this.floorCollision(index);
             default:
                 return true;
         }
@@ -354,50 +356,6 @@ export class MapCollisionSystem {
         //}
     }
 
-    /**
-     * 勇士和地块之间的交互，返回为false，表示交互有延迟，是异步的，true表示交互完成
-     * @param tile tile坐标
-     */
-    collision(tile: Vec2) {
-        //let { tileType, element, index } = this.getTileLayer(tile);
-        //switch (tileType) {
-        //case "prop":
-        //SoundManager.playEffect("eat");
-        //this.hero.addProp(element.propInfo.id);
-        //this.removeElement(index, tileType);
-        //return true;
-        //case "door":
-        //return this.doorCollision(index, element);
-        //case "stair":
-        //if (!element.hide) {
-        //NotifyCenter.emit(GameEvent.SWITCH_LEVEl, element);
-        //}
-        //return true;
-        //case "monster":
-        //{
-        //if (!CalculateSystem.canHeroAttack(this.hero.HeroData, element.monsterInfo, !element.firstAttack)) {
-        //GameManager.getInstance().showToast(`你打不过${element.monsterInfo.name}`);
-        //return true;
-        //}
-        //new MonsterFightSystem().init(index, element, this, this.hero).execute(this.haveMagicHurt(index));
-        //}
-        //break;
-        //case "npc":
-        //new NpcInteractiveSystem().init(index, element, this, this.hero).execute();
-        //break;
-        //case "building":
-        //this.gotoShop();
-        //break;
-        //case "event":
-        //this.eventCollision(element.id);
-        //break;
-        //case "floor":
-        //return this.floorCollision(index);
-        //default:
-        //return true;
-        //}
-        //return false;
-    }
     private monsterDie(monster: Monster, index: number, magic: boolean) {
         //幸运金币
         //let ratio = this.hero.HeroData.getPropNum(27) ? 2 : 1;

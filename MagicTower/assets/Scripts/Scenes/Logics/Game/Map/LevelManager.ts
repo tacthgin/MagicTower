@@ -62,12 +62,7 @@ export class LevelManager extends Component {
 
     private loadArchive() {
         let currentLevel = this.mapData.level;
-        let gameMap = this.createMap(currentLevel);
-        let levelData = this.mapData.getCurrentLevelData();
-        if (!levelData) {
-            levelData = this.mapData.createLevelData(currentLevel, gameMap.getLayersProperties());
-        }
-        gameMap.loadLevelData(levelData);
+        this.createMap(currentLevel);
         this.showHero();
     }
 
@@ -79,6 +74,12 @@ export class LevelManager extends Component {
             let gameMap = mapNode.getComponent(GameMap)!;
             gameMap.init(GameManager.RESOURCE.getAsset(TiledMapAsset, `${level}`));
             this.maps[level] = gameMap;
+
+            let levelData = this.mapData.getLevelData(level);
+            if (!levelData) {
+                levelData = this.mapData.createLevelData(level, gameMap.getLayersProperties());
+            }
+            gameMap.loadLevelData(levelData);
         }
         return this.maps[level];
     }
@@ -91,7 +92,8 @@ export class LevelManager extends Component {
         this.maps[oldLevel].node.active = false;
         let newMap = this.createMap(this.mapData.level);
         newMap.node.active = true;
-        this.showHero();
+        let levelData = this.mapData.getCurrentLevelData();
+        this.showHero(newMap.getTile(levelData.getStair(type).standLocation));
     }
 
     private showHero(tile: Vec2 | null = null) {
@@ -101,7 +103,7 @@ export class LevelManager extends Component {
         }
         let map = this.maps[this.mapData.level];
         this.hero.node.parent = map.node;
-        this.hero.init(map);
+        this.hero.init(map, tile);
     }
 
     private moveHero(touchPos: Vec2) {

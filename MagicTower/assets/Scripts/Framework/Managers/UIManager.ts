@@ -33,7 +33,7 @@ export class UIManager {
     private dialogs: any = {};
 
     init(layers: Node[]) {
-        this.toastY = view.getVisibleSize().height * 0.75;
+        this.toastY = view.getVisibleSize().height * 0.25;
         let dirInfo = resources.getDirWithPath(UIPrefabPath.DIALOGS_PATH, Prefab);
         dirInfo.forEach((info) => {
             let name = info.path.substring(info.path.lastIndexOf("/") + 1);

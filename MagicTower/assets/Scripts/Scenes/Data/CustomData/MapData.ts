@@ -34,7 +34,8 @@ export class MapData extends BaseData {
         }
         let currentLevel = this.data.currentLevel;
         this.data.currentLevel = newLevel;
-        this.emit(MapEvent.SWITCH_LEVEL, currentLevel);
+        //如果是上去的，英雄站到下楼梯的旁边
+        this.emit(MapEvent.SWITCH_LEVEL, currentLevel, diff > 0 ? StairType.Down : StairType.UP);
     }
 
     getCurrentLevelData(): LevelData {

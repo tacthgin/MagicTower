@@ -1,4 +1,4 @@
-import { _decorator, Component, Label, Sprite, SpriteFrame, Prefab, Node, NodePool, UITransform, Vec3 } from "cc";
+import { Component, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, Vec3, _decorator } from "cc";
 import { BasePoolNode } from "../../../../Framework/Base/BasePoolNode";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
@@ -13,35 +13,37 @@ const { ccclass, property } = _decorator;
 @ccclass("GameUI")
 export class GameUI extends Component {
     @property(Label)
-    levelLabel: Label = null;
+    private levelLabel: Label = null!;
     @property(Label)
-    heroAttrLabels: Label[] = [];
+    private heroAttrLabels: Label[] = [];
     @property(Label)
-    equipLabels: Label[] = [];
+    private equipLabels: Label[] = [];
     @property(Sprite)
-    equipSprites: Sprite[] = [];
+    private equipSprites: Sprite[] = [];
     @property(SpriteFrame)
-    keySpriteFrames: SpriteFrame[] = [];
+    private keySpriteFrames: SpriteFrame[] = [];
     @property(Prefab)
-    keyPrefab: Prefab = null;
+    private keyPrefab: Prefab = null!;
     @property(Node)
-    keyLayout: Node = null;
+    private keyLayout: Node = null!;
     @property(Prefab)
-    propButtonPrefab: Prefab = null;
+    private propButtonPrefab: Prefab = null!;
     @property(Node)
-    propButtonLayout: Node = null;
+    private propButtonLayout: Node = null!;
     @property(Label)
-    monsterLabels: Label[] = [];
+    private monsterLabels: Label[] = [];
     @property(Node)
-    monsterNode: Node = null;
+    private monsterNode: Node = null!;
+    @property(Prefab)
+    private monsterIconPrefab: Prefab = null!;
 
-    private heroData: HeroData = null;
+    private heroData: HeroData = null!;
     private keys: any = {};
     private propButtons: any = {};
-    private monsterSprite: Node = null;
+    private monsterSprite: Node = null!;
 
     onLoad() {
-        this.heroData = GameManager.DATA.getData(HeroData);
+        this.heroData = GameManager.DATA.getData(HeroData)!;
         this.heroData.on(HeroEvent.HERO_ATTR, this.heroAttrChanged, this);
         this.heroData.on(HeroEvent.REFRESH_PROP, this.refreshProp, this);
         this.heroData.on(HeroEvent.REFRESH_EQUIP, this.refreshEquip, this);
@@ -54,7 +56,7 @@ export class GameUI extends Component {
             this.keys[i] = [];
         }
 
-        this.monsterSprite = GameManager.POOL.createPrefabNode("MonsterIcon");
+        this.monsterSprite = instantiate(this.monsterIconPrefab);
         this.monsterSprite.position = new Vec3(0, 0, 0);
         this.monsterSprite.parent = this.monsterNode;
         this.monsterSprite.active = false;
@@ -98,15 +100,15 @@ export class GameUI extends Component {
             case PropType.FEATHER:
                 let jsonData = GameManager.DATA.getJsonElement("prop", propInfo.id);
                 //up
-                let button = this.createPropButton(jsonData, 1);
-                let label = button.getChildByName("label");
-                label.active = true;
-                label.getComponent(Label).string = "上";
-                //down
-                button = this.createPropButton(jsonData, 1);
-                label = button.getChildByName("label");
-                label.active = true;
-                label.getComponent(Label).string = "下";
+                let strs = ["上", "下"];
+                for (let i = 0; i < 2; i++) {
+                    let button = this.createPropButton(jsonData, 1);
+                    if (button) {
+                        let label = button.getChildByName("label")!;
+                        label.active = true;
+                        label.getComponent(Label)!.string = strs[i];
+                    }
+                }
                 break;
             default:
                 if (!propInfo.consumption) {
@@ -174,17 +176,19 @@ export class GameUI extends Component {
         this.monsterLabels[3].string = monsterInfo ? monsterInfo.defence : "防御";
         this.monsterSprite.active = monsterInfo != null;
         if (monsterInfo) {
-            this.monsterSprite.getComponent(MonsterIcon).init(monsterInfo.id);
+            this.monsterSprite.getComponent(MonsterIcon)?.init(monsterInfo.id);
         }
     }
 
     createKey(propInfo: any) {
         let index = propInfo.id - 1;
         let key = GameManager.POOL.createPrefabNode(this.keyPrefab, null, true);
-        key.getComponent(Sprite).spriteFrame = this.keySpriteFrames[index];
-        key.setSiblingIndex(this.keySpriteFrames.length - index);
-        key.parent = this.keyLayout;
-        this.keys[index].push(key);
+        if (key) {
+            key.getComponent(Sprite)!.spriteFrame = this.keySpriteFrames[index];
+            key.setSiblingIndex(this.keySpriteFrames.length - index);
+            key.parent = this.keyLayout;
+            this.keys[index].push(key);
+        }
         return key;
     }
 
@@ -199,11 +203,13 @@ export class GameUI extends Component {
 
     createPropButton(propInfo: any, num: number) {
         let propButton = GameManager.POOL.createPrefabNode(this.propButtonPrefab);
-        let control = propButton.getComponent(PropButton);
-        control.init(propInfo);
-        control.setNum(num);
-        propButton.parent = this.propButtonLayout;
-        this.propButtons[propInfo.id] = control;
+        if (propButton) {
+            let control = propButton.getComponent(PropButton)!;
+            control.init(propInfo);
+            control.setNum(num);
+            propButton.parent = this.propButtonLayout;
+            this.propButtons[propInfo.id] = control;
+        }
         return propButton;
     }
 

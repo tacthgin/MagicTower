@@ -1,10 +1,10 @@
-import { director, js, TiledLayer, TiledMap, TiledMapAsset, v2, Vec2, _decorator } from "cc";
-import { AstarMap } from "../../../../Framework/Lib/AI/Astar";
+import { director, js, math, size, TiledLayer, TiledMap, TiledMapAsset, v2, Vec2, _decorator } from "cc";
+import { AstarMap } from "../../../../Framework/Lib/Custom/Astar";
 import { LevelData } from "../../../Data/CustomData/MapData";
 
 const { ccclass } = _decorator;
 
-const MAP_ANIMATION_INTERVAL = 0.02;
+const MAP_ANIMATION_INTERVAL = 0.1;
 
 export enum AstarMoveType {
     HERO,
@@ -20,6 +20,7 @@ export class GameMap extends TiledMap implements AstarMap {
     /** a*行走方式 */
     private _astarMoveType: AstarMoveType = AstarMoveType.HERO;
     private levelData: LevelData | null = null;
+    private gameSize: math.Size = null!;
 
     public set astarMoveType(value: AstarMoveType) {
         this._astarMoveType = value;
@@ -35,6 +36,7 @@ export class GameMap extends TiledMap implements AstarMap {
             return;
         }
         this.tmxAsset = tiledMapAsset;
+        this.gameSize = size(this._mapSize.width * this._tileSize.width, this._mapSize.height * this._tileSize.height);
     }
 
     /** tile索引 */
@@ -42,20 +44,32 @@ export class GameMap extends TiledMap implements AstarMap {
         return Math.floor(tile.y) * this.getMapSize().width + Math.floor(tile.x);
     }
 
+    /** 索引转到tile */
     getTile(index: number) {
         let size = this.getMapSize();
         return new Vec2(index % size.width, Math.floor(index / size.width));
     }
 
+    /** cocos坐标转换为屏幕坐标 */
+    toScreen(position: Vec2) {
+        return v2(this.gameSize.width * 0.5 + position.x, this.gameSize.height * 0.5 - position.y);
+    }
+
+    /** cocos坐标转换为tile坐标 */
     toTile(position: Vec2) {
-        let size = this.getMapSize();
-        return v2(Math.floor(position.x / size.x), Math.floor(position.y / size.y));
+        position = this.toScreen(position);
+        return v2(Math.floor(position.x / this._tileSize.width), Math.floor(position.y / this._tileSize.height));
     }
 
     getPositionAt(tile: Vec2) {
         let layers = this.getLayers();
         if (layers[0]) {
-            return layers[0].getPositionAt(tile);
+            /** 只能获取gl坐标 */
+            let position = layers[0].getPositionAt(tile)!;
+            //转换为格子中心的cocos坐标
+            position.x -= (this.gameSize.width - this._tileSize.width) * 0.5;
+            position.y -= (this.gameSize.height - this._tileSize.height) * 0.5;
+            return position;
         } else {
             return null;
         }
@@ -91,6 +105,7 @@ export class GameMap extends TiledMap implements AstarMap {
                     gid += this.animationCount;
                 }
                 layer.setTileGIDAt(gid, tile.x, tile.y);
+                layer.markForUpdateRenderData(true);
                 this.updateAnimationTiles(layerName, tile, gid);
             }
         } else {
@@ -111,7 +126,7 @@ export class GameMap extends TiledMap implements AstarMap {
         return null;
     }
 
-    getLayersProperties(): any {
+    getLayersProperties() {
         let layers = this.getLayers();
         let layersProperties = {} as { [key: string]: any };
         let properties = null;
@@ -194,11 +209,10 @@ export class GameMap extends TiledMap implements AstarMap {
         for (let layerName in this.animationTiles) {
             for (let index in this.animationTiles[layerName]) {
                 tileIndex = parseInt(index);
-                this.getLayer(layerName)?.setTileGIDAt(
-                    this.animationTiles[layerName][index] + gidDiff,
-                    tileIndex % size.width,
-                    Math.floor(tileIndex / size.width)
-                );
+                let layer = this.getLayer(layerName);
+                this.animationTiles[layerName][index] += gidDiff;
+                layer?.setTileGIDAt(this.animationTiles[layerName][index], tileIndex % size.width, Math.floor(tileIndex / size.width));
+                layer?.markForUpdateRenderData(true);
             }
         }
     }

@@ -1,3 +1,4 @@
+import { v2, Vec2 } from "cc";
 import { BaseData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
@@ -50,9 +51,12 @@ class _HeroData {
 @Fn.registerClass("HeroData")
 export class HeroData extends BaseData {
     protected data: _HeroData = new _HeroData();
+    private position: Vec2 = null!;
 
     load(data: any = null) {
         this.loadData(data || GameManager.DATA.getJsonElement("global", "hero"));
+        let pos = this.data.pos!;
+        this.position = v2(pos[0], pos[1]);
         this.setProxy();
     }
 
@@ -70,6 +74,16 @@ export class HeroData extends BaseData {
         this.data.heroAttr[attr] += diff;
         this.save();
         this.emit(HeroEvent.HERO_ATTR, attr);
+    }
+
+    setPosition(tile: Vec2) {
+        this.position = tile;
+        this.data.pos = [tile.x, tile.y];
+        this.save();
+    }
+
+    getPosition() {
+        return this.position;
     }
 
     weak() {

@@ -3,7 +3,7 @@ import { BasePoolNode } from "../Base/BasePoolNode";
 
 const { ccclass, property } = _decorator;
 
-const SHORTEST_LENGTH: number = 180;
+const SHORTEST_LENGTH: number = 120;
 
 export enum ToastType {
     NORAML,
@@ -25,7 +25,7 @@ export class ColorToast extends BasePoolNode {
         if (labelTransform.width > SHORTEST_LENGTH) {
             transform.width = labelTransform.width + 50;
         } else {
-            transform.width = 200;
+            transform.width = 120;
         }
         this.runToastAction();
     }

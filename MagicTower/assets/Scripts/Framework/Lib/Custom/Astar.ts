@@ -44,7 +44,8 @@ class AstarNode {
     }
 
     add(position: Vec2) {
-        return this._position?.add(position);
+        let result = new Vec2();
+        return Vec2.add(result, this._position, position);
     }
 }
 
@@ -145,6 +146,7 @@ export class Astar {
     makePath(beginPos: Vec2, endPos: Vec2) {
         let hValue = this.estimateHValue(beginPos, endPos);
         if (hValue == 0) return;
+        if (!this.inBoundary(endPos)) return;
 
         this.openList = [];
         this.closeList = {};

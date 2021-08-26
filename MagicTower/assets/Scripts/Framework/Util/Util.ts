@@ -2,7 +2,7 @@ import { Vec2 } from "cc";
 
 export class Util {
     static clamp(number: number, min: number, max: number) {
-        return Math.max(min, Math.min(number, max));
+        return number < min ? min : number > max ? max : number;
     }
 
     static round10(number: number) {

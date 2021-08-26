@@ -8,7 +8,7 @@ const { ccclass, property } = _decorator;
 @ccclass("Monster")
 export class Monster extends Actor {
     @property(Node)
-    lightning: Node = null;
+    private lightning: Node = null!;
 
     private _monsterInfo: any = null;
     private globalInfo: any = null;
