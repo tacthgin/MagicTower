@@ -1,4 +1,4 @@
-import { Component, Label, Sprite, _decorator } from "cc";
+import { Component, Label, _decorator } from "cc";
 import { BaseEvent } from "../../../Framework/Base/BaseContant";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
@@ -23,6 +23,7 @@ export class LoginScene extends Component {
 
     onAllResourcesLoadSuccess() {
         GameManager.DATA.loadLocalStorage();
+
         this.gotoGameScene();
     }
 

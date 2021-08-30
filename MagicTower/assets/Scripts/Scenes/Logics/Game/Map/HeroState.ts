@@ -33,7 +33,7 @@ class MoveState implements HeroStateBase {
     }
 
     exit() {
-        this.hero?.stopMoveAnimation();
+        this.hero.stopMoveAnimation();
     }
 
     update() {}

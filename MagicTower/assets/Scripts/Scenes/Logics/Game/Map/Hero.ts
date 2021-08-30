@@ -21,6 +21,7 @@ export class Hero extends Component {
 
     private _heroData: HeroData = null!;
     private animation: Animation = null!;
+    private currentAnimationName: string | null = null;
     private heroFSM: HeroStateMachine = new HeroStateMachine(this);
     private globalInfo: any = null;
     private map: GameMap = null!;
@@ -51,6 +52,7 @@ export class Hero extends Component {
 
     onFinished() {
         this.setDirectionTexture();
+        this.heroMoving = true;
     }
 
     start() {
@@ -94,6 +96,7 @@ export class Hero extends Component {
     }
 
     private createAnimation() {
+        let clips: (AnimationClip | null)[] = [];
         this._heroData.get("animation").forEach((animationName: any) => {
             let spriteFrames = [];
             for (let i = 1; i < 3; i++) {
@@ -103,16 +106,18 @@ export class Hero extends Component {
             if (clip) {
                 clip.name = animationName;
                 clip.wrapMode = AnimationClip.WrapMode.Loop;
-                this.animation.clips.push(clip);
+                clips.push(clip);
             }
 
             clip = AnimationClip.createWithSpriteFrames(spriteFrames, 8);
             if (clip) {
                 clip.name = `${animationName}_once`;
                 clip.wrapMode = AnimationClip.WrapMode.Normal;
-                this.animation.clips.push(clip);
+                clips.push(clip);
             }
         });
+
+        this.animation.clips = clips;
     }
 
     /**
@@ -127,9 +132,8 @@ export class Hero extends Component {
             Vec2.subtract(result, info, this.heroTile);
             this.heroDirection = this.getDirection(result);
         }
-
-        this.setDirectionTexture();
         this._heroData.set("direction", this.heroDirection);
+        this.setDirectionTexture();
     }
 
     /** 设置人物方向贴图 */
@@ -142,21 +146,20 @@ export class Hero extends Component {
     /** 根据方向播放行走动画 */
     playMoveAnimation() {
         let animationName = this._heroData.get("animation")[this.heroDirection];
-        if (this.animation.defaultClip) {
-            let state = this.animation.getState(this.animation.defaultClip.name);
-            if (state.isPlaying && this.animation.defaultClip.name == animationName) {
+        if (this.currentAnimationName) {
+            let state = this.animation.getState(this.currentAnimationName);
+            if (state.isPlaying && animationName == this.currentAnimationName) {
                 return;
             }
         }
-        console.log("play", animationName);
+
+        this.currentAnimationName = animationName;
+        console.log(animationName);
         this.animation.play(animationName);
     }
 
     stopMoveAnimation() {
-        if (this.animation.defaultClip?.name.indexOf("once") == -1) {
-            console.log(this.animation.defaultClip?.name, "stop");
-            this.animation.stop();
-        }
+        this.animation.stop();
     }
 
     autoMove(endTile: Vec2) {
@@ -169,6 +172,7 @@ export class Hero extends Component {
                 path.pop();
             }
             let moveComplete = () => {
+                this.animation.stop();
                 if (!canEndMove) {
                     this.toward(endTile);
                 }
