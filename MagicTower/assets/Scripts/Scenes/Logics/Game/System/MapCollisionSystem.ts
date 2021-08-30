@@ -2,6 +2,7 @@ import { v2, Vec2 } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
+import { StairType } from "../../../Data/CustomData/Element";
 import { MapData } from "../../../Data/CustomData/MapData";
 import { GameMap } from "../Map/GameMap";
 import { Hero } from "../Map/Hero";
@@ -26,6 +27,7 @@ let HERO_FACE_DIRECTION = [-11, 1, 11, -1];
 export class MapCollisionSystem {
     private gameMap: GameMap = null!;
     private hero: Hero = null!;
+    private canEndMoveTiles: Readonly<string[]> = ["prop", "stair", "event"];
 
     init(gameMap: GameMap, hero: Hero) {
         this.gameMap = gameMap;
@@ -38,22 +40,28 @@ export class MapCollisionSystem {
      * @returns true表示交互结束，false表示交互正在进行
      */
     collision(tile: Vec2) {
-        return true;
         let { layerName, spriteFrame } = this.gameMap.getTileInfo(tile);
         if (!layerName) return true;
-        let jsonData = this.getJsonData(layerName, spriteFrame!.name);
-        let mapData = GameManager.DATA.getData(MapData);
+        let spriteName = null;
+        if (spriteFrame) {
+            spriteName = spriteFrame.name;
+        }
+        let mapData = GameManager.DATA.getData(MapData)!;
         switch (layerName) {
             case "prop":
-                GameManager.AUDIO.playEffect("eat");
-                this.hero.heroData.addProp(jsonData.id, mapData?.level);
-                this.gameMap.setTileGIDAt(layerName, tile, 0);
+                {
+                    let jsonData = this.getJsonData(layerName, spriteName!);
+                    GameManager.AUDIO.playEffect("eat");
+                    this.hero.heroData.addProp(jsonData.id, mapData?.level);
+                    this.gameMap.setTileGIDAt(layerName, tile, 0);
+                }
                 return true;
             case "door":
                 //return this.doorCollision(index, element);
                 return true;
             case "stair":
-                //NotifyCenter.emit(GameEvent.SWITCH_LEVEl, element);
+                let stair = mapData.getCurrentLevelData().getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
+                mapData.setLevelDiff(stair.levelDiff);
                 return true;
             case "monster":
                 {
@@ -88,6 +96,8 @@ export class MapCollisionSystem {
             case "prop":
             case "monster":
                 return GameManager.DATA.getJsonParser(layerName)?.getJsonElementByKey("spriteID", name);
+            default:
+                return null;
         }
     }
 
@@ -277,6 +287,17 @@ export class MapCollisionSystem {
      * @returns -1不能走，0可走但提留在前一格，1可走
      */
     canEndTileMove(tile: Vec2) {
+        let { layerName } = this.gameMap.getTileInfo(tile);
+        switch (layerName) {
+            case "floor":
+                return true; //this.hero.HeroData.Hp > this.getWizardMagicDamage(index);
+            case "monster":
+                return true;
+            // return CalculateSystem.canHeroAttack(this.hero.HeroData, element.monsterInfo, !element.firstAttack);
+            case "door":
+                return false;
+            //return element.hide;
+        }
         //let { tileType, element, index } = this.getTileLayer(tile);
         //switch (tileType) {
         //case "floor":
@@ -286,8 +307,7 @@ export class MapCollisionSystem {
         //case "door":
         //return element.hide;
         //}
-        //return this.canEndMoveTiles.indexOf(tileType) != -1;
-        return true;
+        return this.canEndMoveTiles.includes(layerName!);
     }
     private heroMoveJudge(tile: Vec2, endTile: Vec2) {
         let { tileType, index } = this.getTileLayer(tile);

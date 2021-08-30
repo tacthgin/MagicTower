@@ -1,4 +1,4 @@
-import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, v3, Vec2, _decorator } from "cc";
+import { Animation, AnimationClip, CCLoader, Component, Node, Sprite, Tween, tween, v3, Vec2, _decorator } from "cc";
 import { Astar } from "../../../../Framework/Lib/Custom/Astar";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
@@ -154,7 +154,6 @@ export class Hero extends Component {
         }
 
         this.currentAnimationName = animationName;
-        console.log(animationName);
         this.animation.play(animationName);
     }
 
@@ -171,21 +170,21 @@ export class Hero extends Component {
             if (!canEndMove) {
                 path.pop();
             }
-            let moveComplete = () => {
+            let moveComplete = (tile: Vec2) => {
                 this.animation.stop();
                 if (!canEndMove) {
                     this.toward(endTile);
                 }
-                this._heroData.setPosition(endTile);
+                this._heroData.setPosition(tile);
                 this.isHeroMoving = !this.collisionSystem.collision(endTile);
             };
             this.isHeroMoving = true;
             if (path.length == 0) {
-                moveComplete();
+                moveComplete(endTile);
             } else {
                 this.movePath(path, (tile: Vec2, end: boolean) => {
                     if (end) {
-                        moveComplete();
+                        moveComplete(tile);
                     } else if (!this.collisionSystem.collision(tile)) {
                         //碰到区块处理事件停止;
                         Tween.stopAllByTarget(this.node);
@@ -218,7 +217,7 @@ export class Hero extends Component {
                 .to(this.globalInfo.heroSpeed, { position: v3(position.x, position.y) })
                 .call(() => {
                     this.heroTile = tile;
-                    stop = moveCallback(position, end);
+                    stop = moveCallback(tile, end);
                 });
         };
         for (let i = 0; i < path.length - 1; i++) {

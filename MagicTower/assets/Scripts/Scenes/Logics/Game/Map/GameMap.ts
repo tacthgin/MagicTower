@@ -76,6 +76,7 @@ export class GameMap extends TiledMap implements AstarMap {
     }
 
     getTileInfo(tile: Vec2, layerName?: string) {
+        console.log(tile);
         let layer: TiledLayer | null = null;
         if (layerName) {
             layer = this.getLayer(layerName);
@@ -90,7 +91,7 @@ export class GameMap extends TiledMap implements AstarMap {
         if (layer) {
             return {
                 layerName: layer.getLayerName(),
-                spriteFrame: layer.getTexture(this.getTileIndex(tile)),
+                spriteFrame: layer.getTexture(layer.getTileGIDAt(tile.x, tile.y)!),
             };
         }
 
@@ -101,8 +102,10 @@ export class GameMap extends TiledMap implements AstarMap {
         let layer = this.getLayer(layerName);
         if (layer) {
             if (layer.getTileGIDAt(tile.x, tile.y) != gid) {
-                if (layerName in this.animationTiles) {
-                    gid += this.animationCount;
+                if (gid != 0) {
+                    if (layerName in this.animationTiles) {
+                        gid += this.animationCount;
+                    }
                 }
                 layer.setTileGIDAt(gid, tile.x, tile.y);
                 layer.markForUpdateRenderData(true);

@@ -1,4 +1,4 @@
-import { Vec2 } from "cc";
+import { CCLoader, Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
@@ -54,7 +54,11 @@ export class MapData extends BaseData {
         return levelData;
     }
 
-    getElement(tile: Vec2, gid: number) {}
+    getElement(layerName: string, tile: Vec2) {
+        let levelData = this.data.maps[this.data.currentLevel];
+        if (levelData) {
+        }
+    }
 
     load(info: any = null) {
         if (info) {
