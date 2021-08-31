@@ -96,6 +96,10 @@ export class LevelData extends BaseLoadData {
         return this._disappearTile;
     }
 
+    private saveMapData() {
+        GameManager.DATA.getData(MapData)?.save();
+    }
+
     private emitEvent(layerName: string, index: number, info: any = null) {
         let mapData = GameManager.DATA.getData(MapData);
         mapData?.emit(MapEvent.ADD_ELEMENT, this._level, layerName, index, info);
@@ -236,5 +240,18 @@ export class LevelData extends BaseLoadData {
 
     getLayerInfo(layerName: string) {
         return this.layerInfo[layerName] || null;
+    }
+
+    getLayerElement(layerName: string, index: number | string) {
+        let layerInfo = this.getLayerInfo(layerName);
+        return layerInfo ? layerInfo[index] : null;
+    }
+
+    deleteLayerElement(layerName: string, index: number | string) {
+        let layerInfo = this.getLayerInfo(layerName);
+        if (layerInfo && layerInfo[index]) {
+            delete layerInfo[index];
+            this.saveMapData();
+        }
     }
 }

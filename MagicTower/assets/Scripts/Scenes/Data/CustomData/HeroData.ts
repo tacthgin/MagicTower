@@ -122,11 +122,9 @@ export class HeroData extends BaseData {
                     this.data.props.prop[id] = Util.clamp(this.getPropNum(id) + count, 0, Number.MAX_VALUE);
                     this.save();
                     this.emit(HeroEvent.REFRESH_PROP, id);
-                } else {
-                    if (prop.type >= PropType.HEALING_SALVE && prop.type <= PropType.DEFENCE_GEM) {
-                        let value = prop.value + Math.floor((mapLevel - 1) / 10 + 1);
-                        this.setAttrDiff(prop.type - PropType.HEALING_SALVE + HeroAttr.HP, value);
-                    }
+                } else if (prop.type >= PropType.HEALING_SALVE && prop.type <= PropType.DEFENCE_GEM) {
+                    let value = prop.value + Math.floor((mapLevel - 1) / 10 + 1);
+                    this.setAttrDiff(prop.type - PropType.HEALING_SALVE + HeroAttr.HP, value);
                 }
                 break;
         }

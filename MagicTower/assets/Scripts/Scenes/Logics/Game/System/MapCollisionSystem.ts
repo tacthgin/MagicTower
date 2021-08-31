@@ -124,7 +124,7 @@ export class MapCollisionSystem {
                         condition.splice(index, 1);
                     }
                     if (condition.length == 0) {
-                        return this.eventCollision(eventInfo.value);
+                        this.eventCollision(eventInfo.value);
                     }
                 });
             } else if (eventInfo.doorState == DoorState.DISAPPEAR_EVENT) {
@@ -148,8 +148,25 @@ export class MapCollisionSystem {
                 });
             }
         } else {
-            
+            let doorInfo: Door = levelData.getLayerElement(layerName, tileIndex);
+            if (!doorInfo || doorInfo.canWallOpen()) {
+                this.createDoorAnimation(doorData.id, tile, false, () => {
+                    NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
+                });
+            } else if (doorInfo.doorState == DoorState.APPEAR) {
+                this.createDoorAnimation(doorData.id, tile, true, () => {
+                    NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
+                });
+                levelData.deleteLayerElement(layerName, tileIndex);
+            } else if (doorInfo.isKeyDoor()) {
+                let keyID = GameManager.DATA.getJsonParser("prop")?.getJsonElementByKey("value", doorInfo.id);
+                if (keyID && this.hero.heroData.getPropNum(keyID) > 0) {
+                    this.hero.heroData.addProp(keyID, 1, -1);
+                }
+            }
         }
+
+        return true;
 
         //if (element.canWallOpen()) {
         //墙门

@@ -196,7 +196,7 @@ export class Hero extends Component {
             }
             NotifyCenter.emit(GameEvent.MOVE_PATH);
         } else {
-            GameManager.UI.showToast("路径错误");
+            GameManager.UI.showToast("无效路径");
         }
     }
 

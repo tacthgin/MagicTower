@@ -82,7 +82,6 @@ export class GameMap extends TiledMap implements AstarMap {
     }
 
     getTileInfo(tile: Vec2, layerName?: string) {
-        console.log(tile);
         let layer: TiledLayer | null = null;
         let gid: number | null = 0;
         if (layerName) {
