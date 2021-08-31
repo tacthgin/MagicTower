@@ -21,6 +21,7 @@ export class GameMap extends TiledMap implements AstarMap {
     private _astarMoveType: AstarMoveType = AstarMoveType.HERO;
     private levelData: LevelData | null = null;
     private gameSize: math.Size = null!;
+    private gidToSpriteFrameMap: { [key: number]: string } = {};
 
     public set astarMoveType(value: AstarMoveType) {
         this._astarMoveType = value;
@@ -37,6 +38,9 @@ export class GameMap extends TiledMap implements AstarMap {
         }
         this.tmxAsset = tiledMapAsset;
         this.gameSize = size(this._mapSize.width * this._tileSize.width, this._mapSize.height * this._tileSize.height);
+        this._tilesets.forEach((tilesetInfo) => {
+            this.gidToSpriteFrameMap[tilesetInfo.firstGid] = tilesetInfo.sourceImage!.name;
+        });
     }
 
     /** tile索引 */
@@ -89,9 +93,10 @@ export class GameMap extends TiledMap implements AstarMap {
         }
 
         if (layer) {
+            let spriteName = this.gidToSpriteFrameMap[layer.getTileGIDAt(tile.x, tile.y)!];
             return {
                 layerName: layer.getLayerName(),
-                spriteFrame: layer.getTexture(layer.getTileGIDAt(tile.x, tile.y)!),
+                spriteName: spriteName,
             };
         }
 

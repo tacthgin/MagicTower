@@ -1,4 +1,4 @@
-import { CCLoader, Vec2 } from "cc";
+import { Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";

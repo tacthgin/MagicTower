@@ -40,17 +40,13 @@ export class MapCollisionSystem {
      * @returns true表示交互结束，false表示交互正在进行
      */
     collision(tile: Vec2) {
-        let { layerName, spriteFrame } = this.gameMap.getTileInfo(tile);
+        let { layerName, spriteName } = this.gameMap.getTileInfo(tile);
         if (!layerName) return true;
-        let spriteName = null;
-        if (spriteFrame) {
-            spriteName = spriteFrame.name;
-        }
+        let jsonData = this.getJsonData(layerName, spriteName);
         let mapData = GameManager.DATA.getData(MapData)!;
         switch (layerName) {
             case "prop":
                 {
-                    let jsonData = this.getJsonData(layerName, spriteName!);
                     GameManager.AUDIO.playEffect("eat");
                     this.hero.heroData.addProp(jsonData.id, mapData?.level);
                     this.gameMap.setTileGIDAt(layerName, tile, 0);
@@ -89,13 +85,13 @@ export class MapCollisionSystem {
         return false;
     }
 
-    getJsonData(layerName: string, spriteFrameName: string) {
+    getJsonData(layerName: string, spriteFrameName: string | null | undefined) {
         if (!spriteFrameName) return null;
         let name = spriteFrameName.split("_")[0];
         switch (layerName) {
             case "prop":
             case "monster":
-                return GameManager.DATA.getJsonParser(layerName)?.getJsonElementByKey("spriteID", name);
+                return GameManager.DATA.getJsonParser(layerName)?.getJsonElementByKey("spriteId", name);
             default:
                 return null;
         }

@@ -1,4 +1,4 @@
 export const JsonParserMap = {
-    prop: "PropParser",
+    prop: "JsonParser",
     monster: "JsonParser",
 };

@@ -1,6 +1,9 @@
 {
   /* Base configuration. Do not edit this field. */
   "extends": "./temp/tsconfig.cocos.json",
-  
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+  }
   /* Add your custom configuration here. */
 }
