@@ -41,6 +41,7 @@ export enum DoorState {
 export class Door extends Element {
     private _doorState: DoorState = DoorState.NONE;
     private _value: any = null;
+    private _condition: any = null;
 
     static cantOpenConditionArray: Readonly<DoorState[]> = [DoorState.PASSIVE, DoorState.APPEAR, DoorState.CONDITION];
 
@@ -58,6 +59,15 @@ export class Door extends Element {
 
     get value() {
         return this._value;
+    }
+
+    set condition(value: any) {
+        this._condition = value;
+    }
+
+    /** 事件门条件 */
+    get condition() {
+        return this._condition;
     }
 
     canWallOpen() {

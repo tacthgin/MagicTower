@@ -1,9 +1,9 @@
-import { v2, Vec2 } from "cc";
+import { v2, v3, Vec2 } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
-import { StairType } from "../../../Data/CustomData/Element";
-import { MapData } from "../../../Data/CustomData/MapData";
+import { Door, DoorState, StairType } from "../../../Data/CustomData/Element";
+import { LevelData, MapData } from "../../../Data/CustomData/MapData";
 import { GameMap } from "../Map/GameMap";
 import { Hero } from "../Map/Hero";
 import { CalculateSystem } from "./CalculateSystem";
@@ -34,6 +34,30 @@ export class MapCollisionSystem {
         this.hero = hero;
     }
 
+    private async createDoorAnimation(id: number | string, tile: Vec2, reverse: boolean, callback: Function | null = null) {
+        let name = reverse ? "DoorAnimationNode" : "DoorAnimationReverseNode";
+        let node = await GameManager.POOL.createPoolNode(`Prefabs/Elements/${name}`);
+        if (node) {
+            let position = this.gameMap.getPositionAt(tile);
+            node.position = v3(position?.x, position?.y);
+            node.parent = this.gameMap.node;
+            (node.getComponent(name) as any).init(`door${id}`, callback);
+        }
+    }
+
+    /** 根据图片名字获取json数据 */
+    getJsonData(layerName: string, spriteFrameName: string | null | undefined) {
+        if (!spriteFrameName) return null;
+        let name = spriteFrameName.split("_")[0];
+        switch (layerName) {
+            case "prop":
+            case "monster":
+                return GameManager.DATA.getJsonParser(layerName)?.getJsonElementByKey("spriteId", name);
+            default:
+                return null;
+        }
+    }
+
     /**
      * 英雄和地图元素的交互
      * @param tile 交互坐标
@@ -44,6 +68,7 @@ export class MapCollisionSystem {
         if (!layerName) return true;
         let jsonData = this.getJsonData(layerName, spriteName);
         let mapData = GameManager.DATA.getData(MapData)!;
+        let levelData = mapData.getCurrentLevelData();
         switch (layerName) {
             case "prop":
                 {
@@ -53,10 +78,9 @@ export class MapCollisionSystem {
                 }
                 return true;
             case "door":
-                //return this.doorCollision(index, element);
-                return true;
+                return this.doorCollision(tile, jsonData, layerName, levelData);
             case "stair":
-                let stair = mapData.getCurrentLevelData().getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
+                let stair = levelData.getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
                 mapData.setLevelDiff(stair.levelDiff);
                 return true;
             case "monster":
@@ -85,16 +109,81 @@ export class MapCollisionSystem {
         return false;
     }
 
-    getJsonData(layerName: string, spriteFrameName: string | null | undefined) {
-        if (!spriteFrameName) return null;
-        let name = spriteFrameName.split("_")[0];
-        switch (layerName) {
-            case "prop":
-            case "monster":
-                return GameManager.DATA.getJsonParser(layerName)?.getJsonElementByKey("spriteId", name);
-            default:
-                return null;
+    private doorCollision(tile: Vec2, doorData: any, layerName: string, levelData: LevelData) {
+        let doorInfo = levelData.getLayerInfo(layerName);
+        let tileIndex = this.gameMap.getTileIndex(tile);
+        let eventInfo: Door = doorInfo["event"];
+        if (eventInfo) {
+            //事件门
+            if (eventInfo.doorState == DoorState.APPEAR_EVENT) {
+                this.createDoorAnimation(doorData.id, tile, true, () => {
+                    this.gameMap.setTileGIDAt(layerName, tile, this.gameMap.getGidByName(doorData.spriteId));
+                    let condition: number[] = eventInfo.condition;
+                    let index = condition.indexOf(tileIndex);
+                    if (index != -1) {
+                        condition.splice(index, 1);
+                    }
+                    if (condition.length == 0) {
+                        return this.eventCollision(eventInfo.value);
+                    }
+                });
+            } else if (eventInfo.doorState == DoorState.DISAPPEAR_EVENT) {
+                this.createDoorAnimation(doorData.id, tile, false, () => {
+                    let existCondition = eventInfo.condition[0];
+                    if (existCondition) {
+                        let index = existCondition.indexOf(tileIndex);
+                        if (index != -1) {
+                            eventInfo.condition[0] = null;
+                        } else {
+                            let disappearCondition: number[] = eventInfo.condition[1];
+                            index = disappearCondition.indexOf(tileIndex);
+                            if (index != -1) {
+                                disappearCondition.splice(index, 1);
+                            }
+                            if (disappearCondition.length == 0) {
+                                this.eventCollision(eventInfo.value);
+                            }
+                        }
+                    }
+                });
+            }
+        } else {
+            
         }
+
+        //if (element.canWallOpen()) {
+        //墙门
+        //this.removeElement(index, "door");
+        //return false;
+        //} else if (element.appear) {
+        //if (!element.node.active) {
+        //隐藏的墙门
+        //element.add();
+        //门事件
+        //if (this.doorInfo.appearEventDoor) {
+        //for (let eventId in this.doorInfo.appearEventDoor) {
+        //let indexs = this.doorInfo.appearEventDoor[eventId];
+        //indexs.splice(indexs.indexOf(index), 1);
+        //if (indexs.length != 0) {
+        //this.eventCollision(eventId);
+        //}
+        //}
+        //}
+        //}
+        //return true;
+        //} else if (!element.hide && !element.passive) {
+        //let keyId = this.propParser.getKeyByDoor(element.id);
+        //if (keyId && this.hero.HeroData.getPropNum(keyId) > 0) {
+        //this.hero.removeProp(keyId);
+        //this.removeElement(index, "door");
+        //this.disappearDoorEventTrigger(index);
+        //SoundManager.playEffect("door");
+        //return false;
+        //} else {
+        //GameManager.getInstance().showToast("你无法打开这个门");
+        //}
+        //}
+        //return true;
     }
 
     show() {
@@ -106,44 +195,6 @@ export class MapCollisionSystem {
         //}
     }
 
-    private parseLayer(layerName: string, info: any) {
-        //this.layers[layerName] = {};
-        //this.monsterInfo.magicHurt = {};
-        //if (!info) return;
-        //switch (layerName) {
-        //case "wall":
-        //this.parseWall(layerName, info);
-        //break;
-        //case "door":
-        //this.parseDoor(layerName, info);
-        //break;
-        //case "prop":
-        //this.parseTile(layerName, info, "Prop");
-        //break;
-        //case "monster":
-        //this.parseMonster(layerName, info);
-        //解析怪物魔法伤害
-        //this.parseMagicHurt();
-        //break;
-        //case "stair":
-        //this.parseStair(layerName, info);
-        //break;
-        //case "npc":
-        //this.parseTile(layerName, info, "Npc");
-        //break;
-        //case "building":
-        //this.parseBuilding(layerName, info);
-        //break;
-        //case "event":
-        //this.parseEvent(layerName, info);
-        //break;
-        //case "damage":
-        //this.parseDamage(info);
-        //break;
-        //default:
-        //break;
-        //}
-    }
     private parseWall(layerName: string, info: any) {
         //for (let name in info) {
         //info[name].forEach((tileIndex) => {
@@ -294,17 +345,9 @@ export class MapCollisionSystem {
                 return false;
             //return element.hide;
         }
-        //let { tileType, element, index } = this.getTileLayer(tile);
-        //switch (tileType) {
-        //case "floor":
-        //return this.hero.HeroData.Hp > this.getWizardMagicDamage(index);
-        //case "monster":
-        //return CalculateSystem.canHeroAttack(this.hero.HeroData, element.monsterInfo, !element.firstAttack);
-        //case "door":
-        //return element.hide;
-        //}
         return this.canEndMoveTiles.includes(layerName!);
     }
+
     private heroMoveJudge(tile: Vec2, endTile: Vec2) {
         let { tileType, index } = this.getTileLayer(tile);
         if (
@@ -325,15 +368,6 @@ export class MapCollisionSystem {
         return tileType == "floor" || tileType == "monster" || tileType == "event" || tileType == "stair";
     }
 
-    /** astar判断是否可行走 */
-    isEmpty(tile: Vec2, endTile: Vec2) {
-        switch (this._astarMoveType) {
-            case "hero":
-                return this.heroMoveJudge(tile, endTile);
-            default:
-                return this.elementMoveJudge(tile);
-        }
-    }
     /** 勇士在楼梯旁边 */
     isHeroNextToStair() {
         //for (let index in this.layers["stair"]) {
@@ -343,18 +377,6 @@ export class MapCollisionSystem {
         //}
         //}
         //return false;
-    }
-
-    getTileLayer(tile: Vec2) {
-        let layers = this.getLayers();
-        let layer = null;
-        for (let i = 0; i < layers.length; i++) {
-            if (layers[i].getTileGIDAt(tile.x, tile.y) != 0) {
-                layer = layers[i];
-            }
-        }
-
-        return layer;
     }
 
     /**
@@ -403,6 +425,7 @@ export class MapCollisionSystem {
         //this.elementActionComplete();
         //}
     }
+
     private removeMonsterDoor() {
         //if (!this.doorInfo.monsterDoor) return;
         //let monsterIndexs = null;
@@ -478,42 +501,7 @@ export class MapCollisionSystem {
         //}
         //}
     }
-    /** 返回值为false表示异步 */
-    private doorCollision(index: number, element: Door) {
-        //if (element.canWallOpen()) {
-        //墙门
-        //this.removeElement(index, "door");
-        //return false;
-        //} else if (element.appear) {
-        //if (!element.node.active) {
-        //隐藏的墙门
-        //element.add();
-        //门事件
-        //if (this.doorInfo.appearEventDoor) {
-        //for (let eventId in this.doorInfo.appearEventDoor) {
-        //let indexs = this.doorInfo.appearEventDoor[eventId];
-        //indexs.splice(indexs.indexOf(index), 1);
-        //if (indexs.length != 0) {
-        //this.eventCollision(eventId);
-        //}
-        //}
-        //}
-        //}
-        //return true;
-        //} else if (!element.hide && !element.passive) {
-        //let keyId = this.propParser.getKeyByDoor(element.id);
-        //if (keyId && this.hero.HeroData.getPropNum(keyId) > 0) {
-        //this.hero.removeProp(keyId);
-        //this.removeElement(index, "door");
-        //this.disappearDoorEventTrigger(index);
-        //SoundManager.playEffect("door");
-        //return false;
-        //} else {
-        //GameManager.getInstance().showToast("你无法打开这个门");
-        //}
-        //}
-        //return true;
-    }
+
     private disappearDoorEventTrigger(index: number) {
         //for (let eventId in this.doorInfo.disappearEventDoor) {
         //let info = this.doorInfo.disappearEventDoor[eventId];

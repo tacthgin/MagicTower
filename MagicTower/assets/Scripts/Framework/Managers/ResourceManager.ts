@@ -1,4 +1,4 @@
-import { Asset, assetManager, AudioClip, ImageAsset, isValid, JsonAsset, Prefab, resources, Sprite, SpriteFrame, Texture2D, TiledMapAsset } from "cc";
+import { Asset, assetManager, AudioClip, ImageAsset, JsonAsset, Prefab, resources, SpriteFrame, TiledMapAsset } from "cc";
 import { BaseEvent } from "../Base/BaseContant";
 import { Fn } from "../Util/Fn";
 import { NotifyCenter } from "./NotifyCenter";
@@ -36,6 +36,7 @@ export class ResourceManager {
         return this;
     }
 
+    /** 加载所有资源 */
     loadResources() {
         this.resourceCompleteCount = 0;
         if (this.resourcePromises.length > 0) {
@@ -146,37 +147,55 @@ export class ResourceManager {
         return this.getAsset(ResourceType.SPRITE, path);
     }
 
+    /**
+     * 加载单个资源
+     * @param path 路径
+     * @param type 资源类型构造
+     * @returns
+     */
     loadAsset<T extends Asset>(path: string, type?: Fn.Constructor<T>): Promise<T | null> {
         return new Promise((resolve) => {
-            resources.load(path, type as any, (err, asset: T) => {
+            let asset = resources.get(path);
+            if (asset) {
+                resolve(asset as T);
+            } else {
+                resources.load(path, type as any, (err, asset: T) => {
+                    if (err) {
+                        console.error(err);
+                        resolve(null);
+                        return;
+                    }
+                    resolve(asset);
+                });
+            }
+        });
+    }
+
+    /**
+     * 加载资源文件夹
+     * @param path 路径
+     * @param type 资源类型构造
+     */
+    loadAssetDir<T extends Asset>(path: string, type?: Fn.Constructor<T>): Promise<T[] | null> {
+        return new Promise((resolve) => {
+            resources.loadDir(path, type as any, (err, assets) => {
                 if (err) {
                     console.error(err);
                     resolve(null);
+                    return;
                 }
-                resolve(asset);
+                resolve(assets as any[]);
             });
         });
     }
 
-    loadPrefabDir(path: string) {
-        return new Promise((resolve, reject) => {
-            if (resources.get(path)) {
-                resolve(path);
-            } else {
-                resources.loadDir(path, Prefab, (err, assets) => {
-                    if (err) {
-                        console.error(err);
-                        reject("加载预设失败");
-                        return;
-                    }
-
-                    assets.forEach((asset) => {
-                        this.preloadPrefabs[asset.name] = asset;
-                    });
-                    resolve(path);
-                });
-            }
-        });
+    async loadPrefabDir(path: string) {
+        let assets = await this.loadAssetDir(path, Prefab);
+        if (assets) {
+            assets.forEach((asset) => {
+                this.preloadPrefabs[asset.name] = asset;
+            });
+        }
     }
 
     getPrefab(name: string): Prefab {

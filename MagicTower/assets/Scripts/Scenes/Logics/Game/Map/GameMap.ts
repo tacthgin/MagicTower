@@ -22,6 +22,7 @@ export class GameMap extends TiledMap implements AstarMap {
     private levelData: LevelData | null = null;
     private gameSize: math.Size = null!;
     private gidToSpriteFrameMap: { [key: number]: string } = {};
+    private spriteFrameToGidMap: { [key: string]: number } = {};
 
     public set astarMoveType(value: AstarMoveType) {
         this._astarMoveType = value;
@@ -40,6 +41,7 @@ export class GameMap extends TiledMap implements AstarMap {
         this.gameSize = size(this._mapSize.width * this._tileSize.width, this._mapSize.height * this._tileSize.height);
         this._tilesets.forEach((tilesetInfo) => {
             this.gidToSpriteFrameMap[tilesetInfo.firstGid] = tilesetInfo.sourceImage!.name;
+            this.spriteFrameToGidMap[tilesetInfo.sourceImage!.name] = tilesetInfo.firstGid;
         });
     }
 
@@ -82,18 +84,20 @@ export class GameMap extends TiledMap implements AstarMap {
     getTileInfo(tile: Vec2, layerName?: string) {
         console.log(tile);
         let layer: TiledLayer | null = null;
+        let gid: number | null = 0;
         if (layerName) {
             layer = this.getLayer(layerName);
         } else {
             this.getLayers().forEach((tiledLayer) => {
-                if (tiledLayer.getTileGIDAt(tile.x, tile.y) != 0) {
+                gid = tiledLayer.getTileGIDAt(tile.x, tile.y);
+                if (gid && gid != 0) {
                     layer = tiledLayer;
                 }
             });
         }
 
         if (layer) {
-            let spriteName = this.gidToSpriteFrameMap[layer.getTileGIDAt(tile.x, tile.y)!];
+            let spriteName = this.gidToSpriteFrameMap[gid];
             return {
                 layerName: layer.getLayerName(),
                 spriteName: spriteName,
@@ -103,7 +107,8 @@ export class GameMap extends TiledMap implements AstarMap {
         return { layerName: null, spriteFrame: null };
     }
 
-    setTileGIDAt(layerName: string, tile: Vec2, gid: number) {
+    setTileGIDAt(layerName: string, tile: Vec2, gid: number | null) {
+        if (gid == null) return;
         let layer = this.getLayer(layerName);
         if (layer) {
             if (layer.getTileGIDAt(tile.x, tile.y) != gid) {
@@ -146,6 +151,10 @@ export class GameMap extends TiledMap implements AstarMap {
         });
 
         return layersProperties;
+    }
+
+    getGidByName(name: string) {
+        return this.spriteFrameToGidMap[name] || null;
     }
 
     private updateAnimationTiles(layerName: string, tile: Vec2, gid: number) {
