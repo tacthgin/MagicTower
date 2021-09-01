@@ -76,9 +76,12 @@ export class HeroData extends BaseData {
         this.emit(HeroEvent.HERO_ATTR, attr);
     }
 
-    setPosition(tile: Vec2) {
+    setPosition(tile: Vec2, heroDireciton: number | null = null) {
         this.position = tile;
         this.data.pos = [tile.x, tile.y];
+        if (heroDireciton != null) {
+            this.data.direction = heroDireciton;
+        }
         this.save();
     }
 

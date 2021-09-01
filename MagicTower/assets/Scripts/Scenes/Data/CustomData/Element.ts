@@ -25,6 +25,8 @@ export class Element extends BaseLoadData {
 
 export enum DoorType {
     YELLOW = 1001,
+    BLUE,
+    RED,
     WALL = 1006,
 }
 
@@ -74,8 +76,12 @@ export class Door extends Element {
         return !Door.cantOpenConditionArray.includes(this._doorState) && this._id == DoorType.WALL;
     }
 
-    isYellow() {
-        return this._id == DoorType.YELLOW;
+    isKeyDoor() {
+        return this._doorState == DoorState.NONE;
+    }
+
+    static isYellow(id: number) {
+        return id == DoorType.YELLOW;
     }
 }
 

@@ -132,7 +132,6 @@ export class Hero extends Component {
             Vec2.subtract(result, info, this.heroTile);
             this.heroDirection = this.getDirection(result);
         }
-        this._heroData.set("direction", this.heroDirection);
         this.setDirectionTexture();
     }
 
@@ -163,31 +162,35 @@ export class Hero extends Component {
 
     autoMove(endTile: Vec2) {
         this.map.astarMoveType = AstarMoveType.HERO;
-        console.log(this.heroTile);
+        console.log(this.heroTile, endTile);
         let path = this.astar.getPath(this.map, this.heroTile, endTile);
         if (path) {
             let canEndMove = this.collisionSystem.canEndTileMove(endTile);
             if (!canEndMove) {
                 path.pop();
             }
-            let moveComplete = (tile: Vec2) => {
-                this.animation.stop();
+            let moveComplete = () => {
                 if (!canEndMove) {
                     this.toward(endTile);
+                } else {
+                    this.toward(this.heroDirection);
                 }
-                this._heroData.setPosition(tile);
+                let tile = canEndMove ? endTile : path![path!.length - 1];
+                if (tile) {
+                    this._heroData.setPosition(tile, this.heroDirection);
+                }
                 this.isHeroMoving = !this.collisionSystem.collision(endTile);
+                this.stand();
             };
             this.isHeroMoving = true;
             if (path.length == 0) {
-                moveComplete(endTile);
+                moveComplete();
             } else {
                 this.movePath(path, (tile: Vec2, end: boolean) => {
                     if (end) {
-                        moveComplete(tile);
+                        moveComplete();
                     } else if (!this.collisionSystem.collision(tile)) {
                         //碰到区块处理事件停止;
-                        Tween.stopAllByTarget(this.node);
                         this.stand();
                         return true;
                     }
@@ -231,6 +234,7 @@ export class Hero extends Component {
     }
 
     stand() {
+        Tween.stopAllByTarget(this.node);
         this.heroFSM.changeState(HeroState.IDLE);
     }
 
@@ -241,7 +245,7 @@ export class Hero extends Component {
         this.heroTile = this._heroData.getPosition();
         let position = this.map.getPositionAt(this.heroTile) || Vec2.ZERO;
         this.node.position = v3(position.x, position.y);
-        this.toward(2);
+        this.toward(this._heroData.get("direction"));
     }
 
     showAttack(active: boolean) {

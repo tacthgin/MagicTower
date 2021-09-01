@@ -5,6 +5,7 @@ import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { Util } from "../../../../Framework/Util/Util";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroAttr, HeroData, HeroEvent, PropType } from "../../../Data/CustomData/HeroData";
+import { MapData } from "../../../Data/CustomData/MapData";
 import { MonsterIcon } from "./MonsterIcon";
 import { PropButton } from "./PropButton";
 
@@ -44,13 +45,13 @@ export class GameUI extends Component {
 
     onLoad() {
         this.heroData = GameManager.DATA.getData(HeroData)!;
-        this.heroData.on(HeroEvent.HERO_ATTR, this.heroAttrChanged, this);
-        this.heroData.on(HeroEvent.REFRESH_PROP, this.refreshProp, this);
-        this.heroData.on(HeroEvent.REFRESH_EQUIP, this.refreshEquip, this);
-        NotifyCenter.on(GameEvent.REFRESH_LEVEL, this.refreshLevel, this);
-        NotifyCenter.on(GameEvent.REFRESH_ARCHIVE, this.refreshArchive, this);
-        NotifyCenter.on(GameEvent.MONSTER_FIGHT, this.monsterFight, this);
-        NotifyCenter.on(GameEvent.MOVE_PATH, this.movePath, this);
+        this.heroData.on(HeroEvent.HERO_ATTR, this.onHeroAttrChanged, this);
+        this.heroData.on(HeroEvent.REFRESH_PROP, this.onRefreshProp, this);
+        this.heroData.on(HeroEvent.REFRESH_EQUIP, this.onRefreshEquip, this);
+        NotifyCenter.on(GameEvent.REFRESH_LEVEL, this.onRefreshLevel, this);
+        NotifyCenter.on(GameEvent.REFRESH_ARCHIVE, this.onRefreshArchive, this);
+        NotifyCenter.on(GameEvent.MONSTER_FIGHT, this.onMonsterFight, this);
+        NotifyCenter.on(GameEvent.MOVE_PATH, this.onMovePath, this);
 
         for (let i = 0; i < this.keySpriteFrames.length; i++) {
             this.keys[i] = [];
@@ -60,17 +61,25 @@ export class GameUI extends Component {
         this.monsterSprite.position = new Vec3(0, 0, 0);
         this.monsterSprite.parent = this.monsterNode;
         this.monsterSprite.active = false;
+
+        this.loadArchive();
     }
 
     onDestroy() {
         this.heroData.targetOff(this);
     }
 
-    heroAttrChanged(attr: HeroAttr) {
+    loadArchive() {
+        this.onRefreshArchive();
+        let mapData = GameManager.DATA.getData(MapData);
+        this.onRefreshLevel(mapData?.level);
+    }
+
+    onHeroAttrChanged(attr: HeroAttr) {
         this.heroAttrLabels[attr].string = this.heroData.getAttr(attr).toString();
     }
 
-    refreshProp(id: number, count: number = 1) {
+    onRefreshProp(id: number | string, count: number = 1) {
         let propInfo = GameManager.DATA.getJsonElement("prop", id);
         switch (propInfo.type) {
             case PropType.SWARD:
@@ -125,7 +134,7 @@ export class GameUI extends Component {
         }
     }
 
-    refreshLevel(level: number) {
+    onRefreshLevel(level: number) {
         if (level == 0) {
             this.levelLabel.string = "魔塔地下室";
         } else {
@@ -133,38 +142,42 @@ export class GameUI extends Component {
         }
     }
 
-    refreshArchive() {
+    onRefreshArchive() {
         this.refreshHeroAttr();
         let props = this.heroData.getProps();
         for (let id in props) {
-            this.refreshProp(parseInt(id), props[id]);
+            this.onRefreshProp(parseInt(id), props[id]);
         }
-        this.refreshEquip(PropType.SWARD);
-        this.refreshEquip(PropType.SHIELD);
+        this.onRefreshEquip(PropType.SWARD);
+        this.onRefreshEquip(PropType.SHIELD);
     }
 
     refreshHeroAttr() {
         for (let key in HeroAttr) {
-            this.heroAttrChanged(HeroAttr[key] as any as HeroAttr);
+            if (!isNaN(parseInt(key))) {
+                this.onHeroAttrChanged(parseInt(key) as any);
+            } else {
+                break;
+            }
         }
     }
 
-    refreshEquip(propType: PropType) {
+    onRefreshEquip(propType: PropType) {
         let id = this.heroData.getEquips(propType);
         let index = propType == PropType.SWARD ? 0 : 1;
         if (id == 0) {
             this.equipLabels[index].string = "无";
             this.equipSprites[index].spriteFrame = null;
         } else {
-            this.refreshProp(id);
+            this.onRefreshProp(id);
         }
     }
 
-    movePath() {
+    onMovePath() {
         this.refreshMonsterInfo();
     }
 
-    monsterFight(monsterInfo: any) {
+    onMonsterFight(monsterInfo: any) {
         this.refreshHeroAttr();
         this.refreshMonsterInfo(monsterInfo);
     }

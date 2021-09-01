@@ -77,7 +77,10 @@ export class LevelManager extends Component {
 
             let levelData = this.mapData.getLevelData(level);
             if (!levelData) {
-                levelData = this.mapData.createLevelData(level, gameMap.getLayersProperties());
+                levelData = this.mapData.createLevelData(level, gameMap.getLayersProperties(), {
+                    tiles: gameMap.getLayersTiles("door"),
+                    parseGid: gameMap.getNameByGid.bind(gameMap),
+                });
             }
             gameMap.loadLevelData(levelData);
         }

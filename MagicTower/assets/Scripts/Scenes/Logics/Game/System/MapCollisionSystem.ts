@@ -52,6 +52,7 @@ export class MapCollisionSystem {
         switch (layerName) {
             case "prop":
             case "monster":
+            case "door":
                 return GameManager.DATA.getJsonParser(layerName)?.getJsonElementByKey("spriteId", name);
             default:
                 return null;
@@ -75,6 +76,7 @@ export class MapCollisionSystem {
                     GameManager.AUDIO.playEffect("eat");
                     this.hero.heroData.addProp(jsonData.id, mapData?.level);
                     this.gameMap.setTileGIDAt(layerName, tile, 0);
+                    levelData.setDisappear(layerName, this.gameMap.getTileIndex(tile));
                 }
                 return true;
             case "door":
@@ -118,34 +120,35 @@ export class MapCollisionSystem {
             if (eventInfo.doorState == DoorState.APPEAR_EVENT) {
                 this.createDoorAnimation(doorData.id, tile, true, () => {
                     this.gameMap.setTileGIDAt(layerName, tile, this.gameMap.getGidByName(doorData.spriteId));
-                    let condition: number[] = eventInfo.condition;
-                    let index = condition.indexOf(tileIndex);
-                    if (index != -1) {
-                        condition.splice(index, 1);
-                    }
-                    if (condition.length == 0) {
-                        this.eventCollision(eventInfo.value);
-                    }
                 });
+
+                let condition: number[] = eventInfo.condition;
+                let index = condition.indexOf(tileIndex);
+                if (index != -1) {
+                    condition.splice(index, 1);
+                }
+                if (condition.length == 0) {
+                    this.eventCollision(eventInfo.value);
+                }
             } else if (eventInfo.doorState == DoorState.DISAPPEAR_EVENT) {
-                this.createDoorAnimation(doorData.id, tile, false, () => {
-                    let existCondition = eventInfo.condition[0];
-                    if (existCondition) {
-                        let index = existCondition.indexOf(tileIndex);
+                this.createDoorAnimation(doorData.id, tile, false);
+                this.gameMap.setTileGIDAt(layerName, tile, 0);
+                let existCondition = eventInfo.condition[0];
+                if (existCondition) {
+                    let index = existCondition.indexOf(tileIndex);
+                    if (index != -1) {
+                        eventInfo.condition[0] = null;
+                    } else {
+                        let disappearCondition: number[] = eventInfo.condition[1];
+                        index = disappearCondition.indexOf(tileIndex);
                         if (index != -1) {
-                            eventInfo.condition[0] = null;
-                        } else {
-                            let disappearCondition: number[] = eventInfo.condition[1];
-                            index = disappearCondition.indexOf(tileIndex);
-                            if (index != -1) {
-                                disappearCondition.splice(index, 1);
-                            }
-                            if (disappearCondition.length == 0) {
-                                this.eventCollision(eventInfo.value);
-                            }
+                            disappearCondition.splice(index, 1);
+                        }
+                        if (disappearCondition.length == 0) {
+                            this.eventCollision(eventInfo.value);
                         }
                     }
-                });
+                }
             }
         } else {
             let doorInfo: Door = levelData.getLayerElement(layerName, tileIndex);

@@ -1,8 +1,8 @@
-import { Vec2 } from "cc";
+import { game, Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
-import { Door, DoorState, Element, Stair, StairType } from "./Element";
+import { Door, DoorState, DoorType, Element, Stair, StairType } from "./Element";
 
 export enum MapEvent {
     ADD_ELEMENT,
@@ -46,18 +46,19 @@ export class MapData extends BaseData {
         return this.data.maps[level] || null;
     }
 
-    createLevelData(level: number, properties: any) {
+    /**
+     * 创建层数据
+     * @param level 层等级
+     * @param properties 层地图属性
+     * @param data 额外数据
+     * @returns 层数据
+     */
+    createLevelData(level: number, properties: any, data: any = null) {
         let levelData = new LevelData();
         levelData.level = level;
-        levelData.loadProperties(properties);
+        levelData.loadProperties(properties, data);
         this.data.maps[level] = levelData;
         return levelData;
-    }
-
-    getElement(layerName: string, tile: Vec2) {
-        let levelData = this.data.maps[this.data.currentLevel];
-        if (levelData) {
-        }
     }
 
     load(info: any = null) {
@@ -96,7 +97,7 @@ export class LevelData extends BaseLoadData {
         return this._disappearTile;
     }
 
-    private saveMapData() {
+    saveMapData() {
         GameManager.DATA.getData(MapData)?.save();
     }
 
@@ -152,6 +153,26 @@ export class LevelData extends BaseLoadData {
     private parseDoor(propertiesInfo: any, data: any = null) {
         let doorInfos: any = {};
         let propertiesValue: string = null!;
+        let condition: number[] = [];
+        if (data) {
+            let tiles: number[] = data.tiles;
+            let parseGid = data.parseGid;
+            for (let i = 0; i < tiles.length; i++) {
+                if (tiles[i] != 0) {
+                    condition.push(i);
+                    let name = parseGid(tiles[i]);
+                    if (name) {
+                        name = name.split("_")[0];
+                        let doorJson = GameManager.DATA.getJsonParser("door")?.getJsonElementByKey("spriteId", name);
+                        if (doorJson && doorJson.id <= DoorType.RED) {
+                            let door = new Door();
+                            door.id = doorJson.id;
+                            doorInfos[i] = door;
+                        }
+                    }
+                }
+            }
+        }
         for (let key in propertiesInfo) {
             propertiesValue = propertiesInfo[key];
             switch (key) {
@@ -170,9 +191,7 @@ export class LevelData extends BaseLoadData {
                         door.doorState = DoorState.APPEAR_EVENT;
                         //事件id
                         door.value = parseInt(propertiesValue);
-                        if (data) {
-                            door.condition = data;
-                        }
+                        door.condition = condition;
                         doorInfos["event"] = door;
                     }
                     break;
@@ -220,6 +239,7 @@ export class LevelData extends BaseLoadData {
             this._appearTile[layerName] = {};
         }
         this._appearTile[layerName][index] = gid;
+        this.saveMapData();
     }
 
     setDisappear(layerName: string, index: number) {
@@ -227,6 +247,7 @@ export class LevelData extends BaseLoadData {
             this._disappearTile[layerName] = [];
         }
         this._disappearTile[layerName].push(index);
+        this.saveMapData();
     }
 
     canHeroMove(tile: Vec2) {
