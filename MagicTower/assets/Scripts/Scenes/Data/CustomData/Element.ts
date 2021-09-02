@@ -1,4 +1,5 @@
 import { BaseLoadData } from "../../../Framework/Base/BaseData";
+import { GameManager } from "../../../Framework/Managers/GameManager";
 
 export class Element extends BaseLoadData {
     protected _gid: number = 0;
@@ -45,8 +46,6 @@ export class Door extends Element {
     private _value: any = null;
     private _condition: any = null;
 
-    static cantOpenConditionArray: Readonly<DoorState[]> = [DoorState.PASSIVE, DoorState.APPEAR, DoorState.CONDITION];
-
     set doorState(value: DoorState) {
         this._doorState = value;
     }
@@ -73,11 +72,11 @@ export class Door extends Element {
     }
 
     canWallOpen() {
-        return !Door.cantOpenConditionArray.includes(this._doorState) && this._id == DoorType.WALL;
+        return this._doorState == DoorState.NONE && this._id == DoorType.WALL;
     }
 
     isKeyDoor() {
-        return this._doorState == DoorState.NONE;
+        return this._id <= DoorType.RED;
     }
 
     static isYellow(id: number) {
@@ -120,6 +119,41 @@ export class Stair extends Element {
     /** 隐藏的楼梯 */
     get hide() {
         return this._hide;
+    }
+}
+
+export class Monster extends Element {
+    private _monsterInfo: any = null;
+
+    set id(value: number) {
+        this._id = value;
+        this._monsterInfo = GameManager.DATA.getJsonElement("monster", this._id, true);
+    }
+
+    get monsterInfo() {
+        return this._monsterInfo;
+    }
+
+    get firstAttack(): boolean {
+        return this._monsterInfo.firstAttack;
+    }
+
+    get boss(): boolean {
+        return this._monsterInfo.boss;
+    }
+
+    hurt(damage: number) {
+        this._monsterInfo.hp -= damage;
+        if (this._monsterInfo.hp < 0) {
+            this._monsterInfo.hp = 0;
+        }
+        return this._monsterInfo.hp == 0;
+    }
+
+    weak(ratio: number) {
+        this._monsterInfo.attack *= ratio;
+        this._monsterInfo.defence *= ratio;
+        this._monsterInfo.hp *= ratio;
     }
 }
 

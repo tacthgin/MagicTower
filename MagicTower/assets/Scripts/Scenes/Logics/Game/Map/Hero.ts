@@ -254,7 +254,11 @@ export class Hero extends Component {
     }
 
     hurt(damage: number) {
-        this._heroData.setAttrDiff(HeroAttr.HP, Util.clamp(this._heroData.getAttr(HeroAttr.HP) - damage, 0, Number.MAX_VALUE));
+        let hp = this._heroData.getAttr(HeroAttr.HP) - damage;
+        if (hp < 0) {
+            hp = 0;
+        }
+        this._heroData.setAttrDiff(HeroAttr.HP, hp);
     }
 
     magicLight(monsterIndexs: number[]) {

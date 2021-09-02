@@ -245,10 +245,10 @@ export class GameMap extends TiledMap implements AstarMap {
         }
 
         for (let layerName in levelData.disappearTile) {
-            let disappearInfo = levelData.disappearTile[layerName];
-            for (let index in disappearInfo) {
-                this.setTileGIDAt(layerName, this.getTile(parseInt(index)), 0);
-            }
+            let disappearInfo: number[] = levelData.disappearTile[layerName];
+            disappearInfo.forEach((index) => {
+                this.setTileGIDAt(layerName, this.getTile(index), 0);
+            });
         }
         this.levelData = levelData;
     }

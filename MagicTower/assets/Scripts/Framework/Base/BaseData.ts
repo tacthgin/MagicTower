@@ -46,6 +46,7 @@ export abstract class BaseData extends CustomEventTarget {
 export abstract class BaseLoadData {
     load(data: any) {
         this.loadData(data);
+        return this;
     }
 
     /** 按key赋值 */

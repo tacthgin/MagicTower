@@ -1,4 +1,4 @@
-import { game, Vec2 } from "cc";
+import { Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
@@ -108,6 +108,24 @@ export class LevelData extends BaseLoadData {
 
     load(info: any) {
         this.loadData(info);
+        for (let layerName in this.layerInfo) {
+            let layerInfo = this.layerInfo[layerName];
+            switch (layerName) {
+                case "door":
+                    for (let key in layerInfo) {
+                        let door = new Door();
+                        layerInfo[key] = door.load(layerInfo[key]);
+                    }
+                    break;
+                case "stair":
+                    for (let i = 0; i < layerInfo.length; i++) {
+                        let stair = new Stair();
+                        layerInfo[i] = stair.load(layerInfo[i]);
+                    }
+                    break;
+            }
+        }
+        return this;
     }
 
     loadProperties(properties: any, data: any = null) {
@@ -158,17 +176,18 @@ export class LevelData extends BaseLoadData {
             let tiles: number[] = data.tiles;
             let parseGid = data.parseGid;
             for (let i = 0; i < tiles.length; i++) {
-                if (tiles[i] != 0) {
-                    condition.push(i);
-                    let name = parseGid(tiles[i]);
-                    if (name) {
-                        name = name.split("_")[0];
-                        let doorJson = GameManager.DATA.getJsonParser("door")?.getJsonElementByKey("spriteId", name);
-                        if (doorJson && doorJson.id <= DoorType.RED) {
-                            let door = new Door();
-                            door.id = doorJson.id;
-                            doorInfos[i] = door;
-                        }
+                if (tiles[i] == 0) {
+                    continue;
+                }
+                condition.push(i);
+                let name = parseGid(tiles[i]);
+                if (name) {
+                    name = name.split("_")[0];
+                    let doorJson = GameManager.DATA.getJsonParser("door")?.getJsonElementByKey("spriteId", name);
+                    if (doorJson && (doorJson.id <= DoorType.RED || doorJson.id == DoorType.WALL)) {
+                        let door = new Door();
+                        door.id = doorJson.id;
+                        doorInfos[i] = door;
                     }
                 }
             }
@@ -221,9 +240,11 @@ export class LevelData extends BaseLoadData {
                                 door.doorState = DoorState.PASSIVE;
                                 break;
                             case "appear":
-                                door.doorState = DoorState.APPEAR;
                             case "hide":
-                                door.doorState = DoorState.HIDE;
+                                door.doorState = key == "appear" ? DoorState.APPEAR : DoorState.HIDE;
+                                let index = parseInt(propertiesValue);
+                                door.gid = data.tiles[index];
+                                this.setDisappear("door", index);
                                 break;
                         }
                         doorInfos[propertiesValue] = door;
@@ -268,11 +289,11 @@ export class LevelData extends BaseLoadData {
         return layerInfo ? layerInfo[index] : null;
     }
 
-    deleteLayerElement(layerName: string, index: number | string) {
+    deleteLayerElement(layerName: string, index: number) {
         let layerInfo = this.getLayerInfo(layerName);
         if (layerInfo && layerInfo[index]) {
             delete layerInfo[index];
-            this.saveMapData();
+            this.setDisappear(layerName, index);
         }
     }
 }

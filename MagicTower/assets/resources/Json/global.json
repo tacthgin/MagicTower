@@ -12,7 +12,6 @@
         "attack": 10,
         "defence": 10
     },
-    "attackInterval": 0.1,
     "testLoad": {
         "currentLevel": 10,
         "maps": {},
