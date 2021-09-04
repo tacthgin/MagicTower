@@ -116,7 +116,8 @@ export class LevelManager extends Component {
             return;
         }
         if (!this.hero.heroMoving) {
-            let localPos = this.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(touchPos.x, touchPos.y));
+            console.log(touchPos);
+            let localPos = currentMap.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(touchPos.x, touchPos.y));
             let endTile = currentMap.toTile(v2(localPos?.x, localPos?.y));
             this.hero.autoMove(endTile);
         }

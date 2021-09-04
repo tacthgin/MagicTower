@@ -3,7 +3,7 @@ import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { Door, DoorState, DoorType, Monster, StairType } from "../../../Data/CustomData/Element";
-import { HeroData } from "../../../Data/CustomData/HeroData";
+import { HeroAttr, HeroData } from "../../../Data/CustomData/HeroData";
 import { LevelData, MapData } from "../../../Data/CustomData/MapData";
 import { GameMap } from "../Map/GameMap";
 import { Hero } from "../Map/Hero";
@@ -387,7 +387,7 @@ export class MapCollisionSystem {
         let { layerName } = this.gameMap.getTileInfo(tile);
         switch (layerName) {
             case "floor":
-                return this.hero.HeroData.Hp > this.getWizardMagicDamage(index);
+                return true; //this.heroData.getAttr(HeroAttr.HP) > this.getWizardMagicDamage(index);
             case "monster":
                 return true;
             // return CalculateSystem.canHeroAttack(this.hero.HeroData, element.monsterInfo, !element.firstAttack);
@@ -400,11 +400,7 @@ export class MapCollisionSystem {
 
     private heroMoveJudge(tile: Vec2, endTile: Vec2) {
         let { tileType, index } = this.getTileLayer(tile);
-        if (
-            (this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) ||
-            this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)
-        )
-            return false;
+        if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
         if (tile.equals(endTile)) {
             //假设终点都可以走，然后在门和npc这种类型停在寻路前一格
             return true;
