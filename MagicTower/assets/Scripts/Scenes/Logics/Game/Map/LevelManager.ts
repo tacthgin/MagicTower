@@ -50,8 +50,9 @@ export class LevelManager extends Component {
             return;
         }
         this.touchId = event.getID();
+        console.log(event.getLocation(), event.getUILocation());
         //处理多点触摸;
-        this.moveHero(event.getLocation());
+        this.moveHero(event.getUILocation());
     }
 
     private onTouchEnd(event: Touch) {
@@ -116,7 +117,6 @@ export class LevelManager extends Component {
             return;
         }
         if (!this.hero.heroMoving) {
-            console.log(touchPos);
             let localPos = currentMap.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(touchPos.x, touchPos.y));
             let endTile = currentMap.toTile(v2(localPos?.x, localPos?.y));
             this.hero.autoMove(endTile);
