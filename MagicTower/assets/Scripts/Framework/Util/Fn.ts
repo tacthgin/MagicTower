@@ -61,7 +61,7 @@ export module Fn {
             try {
                 throw new Error("");
             } catch (e) {
-                console.log(e.stack);
+                console.log((e as any).stack);
             }
         }
     }

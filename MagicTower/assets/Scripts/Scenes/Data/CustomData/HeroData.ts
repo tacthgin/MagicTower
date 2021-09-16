@@ -60,6 +60,13 @@ export class HeroData extends BaseData {
         this.setProxy();
     }
 
+    useTestLoad() {
+        let useTestload = GameManager.DATA.getJsonElement("global", "useTestLoad")
+        if (useTestload) {
+            
+        }
+    }
+
     getAttr(attr: HeroAttr) {
         return this.data.heroAttr[attr];
     }

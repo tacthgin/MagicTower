@@ -1,4 +1,4 @@
-import { instantiate, IPoolHandlerComponent, Node, NodePool, Prefab, _decorator } from "cc";
+import { instantiate, IPoolHandlerComponent, isValid, Node, NodePool, Prefab, _decorator } from "cc";
 import { BaseComponent } from "./BaseComponent";
 const { ccclass } = _decorator;
 
@@ -42,7 +42,7 @@ export class BasePoolNode extends BaseComponent {
     remove() {
         if (this.pool) {
             this.pool.put(this.node);
-        } else {
+        } else if (isValid(this.node)) {
             this.node.destroy();
         }
     }

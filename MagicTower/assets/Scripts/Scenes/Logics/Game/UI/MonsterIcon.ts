@@ -1,10 +1,12 @@
-import { _decorator, Component, Animation, SpriteFrame, Sprite } from "cc";
+import { Animation, Sprite, _decorator } from "cc";
+import { BasePoolNode } from "../../../../Framework/Base/BasePoolNode";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
-import { MapElement } from "../Elements/Base/MapElement";
+import { ElementManager } from "../ElementManager";
 const { ccclass } = _decorator;
 
 @ccclass("MonsterIcon")
-export class MonsterIcon extends MapElement {
+export class MonsterIcon extends BasePoolNode {
+    private animation: Animation | null = null;
     private monsterInfo: any = null;
 
     onLoad() {
@@ -13,15 +15,15 @@ export class MonsterIcon extends MapElement {
 
     init(id: number) {
         this.monsterInfo = GameManager.DATA.getJsonElement("monster", id, true);
-        this.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this.monsterInfo.spriteId}_0`);
-        this.createAnimation(this.monsterInfo.spriteId);
-        this.animation.play(this.monsterInfo.spriteId);
+        this.getComponent(Sprite)!.spriteFrame = ElementManager.getInstance().getElementSpriteFrame(`${this.monsterInfo.spriteId}_0`);
+        
+        this.animation?.play(this.monsterInfo.spriteId);
     }
 
     createAnimationClip() {
         let spriteFrames = [];
         for (let i = 0; i < 2; i++) {
-            spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${this.monsterInfo.spriteId}_${i}`));
+            spriteFrames.push(ElementManager.getInstance().getElementSpriteFrame(`${this.monsterInfo.spriteId}_${i}`));
         }
         return spriteFrames;
     }

@@ -1,5 +1,6 @@
 import { Animation, Sprite, _decorator } from "cc";
 import { BasePoolNode } from "../../../../Framework/Base/BasePoolNode";
+import { ElementManager } from "../ElementManager";
 const { ccclass, property } = _decorator;
 
 @ccclass("DoorAnimationNode")
@@ -13,8 +14,8 @@ export class DoorAnimationNode extends BasePoolNode {
 
     init(name: string, callback: Function | null) {
         this.callback = callback;
-        this.getComponent(Sprite)!.spriteFrame = null;
-        this.getComponent(Animation)?.play(name);
+        this.getComponent(Sprite)!.spriteFrame = ElementManager.getInstance().getElementSpriteFrame(name);
+        //this.getComponent(Animation)?.play(name);
     }
 
     onFinished() {

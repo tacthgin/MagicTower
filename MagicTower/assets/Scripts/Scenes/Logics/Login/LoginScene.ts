@@ -1,8 +1,9 @@
-import { Component, Label, _decorator } from "cc";
+import { Component, Label, SpriteFrame, _decorator } from "cc";
 import { BaseEvent } from "../../../Framework/Base/BaseContant";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
 import { JsonParserMap } from "../../Constant/JsonParserMap";
+import { ElementManager } from "../Game/ElementManager";
 
 const { ccclass, property } = _decorator;
 
@@ -23,7 +24,6 @@ export class LoginScene extends Component {
 
     onAllResourcesLoadSuccess() {
         GameManager.DATA.loadLocalStorage();
-
         this.gotoGameScene();
     }
 
@@ -31,8 +31,8 @@ export class LoginScene extends Component {
         this.progressLabel.string = `资源加载中，${(progress * 100).toFixed(2)}%...`;
     }
 
-    async gotoGameScene() {
-        await GameManager.RESOURCE.loadPrefabDir("Prefabs/Elements");
+    gotoGameScene() {
+        ElementManager.getInstance().loadAsset();
         GameManager.getInstance().loadScene("GameScene");
     }
 }

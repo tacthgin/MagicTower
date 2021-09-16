@@ -88,21 +88,6 @@ export class GameManager extends Component {
         this.registerEvents();
     }
 
-    /** 初始化物理相关 */
-    private initPhysics() {
-        // let physicsManager = cc.director.getPhysicsManager()
-        // physicsManager.enabled = true
-        // physicsManager.enabledAccumulator = true
-        // physicsManager.debugDrawFlags =
-        //     cc.PhysicsManager.DrawBits.e_aabbBit |
-        //     cc.PhysicsManager.DrawBits.e_pairBit |
-        //     cc.PhysicsManager.DrawBits.e_centerOfMassBit |
-        //     cc.PhysicsManager.DrawBits.e_jointBit |
-        //     cc.PhysicsManager.DrawBits.e_shapeBit
-        //cc.director.getCollisionManager().enabled = true;
-        //cc.director.getCollisionManager().enabledDebugDraw = true;
-    }
-
     private initGameSize() {
         let transform = this.getComponent(UITransform);
         if (transform) {

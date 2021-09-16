@@ -6,6 +6,7 @@ import { Util } from "../../../../Framework/Util/Util";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroAttr, HeroData, HeroEvent, PropType } from "../../../Data/CustomData/HeroData";
 import { MapData } from "../../../Data/CustomData/MapData";
+import { ElementManager } from "../ElementManager";
 import { MonsterIcon } from "./MonsterIcon";
 import { PropButton } from "./PropButton";
 
@@ -87,7 +88,7 @@ export class GameUI extends Component {
                 //装备
                 let index = propInfo.type - PropType.SWARD;
                 this.equipLabels[index].string = propInfo.name;
-                this.equipSprites[index].spriteFrame = GameManager.RESOURCE.getSpriteFrame(propInfo.spriteId);
+                this.equipSprites[index].spriteFrame = ElementManager.getInstance().getElementSpriteFrame(propInfo.spriteId);
                 break;
             case PropType.KEY:
                 //钥匙

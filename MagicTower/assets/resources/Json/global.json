@@ -13,9 +13,9 @@
         "defence": 10
     },
     "testLoad": {
-        "currentLevel": 10,
+        "currentLevel": 1,
         "maps": {},
-        "heroPos": [5, 9],
+        "heroPos": [7, 0],
         "gold": 10000000,
         "attack": 100,
         "defence": 30,

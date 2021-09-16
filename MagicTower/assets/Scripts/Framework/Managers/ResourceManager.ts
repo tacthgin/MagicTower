@@ -24,6 +24,8 @@ export class ResourceManager {
     };
     /** 预加载资源完成个数 */
     private resourceCompleteCount: number = 0;
+    /** 资源完成的类型 */
+    private resourceCompleteTypes: { [key: string]: boolean } = {};
     /** 预加载预设 */
     private preloadPrefabs: any = {};
     /** 远程图片集合 */
@@ -53,29 +55,31 @@ export class ResourceManager {
 
     private createResourcePromise(type: string) {
         return new Promise((resolve, reject) => {
-            if (resources.get(type)) {
+            if (this.resourceCompleteTypes[type]) {
                 resolve(type);
-            } else {
-                let now = Date.now();
-                resources.loadDir(
-                    type,
-                    this.resourceAssetConfig[type],
-                    (finished: number, total: number) => {
-                        this.onProgress(type, finished / total);
-                    },
-                    (err, assets) => {
-                        if (err) {
-                            console.error(err);
-                            reject(type);
-                            return;
-                        }
-                        console.log(`加载${type}资源: ${Date.now() - now}ms`);
-                        this.setAssets(type, assets);
-                        resolve(type);
-                        NotifyCenter.emit(BaseEvent.RESOURCE_COMPLETE, type);
-                    }
-                );
+                return;
             }
+
+            let now = Date.now();
+            resources.loadDir(
+                type,
+                this.resourceAssetConfig[type],
+                (finished: number, total: number) => {
+                    this.onProgress(type, finished / total);
+                },
+                (err, assets) => {
+                    if (err) {
+                        console.error(err);
+                        reject(type);
+                        return;
+                    }
+                    console.log(`加载${type}资源: ${Date.now() - now}ms`);
+                    this.setAssets(type, assets);
+                    this.resourceCompleteTypes[type] = true;
+                    resolve(type);
+                    NotifyCenter.emit(BaseEvent.RESOURCE_COMPLETE, type);
+                }
+            );
         });
     }
 
@@ -107,15 +111,6 @@ export class ResourceManager {
         //console.log(this.resourceCompleteCount, progress);
         progress = this.resourceCompleteCount / this.resourcePromises.length + (1 / this.resourcePromises.length) * progress;
         NotifyCenter.emit(BaseEvent.RESOURCE_PROGRESS, type, progress);
-    }
-
-    releaseResDir(type: ResourceType) {
-        let assets = this.assets[type];
-        if (assets) {
-            assets.forEach((asset: Asset) => {
-                assetManager.releaseAsset(asset);
-            });
-        }
     }
 
     getAssets(type: ResourceType): any {
@@ -231,5 +226,14 @@ export class ResourceManager {
         }
 
         return this.remoteImages[url];
+    }
+
+    releaseResDir(type: ResourceType) {
+        let assets = this.assets[type];
+        if (assets) {
+            assets.forEach((asset: Asset) => {
+                assetManager.releaseAsset(asset);
+            });
+        }
     }
 }
