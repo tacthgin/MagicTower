@@ -2,6 +2,7 @@ import { Component, director, game, Node, UITransform, Vec3, view, _decorator } 
 import { BaseEvent } from "../Base/BaseContant";
 import { AudioController } from "./AudioController";
 import { DataManager } from "./DataManager";
+import { NetManager } from "./NetManager";
 import { NodePoolManager } from "./NodePoolManager";
 import { NotifyCenter } from "./NotifyCenter";
 import { ResourceManager, ResourceType } from "./ResourceManager";
@@ -22,7 +23,7 @@ export class GameManager extends Component {
     private dataManager: DataManager = null!;
     private resourceManager: ResourceManager = null!;
     private nodePoolManager: NodePoolManager = null!;
-    private netManager: NodePoolManager = null!;
+    private netManager: NetManager = null!;
     private static instance: GameManager = null!;
 
     /** GameManager 实例 */
@@ -85,6 +86,7 @@ export class GameManager extends Component {
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager().init();
         this.nodePoolManager = new NodePoolManager();
+        //this.netManager = new NetManager();
         this.registerEvents();
     }
 
