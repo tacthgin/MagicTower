@@ -1,4 +1,4 @@
-import { _decorator, Component, AudioSource, AudioClip, resources, path, Event } from "cc";
+import { _decorator, Component, AudioSource, AudioClip, resources, path } from "cc";
 const { ccclass, type } = _decorator;
 
 const AUDIO_PATH = "Audio";
@@ -16,19 +16,27 @@ export class AudioController extends Component {
     private audioEnabled: boolean[] = [true, true];
 
     public set musicEnabled(value: boolean) {
-        this.audioEnabled[0] = value;
+        this.audioEnabled[AudioType.MUSIC] = value;
+        if (value) {
+            this.audioSource[AudioType.MUSIC].play();
+        } else {
+            this.stopMusic();
+        }
     }
 
     public get musicEnabled() {
-        return this.audioEnabled[0];
+        return this.audioEnabled[AudioType.MUSIC];
     }
 
     public set effectEnabled(value: boolean) {
-        this.audioEnabled[1] = value;
+        this.audioEnabled[AudioType.EFFECT] = value;
+        if (!value) {
+            this.stopEffect();
+        }
     }
 
     public get effectEnabled() {
-        return this.audioEnabled[1];
+        return this.audioEnabled[AudioType.EFFECT];
     }
 
     private getAudioClip(audioPath: string) {
@@ -63,10 +71,6 @@ export class AudioController extends Component {
         if (!this.audioEnabled[type]) return;
         this.getAudioClip(audioPath).then((audioClip: any) => {
             let audioSource = this.audioSource[type];
-            if (type == AudioType.MUSIC && audioSource.clip != audioClip) {
-                console.warn("音效资源相同", audioPath);
-                return;
-            }
             audioSource.clip = audioClip;
             audioSource.loop = loop;
             audioSource.volume = volume;
@@ -78,18 +82,18 @@ export class AudioController extends Component {
         this.audioSource[type].stop();
     }
 
-    stopMusic() {
-        this.audioSource[AudioType.MUSIC].stop();
+    private stopMusic() {
+        this.stop(AudioType.MUSIC);
     }
 
-    stopEffect() {
-        this.audioSource[AudioType.EFFECT].stop();
+    private stopEffect() {
+        //音效只能停止当前的，感觉要做停止所有音效，必须建造多个audiosource
+        this.stop(AudioType.EFFECT);
     }
 
     stopAll() {
-        this.audioSource.forEach((audioSource) => {
-            audioSource.stop();
-        });
+        this.stopEffect();
+        this.stopMusic();
     }
 
     playMusic(audioPath: string, loop: boolean = true, volume: number = 1) {
@@ -100,11 +104,11 @@ export class AudioController extends Component {
         this.play(AudioType.EFFECT, audioPath, loop, volume);
     }
 
-    /** 对音乐特效进行一次播放 */
-    playOneShot(audioPath: string, volume: number = 1) {
+    /** 对音效进行一次播放 */
+    playOneShot(audioPath: string, volumeScale: number = 1) {
         if (!this.effectEnabled) return;
         this.getAudioClip(audioPath).then((audioClip: any) => {
-            this.audioSource[AudioType.EFFECT].playOneShot(audioClip, volume);
+            this.audioSource[AudioType.EFFECT].playOneShot(audioClip, volumeScale);
         });
     }
 }
