@@ -1,13 +1,12 @@
-import { _decorator, Animation, SpriteFrame, Sprite, AnimationClip } from "cc";
+import { _decorator, Animation, SpriteFrame, Sprite, AnimationClip, Component } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
-import { MapElement } from "./Base/MapElement";
 
 const { ccclass, property } = _decorator;
 
 @ccclass("Door")
-export class Door extends MapElement {
+export class Door extends Component {
     private doorInfo: any = null;
     /** 被动的墙 */
     private _passive: boolean = false;

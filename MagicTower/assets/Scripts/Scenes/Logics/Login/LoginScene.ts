@@ -20,6 +20,7 @@ export class LoginScene extends Component {
     start() {
         GameManager.DATA.setParserMap(JsonParserMap);
         GameManager.RESOURCE.loadResources();
+        GameManager.NET.a();
     }
 
     onAllResourcesLoadSuccess() {
@@ -33,6 +34,6 @@ export class LoginScene extends Component {
 
     gotoGameScene() {
         ElementManager.getInstance().loadAsset();
-        GameManager.getInstance().loadScene("GameScene");
+        //GameManager.getInstance().loadScene("GameScene");
     }
 }

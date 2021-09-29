@@ -1,8 +1,8 @@
 import { _decorator, Component, Label, NodePool } from "cc";
 import { BasePoolNode } from "../../Framework/Base/BasePoolNode";
 import { GameManager } from "../../Framework/Managers/GameManager";
+import { Monster } from "../Data/CustomData/Element";
 import { HeroData } from "../Data/CustomData/HeroData";
-import Monster from "../Logics/Game/Elements/Monster";
 
 const { ccclass, property } = _decorator;
 

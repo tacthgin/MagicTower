@@ -1,11 +1,10 @@
-import { Animation, Sprite, _decorator } from "cc";
+import { Animation, Component, Sprite, _decorator } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
-import { Actor } from "./Base/Actor";
 
 const { ccclass } = _decorator;
 
 @ccclass("Npc")
-export class Npc extends Actor {
+export class Npc extends Component {
     private _npcInfo: any = null;
     private stepIndex: number = 0;
     private moveIndex: number = 0;

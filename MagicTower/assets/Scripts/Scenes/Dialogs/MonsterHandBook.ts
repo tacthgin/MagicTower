@@ -1,6 +1,6 @@
 import { Node, _decorator } from "cc";
 import { BaseDialog } from "../../Framework/Base/BaseDialog";
-import Monster from "../Logics/Game/Elements/Monster";
+import { Monster } from "../Data/CustomData/Element";
 const { ccclass, property } = _decorator;
 
 @ccclass("MonsterHandBook")

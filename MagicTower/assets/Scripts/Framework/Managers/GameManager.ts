@@ -86,7 +86,7 @@ export class GameManager extends Component {
         this.dataManager = new DataManager();
         this.resourceManager = new ResourceManager().init();
         this.nodePoolManager = new NodePoolManager();
-        //this.netManager = new NetManager();
+        this.netManager = new NetManager();
         this.registerEvents();
     }
 
