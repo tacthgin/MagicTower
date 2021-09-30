@@ -127,7 +127,7 @@ export class LevelManager extends Component {
         path.forEach((element) => {
             console.log(element.x, element.y);
         });
-        console.log("********************");
+        console.log("************************");
     }
 
     /** 碰撞结束 */

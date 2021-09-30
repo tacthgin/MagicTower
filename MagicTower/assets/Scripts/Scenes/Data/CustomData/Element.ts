@@ -4,6 +4,7 @@ import { GameManager } from "../../../Framework/Managers/GameManager";
 export class Element extends BaseLoadData {
     protected _gid: number = 0;
     protected _id: number = 0;
+    protected _index: number = 0;
 
     set gid(value: number) {
         this._gid = value;
@@ -21,6 +22,15 @@ export class Element extends BaseLoadData {
     /** 唯一id */
     get id() {
         return this._id;
+    }
+
+    set index(value: number) {
+        this._index = value;
+    }
+
+    /** tile index */
+    get index() {
+        return this._index;
     }
 }
 

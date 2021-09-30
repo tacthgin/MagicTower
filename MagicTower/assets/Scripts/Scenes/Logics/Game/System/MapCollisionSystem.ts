@@ -3,7 +3,7 @@ import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { Door, DoorState, DoorType, Monster, StairType } from "../../../Data/CustomData/Element";
-import { HeroAttr, HeroData } from "../../../Data/CustomData/HeroData";
+import { HeroAttr, HeroData, PropType } from "../../../Data/CustomData/HeroData";
 import { LevelData, MapData } from "../../../Data/CustomData/MapData";
 import { GameMap } from "../Map/GameMap";
 import { Hero } from "../Map/Hero";
@@ -32,10 +32,46 @@ export class MapCollisionSystem {
     private canEndMoveTiles: Readonly<string[]> = ["prop", "stair", "event"];
     private monsterFightSystem: MonsterFightSystem = new MonsterFightSystem();
 
+    constructor() {
+        NotifyCenter.on(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
+    }
+
     init(gameMap: GameMap, hero: Hero) {
         this.gameMap = gameMap;
         this.hero = hero;
         this.heroData = hero.heroData;
+    }
+
+    private onMonsterDie(monster: Monster, magic: boolean) {
+        //幸运金币
+        let ratio = this.heroData.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
+        this.heroData.setAttrDiff(HeroAttr.GOLD, monster.monsterInfo.gold * ratio)
+        this.gameMap.setTileGIDAt("monster", this.gameMap.getTile(monster.index), 0);
+        //this.removeMonsterDoor();
+        //this.monsterEventTrigger(index);
+        //this.removeMagicHurt(index, monster);
+        // if (monster.monsterInfo.big) {
+        //     this.monsterInfo.bigMonster = null;
+        // }
+        // if (this.doorInfo.monsterCondition) {
+        //     let doorIndex = this.doorInfo.monsterCondition[index];
+        //     if (doorIndex) {
+        //         let door = this.getElement(doorIndex, "door");
+        //         if (door) {
+        //             door.condition = null;
+        //         }
+        //     }
+        //     delete this.doorInfo.monsterCondition[index];
+        // }
+        // if (monster.monsterInfo.eventId) {
+        //     this.eventCollision(monster.monsterInfo.eventId);
+        // } else if (this.gameEventSystem && !this.gameEventSystem.executeComplete()) {
+        //     this.gameEventSystem.execute();
+        // } else if (magic) {
+        //     this.floorCollision(index);
+        // } else {
+        //     this.elementActionComplete();
+        // }
     }
 
     private async createDoorAnimation(id: number | string, tile: Vec2, reverse: boolean, callback: Function | null = null) {
@@ -98,6 +134,7 @@ export class MapCollisionSystem {
                     }
                     let monster = new Monster();
                     monster.id = parseInt(jsonData.id);
+                    monster.index = this.gameMap.getTileIndex(tile);
                     this.monsterFightSystem.setFightInfo(this.gameMap, this.hero, monster);
                     this.monsterFightSystem.execute(/*this.haveMagicHurt(index)*/ false);
                 }
@@ -437,38 +474,6 @@ export class MapCollisionSystem {
         //let layer = this.layers[layerName];
         //if (layer) {
         //layer[dstIndex] = control;
-        //}
-    }
-
-    private monsterDie(monster: Monster, index: number, magic: boolean) {
-        //幸运金币
-        //let ratio = this.hero.HeroData.getPropNum(27) ? 2 : 1;
-        //this.hero.HeroData.Gold += monster.monsterInfo.gold * ratio;
-        //this.removeElement(index, "monster");
-        //this.removeMonsterDoor();
-        //this.monsterEventTrigger(index);
-        //this.removeMagicHurt(index, monster);
-        //if (monster.monsterInfo.big) {
-        //this.monsterInfo.bigMonster = null;
-        //}
-        //if (this.doorInfo.monsterCondition) {
-        //let doorIndex = this.doorInfo.monsterCondition[index];
-        //if (doorIndex) {
-        //let door = this.getElement(doorIndex, "door");
-        //if (door) {
-        //door.condition = null;
-        //}
-        //}
-        //delete this.doorInfo.monsterCondition[index];
-        //}
-        //if (monster.monsterInfo.eventId) {
-        //this.eventCollision(monster.monsterInfo.eventId);
-        //} else if (this.gameEventSystem && !this.gameEventSystem.executeComplete()) {
-        //this.gameEventSystem.execute();
-        //} else if (magic) {
-        //this.floorCollision(index);
-        //} else {
-        //this.elementActionComplete();
         //}
     }
 

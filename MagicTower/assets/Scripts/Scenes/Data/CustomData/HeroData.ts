@@ -18,10 +18,12 @@ export enum PropType {
     DEFENCE_GEM,
     SWARD = 5,
     SHIELD,
+    /** 羽毛 */
     FEATHER = 9,
     /** 神圣盾 */
     DIVINE_SHIELD = 17,
     RECORD_BOOK = 19,
+    LUCKY_GOLD = 27,
 }
 
 export enum HeroEvent {
@@ -61,9 +63,8 @@ export class HeroData extends BaseData {
     }
 
     useTestLoad() {
-        let useTestload = GameManager.DATA.getJsonElement("global", "useTestLoad")
+        let useTestload = GameManager.DATA.getJsonElement("global", "useTestLoad");
         if (useTestload) {
-            
         }
     }
 

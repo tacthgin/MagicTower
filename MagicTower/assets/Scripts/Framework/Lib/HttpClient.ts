@@ -1,5 +1,4 @@
 import { assert } from "cc";
-import { Fn } from "../Util/Fn";
 
 enum HttpMethodType {
     GET = "GET",
@@ -8,7 +7,7 @@ enum HttpMethodType {
 
 export class HttpClient {
     /** 超时时间设置 */
-    private readonly timeOut: number = 10000;
+    private readonly timeOut: number = 5000;
     /** 重新尝试次数 */
     private readonly retryCount: number = 2;
     /** url加密 */

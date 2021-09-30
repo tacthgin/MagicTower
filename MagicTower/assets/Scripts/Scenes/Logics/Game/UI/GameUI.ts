@@ -2,6 +2,7 @@ import { Component, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, Vec3,
 import { BasePoolNode } from "../../../../Framework/Base/BasePoolNode";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { Fn } from "../../../../Framework/Util/Fn";
 import { Util } from "../../../../Framework/Util/Util";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroAttr, HeroData, HeroEvent, PropType } from "../../../Data/CustomData/HeroData";
@@ -184,8 +185,10 @@ export class GameUI extends Component {
     }
 
     refreshMonsterInfo(monsterInfo: any = null) {
+        console.log(monsterInfo);
+        Fn.printCallStack();
         this.monsterLabels[0].string = monsterInfo ? monsterInfo.name : "怪物名字";
-        this.monsterLabels[1].string = monsterInfo ? monsterInfo.hp : "生命";
+        this.monsterLabels[1].string = monsterInfo ? monsterInfo.hp.toString() : "生命";
         this.monsterLabels[2].string = monsterInfo ? monsterInfo.attack : "攻击";
         this.monsterLabels[3].string = monsterInfo ? monsterInfo.defence : "防御";
         this.monsterSprite.active = monsterInfo != null;

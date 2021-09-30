@@ -32,7 +32,7 @@ export class MonsterFightSystem {
         let count = CalculateSystem.getHeroAttackCount(heroData, monsterInfo);
         let damageInfo = CalculateSystem.perAttackDamage(heroData, monsterInfo);
         //谁先攻击 0英雄先攻击
-        let i = monsterInfo ? 1 : 0;
+        let i = monsterInfo.firstAttack ? 1 : 0;
         let scheduleCount = i == 0 ? count * 2 - 1 : count * 2;
         //先贴图怪物信息
         NotifyCenter.emit(GameEvent.MONSTER_FIGHT, monsterInfo);
@@ -41,17 +41,17 @@ export class MonsterFightSystem {
                 if (i % 2 == 0) {
                     this.hero.showAttack(true);
                     this.monster.hurt(damageInfo.monsterDamage);
+                    NotifyCenter.emit(GameEvent.MONSTER_FIGHT, monsterInfo);
                 } else {
                     this.hero.showAttack(false);
                     //怪物死了
                     if (monsterInfo.hp == 0) {
-                        NotifyCenter.emit(GameEvent.MONSTER_DIE, this.monster, this.index, magic);
+                        NotifyCenter.emit(GameEvent.MONSTER_DIE, monsterInfo, magic);
                     } else {
                         this.hero.hurt(damageInfo.heroDamage);
                     }
                 }
                 ++i;
-                NotifyCenter.emit(GameEvent.MONSTER_FIGHT, monsterInfo);
             },
             ATTACK_INTERVAL,
             scheduleCount

@@ -2781,15 +2781,15 @@
       "b": 255,
       "a": 255
     },
-    "_string": "生命",
-    "_horizontalAlign": 2,
+    "_string": "0",
+    "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 14,
     "_fontSize": 14,
     "_fontFamily": "Regular",
     "_lineHeight": 16,
     "_overflow": 0,
-    "_enableWrapText": true,
+    "_enableWrapText": false,
     "_font": {
       "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
       "__expectedType__": "cc.TTFFont"
@@ -2825,12 +2825,12 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 28,
+      "width": 7.98,
       "height": 20.16
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 1,
+      "x": 0.5,
       "y": 0.5
     },
     "_id": "df83aNDIZHE707v17K7kpE"
@@ -2908,14 +2908,14 @@
       "a": 255
     },
     "_string": "攻击",
-    "_horizontalAlign": 2,
+    "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 14,
     "_fontSize": 14,
     "_fontFamily": "Regular",
     "_lineHeight": 16,
     "_overflow": 0,
-    "_enableWrapText": true,
+    "_enableWrapText": false,
     "_font": {
       "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
       "__expectedType__": "cc.TTFFont"
@@ -2956,7 +2956,7 @@
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 1,
+      "x": 0.5,
       "y": 0.5
     },
     "_id": "b3IIwSLtJCUZL+jNIUuqNn"
@@ -3034,14 +3034,14 @@
       "a": 255
     },
     "_string": "防御",
-    "_horizontalAlign": 2,
+    "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 14,
     "_fontSize": 14,
     "_fontFamily": "Regular",
     "_lineHeight": 16,
     "_overflow": 0,
-    "_enableWrapText": true,
+    "_enableWrapText": false,
     "_font": {
       "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
       "__expectedType__": "cc.TTFFont"
@@ -3082,7 +3082,7 @@
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 1,
+      "x": 0.5,
       "y": 0.5
     },
     "_id": "4dcKpHOlFP86wSpPV0qqeT"
@@ -3625,13 +3625,9 @@
     "_autoAdapt": true,
     "_pcf": 0,
     "_bias": 0.0035,
-    "_packing": false,
-    "_linear": true,
-    "_selfShadow": false,
     "_normalBias": 0,
     "_near": 1,
     "_far": 30,
-    "_aspect": 1,
     "_orthoSize": 5,
     "_maxReceived": 4,
     "_size": {
