@@ -46,7 +46,7 @@ export class MonsterFightSystem {
                     this.hero.showAttack(false);
                     //怪物死了
                     if (monsterInfo.hp == 0) {
-                        NotifyCenter.emit(GameEvent.MONSTER_DIE, monsterInfo, magic);
+                        NotifyCenter.emit(GameEvent.MONSTER_DIE, this.monster, magic);
                     } else {
                         this.hero.hurt(damageInfo.heroDamage);
                     }

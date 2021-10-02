@@ -59,12 +59,12 @@ export class Hero extends Actor {
 
     init(map: GameMap, tile: Vec2 | null = null) {
         this.setOwnerMap(map);
-        this.collisionSystem.init(map, this);
         this.location(tile);
     }
 
     setOwnerMap(map: GameMap) {
         this.map = map;
+        this.collisionSystem.init(map, this);
     }
 
     /**

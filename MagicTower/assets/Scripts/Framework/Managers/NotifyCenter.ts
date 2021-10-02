@@ -2,6 +2,10 @@ import { _decorator, EventTarget } from "cc";
 
 /** 自定义事件，支持整型和字符创类型事件分发 */
 export class CustomEventTarget extends EventTarget {
+    hasEventListener(type: number | string, callback?: (...any: any[]) => void, target?: any): boolean {
+        return super.hasEventListener(type.toString(), callback, target);
+    }
+
     on<TFunction extends (...any: any[]) => void>(type: number | string, callback: TFunction, thisArg?: any, once?: boolean): typeof callback {
         return super.on(type.toString(), callback, thisArg, once);
     }

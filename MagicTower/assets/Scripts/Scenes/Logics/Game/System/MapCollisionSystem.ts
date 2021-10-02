@@ -33,16 +33,19 @@ export class MapCollisionSystem {
     private canEndMoveTiles: Readonly<string[]> = ["prop", "stair", "event"];
     private monsterFightSystem: MonsterFightSystem = new MonsterFightSystem();
 
-    constructor() {
-        NotifyCenter.on(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
-    }
-
     init(gameMap: GameMap, hero: Hero) {
         this.gameMap = gameMap;
         this.hero = hero;
         this.heroData = hero.heroData;
         let mapData = GameManager.DATA.getData(MapData)!;
         this.levelData = mapData.getCurrentLevelData();
+        this.registerEvent();
+    }
+
+    private registerEvent() {
+        if (!NotifyCenter.hasEventListener(GameEvent.MONSTER_DIE, this.onMonsterDie, this)) {
+            NotifyCenter.on(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
+        }
     }
 
     private setDisappear(layerName: string, tileOrIndex: Vec2 | number) {
@@ -60,6 +63,7 @@ export class MapCollisionSystem {
         let ratio = this.heroData.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
         this.heroData.setAttrDiff(HeroAttr.GOLD, monster.monsterInfo.gold * ratio);
         this.setDisappear("monster", monster.index);
+        this.elementActionComplete();
         //this.removeMonsterDoor();
         //this.monsterEventTrigger(index);
         //this.removeMagicHurt(index, monster);
@@ -134,7 +138,8 @@ export class MapCollisionSystem {
                 return this.doorCollision(tile, layerName);
             case "stair":
                 let stair = this.levelData.getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
-                this.levelData.mapData.setLevelDiff(stair.levelDiff);
+                let mapData = GameManager.DATA.getData(MapData)!;
+                mapData.setLevelDiff(stair.levelDiff);
                 return true;
             case "monster":
                 {
@@ -710,8 +715,9 @@ export class MapCollisionSystem {
     }
 
     private elementActionComplete() {
-        //NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
+        NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
     }
+
     getMonsters() {
         //let layer = this.layers["monster"];
         //let monsters = {};
