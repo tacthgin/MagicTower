@@ -6,15 +6,16 @@ const { ccclass, property } = _decorator;
 @ccclass("RecordBook")
 export class RecordBook extends BaseDialog {
     @property(PageView)
-    pageView: PageView | null = null;
+    pageView: PageView = null!;
     @property(Node)
-    content: Node | null = null;
+    content: Node = null!;
     @property(Node)
-    pageNode: Node | null = null;
+    pageNode: Node = null!;
     @property(Label)
-    totalPage: Label | null = null;
+    totalPage: Label = null!;
     @property(Label)
-    currentPage: Label | null = null;
+    currentPage: Label = null!;
+
     init() {
         //let texts = [];
         //let records = DataManager.getCustomData("GameInfo").HeroData.getRecordTalk();

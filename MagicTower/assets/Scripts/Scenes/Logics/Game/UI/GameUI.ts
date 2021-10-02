@@ -7,7 +7,7 @@ import { Util } from "../../../../Framework/Util/Util";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroAttr, HeroData, HeroEvent, PropType } from "../../../Data/CustomData/HeroData";
 import { MapData } from "../../../Data/CustomData/MapData";
-import { ElementManager } from "../ElementManager";
+import { ElementManager } from "../Map/ElementManager";
 import { MonsterIcon } from "./MonsterIcon";
 import { PropButton } from "./PropButton";
 
@@ -185,8 +185,6 @@ export class GameUI extends Component {
     }
 
     refreshMonsterInfo(monsterInfo: any = null) {
-        console.log(monsterInfo);
-        Fn.printCallStack();
         this.monsterLabels[0].string = monsterInfo ? monsterInfo.name : "怪物名字";
         this.monsterLabels[1].string = monsterInfo ? monsterInfo.hp.toString() : "生命";
         this.monsterLabels[2].string = monsterInfo ? monsterInfo.attack : "攻击";

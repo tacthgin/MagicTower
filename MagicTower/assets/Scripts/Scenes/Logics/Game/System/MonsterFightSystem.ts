@@ -2,7 +2,7 @@ import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { Monster } from "../../../Data/CustomData/Element";
 import { GameMap } from "../Map/GameMap";
-import { Hero } from "../Map/Hero";
+import { Hero } from "../Map/Actor/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 
 const ATTACK_INTERVAL = 0.1;

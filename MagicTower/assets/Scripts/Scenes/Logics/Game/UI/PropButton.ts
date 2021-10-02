@@ -10,21 +10,21 @@ export class PropButton extends Component {
 
     init(propInfo: any) {
         this.propInfo = propInfo;
-        this.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(propInfo.spriteId);
+        this.getComponent(Sprite)!.spriteFrame = GameManager.RESOURCE.getSpriteFrame(propInfo.spriteId);
     }
 
     onPropButtonClick() {
         let info = null;
         if (this.propInfo.type == 9) {
-            info = this.node.getChildByName("label").getComponent(Label).string == "上" ? "up" : "down";
+            info = this.node.getChildByName("label")?.getComponent(Label)?.string == "上" ? "up" : "down";
         }
         NotifyCenter.emit(GameEvent.USE_PROP, this.propInfo, info);
     }
 
     setNum(num: number) {
-        let label = this.node.getChildByName("label");
+        let label = this.node.getChildByName("label")!;
         if (num > 1) {
-            label.getComponent(Label).string = num.toString();
+            label.getComponent(Label)!.string = num.toString();
             label.active = true;
         } else {
             label.active = false;

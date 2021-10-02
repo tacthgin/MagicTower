@@ -7,21 +7,25 @@ const { ccclass, property } = _decorator;
 export class SettingDialog extends BaseDialog {
     @property([Toggle])
     toogles: Toggle[] = [];
+
     onLoad() {
         //super.onLoad();
         //this.toogles[0].isChecked = DataManager.getMusicEnable();
         //this.toogles[1].isChecked = DataManager.getEffectsEnable();
         //this.toogles[2].isChecked = DataManager.getVibrateEnable();
     }
+
     protected onBgButtonClick() {
         //if (this.clickBgClose) {
         //this.onCloseBtnClick();
         //}
     }
+
     onCloseBtnClick() {
         //DataManager.saveGameConfig();
         //this.close();
     }
+
     onToogleClick(toggle: Toggle, customEventData: string) {
         //switch (parseInt(customEventData)) {
         //case 1:

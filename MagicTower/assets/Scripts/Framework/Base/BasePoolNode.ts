@@ -1,4 +1,4 @@
-import { instantiate, IPoolHandlerComponent, isValid, Node, NodePool, Prefab, _decorator } from "cc";
+import { instantiate, isValid, Node, NodePool, Prefab, _decorator } from "cc";
 import { BaseComponent } from "./BaseComponent";
 const { ccclass } = _decorator;
 

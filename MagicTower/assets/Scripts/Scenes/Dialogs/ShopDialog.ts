@@ -14,17 +14,18 @@ export class ShopDialog extends BaseDialog {
     @property(Label)
     attr: Label[] = [];
 
-    private callback: (attr: string) => void = null;
+    private callback: ((attr: string) => void) | null = null;
+
     private isGoldEnough: boolean = true;
 
     init(callback: (attr: string) => void) {
-        let shopData = GameManager.DATA.getData(ShopData);
+        let shopData = GameManager.DATA.getData(ShopData)!;
         this.content.string = `你若给我 ${shopData.needGold} 个金币，\n我就替你提升以下一种能力。`;
         this.attr[0].string = `生命力 + ${shopData.hp}`;
         this.attr[1].string = `攻击力 + ${shopData.attack}`;
         this.attr[2].string = `防御力 + ${shopData.defence}`;
         this.callback = callback;
-        let heroGold = GameManager.DATA.getData(HeroData).getAttr(HeroAttr.GOLD);
+        let heroGold = GameManager.DATA.getData(HeroData)!.getAttr(HeroAttr.GOLD);
         this.isGoldEnough = shopData.needGold <= heroGold;
     }
 

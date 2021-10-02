@@ -5,7 +5,7 @@ import { GameEvent } from "../../../Constant/GameEvent";
 import { StairType } from "../../../Data/CustomData/Element";
 import { MapData, MapEvent } from "../../../Data/CustomData/MapData";
 import { GameMap } from "./GameMap";
-import { Hero } from "./Hero";
+import { Hero } from "./Actor/Hero";
 const { ccclass, type } = _decorator;
 
 @ccclass("LevelManager")
@@ -50,7 +50,7 @@ export class LevelManager extends Component {
             return;
         }
         this.touchId = event.getID();
-        console.log(event.getLocation(), event.getUILocation());
+        //console.log(event.getLocation(), event.getUILocation());
         //处理多点触摸;
         this.moveHero(event.getUILocation());
     }

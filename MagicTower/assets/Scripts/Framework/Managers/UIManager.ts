@@ -154,7 +154,7 @@ export class UIManager {
         });
         if (this.dialogQueue.length == 1) {
             let queueInfo = this.dialogQueue[0];
-            this.showDialog(queueInfo.dialogName, queueInfo.args);
+            this.showDialog(queueInfo.dialogName, ...queueInfo.args);
         }
     }
 

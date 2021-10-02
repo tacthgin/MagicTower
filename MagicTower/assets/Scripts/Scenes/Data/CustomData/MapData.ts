@@ -54,8 +54,7 @@ export class MapData extends BaseData {
      * @returns 层数据
      */
     createLevelData(level: number, properties: any, data: any = null) {
-        let levelData = new LevelData();
-        levelData.level = level;
+        let levelData = new LevelData(this, level);
         levelData.loadProperties(properties, data);
         this.data.maps[level] = levelData;
         return levelData;
@@ -65,7 +64,7 @@ export class MapData extends BaseData {
         if (info) {
             this.data.currentLevel = info.currentLevel;
             for (let level in info.maps) {
-                this.data.maps[level] = new LevelData();
+                this.data.maps[level] = new LevelData(this, parseInt(level));
                 this.data.maps[level].load(info.maps[level]);
             }
         }
@@ -73,6 +72,8 @@ export class MapData extends BaseData {
 }
 
 export class LevelData extends BaseLoadData {
+    private _mapData: MapData = null!;
+    //层
     private _level: number = 0;
     /** 出现的tile */
     private _appearTile: any = {};
@@ -81,8 +82,8 @@ export class LevelData extends BaseLoadData {
     /** 层元素信息 */
     private layerInfo: any = {};
 
-    public set level(value: number) {
-        this._level = value;
+    public get mapData() {
+        return this._mapData;
     }
 
     public get level() {
@@ -95,6 +96,12 @@ export class LevelData extends BaseLoadData {
 
     public get disappearTile() {
         return this._disappearTile;
+    }
+
+    constructor(mapData: MapData, level: number) {
+        super();
+        this._mapData = mapData;
+        this._level = level;
     }
 
     saveMapData() {

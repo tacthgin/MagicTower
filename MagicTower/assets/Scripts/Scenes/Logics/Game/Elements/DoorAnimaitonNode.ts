@@ -1,6 +1,7 @@
 import { Animation, Sprite, _decorator } from "cc";
 import { BasePoolNode } from "../../../../Framework/Base/BasePoolNode";
-import { ElementManager } from "../ElementManager";
+import { ElementManager } from "../Map/ElementManager";
+
 const { ccclass, property } = _decorator;
 
 @ccclass("DoorAnimationNode")

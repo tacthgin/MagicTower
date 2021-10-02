@@ -12,10 +12,10 @@ export class MonsterHandBookItem extends BasePoolNode {
     private labels: Label[] = [];
 
     @property(Label)
-    private monsterName: Label | null = null;
+    private monsterName: Label = null!;
 
     @property(Label)
-    private damageLabel: Label | null = null;
+    private damageLabel: Label = null!;
 
     private monsterNode: any = null;
 

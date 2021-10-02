@@ -443,7 +443,7 @@
     "fileId": "174wZFH9hIx7yDJ3lYTpH9"
   },
   {
-    "__type__": "d8abdU1MoVLH7SkP/JtIc/m",
+    "__type__": "5bee2IXuGpIB4sewRWCywlO",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -452,6 +452,9 @@
     "_enabled": true,
     "__prefab": {
       "__id__": 25
+    },
+    "animation": {
+      "__id__": 9
     },
     "attackIcon": {
       "__id__": 12
@@ -463,7 +466,7 @@
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "e5zWgoIuZIo5LIl2CcEXon"
+    "fileId": "8cCz0WItVL2I5xqj/uTG1Q"
   },
   {
     "__type__": "cc.PrefabInfo",

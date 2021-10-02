@@ -178,3 +178,5 @@ export class EventInfo extends Element {
         return this._monsters;
     }
 }
+
+export class Npc extends Element {}

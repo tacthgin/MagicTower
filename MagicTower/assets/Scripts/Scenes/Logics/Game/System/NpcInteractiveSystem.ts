@@ -1,9 +1,14 @@
+import { Npc } from "../../../Data/CustomData/Element";
+import { GameMap } from "../Map/GameMap";
+import { Hero } from "../Map/Actor/Hero";
+
 export class NpcInteractiveSystem {
-    private npc: Npc = null;
-    private map: GameMap = null;
-    private hero: Hero = null;
+    private npc: Npc = null!;
+    private map: GameMap = null!;
+    private hero: Hero = null!;
     /** npc tile index */
     private index: number = 0;
+
     init(tileIndex: number, npc: Npc, map: GameMap, hero: Hero) {
         //this.npc = npc;
         //this.hero = hero;
@@ -11,6 +16,7 @@ export class NpcInteractiveSystem {
         //this.index = tileIndex;
         //return this;
     }
+
     execute() {
         //if (this.npc.canTrade()) {
         //物品交易

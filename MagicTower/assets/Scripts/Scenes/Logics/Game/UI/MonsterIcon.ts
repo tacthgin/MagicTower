@@ -1,7 +1,7 @@
 import { Animation, Sprite, _decorator } from "cc";
 import { BasePoolNode } from "../../../../Framework/Base/BasePoolNode";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
-import { ElementManager } from "../ElementManager";
+import { ElementManager } from "../Map/ElementManager";
 const { ccclass } = _decorator;
 
 @ccclass("MonsterIcon")
@@ -16,7 +16,7 @@ export class MonsterIcon extends BasePoolNode {
     init(id: number) {
         this.monsterInfo = GameManager.DATA.getJsonElement("monster", id, true);
         this.getComponent(Sprite)!.spriteFrame = ElementManager.getInstance().getElementSpriteFrame(`${this.monsterInfo.spriteId}_0`);
-        
+
         this.animation?.play(this.monsterInfo.spriteId);
     }
 

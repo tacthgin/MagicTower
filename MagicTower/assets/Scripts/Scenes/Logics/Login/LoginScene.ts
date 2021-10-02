@@ -3,7 +3,7 @@ import { BaseEvent } from "../../../Framework/Base/BaseContant";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
 import { JsonParserMap } from "../../Constant/JsonParserMap";
-import { ElementManager } from "../Game/ElementManager";
+import { ElementManager } from "../Game/Map/ElementManager";
 
 const { ccclass, property } = _decorator;
 

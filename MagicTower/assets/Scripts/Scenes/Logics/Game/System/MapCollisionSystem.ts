@@ -6,7 +6,7 @@ import { Door, DoorState, DoorType, Monster, StairType } from "../../../Data/Cus
 import { HeroAttr, HeroData, PropType } from "../../../Data/CustomData/HeroData";
 import { LevelData, MapData } from "../../../Data/CustomData/MapData";
 import { GameMap } from "../Map/GameMap";
-import { Hero } from "../Map/Hero";
+import { Hero } from "../Map/Actor/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 import { MonsterFightSystem } from "./MonsterFightSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
@@ -29,6 +29,7 @@ export class MapCollisionSystem {
     private gameMap: GameMap = null!;
     private hero: Hero = null!;
     private heroData: HeroData = null!;
+    private levelData: LevelData = null!;
     private canEndMoveTiles: Readonly<string[]> = ["prop", "stair", "event"];
     private monsterFightSystem: MonsterFightSystem = new MonsterFightSystem();
 
@@ -40,13 +41,25 @@ export class MapCollisionSystem {
         this.gameMap = gameMap;
         this.hero = hero;
         this.heroData = hero.heroData;
+        let mapData = GameManager.DATA.getData(MapData)!;
+        this.levelData = mapData.getCurrentLevelData();
+    }
+
+    private setDisappear(layerName: string, tileOrIndex: Vec2 | number) {
+        if (typeof tileOrIndex == "number") {
+            this.gameMap.setTileGIDAt("monster", this.gameMap.getTile(tileOrIndex), 0);
+            this.levelData.setDisappear(layerName, tileOrIndex);
+        } else {
+            this.gameMap.setTileGIDAt("monster", tileOrIndex, 0);
+            this.levelData.setDisappear(layerName, this.gameMap.getTileIndex(tileOrIndex));
+        }
     }
 
     private onMonsterDie(monster: Monster, magic: boolean) {
         //幸运金币
         let ratio = this.heroData.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
-        this.heroData.setAttrDiff(HeroAttr.GOLD, monster.monsterInfo.gold * ratio)
-        this.gameMap.setTileGIDAt("monster", this.gameMap.getTile(monster.index), 0);
+        this.heroData.setAttrDiff(HeroAttr.GOLD, monster.monsterInfo.gold * ratio);
+        this.setDisappear("monster", monster.index);
         //this.removeMonsterDoor();
         //this.monsterEventTrigger(index);
         //this.removeMagicHurt(index, monster);
@@ -108,23 +121,20 @@ export class MapCollisionSystem {
         let { layerName, spriteName } = this.gameMap.getTileInfo(tile);
         if (!layerName) return true;
         let jsonData = this.getJsonData(layerName, spriteName);
-        let mapData = GameManager.DATA.getData(MapData)!;
-        let levelData = mapData.getCurrentLevelData();
         switch (layerName) {
             case "prop":
                 {
                     GameManager.AUDIO.playEffect("eat");
-                    this.heroData.addProp(jsonData.id, mapData?.level);
-                    this.gameMap.setTileGIDAt(layerName, tile, 0);
-                    levelData.setDisappear(layerName, this.gameMap.getTileIndex(tile));
+                    this.heroData.addProp(jsonData.id, this.levelData.level);
+                    this.setDisappear(layerName, tile);
                 }
                 return true;
             case "door":
                 //这里只处理可见的门逻辑
-                return this.doorCollision(tile, layerName, levelData);
+                return this.doorCollision(tile, layerName);
             case "stair":
-                let stair = levelData.getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
-                mapData.setLevelDiff(stair.levelDiff);
+                let stair = this.levelData.getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
+                this.levelData.mapData.setLevelDiff(stair.levelDiff);
                 return true;
             case "monster":
                 {
@@ -156,10 +166,10 @@ export class MapCollisionSystem {
         return false;
     }
 
-    private doorCollision(tile: Vec2, layerName: string, levelData: LevelData) {
+    private doorCollision(tile: Vec2, layerName: string) {
         let tileIndex = this.gameMap.getTileIndex(tile);
 
-        let doorInfo: Door = levelData.getLayerElement(layerName, tileIndex);
+        let doorInfo: Door = this.levelData.getLayerElement(layerName, tileIndex);
         if (!doorInfo) {
             return true;
         }
@@ -168,7 +178,7 @@ export class MapCollisionSystem {
             this.createDoorAnimation(doorInfo.id, tile, false, () => {
                 NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
             });
-            levelData.deleteLayerElement(layerName, tileIndex);
+            this.levelData.deleteLayerElement(layerName, tileIndex);
             this.gameMap.setTileGIDAt(layerName, tile, 0);
         };
 
@@ -179,7 +189,7 @@ export class MapCollisionSystem {
             if (keyID && this.heroData.getPropNum(keyID) > 0) {
                 this.heroData.addProp(keyID, 1, -1);
                 openDoor();
-                let eventInfo = levelData.getLayerInfo(layerName)["event"];
+                let eventInfo = this.levelData.getLayerInfo(layerName)["event"];
                 if (eventInfo && eventInfo.doorState == DoorState.DISAPPEAR_EVENT) {
                     let existCondition = eventInfo.condition[0];
                     if (existCondition) {
@@ -436,19 +446,19 @@ export class MapCollisionSystem {
     }
 
     private heroMoveJudge(tile: Vec2, endTile: Vec2) {
-        let { tileType, index } = this.getTileLayer(tile);
-        if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
-        if (tile.equals(endTile)) {
-            //假设终点都可以走，然后在门和npc这种类型停在寻路前一格
-            return true;
-        } else {
-            //中途过程遇到事件也可以走
-            return tileType == "floor" || tileType == "event" || tileType == "prop";
-        }
+        // let { tileType, index } = this.getTileLayer(tile);
+        // if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
+        // if (tile.equals(endTile)) {
+        //     //假设终点都可以走，然后在门和npc这种类型停在寻路前一格
+        //     return true;
+        // } else {
+        //     //中途过程遇到事件也可以走
+        //     return tileType == "floor" || tileType == "event" || tileType == "prop";
+        // }
     }
     private elementMoveJudge(tile: Vec2) {
-        let { tileType } = this.getTileLayer(tile);
-        return tileType == "floor" || tileType == "monster" || tileType == "event" || tileType == "stair";
+        // let { tileType } = this.getTileLayer(tile);
+        // return tileType == "floor" || tileType == "monster" || tileType == "event" || tileType == "stair";
     }
 
     /** 勇士在楼梯旁边 */

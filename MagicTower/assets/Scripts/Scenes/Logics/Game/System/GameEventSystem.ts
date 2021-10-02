@@ -1,12 +1,9 @@
 /**处理地图上的事件 */
 
 import { _decorator } from "cc";
-import { DataManager } from "../../../Managers/DataManager";
-import { GameManager } from "../../../Managers/GameManager";
-import { NotifyCenter } from "../../../Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
-import Hero from "../Map/Hero";
 import { GameMap } from "../Map/GameMap";
+import { Hero } from "../Map/Actor/Hero";
 
 export class GameEventSystem {
     private eventInfo: any = null;
@@ -15,9 +12,10 @@ export class GameEventSystem {
     private disappearStep: number = 0;
     private moveStep: number = 0;
     private step: number = 0;
-    private map: GameMap = null;
+    private map: GameMap = null!;
     private globalConfig: any = null;
-    private hero: Hero = null;
+    private hero: Hero = null!;
+
     init(eventId: number | string, map: GameMap, hero: Hero) {
         //this.eventInfo = GameManager.DATA.getJsonElement("event", eventId);
         //this.map = map;
@@ -149,7 +147,7 @@ export class GameEventSystem {
         //}, info.interval);
         //}
     }
-    getAppearClassName(layer) {
+    getAppearClassName(layer: string) {
         //if (layer == "wall") {
         //return "door1006_0";
         //} else {

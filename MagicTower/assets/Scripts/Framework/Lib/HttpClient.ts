@@ -13,7 +13,7 @@ export class HttpClient {
     /** url加密 */
     private readonly isUrlEncode: boolean = false;
     /** 重连次数表 */
-    private retryConnectMap: { [key: string]: number } = {};
+    private reconnectMap: any = {};
 
     private method(method: HttpMethodType, url: string, data: any, successCallback: Function, failCallback: Function, headInfo: any = null) {
         if (!url) {
@@ -59,13 +59,17 @@ export class HttpClient {
 
     get(url: string, data: any, successCallback: Function, failCallback: Function, headInfo: any = null) {
         let failFunc = () => {
-            if (this.retryConnectMap[url] == undefined) {
+            let connectInfo = this.reconnectMap[url];
+            if (connectInfo == undefined) {
                 failCallback && failCallback();
-                this.retryConnectMap[url] = 0;
+                connectInfo = this.reconnectMap[url] = { count: 0, timeID: 0 };
                 //重连
-                setTimeout(() => {
-                    this.retryConnectMap[url] += 1;
+                connectInfo.timeID = setTimeout(() => {
+                    connectInfo.count += 1;
                 }, 1000);
+            } else if (this.reconnectMap[url] >= this.retryCount) {
+                delete this.reconnectMap[url];
+            } else {
             }
         };
         this.method(HttpMethodType.GET, url, data, successCallback, failFunc, headInfo);

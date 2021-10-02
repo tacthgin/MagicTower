@@ -74,7 +74,7 @@ export class QuadTree<T extends QuadEntity> {
     }
 
     private createQuadBranch(node: QuadTreeNode<T>): QuadTreeNode<T>[] {
-        assert(!node, "叶节点父节点不能为空");
+        assert(node, "叶节点父节点不能为空");
         let regions = this.splitRegion(node.getRegion());
         node.createBranch(regions);
         return node.getLeafNodes() || [];

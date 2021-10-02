@@ -1,28 +1,26 @@
-import { Animation, AnimationClip, CCLoader, Component, Node, Sprite, Tween, tween, v3, Vec2, _decorator } from "cc";
-import { Astar } from "../../../../Framework/Lib/Custom/Astar";
-import { GameManager } from "../../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
-import { Util } from "../../../../Framework/Util/Util";
-import { GameEvent } from "../../../Constant/GameEvent";
-import { HeroAttr, HeroData } from "../../../Data/CustomData/HeroData";
-import { Lightning } from "../Elements/Lightning";
-import { MapCollisionSystem } from "../System/MapCollisionSystem";
-import { AstarMoveType, GameMap } from "./GameMap";
-import { HeroState, HeroStateMachine } from "./HeroState";
+import { Animation, AnimationClip, Node, Sprite, Tween, tween, v3, Vec2, _decorator } from "cc";
+import { Astar } from "../../../../../Framework/Lib/Custom/Astar";
+import { GameManager } from "../../../../../Framework/Managers/GameManager";
+import { NotifyCenter } from "../../../../../Framework/Managers/NotifyCenter";
+import { GameEvent } from "../../../../Constant/GameEvent";
+import { HeroAttr, HeroData } from "../../../../Data/CustomData/HeroData";
+import { Lightning } from "../../Elements/Lightning";
+import { MapCollisionSystem } from "../../System/MapCollisionSystem";
+import { AstarMoveType, GameMap } from "../GameMap";
+import { Actor } from "./Actor";
+import { ActorState, StateMachine } from "./ActorState";
 
 const { ccclass, property } = _decorator;
 
 @ccclass("Hero")
-export class Hero extends Component {
+export class Hero extends Actor {
     @property(Node)
     private attackIcon: Node = null!;
     @property(Node)
     private heroNode: Node = null!;
 
     private _heroData: HeroData = null!;
-    private animation: Animation = null!;
-    private currentAnimationName: string | null = null;
-    private heroFSM: HeroStateMachine = new HeroStateMachine(this);
+    private heroFSM: StateMachine = new StateMachine(this);
     private globalInfo: any = null;
     private map: GameMap = null!;
     private astar: Astar = new Astar();
@@ -44,7 +42,6 @@ export class Hero extends Component {
     }
 
     onLoad() {
-        this.animation = this.heroNode.getComponent(Animation)!;
         this.animation.on(Animation.EventType.FINISHED, this.onFinished, this);
         this.globalInfo = GameManager.DATA.getJson("global");
         this._heroData = GameManager.DATA.getData(HeroData)!;
@@ -57,7 +54,7 @@ export class Hero extends Component {
 
     start() {
         this.createAnimation();
-        this.heroFSM.changeState(HeroState.IDLE);
+        this.heroFSM.changeState(ActorState.IDLE);
     }
 
     init(map: GameMap, tile: Vec2 | null = null) {
@@ -120,6 +117,14 @@ export class Hero extends Component {
         this.animation.clips = clips;
     }
 
+    protected getAnimationName(state: ActorState): string {
+        if (state == ActorState.MOVE) {
+            return this._heroData.get("animation")[this.heroDirection];
+        }
+
+        return "";
+    }
+
     /**
      * 人物朝向
      * @param info info为vec2，人物朝向的点，info为nubmer直接传入方向
@@ -137,27 +142,7 @@ export class Hero extends Component {
 
     /** 设置人物方向贴图 */
     setDirectionTexture() {
-        this.heroNode.getComponent(Sprite)!.spriteFrame = GameManager.RESOURCE.getSpriteFrame(
-            `${this._heroData.get("animation")[this.heroDirection]}_0`
-        );
-    }
-
-    /** 根据方向播放行走动画 */
-    playMoveAnimation() {
-        let animationName = this._heroData.get("animation")[this.heroDirection];
-        if (this.currentAnimationName) {
-            let state = this.animation.getState(this.currentAnimationName);
-            if (state.isPlaying && animationName == this.currentAnimationName) {
-                return;
-            }
-        }
-
-        this.currentAnimationName = animationName;
-        this.animation.play(animationName);
-    }
-
-    stopMoveAnimation() {
-        this.animation.stop();
+        this.heroNode.getComponent(Sprite)!.spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._heroData.get("animation")[this.heroDirection]}_0`);
     }
 
     autoMove(endTile: Vec2) {
@@ -214,7 +199,7 @@ export class Hero extends Component {
                     this.heroDirection = this.getDirection(Vec2.subtract(result, tile, this.heroTile));
                     if (!stop) {
                         //动作停止callFunc依然会调用一次;
-                        this.heroFSM.changeState(HeroState.MOVE);
+                        this.heroFSM.changeState(ActorState.MOVE);
                     }
                 })
                 .to(this.globalInfo.heroSpeed, { position: v3(position.x, position.y) })
@@ -235,7 +220,7 @@ export class Hero extends Component {
 
     stand() {
         Tween.stopAllByTarget(this.node);
-        this.heroFSM.changeState(HeroState.IDLE);
+        this.heroFSM.changeState(ActorState.IDLE);
     }
 
     location(tile: Vec2 | null) {

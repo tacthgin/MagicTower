@@ -523,7 +523,6 @@
       "__id__": 2
     },
     "_enabled": true,
-    "__prefab": null,
     "audioController": {
       "__id__": 8
     },
@@ -957,7 +956,6 @@
       "__id__": 19
     },
     "_enabled": true,
-    "__prefab": null,
     "progressLabel": {
       "__id__": 27
     },
@@ -1150,12 +1148,14 @@
       "b": 0,
       "a": 76
     },
-    "_autoAdapt": true,
+    "_fixedArea": false,
     "_pcf": 0,
-    "_bias": 0.0035,
+    "_bias": 1,
     "_normalBias": 0,
     "_near": 1,
     "_far": 30,
+    "_shadowDistance": 100,
+    "_invisibleOcclusionRange": 200,
     "_orthoSize": 5,
     "_maxReceived": 4,
     "_size": {

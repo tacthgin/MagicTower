@@ -1,5 +1,5 @@
 import { SpriteFrame } from "cc";
-import { GameManager } from "../../../Framework/Managers/GameManager";
+import { GameManager } from "../../../../Framework/Managers/GameManager";
 
 export class ElementManager {
     private spriteFrames: { [key: string]: SpriteFrame } = {};
