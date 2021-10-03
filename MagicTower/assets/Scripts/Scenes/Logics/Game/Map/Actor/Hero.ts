@@ -12,6 +12,13 @@ import { ActorState, StateMachine } from "./ActorState";
 
 const { ccclass, property } = _decorator;
 
+enum HeroDirecton {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT,
+}
+
 @ccclass("Hero")
 export class Hero extends Actor {
     @property(Node)
@@ -226,11 +233,13 @@ export class Hero extends Actor {
     location(tile: Vec2 | null) {
         if (tile) {
             this._heroData.setPosition(tile);
+            this.toward(HeroDirecton.DOWN);
+        } else {
+            this.toward(this._heroData.get("direction"));
         }
         this.heroTile = this._heroData.getPosition();
         let position = this.map.getPositionAt(this.heroTile) || Vec2.ZERO;
         this.node.position = v3(position.x, position.y);
-        this.toward(this._heroData.get("direction"));
     }
 
     showAttack(active: boolean) {

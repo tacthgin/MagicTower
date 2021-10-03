@@ -153,6 +153,10 @@ export class LevelData extends BaseLoadData {
                     if (propertiesInfo["hide"]) {
                         stairs[0].hide = true;
                     }
+                    if (stairs[1]) {
+                        stairs[1].levelDiff *= -1;
+                    }
+
                     this.layerInfo[layerName] = stairs;
                     break;
                 case "monster":
@@ -164,6 +168,7 @@ export class LevelData extends BaseLoadData {
                         element.id = parseInt(propertiesInfo[index]);
                         eventInfo[index] = element;
                     }
+                    this.layerInfo[layerName] = eventInfo;
                     break;
             }
         }

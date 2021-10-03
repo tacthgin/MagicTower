@@ -2,7 +2,7 @@ import { v2, v3, Vec2 } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
-import { Door, DoorState, DoorType, Monster, StairType } from "../../../Data/CustomData/Element";
+import { Door, DoorState, DoorType, Element, Monster, StairType } from "../../../Data/CustomData/Element";
 import { HeroAttr, HeroData, PropType } from "../../../Data/CustomData/HeroData";
 import { LevelData, MapData } from "../../../Data/CustomData/MapData";
 import { GameMap } from "../Map/GameMap";
@@ -10,6 +10,7 @@ import { Hero } from "../Map/Actor/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 import { MonsterFightSystem } from "./MonsterFightSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
+import { GameEventSystem } from "./GameEventSystem";
 
 /** 在楼梯旁的index差值 */
 let INDEX_DIFFS = [1, 11];
@@ -32,6 +33,9 @@ export class MapCollisionSystem {
     private levelData: LevelData = null!;
     private canEndMoveTiles: Readonly<string[]> = ["prop", "stair", "event"];
     private monsterFightSystem: MonsterFightSystem = new MonsterFightSystem();
+    private npcInteractiveSystem: NpcInteractiveSystem = new NpcInteractiveSystem();
+    private gameEventSystem: GameEventSystem = new GameEventSystem();
+    private levelEvent: any = {};
 
     init(gameMap: GameMap, hero: Hero) {
         this.gameMap = gameMap;
@@ -45,16 +49,6 @@ export class MapCollisionSystem {
     private registerEvent() {
         if (!NotifyCenter.hasEventListener(GameEvent.MONSTER_DIE, this.onMonsterDie, this)) {
             NotifyCenter.on(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
-        }
-    }
-
-    private setDisappear(layerName: string, tileOrIndex: Vec2 | number) {
-        if (typeof tileOrIndex == "number") {
-            this.gameMap.setTileGIDAt("monster", this.gameMap.getTile(tileOrIndex), 0);
-            this.levelData.setDisappear(layerName, tileOrIndex);
-        } else {
-            this.gameMap.setTileGIDAt("monster", tileOrIndex, 0);
-            this.levelData.setDisappear(layerName, this.gameMap.getTileIndex(tileOrIndex));
         }
     }
 
@@ -80,8 +74,8 @@ export class MapCollisionSystem {
         //     }
         //     delete this.doorInfo.monsterCondition[index];
         // }
-        // if (monster.monsterInfo.eventId) {
-        //     this.eventCollision(monster.monsterInfo.eventId);
+        // if (monster.monsterInfo.eventID) {
+        //     this.eventCollision(monster.monsterInfo.eventID);
         // } else if (this.gameEventSystem && !this.gameEventSystem.executeComplete()) {
         //     this.gameEventSystem.execute();
         // } else if (magic) {
@@ -89,6 +83,16 @@ export class MapCollisionSystem {
         // } else {
         //     this.elementActionComplete();
         // }
+    }
+
+    private setDisappear(layerName: string, tileOrIndex: Vec2 | number) {
+        if (typeof tileOrIndex == "number") {
+            this.gameMap.setTileGIDAt(layerName, this.gameMap.getTile(tileOrIndex), 0);
+            this.levelData.setDisappear(layerName, tileOrIndex);
+        } else {
+            this.gameMap.setTileGIDAt(layerName, tileOrIndex, 0);
+            this.levelData.setDisappear(layerName, this.gameMap.getTileIndex(tileOrIndex));
+        }
     }
 
     private async createDoorAnimation(id: number | string, tile: Vec2, reverse: boolean, callback: Function | null = null) {
@@ -103,7 +107,7 @@ export class MapCollisionSystem {
     }
 
     /** 根据图片名字获取json数据 */
-    getJsonData(layerName: string, spriteFrameName: string | null | undefined) {
+    private getJsonData(layerName: string, spriteFrameName: string | null | undefined) {
         if (!spriteFrameName) return null;
         let name = spriteFrameName.split("_")[0];
         switch (layerName) {
@@ -155,16 +159,16 @@ export class MapCollisionSystem {
                 }
                 break;
             case "npc":
-                //new NpcInteractiveSystem().init(index, element, this, this.hero).execute();
+                this.npcInteractiveSystem.init(this.gameMap, this.hero, null!);
                 break;
             case "building":
                 this.gotoShop();
                 break;
             case "event":
-                //this.eventCollision(element.id);
+                this.eventCollision(tile);
                 break;
             case "floor":
-            //return this.floorCollision(index);
+                return this.floorCollision(tile);
             default:
                 return true;
         }
@@ -228,11 +232,11 @@ export class MapCollisionSystem {
         //element.add();
         //门事件
         //if (this.doorInfo.appearEventDoor) {
-        //for (let eventId in this.doorInfo.appearEventDoor) {
-        //let indexs = this.doorInfo.appearEventDoor[eventId];
+        //for (let eventID in this.doorInfo.appearEventDoor) {
+        //let indexs = this.doorInfo.appearEventDoor[eventID];
         //indexs.splice(indexs.indexOf(index), 1);
         //if (indexs.length != 0) {
-        //this.eventCollision(eventId);
+        //this.eventCollision(eventID);
         //}
         //}
         //}
@@ -253,9 +257,9 @@ export class MapCollisionSystem {
         //return true;
     }
 
-    private invisibleDoorCollision(tile: Vec2, levelData: LevelData) {
+    private invisibleDoorCollision(tile: Vec2) {
         let layerName = "door";
-        let doorLayerInfo = levelData.getLayerInfo(layerName);
+        let doorLayerInfo = this.levelData.getLayerInfo(layerName);
         if (!doorLayerInfo) {
             return true;
         }
@@ -273,12 +277,12 @@ export class MapCollisionSystem {
             if (index != -1) {
                 condition.splice(index, 1);
             }
-            levelData.saveMapData();
+            this.levelData.saveMapData();
             if (condition.length == 0) {
                 this.eventCollision(eventInfo.value);
             }
         } else {
-            let doorInfo: Door = levelData.getLayerElement(layerName, tileIndex);
+            let doorInfo: Door = this.levelData.getLayerElement(layerName, tileIndex);
             if (doorInfo && doorInfo.doorState == DoorState.APPEAR) {
                 this.createDoorAnimation(doorInfo.id, tile, true, () => {
                     this.gameMap.setTileGIDAt(layerName, tile, doorInfo.gid);
@@ -286,22 +290,16 @@ export class MapCollisionSystem {
                 });
             }
         }
+
+        return false;
     }
 
     show() {
         //跨层事件
-        //let eventId = this.eventInfo.get(this.mapData.level);
-        //if (eventId) {
-        //this.excuteEvent(eventId);
+        //let eventID = this.eventInfo.get(this.mapData.level);
+        //if (eventID) {
+        //this.excuteEvent(eventID);
         //this.eventInfo.clear(this.mapData.level);
-        //}
-    }
-
-    private parseWall(layerName: string, info: any) {
-        //for (let name in info) {
-        //info[name].forEach((tileIndex) => {
-        //this.addElement(tileIndex, layerName, "Common", name).node.zIndex = 2;
-        //});
         //}
     }
 
@@ -358,30 +356,7 @@ export class MapCollisionSystem {
         //});
         //}
     }
-    private parseStair(layerName: string, info: any) {
-        //let hide = info.hide;
-        //if (hide) {
-        //delete info.hide;
-        //}
-        //for (let key in info) {
-        //this.addElement(info[key][0], layerName, "Stair", key, info[key][1], info[key][2]);
-        //}
-        //if (hide) {
-        //let stair = this.getElement(hide[0], layerName);
-        //stair.hide = true;
-        //stair.node.active = false;
-        //}
-    }
-    private parseBuilding(layerName: string, info: any) {
-        //info.forEach((tileIndex) => {
-        //this.addElement(tileIndex, layerName, "Shop");
-        //});
-    }
-    private parseEvent(layerName: string, info: any) {
-        //info.forEach((elementInfo) => {
-        //this.addElement(elementInfo[0], layerName, "EventTrigger", elementInfo[1]);
-        //});
-    }
+
     private parseDamage(info: any) {
         //魔法警卫
         //this.monsterInfo.magicHurt.magic = {};
@@ -430,6 +405,7 @@ export class MapCollisionSystem {
         //}
         //this.monsterInfo.magicHurt.wizard = wizard;
     }
+
     /**
      * 是否终点tile可以移动
      * @param tile tile坐标
@@ -523,8 +499,8 @@ export class MapCollisionSystem {
     private monsterEventTrigger(monsterIndex: number) {
         //if (!this.monsterInfo.monsterEvent) return;
         //let id = null;
-        //for (let eventId in this.monsterInfo.monsterEvent) {
-        //let eventInfo = this.monsterInfo.monsterEvent[eventId];
+        //for (let eventID in this.monsterInfo.monsterEvent) {
+        //let eventInfo = this.monsterInfo.monsterEvent[eventID];
         //let index = eventInfo.tile.indexOf(monsterIndex);
         //if (index != -1) {
         //eventInfo.tile.splice(index, 1);
@@ -538,14 +514,14 @@ export class MapCollisionSystem {
         //}
         //}
         //if (exist) {
-        //id = eventId;
+        //id = eventID;
         //}
         //} else {
-        //id = eventId;
+        //id = eventID;
         //}
         //}
         //}
-        //if (this.monsterInfo.monsterEvent[eventId].length == 0) {
+        //if (this.monsterInfo.monsterEvent[eventID].length == 0) {
         //}
         //}
         //if (id != null) {
@@ -569,17 +545,17 @@ export class MapCollisionSystem {
     }
 
     private disappearDoorEventTrigger(index: number) {
-        //for (let eventId in this.doorInfo.disappearEventDoor) {
-        //let info = this.doorInfo.disappearEventDoor[eventId];
+        //for (let eventID in this.doorInfo.disappearEventDoor) {
+        //let info = this.doorInfo.disappearEventDoor[eventID];
         //if (info.condition.indexOf(index) != -1) {
-        //delete this.doorInfo.disappearEventDoor[eventId];
+        //delete this.doorInfo.disappearEventDoor[eventID];
         //} else {
         //let disappearIndex = info.tile.indexOf(index);
         //if (disappearIndex != -1) {
         //info.tile.splice(disappearIndex, 1);
         //if (info.tile.length == 0) {
-        //delete this.doorInfo.disappearEventDoor[eventId];
-        //this.eventCollision(eventId);
+        //delete this.doorInfo.disappearEventDoor[eventID];
+        //this.eventCollision(eventID);
         //}
         //}
         //}
@@ -618,13 +594,32 @@ export class MapCollisionSystem {
         //control.node.position = this._dialogPos;
         //});
     }
-    eventCollision(eventId: number | string) {
-        //let eventInfo = GameManager.DATA.getJsonElement("event", eventId);
-        //if (!eventInfo.save || eventInfo.save == this.mapData.level) {
-        //this.excuteEvent(eventId);
-        //} else {
-        //this.eventInfo.put(eventInfo.save, eventId);
-        //}
+
+    private eventCollision(eventID: number | string | Vec2) {
+        let id: number | string | null = null;
+        if (eventID instanceof Vec2) {
+            let index = this.gameMap.getTileIndex(eventID);
+            let eventInfo = this.levelData.getLayerInfo("event");
+            if (eventInfo) {
+                let event: Element = eventInfo[index];
+                if (event) {
+                    id = event.id;
+                }
+            }
+        } else {
+            id = eventID;
+        }
+
+        if (id) {
+            let eventInfo = GameManager.DATA.getJsonElement("event", id);
+            if (!eventInfo.save || eventInfo.save == this.levelData.level) {
+                this.gameEventSystem.init(this.gameMap, this.hero, id).execute();
+                return false;
+            } else {
+                this.levelEvent[eventInfo.save] = id;
+            }
+        }
+        return true;
     }
 
     haveMagicHurt(index: number) {
@@ -656,7 +651,12 @@ export class MapCollisionSystem {
         //}
         //return totalDamage;
     }
-    floorCollision(index: number) {
+
+    private floorCollision(tile: Vec2) {
+        if (!this.invisibleDoorCollision(tile)) {
+            return false;
+        }
+
         //if (!this.hero.HeroData.equipedDivineShield()) {
         //if (this.monsterInfo.magicHurt.magic) {
         //如果通过魔法守卫中间
@@ -693,25 +693,11 @@ export class MapCollisionSystem {
         //}
         //}
         //}
-        //return true;
+        return true;
     }
-    private excuteEvent(eventId: number | string) {
-        //this.gameEventSystem = new GameEventSystem();
-        //this.gameEventSystem.init(eventId, this, this.hero).execute();
-    }
+
     clearGameEventSystem() {
         //this.gameEventSystem = null;
-    }
-    public getStair(stairType: string) {
-        //let layer = this.layers["stair"];
-        //if (layer) {
-        //for (let type in layer) {
-        //if (layer[type].stairType == stairType) {
-        //return layer[type];
-        //}
-        //}
-        //}
-        //return null;
     }
 
     private elementActionComplete() {

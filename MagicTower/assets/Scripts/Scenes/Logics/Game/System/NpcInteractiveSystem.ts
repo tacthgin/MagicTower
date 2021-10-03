@@ -9,7 +9,7 @@ export class NpcInteractiveSystem {
     /** npc tile index */
     private index: number = 0;
 
-    init(tileIndex: number, npc: Npc, map: GameMap, hero: Hero) {
+    init(map: GameMap, hero: Hero, npc: Npc) {
         //this.npc = npc;
         //this.hero = hero;
         //this.map = map;

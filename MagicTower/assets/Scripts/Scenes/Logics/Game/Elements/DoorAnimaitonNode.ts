@@ -16,7 +16,7 @@ export class DoorAnimationNode extends BasePoolNode {
     init(name: string, callback: Function | null) {
         this.callback = callback;
         this.getComponent(Sprite)!.spriteFrame = ElementManager.getInstance().getElementSpriteFrame(name);
-        //this.getComponent(Animation)?.play(name);
+        this.getComponent(Animation)?.play(name);
     }
 
     onFinished() {
