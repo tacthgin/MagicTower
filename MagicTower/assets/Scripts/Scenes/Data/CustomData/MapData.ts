@@ -2,7 +2,7 @@ import { Vec2 } from "cc";
 import { BaseData, BaseLoadData } from "../../../Framework/Base/BaseData";
 import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Fn } from "../../../Framework/Util/Fn";
-import { Door, DoorState, DoorType, Element, Stair, StairType } from "./Element";
+import { Door, DoorState, DoorType, Element, EventInfo, Stair, StairType } from "./Element";
 
 export enum MapEvent {
     ADD_ELEMENT,
@@ -99,7 +99,7 @@ export class LevelData extends BaseLoadData {
     }
 
     saveMapData() {
-        GameManager.DATA.getData(MapData)?.save();
+        // GameManager.DATA.getData(MapData)?.save();
     }
 
     private emitEvent(layerName: string, index: number, info: any = null) {
@@ -131,45 +131,20 @@ export class LevelData extends BaseLoadData {
 
     loadProperties(properties: any, data: any = null) {
         let propertiesInfo = null;
-        for (let layerName in properties) {
-            propertiesInfo = properties[layerName];
-            switch (layerName) {
-                case "door":
-                    this.parseDoor(propertiesInfo, data);
-                    break;
-                case "stair":
-                    let stairs: Stair[] = [];
-                    let location = propertiesInfo["location"].split(",");
-                    for (let i = 0; i < 2; i++) {
-                        if (location[i] != "0") {
-                            let stair = new Stair();
-                            if (location[i + 2]) {
-                                stair.levelDiff = parseInt(location[i + 2]);
-                            }
-                            stair.standLocation = parseInt(location[i]);
-                            stairs[i] = stair;
-                        }
-                    }
-                    if (propertiesInfo["hide"]) {
-                        stairs[0].hide = true;
-                    }
-                    if (stairs[1]) {
-                        stairs[1].levelDiff *= -1;
-                    }
 
-                    this.layerInfo[layerName] = stairs;
-                    break;
-                case "monster":
-                    break;
-                case "event":
-                    let eventInfo: { [key: string]: Element } = {};
-                    for (let index in propertiesInfo) {
-                        let element = new Element();
-                        element.id = parseInt(propertiesInfo[index]);
-                        eventInfo[index] = element;
-                    }
-                    this.layerInfo[layerName] = eventInfo;
-                    break;
+        let parsers: { [key: string]: Function } = {
+            door: this.parseDoor,
+            stair: this.parseStair,
+            event: this.parseEvent,
+        };
+        for (let layerName in properties) {
+            let func = parsers[layerName];
+            if (func) {
+                propertiesInfo = properties[layerName];
+                let tilesData = data ? data[layerName] : null;
+                func.call(this, propertiesInfo, tilesData);
+            } else {
+                console.error("没有层属性:", layerName);
             }
         }
     }
@@ -258,7 +233,40 @@ export class LevelData extends BaseLoadData {
                     break;
             }
         }
-        this.layerInfo["door"] = doorInfos;
+        return doorInfos;
+    }
+
+    private parseStair(propertiesInfo: any) {
+        let stairs: Stair[] = [];
+        let location = propertiesInfo["location"].split(",");
+        for (let i = 0; i < 2; i++) {
+            if (location[i] != "0") {
+                let stair = new Stair();
+                if (location[i + 2]) {
+                    stair.levelDiff = parseInt(location[i + 2]);
+                }
+                stair.standLocation = parseInt(location[i]);
+                stairs[i] = stair;
+            }
+        }
+        if (propertiesInfo["hide"]) {
+            stairs[0].hide = true;
+        }
+        if (stairs[1]) {
+            stairs[1].levelDiff *= -1;
+        }
+
+        return stairs;
+    }
+
+    private parseEvent(propertiesInfo: any) {
+        let eventInfo: { [key: string]: EventInfo } = {};
+        for (let index in propertiesInfo) {
+            let element = new EventInfo();
+            element.id = parseInt(propertiesInfo[index]);
+            eventInfo[index] = element;
+        }
+        return eventInfo;
     }
 
     setAppear(layerName: string, index: number, gid: number) {

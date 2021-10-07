@@ -2,7 +2,7 @@ import { v2, v3, Vec2 } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
-import { Door, DoorState, DoorType, Element, Monster, StairType } from "../../../Data/CustomData/Element";
+import { Door, DoorState, DoorType, Element, Monster, Npc, StairType } from "../../../Data/CustomData/Element";
 import { HeroAttr, HeroData, PropType } from "../../../Data/CustomData/HeroData";
 import { LevelData, MapData } from "../../../Data/CustomData/MapData";
 import { GameMap } from "../Map/GameMap";
@@ -159,6 +159,7 @@ export class MapCollisionSystem {
                 }
                 break;
             case "npc":
+                let npc = new Npc();
                 this.npcInteractiveSystem.init(this.gameMap, this.hero, null!);
                 break;
             case "building":
@@ -613,7 +614,7 @@ export class MapCollisionSystem {
         if (id) {
             let eventInfo = GameManager.DATA.getJsonElement("event", id);
             if (!eventInfo.save || eventInfo.save == this.levelData.level) {
-                this.gameEventSystem.init(this.gameMap, this.hero, id).execute();
+                this.gameEventSystem.init(this, this.gameMap, this.hero, id).execute();
                 return false;
             } else {
                 this.levelEvent[eventInfo.save] = id;

@@ -59,7 +59,7 @@ export class HeroData extends BaseData {
         this.loadData(data || GameManager.DATA.getJsonElement("global", "hero"));
         let pos = this.data.pos!;
         this.position = v2(pos[0], pos[1]);
-        this.setProxy();
+        //this.setProxy();
     }
 
     useTestLoad() {

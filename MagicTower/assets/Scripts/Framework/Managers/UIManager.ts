@@ -1,4 +1,4 @@
-import { instantiate, Node, NodePool, Prefab, resources, Vec3, view } from "cc";
+import { instantiate, Node, Prefab, resources, Vec3, view } from "cc";
 import { BaseDialog } from "../Base/BaseDialog";
 import { ColorToast, ToastType } from "../Components/ColorToast";
 import { GameManager } from "./GameManager";
@@ -158,6 +158,10 @@ export class UIManager {
         }
     }
 
+    getDialog(dialogName: string) {
+        return this.layers[UILayerIndex.DIALOG_LAYER].getChildByName(dialogName);
+    }
+
     /** 弹窗关闭回调 */
     closeDialogCallback(dialogName: string) {
         let first = this.dialogQueue[0];
@@ -169,7 +173,7 @@ export class UIManager {
     }
 
     closeDialog(dialogName: string, useAction: boolean = true) {
-        let dialog = this.layers[UILayerIndex.DIALOG_LAYER].getChildByName(dialogName);
+        let dialog = this.getDialog(dialogName);
         dialog && dialog.getComponent(BaseDialog)?.close(useAction);
     }
 

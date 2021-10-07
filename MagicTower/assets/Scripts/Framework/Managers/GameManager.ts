@@ -113,4 +113,12 @@ export class GameManager extends Component {
         this.uiManager.clearLayers();
         director.loadScene(sceneName);
     }
+
+    globalSchedule(callback: any, interval?: number, repeat?: number, delay?: number) {
+        this.schedule(callback, interval, repeat, delay);
+    }
+
+    globalScheduleOnce(callback: any, interval?: number) {
+        this.scheduleOnce(callback, interval);
+    }
 }

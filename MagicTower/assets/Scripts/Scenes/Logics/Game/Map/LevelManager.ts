@@ -78,8 +78,13 @@ export class LevelManager extends Component {
 
             let levelData = this.mapData.getLevelData(level);
             if (!levelData) {
+                let selectLayers = ["door"];
+                let selctTiles: { [key: string]: number[] | null } = {};
+                selectLayers.forEach((layerName) => {
+                    selctTiles[layerName] = gameMap.getLayersTiles(layerName);
+                });
                 levelData = this.mapData.createLevelData(level, gameMap.getLayersProperties(), {
-                    tiles: gameMap.getLayersTiles("door"),
+                    tiles: selctTiles,
                     parseGid: gameMap.getNameByGid.bind(gameMap),
                 });
             }
