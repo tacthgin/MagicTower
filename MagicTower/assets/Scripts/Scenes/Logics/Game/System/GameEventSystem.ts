@@ -1,11 +1,11 @@
 /**处理地图上的事件 */
 
-import { tween, _decorator } from "cc";
-import { GameEvent } from "../../../Constant/GameEvent";
-import { GameMap } from "../Map/GameMap";
-import { Hero } from "../Map/Actor/Hero";
+import { tween } from "cc";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { GameEvent } from "../../../Constant/GameEvent";
+import { Hero } from "../Map/Actor/Hero";
+import { GameMap } from "../Map/GameMap";
 import { MapCollisionSystem } from "./MapCollisionSystem";
 
 export class GameEventSystem {
@@ -53,7 +53,7 @@ export class GameEventSystem {
                     this.disappear();
                     break;
                 case "do":
-                    //this.map.collision(this.map.indexToTile(this.eventInfo.do));
+                    this.collisionSystem.collision(this.map.getTile(this.eventInfo.do));
                     break;
                 case "show":
                     //this.map.getElement(this.eventInfo.show).add();
@@ -96,23 +96,8 @@ export class GameEventSystem {
         for (let layer in movePath) {
             //moveinfo 格式[0, 38, 5]第一个延时，第二个当前坐标，第三个终点坐标
             let move = movePath[layer];
-            //行走类型判断
-            this.map.astarMoveType = layer;
-            move.forEach((moveInfo) => {
-                let path = CommonAstar.getPath(this.map, this.map.indexToTile(moveInfo[1]), this.map.indexToTile(moveInfo[2]));
-                if (path) {
-                    let element = this.map.getElement(moveInfo[1], layer);
-                    let moveFunc = () => {
-                        element.movePath(this.map.changePathCoord(path), moveData.speed).then(() => {
-                            this.map.changeElementInfo(moveInfo[1], moveInfo[2], layer, element);
-                        });
-                    };
-                    if (moveInfo[0] != 0) {
-                        tween(element.node).delay(moveInfo[0]).call(moveFunc).start();
-                    } else {
-                        tween(element.node).call(moveFunc).start();
-                    }
-                }
+            move.forEach((moveInfo: number[]) => {
+                this.collisionSystem.move(layer, moveInfo[1], moveInfo[2], moveData.speed, moveInfo[0]);
             });
         }
         this.map.scheduleOnce(() => {
@@ -171,25 +156,25 @@ export class GameEventSystem {
                 let layerInfo = appearInfo.layer[layer];
                 let className = this.getAppearClassName(layer);
                 for (let i = 0; i < layerInfo.length; i++) {
-                    let element = this.map.addElement(layerInfo[i][0], layer, className, layerInfo[i][1]);
-                    element.node.active = false;
-                    tween(element.node)
-                        .delay(appearInfo.delay[i])
-                        .call(() => {
-                            element.node.active = true;
-                            element.add();
-                        })
-                        .start();
+                    // let element = this.map.addElement(layerInfo[i][0], layer, className, layerInfo[i][1]);
+                    // element.node.active = false;
+                    // tween(element.node)
+                    //     .delay(appearInfo.delay[i])
+                    //     .call(() => {
+                    //         element.node.active = true;
+                    //         element.add();
+                    //     })
+                    //     .start();
                 }
             }
         } else {
             for (let layer in appearInfo.layer) {
                 let layerInfo = appearInfo.layer[layer];
                 let className = this.getAppearClassName(layer);
-                layerInfo.forEach((elementInfo) => {
-                    let element = this.map.addElement(elementInfo[0], layer, className, elementInfo[1]);
-                    element.add();
-                });
+                // layerInfo.forEach((elementInfo) => {
+                //     let element = this.map.addElement(elementInfo[0], layer, className, elementInfo[1]);
+                //     element.add();
+                // });
             }
         }
         this.map.scheduleOnce(() => {
@@ -200,8 +185,8 @@ export class GameEventSystem {
     private disappear() {
         let info = this.eventInfo.disappear[this.disappearStep++];
         for (let layer in info) {
-            info[layer].forEach((index) => {
-                this.map.removeElement(index, layer);
+            info[layer].forEach((index: number) => {
+                this.collisionSystem.disappear(layer, index);
             });
         }
         this.execute();
@@ -211,8 +196,8 @@ export class GameEventSystem {
         if (info.hero) {
             this.hero.magicLight(info.hero);
         } else if (info.monster) {
-            let monster = this.map.getElement(info.monster, "monster");
-            monster.beAttack();
+            // let monster = this.map.getElement(info.monster, "monster");
+            // monster.beAttack();
         }
         this.map.scheduleOnce(() => {
             this.execute();

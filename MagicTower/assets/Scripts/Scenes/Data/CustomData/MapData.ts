@@ -285,6 +285,18 @@ export class LevelData extends BaseLoadData {
         this.saveMapData();
     }
 
+    move(layerName: string, src: number, dst: number, gid: number) {
+        if (!this._appearTile[layerName]) {
+            this._appearTile[layerName] = {};
+        }
+        let tiles = this._appearTile[layerName];
+        if (tiles[src]) {
+            delete tiles[src];
+        }
+        tiles[dst] = gid;
+        this.saveMapData();
+    }
+
     canHeroMove(tile: Vec2) {
         //if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroData.Hp <= this.getWizardMagicDamage(index)) return false;
         return true;

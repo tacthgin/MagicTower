@@ -1,16 +1,23 @@
-import { v2, v3, Vec2 } from "cc";
+import { tween, v2, v3, Vec2 } from "cc";
+import { CommonAstar } from "../../../../Framework/Lib/Custom/Astar";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { Door, DoorState, DoorType, Element, Monster, Npc, StairType } from "../../../Data/CustomData/Element";
 import { HeroAttr, HeroData, PropType } from "../../../Data/CustomData/HeroData";
 import { LevelData, MapData } from "../../../Data/CustomData/MapData";
-import { GameMap } from "../Map/GameMap";
+import { ElementNode } from "../Elements/ElementNode";
 import { Hero } from "../Map/Actor/Hero";
+import { AstarMoveType, GameMap } from "../Map/GameMap";
 import { CalculateSystem } from "./CalculateSystem";
+import { GameEventSystem } from "./GameEventSystem";
 import { MonsterFightSystem } from "./MonsterFightSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
-import { GameEventSystem } from "./GameEventSystem";
+
+const LAYER_TO_MOVE: { [key: string]: AstarMoveType } = {
+    npc: AstarMoveType.MONSTER,
+    monster: AstarMoveType.MONSTER,
+};
 
 /** 在楼梯旁的index差值 */
 let INDEX_DIFFS = [1, 11];
@@ -56,7 +63,7 @@ export class MapCollisionSystem {
         //幸运金币
         let ratio = this.heroData.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
         this.heroData.setAttrDiff(HeroAttr.GOLD, monster.monsterInfo.gold * ratio);
-        this.setDisappear("monster", monster.index);
+        this.disappear("monster", monster.index);
         this.elementActionComplete();
         //this.removeMonsterDoor();
         //this.monsterEventTrigger(index);
@@ -85,14 +92,69 @@ export class MapCollisionSystem {
         // }
     }
 
-    private setDisappear(layerName: string, tileOrIndex: Vec2 | number) {
+    private getTileOrIndex(tileOrIndex: Vec2 | number) {
+        let tile: Vec2 | null = null;
+        let index: number = -1;
         if (typeof tileOrIndex == "number") {
-            this.gameMap.setTileGIDAt(layerName, this.gameMap.getTile(tileOrIndex), 0);
-            this.levelData.setDisappear(layerName, tileOrIndex);
+            tile = this.gameMap.getTile(tileOrIndex);
+            index = tileOrIndex;
         } else {
-            this.gameMap.setTileGIDAt(layerName, tileOrIndex, 0);
-            this.levelData.setDisappear(layerName, this.gameMap.getTileIndex(tileOrIndex));
+            tile = tileOrIndex;
+            index = this.gameMap.getTileIndex(tileOrIndex);
         }
+
+        return { tile: tile, index: index };
+    }
+
+    appear(layerName: string, tileOrIndex: Vec2 | number, id: number, record: boolean = true) {
+        let json = GameManager.DATA.getJsonElement(layerName, id);
+        if (json) {
+            let { index, tile } = this.getTileOrIndex(tileOrIndex);
+            let gid = this.gameMap.getGidByName(`${json.spriteId}_0`);
+            if (gid) {
+                this.gameMap.setTileGIDAt(layerName, tile, gid);
+                record && this.levelData.setAppear(layerName, index, gid);
+            } else {
+                console.error("appear gid 找不到");
+            }
+        } else {
+            console.error("appear error id:", id);
+        }
+    }
+
+    disappear(layerName: string, tileOrIndex: Vec2 | number, record: boolean = true) {
+        let { index, tile } = this.getTileOrIndex(tileOrIndex);
+        this.gameMap.setTileGIDAt(layerName, tile, 0);
+        record && this.levelData.setDisappear(layerName, index);
+    }
+
+    async move(layerName: string, src: number, dst: number, speed: number, delay: number) {
+        let tile = this.gameMap.getTile(src);
+        let gid = this.gameMap.getTileGIDAt(layerName, tile);
+        if (gid) {
+            let element = await this.createElement();
+            if (element) {
+                this.levelData.move(layerName, src, dst, gid);
+                this.gameMap.setTileGIDAt(layerName, tile, 0);
+                let path = CommonAstar.getPath(this.gameMap, this.gameMap.getTile(src), this.gameMap.getTile(dst));
+                if (path) {
+                    let moveFunc = () => {
+                        element?.getComponent(ElementNode)?.movePath(this.changePathCoord(path!), speed);
+                    };
+                    if (delay != 0) {
+                        tween(element).delay(delay).call(moveFunc).start();
+                    } else {
+                        tween(element).call(moveFunc).start();
+                    }
+                }
+            }
+        } else {
+            console.error("move gid 找不到");
+        }
+    }
+
+    private async createElement() {
+        return await GameManager.POOL.createPoolNode(`Prefabs/Elements/ElementNode`);
     }
 
     private async createDoorAnimation(id: number | string, tile: Vec2, reverse: boolean, callback: Function | null = null) {
@@ -134,7 +196,7 @@ export class MapCollisionSystem {
                 {
                     GameManager.AUDIO.playEffect("eat");
                     this.heroData.addProp(jsonData.id, this.levelData.level);
-                    this.setDisappear(layerName, tile);
+                    this.disappear(layerName, tile);
                 }
                 return true;
             case "door":
@@ -160,7 +222,7 @@ export class MapCollisionSystem {
                 break;
             case "npc":
                 let npc = new Npc();
-                this.npcInteractiveSystem.init(this.gameMap, this.hero, null!);
+                this.npcInteractiveSystem.init(this.gameMap, this.hero, npc);
                 break;
             case "building":
                 this.gotoShop();
@@ -562,12 +624,14 @@ export class MapCollisionSystem {
         //}
         //}
     }
-    changePathCoord(path: Vec2[]) {
-        //for (let i = 0; i < path.length; i++) {
-        //path[i] = this.tileToNodeSpaceAR(path[i]);
-        //}
-        //return path;
+
+    private changePathCoord(path: Vec2[]) {
+        for (let i = 0; i < path.length; i++) {
+            path[i] = this.gameMap.getPositionAt(path[i])!;
+        }
+        return path;
     }
+
     private gotoShop() {
         //this.shopInfo.level = this.mapData.level;
         //GameManager.getInstance()
@@ -913,4 +977,6 @@ export class MapCollisionSystem {
     // getMap(level: number): GameMap {
     //     return this.maps[level];
     // }
+
+    moveElement(layerName: string, from: number, to: number) {}
 }

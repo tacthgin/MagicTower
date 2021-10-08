@@ -274,6 +274,4 @@ export class GameMap extends TiledMap implements AstarMap {
 
         return true;
     }
-
-    private test() {}
 }
