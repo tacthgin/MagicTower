@@ -18,12 +18,25 @@ export enum PropType {
     DEFENCE_GEM,
     SWARD = 5,
     SHIELD,
-    /** 羽毛 */
-    FEATHER = 9,
-    /** 神圣盾 */
-    DIVINE_SHIELD = 17,
-    RECORD_BOOK = 19,
-    LUCKY_GOLD = 27,
+    MONSTER_HAND_BOOK,
+    RECORD_BOOK,
+    /** 飞行魔杖 */
+    FLYING_WAND,
+    /** 镐 */
+    PICKAXE,
+    EARTHQUAKE_SCROLL,
+    /** 冰冻魔法 */
+    ICE_MAGIC,
+    BOMB,
+    MAGIC_KEY,
+    HOLY_WATER,
+    LUCKY_GOLD,
+    CROSS,
+    DRAGON_SLAYING_KNIFE,
+    /** 上下飞行 */
+    FEATHER,
+    /** 中心飞行 */
+    CENTER_FEATHER,
 }
 
 export enum HeroEvent {
@@ -163,7 +176,7 @@ export class HeroData extends BaseData {
     }
 
     equipedDivineShield() {
-        return this.data.props.shieldID == PropType.DIVINE_SHIELD;
+        return this.data.props.shieldID == 17;
     }
 
     getRecordTalk() {

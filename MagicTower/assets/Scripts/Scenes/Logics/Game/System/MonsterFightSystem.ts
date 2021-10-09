@@ -11,15 +11,12 @@ export class MonsterFightSystem {
     private map: GameMap = null!;
     private hero: Hero = null!;
     private monster: Monster = null!;
-    /** npc tile index */
-    private index: number = 0;
 
-    constructor() {}
-
-    setFightInfo(gameMap: GameMap, hero: Hero, monster: Monster) {
+    init(gameMap: GameMap, hero: Hero, monster: Monster) {
         this.hero = hero;
         this.map = gameMap;
         this.monster = monster;
+        return this;
     }
 
     /**

@@ -5,7 +5,6 @@ import { NotifyCenter } from "../../../../../Framework/Managers/NotifyCenter";
 import { GameEvent } from "../../../../Constant/GameEvent";
 import { HeroAttr, HeroData } from "../../../../Data/CustomData/HeroData";
 import { Lightning } from "../../Elements/Lightning";
-import { MapCollisionSystem } from "../../System/MapCollisionSystem";
 import { AstarMoveType, GameMap } from "../GameMap";
 import { Actor } from "./Actor";
 import { ActorState, StateMachine } from "./ActorState";
@@ -30,10 +29,8 @@ export class Hero extends Actor {
     private heroFSM: StateMachine = new StateMachine(this);
     private globalInfo: any = null;
     private map: GameMap = null!;
-    private astar: Astar = new Astar();
     private isHeroMoving: boolean = false;
-    private collisionSystem: MapCollisionSystem = new MapCollisionSystem();
-    private heroTile: Vec2 = null!;
+    private _heroTile: Vec2 = null!;
     private heroDirection: number = 0;
 
     get heroData() {
@@ -46,6 +43,10 @@ export class Hero extends Actor {
 
     get heroMoving() {
         return this.isHeroMoving;
+    }
+
+    get heroTile() {
+        return this._heroTile;
     }
 
     onLoad() {
@@ -71,7 +72,6 @@ export class Hero extends Actor {
 
     setOwnerMap(map: GameMap) {
         this.map = map;
-        this.collisionSystem.init(map, this);
     }
 
     /**
@@ -141,7 +141,7 @@ export class Hero extends Actor {
             this.heroDirection = info;
         } else {
             let result = new Vec2();
-            Vec2.subtract(result, info, this.heroTile);
+            Vec2.subtract(result, info, this._heroTile);
             this.heroDirection = this.getDirection(result);
         }
         this.setDirectionTexture();
@@ -152,50 +152,46 @@ export class Hero extends Actor {
         this.heroNode.getComponent(Sprite)!.spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._heroData.get("animation")[this.heroDirection]}_0`);
     }
 
-    autoMove(endTile: Vec2) {
-        this.map.astarMoveType = AstarMoveType.HERO;
-        console.log(this.heroTile, endTile);
-        let path = this.astar.getPath(this.map, this.heroTile, endTile);
-        if (path) {
-            let canEndMove = this.collisionSystem.canEndTileMove(endTile);
+    /**
+     * 自动行走
+     * @param path 路径
+     * @param canEndMove 终点是否能行走
+     * @param endTile 终点tile
+     * @param collisionFunc 与其他元素碰撞交互函数
+     */
+    autoMove(path: Vec2[], canEndMove: boolean, endTile: Vec2, collisionFunc: Function) {
+        let moveComplete = () => {
             if (!canEndMove) {
-                path.pop();
-            }
-            let moveComplete = () => {
-                if (!canEndMove) {
-                    this.toward(endTile);
-                } else {
-                    this.toward(this.heroDirection);
-                }
-                let tile = canEndMove ? endTile : path![path!.length - 1];
-                if (tile) {
-                    this._heroData.setPosition(tile, this.heroDirection);
-                }
-                this.isHeroMoving = !this.collisionSystem.collision(endTile);
-                this.stand();
-            };
-            this.isHeroMoving = true;
-            if (path.length == 0) {
-                moveComplete();
+                this.toward(endTile);
             } else {
-                this.movePath(path, (tile: Vec2, end: boolean) => {
-                    if (end) {
-                        moveComplete();
-                    } else if (!this.collisionSystem.collision(tile)) {
-                        //碰到区块处理事件停止;
-                        this.stand();
-                        return true;
-                    }
-                    return false;
-                });
+                this.toward(this.heroDirection);
             }
-            NotifyCenter.emit(GameEvent.MOVE_PATH);
+            let tile = canEndMove ? endTile : path![path!.length - 1];
+            if (tile) {
+                this._heroData.setPosition(tile, this.heroDirection);
+            }
+            this.isHeroMoving = !collisionFunc(endTile);
+            this.stand();
+        };
+        this.isHeroMoving = true;
+        if (path.length == 0) {
+            moveComplete();
         } else {
-            GameManager.UI.showToast("无效路径");
+            this.movePath(path, this.globalInfo.heroSpeed, (tile: Vec2, end: boolean) => {
+                if (end) {
+                    moveComplete();
+                } else if (!collisionFunc(tile)) {
+                    //碰到区块处理事件停止;
+                    this.stand();
+                    return true;
+                }
+                return false;
+            });
         }
+        NotifyCenter.emit(GameEvent.MOVE_PATH);
     }
 
-    movePath(path: Vec2[], moveCallback: (tile: Vec2, end: boolean) => boolean) {
+    movePath(path: Vec2[], speed: number, moveCallback: Function) {
         let moveActions: Tween<Node>[] = [];
         let stop = false;
         let moveAction = (tile: Vec2, end: boolean = false) => {
@@ -203,15 +199,15 @@ export class Hero extends Actor {
             return tween()
                 .call(() => {
                     let result = new Vec2();
-                    this.heroDirection = this.getDirection(Vec2.subtract(result, tile, this.heroTile));
+                    this.heroDirection = this.getDirection(Vec2.subtract(result, tile, this._heroTile));
                     if (!stop) {
                         //动作停止callFunc依然会调用一次;
                         this.heroFSM.changeState(ActorState.MOVE);
                     }
                 })
-                .to(this.globalInfo.heroSpeed, { position: v3(position.x, position.y) })
+                .to(speed, { position: v3(position.x, position.y) })
                 .call(() => {
-                    this.heroTile = tile;
+                    this._heroTile = tile;
                     stop = moveCallback(tile, end);
                 });
         };
@@ -237,8 +233,8 @@ export class Hero extends Actor {
         } else {
             this.toward(this._heroData.get("direction"));
         }
-        this.heroTile = this._heroData.getPosition();
-        let position = this.map.getPositionAt(this.heroTile) || Vec2.ZERO;
+        this._heroTile = this._heroData.getPosition();
+        let position = this.map.getPositionAt(this._heroTile) || Vec2.ZERO;
         this.node.position = v3(position.x, position.y);
     }
 
@@ -256,7 +252,7 @@ export class Hero extends Actor {
     }
 
     magicLight(monsterIndexs: number[]) {
-        let heroIndex = this.map.getTileIndex(this.heroTile);
+        let heroIndex = this.map.getTileIndex(this._heroTile);
         monsterIndexs.forEach((index) => {
             let lightning = GameManager.POOL.createPrefabNode("Lightning")!;
             lightning.parent = this.node;

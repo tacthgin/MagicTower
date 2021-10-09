@@ -1,9 +1,10 @@
-import { Animation, Component, _decorator } from "cc";
+import { Animation, tween, Tween, Vec2, _decorator } from "cc";
+import { BasePoolNode } from "../../../../../Framework/Base/BasePoolNode";
 import { ActorState } from "./ActorState";
 const { ccclass, property } = _decorator;
 
 @ccclass("Actor")
-export abstract class Actor extends Component {
+export abstract class Actor extends BasePoolNode {
     @property(Animation)
     protected animation: Animation = null!;
 
@@ -38,5 +39,18 @@ export abstract class Actor extends Component {
         if (state != newState) {
             this.stopAnimaiton();
         }
+    }
+
+    movePath(path: Vec2[], speed: number, callback: Function | null = null) {
+        if (!path) return;
+        let moveActions: Tween<unknown>[] = [];
+        for (let i = 0; i < path.length - 1; i++) {
+            moveActions.push(tween().to(speed, { position: path[i] }));
+        }
+
+        callback && moveActions.push(tween().call(callback));
+        tween(this.node)
+            .sequence(...moveActions)
+            .start();
     }
 }

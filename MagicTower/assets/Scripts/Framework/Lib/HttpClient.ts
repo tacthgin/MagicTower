@@ -43,6 +43,7 @@ export class HttpClient {
             console.error(Date.now(), "HTTP超时:", url);
             failCallback();
         };
+
         xhr.open(method, url, true);
         //附带头数据
         if (headInfo) {

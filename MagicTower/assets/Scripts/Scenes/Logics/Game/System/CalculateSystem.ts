@@ -52,9 +52,7 @@ export class CalculateSystem {
     }
 
     static getHeroAttack(heroData: HeroData, monsterInfo: any) {
-        return monsterInfo.extraDamage && heroData.getPropNum(monsterInfo.extraDamage)
-            ? heroData.getAttr(HeroAttr.ATTACK) * 2
-            : heroData.getAttr(HeroAttr.ATTACK);
+        return monsterInfo.extraDamage && heroData.getPropNum(monsterInfo.extraDamage) ? heroData.getAttr(HeroAttr.ATTACK) * 2 : heroData.getAttr(HeroAttr.ATTACK);
     }
 
     /**

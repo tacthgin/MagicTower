@@ -82,6 +82,11 @@ export class GameEventSystem {
             NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
         }
     }
+
+    private scheduleExecute(interval: number) {
+        this.collisionSystem.scheduleOnce(this.execute.bind(this), interval);
+    }
+
     private chat() {
         GameManager.UI.showDialog("ChatDialog", this.eventInfo.chat[this.chatStep++], () => {
             this.execute();
@@ -100,53 +105,14 @@ export class GameEventSystem {
                 this.collisionSystem.move(layer, moveInfo[1], moveInfo[2], moveData.speed, moveInfo[0]);
             });
         }
-        this.map.scheduleOnce(() => {
-            this.execute();
-        }, moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
+
+        this.scheduleExecute(moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
     }
 
     private specialMove() {
         let info = this.eventInfo.specialMove;
-        if (info.type == "spawn") {
-            let actions: any = [];
-            for (let actionName in info) {
-                switch (actionName) {
-                    case "move":
-                        {
-                            let tile = this.map.getTile(info[actionName].to);
-                            actions.push(tween().to(info.interval, { position: this.map.getPositionAt(tile) }));
-                        }
-                        break;
-                    case "fadeOut":
-                        {
-                            actions.push(tween().to(info.interval, {}));
-                        }
-                        break;
-                }
-            }
-            if (info.move) {
-                info.move.from.forEach((index: number) => {
-                    // let element = this.map.getElement(index, "monster");
-                    // tween(element.node)
-                    //     .parallel(actions)
-                    //     .call(() => {
-                    //         this.map.removeElement(index, "monster");
-                    //     })
-                    //     .start();
-                });
-            }
-            this.map.scheduleOnce(() => {
-                this.execute();
-            }, info.interval);
-        }
-    }
-
-    getAppearClassName(layer: string) {
-        if (layer == "wall") {
-            return "door1006_0";
-        } else {
-            return layer.charAt(0).toUpperCase() + layer.slice(1);
-        }
+        this.collisionSystem.specialMove(info);
+        this.scheduleExecute(info.interval);
     }
 
     private appear() {
@@ -154,32 +120,22 @@ export class GameEventSystem {
         if (appearInfo.delay) {
             for (let layer in appearInfo.layer) {
                 let layerInfo = appearInfo.layer[layer];
-                let className = this.getAppearClassName(layer);
                 for (let i = 0; i < layerInfo.length; i++) {
-                    // let element = this.map.addElement(layerInfo[i][0], layer, className, layerInfo[i][1]);
-                    // element.node.active = false;
-                    // tween(element.node)
-                    //     .delay(appearInfo.delay[i])
-                    //     .call(() => {
-                    //         element.node.active = true;
-                    //         element.add();
-                    //     })
-                    //     .start();
+                    this.collisionSystem.scheduleOnce(() => {
+                        this.collisionSystem.appear(layer, layerInfo[i][0], layerInfo[i][1]);
+                    }, appearInfo.delay[i]);
                 }
             }
         } else {
             for (let layer in appearInfo.layer) {
                 let layerInfo = appearInfo.layer[layer];
-                let className = this.getAppearClassName(layer);
-                // layerInfo.forEach((elementInfo) => {
-                //     let element = this.map.addElement(elementInfo[0], layer, className, elementInfo[1]);
-                //     element.add();
-                // });
+                layerInfo.forEach((elementInfo: number[]) => {
+                    this.collisionSystem.appear(layer, elementInfo[0], elementInfo[1]);
+                });
             }
         }
-        this.map.scheduleOnce(() => {
-            this.execute();
-        }, appearInfo.interval);
+
+        this.scheduleExecute(appearInfo.interval);
     }
 
     private disappear() {
@@ -199,9 +155,8 @@ export class GameEventSystem {
             // let monster = this.map.getElement(info.monster, "monster");
             // monster.beAttack();
         }
-        this.map.scheduleOnce(() => {
-            this.execute();
-        }, this.globalConfig.fadeInterval + 0.05);
+
+        this.scheduleExecute(this.globalConfig.fadeInterval + 0.05);
     }
 
     private sceneAppear() {
