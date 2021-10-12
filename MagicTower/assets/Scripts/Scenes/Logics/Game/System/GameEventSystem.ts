@@ -84,7 +84,7 @@ export class GameEventSystem {
     }
 
     private scheduleExecute(interval: number) {
-        this.collisionSystem.scheduleOnce(this.execute.bind(this), interval);
+        this.map.scheduleOnce(this.execute.bind(this), interval);
     }
 
     private chat() {
@@ -121,7 +121,7 @@ export class GameEventSystem {
             for (let layer in appearInfo.layer) {
                 let layerInfo = appearInfo.layer[layer];
                 for (let i = 0; i < layerInfo.length; i++) {
-                    this.collisionSystem.scheduleOnce(() => {
+                    this.map.scheduleOnce(() => {
                         this.collisionSystem.appear(layer, layerInfo[i][0], layerInfo[i][1]);
                     }, appearInfo.delay[i]);
                 }
@@ -161,10 +161,8 @@ export class GameEventSystem {
 
     private sceneAppear() {
         let info = this.eventInfo.sceneAppear;
-        //NotifyCenter.emit(GameEvent.SCENE_APPEAR, info[0], this.map.indexToTile(info[1]));
         this.hero.weak();
-        //NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
-        // NotifyCenter.emit(GameEvent.REFRESH_EQUIP);
+        NotifyCenter.emit(GameEvent.SCENE_APPEAR, info[0], this.map.getTile(info[1]));
         this.execute();
     }
 

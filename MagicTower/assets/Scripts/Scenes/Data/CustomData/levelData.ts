@@ -4,6 +4,12 @@ import { GameManager } from "../../../Framework/Managers/GameManager";
 import { Door, DoorState, DoorType, EventInfo, Stair, StairType } from "./Element";
 import { MapData, MapEvent } from "./MapData";
 
+const CLASS_MAP: any = {
+    door: Door,
+    stair: Stair,
+    event: EventInfo,
+};
+
 export class LevelData extends BaseLoadData {
     //层
     private _level: number = 0;
@@ -44,19 +50,14 @@ export class LevelData extends BaseLoadData {
         this.loadData(info);
         for (let layerName in this.layerInfo) {
             let layerInfo = this.layerInfo[layerName];
-            switch (layerName) {
-                case "door":
+            for (let key in layerInfo) {
+                let constructor = CLASS_MAP[key];
+                if (constructor) {
                     for (let key in layerInfo) {
-                        let door = new Door();
-                        layerInfo[key] = door.load(layerInfo[key]);
+                        let element = new constructor();
+                        layerInfo[key] = element.load(layerInfo[key]);
                     }
-                    break;
-                case "stair":
-                    for (let i = 0; i < layerInfo.length; i++) {
-                        let stair = new Stair();
-                        layerInfo[i] = stair.load(layerInfo[i]);
-                    }
-                    break;
+                }
             }
         }
         return this;
@@ -167,7 +168,23 @@ export class LevelData extends BaseLoadData {
         return doorInfos;
     }
 
-    private parseStair(propertiesInfo: any) {
+    private parseStair(propertiesInfo: any, data: any) {
+        let tileIndexes: number[] = [];
+        if (data) {
+            let tiles: number[] = data.tiles;
+            let parseGid = data.parseGid;
+            for (let i = 0; i < tiles.length; i++) {
+                if (tiles[i] == 0) {
+                    continue;
+                }
+
+                let name = parseGid(tiles[i]);
+                if (name) {
+                    name = name.split("_")[1];
+                    tileIndexes[name == "up" ? StairType.UP : StairType.Down] = i;
+                }
+            }
+        }
         let stairs: Stair[] = [];
         let location = propertiesInfo["location"].split(",");
         for (let i = 0; i < 2; i++) {
@@ -177,6 +194,7 @@ export class LevelData extends BaseLoadData {
                     stair.levelDiff = parseInt(location[i + 2]);
                 }
                 stair.standLocation = parseInt(location[i]);
+                stair.index = tileIndexes[i];
                 stairs[i] = stair;
             }
         }
@@ -233,7 +251,7 @@ export class LevelData extends BaseLoadData {
         return true;
     }
 
-    getStair(type: StairType): Stair {
+    getStair(type: StairType): Stair | null {
         return this.layerInfo["stair"][type] || null;
     }
 

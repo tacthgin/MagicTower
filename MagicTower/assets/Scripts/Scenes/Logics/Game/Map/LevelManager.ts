@@ -38,9 +38,9 @@ export class LevelManager extends Component {
 
         this.mapData = GameManager.DATA.getData(MapData)!;
 
-        NotifyCenter.on(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
         this.mapData.on(MapEvent.SWITCH_LEVEL, this.onSwitchLevel, this);
-        // NotifyCenter.on(GameEvent.SCENE_APPEAR, this.sceneAppear, this);
+        NotifyCenter.on(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
+        NotifyCenter.on(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
         NotifyCenter.on(GameEvent.USE_PROP, this.onUseProp, this);
     }
 
@@ -81,13 +81,13 @@ export class LevelManager extends Component {
 
             let levelData = this.mapData.getLevelData(level);
             if (!levelData) {
-                let selectLayers = ["door"];
-                let selctTiles: { [key: string]: number[] | null } = {};
+                let selectLayers = ["door", "stair", "monster"];
+                let selectTiles: { [key: string]: number[] | null } = {};
                 selectLayers.forEach((layerName) => {
-                    selctTiles[layerName] = gameMap.getLayersTiles(layerName);
+                    selectTiles[layerName] = gameMap.getLayersTiles(layerName);
                 });
                 levelData = this.mapData.createLevelData(level, gameMap.getLayersProperties(), {
-                    tiles: selctTiles,
+                    tiles: selectTiles,
                     parseGid: gameMap.getNameByGid.bind(gameMap),
                 });
             }
@@ -105,11 +105,19 @@ export class LevelManager extends Component {
         let newMap = this.createMap(this.mapData.level);
         newMap.node.active = true;
         let levelData = this.mapData.getCurrentLevelData();
-        this.showHero(newMap.getTile(levelData.getStair(type).standLocation));
+        this.showHero(newMap.getTile(levelData.getStair(type)!.standLocation));
     }
 
     private onUseProp(propInfo: any, extraInfo: any) {
-        this.collisionSystem.useProp(propInfo, extraInfo)
+        this.collisionSystem.useProp(propInfo, extraInfo);
+    }
+
+    private onSceneAppear(level: number, tile: Vec2) {
+        this.maps[this.mapData.level].node.active = false;
+        this.mapData.level = level;
+        let newMap = this.createMap(this.mapData.level);
+        newMap.node.active = true;
+        this.showHero(tile);
     }
 
     private showHero(tile: Vec2 | null = null) {

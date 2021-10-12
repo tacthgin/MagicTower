@@ -1,7 +1,8 @@
 import { BaseData } from "../../../Framework/Base/BaseData";
 import { Fn } from "../../../Framework/Util/Fn";
 import { StairType } from "./Element";
-import { LevelData } from "./levelData";
+import { LevelData } from "./LevelData";
+import { LevelTempData } from "./LevelTempData";
 
 export enum MapEvent {
     ADD_ELEMENT,
@@ -16,6 +17,8 @@ export class MapData extends BaseData {
         currentLevel: 1,
         maps: {},
     };
+
+    private levelTempDatas: { [key: number]: LevelTempData } = {};
 
     set level(value) {
         this.data.currentLevel = value;
@@ -45,6 +48,10 @@ export class MapData extends BaseData {
         return this.data.maps[level] || null;
     }
 
+    getLevelTempData(level: number): LevelTempData {
+        return this.levelTempDatas[level] || null;
+    }
+
     /**
      * 创建层数据
      * @param level 层等级
@@ -56,6 +63,7 @@ export class MapData extends BaseData {
         let levelData = new LevelData(level);
         levelData.loadProperties(properties, data);
         this.data.maps[level] = levelData;
+        this.levelTempDatas[level] = new LevelTempData(level, levelData, data);
         return levelData;
     }
 

@@ -4,7 +4,7 @@ import { GameManager } from "../../../Framework/Managers/GameManager";
 export class Element extends BaseLoadData {
     protected _gid: number = 0;
     protected _id: number = 0;
-    protected _index: number = 0;
+    protected _index: number = -1;
 
     set gid(value: number) {
         this._gid = value;
@@ -130,6 +130,13 @@ export class Stair extends Element {
     get hide() {
         return this._hide;
     }
+}
+
+export enum MonsterType {
+    JUNIOR_WIZARD = 125,
+    SENIOR_WIZARD = 126,
+    /** 魔法警卫 */
+    MAGIC_GUARD = 130,
 }
 
 export class Monster extends Element {
