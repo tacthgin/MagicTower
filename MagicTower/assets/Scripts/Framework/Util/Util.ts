@@ -1,14 +1,6 @@
-import { Vec2 } from "cc";
+import { math, Vec2 } from "cc";
 
 export class Util {
-    static clamp(number: number, min: number, max: number) {
-        return number < min ? min : number > max ? max : number;
-    }
-
-    static round10(number: number) {
-        return Math.round(number * 10) / 10;
-    }
-
     /** 得到圆上一个点 */
     static getPointOnCycle(rad: number, radius: number, center: Vec2 = Vec2.ZERO) {
         return new Vec2(1, 0).rotate(rad).multiplyScalar(radius).add(center);
@@ -158,10 +150,7 @@ export class Util {
         }
         for (let k in dateFormat) {
             if (new RegExp("(" + k + ")").test(format)) {
-                format = format.replace(
-                    RegExp.$1,
-                    RegExp.$1.length == 1 ? dateFormat[k] : ("00" + dateFormat[k]).substr(("" + dateFormat[k]).length)
-                );
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? dateFormat[k] : ("00" + dateFormat[k]).substr(("" + dateFormat[k]).length));
             }
         }
         return format;

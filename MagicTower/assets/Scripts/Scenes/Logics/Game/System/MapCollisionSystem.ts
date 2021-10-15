@@ -1,4 +1,4 @@
-import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "cc";
+import { math, Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "cc";
 import { CommonAstar } from "../../../../Framework/Lib/Custom/Astar";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
