@@ -1,5 +1,5 @@
 import { instantiate, Node, Prefab, resources, Vec3, view } from "cc";
-import { BaseDialog } from "../Base/BaseDialog";
+import { BaseDialog } from "./BaseDialog";
 import { ColorToast, ToastType } from "../Components/ColorToast";
 import { GameManager } from "./GameManager";
 
