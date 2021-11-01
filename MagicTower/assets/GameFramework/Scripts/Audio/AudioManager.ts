@@ -8,8 +8,8 @@ export enum AudioType {
     EFFECT,
 }
 
-@ccclass("AudioController")
-export class AudioController extends Component {
+@ccclass("AudioManager")
+export class AudioManager extends Component {
     @type(AudioSource)
     private audioSource: AudioSource[] = [];
 
