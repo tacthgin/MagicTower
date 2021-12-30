@@ -1,8 +1,4 @@
 import { Component, Label, SpriteFrame, _decorator } from "cc";
-import { BaseEvent } from "../../../Framework/Base/BaseContant";
-import { GameManager } from "../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../Framework/Managers/NotifyCenter";
-import { JsonParserMap } from "../../Constant/JsonParserMap";
 import { ElementManager } from "../Game/Map/ElementManager";
 
 const { ccclass, property } = _decorator;
@@ -13,26 +9,15 @@ export class LoginScene extends Component {
     private progressLabel: Label = null!;
 
     onLoad() {
-        NotifyCenter.on(BaseEvent.ALL_RESOURCES_LOAD_SUCCESS, this.onAllResourcesLoadSuccess, this);
-        NotifyCenter.on(BaseEvent.RESOURCE_PROGRESS, this.onResouceProgress, this);
+       
     }
 
     start() {
-        GameManager.DATA.setParserMap(JsonParserMap);
-        GameManager.RESOURCE.loadResources();
-    }
-
-    onAllResourcesLoadSuccess() {
-        GameManager.DATA.loadLocalStorage();
-        this.gotoGameScene();
-    }
-
-    onResouceProgress(type: string, progress: number) {
-        this.progressLabel.string = `资源加载中，${(progress * 100).toFixed(2)}%...`;
+       
     }
 
     gotoGameScene() {
         ElementManager.getInstance().loadAsset();
-        GameManager.getInstance().loadScene("GameScene");
+        //GameManager.getInstance().loadScene("GameScene");
     }
 }

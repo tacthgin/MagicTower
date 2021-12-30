@@ -1,27 +1,56 @@
-import { _decorator, EventTarget } from "cc";
+import { EventHandle } from "../Base/EventPool/EventHandle";
+import { EventPool } from "../Base/EventPool/EventPool";
+import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
+import { GameFrameworkModule } from "../Base/GameFrameworkModule";
+import { GameEventArgs } from "./GameEventArgs";
+import { IEventManager } from "./IEventManager";
 
-/** 自定义事件，支持整型和字符创类型事件分发 */
-export class CustomEventTarget extends EventTarget {
-    hasEventListener(type: number | string, callback?: (...any: any[]) => void, target?: any): boolean {
-        return super.hasEventListener(type.toString(), callback, target);
+@GameFrameworkEntry.registerModule("EventManager")
+export class EventManager extends GameFrameworkModule implements IEventManager {
+    private readonly _eventPool: EventPool<GameEventArgs> = null!;
+
+    constructor() {
+        super();
+        this._eventPool = new EventPool<GameEventArgs>();
     }
 
-    on<TFunction extends (...any: any[]) => void>(type: number | string, callback: TFunction, thisArg?: any, once?: boolean): typeof callback {
-        return super.on(type.toString(), callback, thisArg, once);
+    get priority(): number {
+        return 4;
     }
 
-    once<TFunction extends (...any: any[]) => void>(type: number | string, callback: TFunction, thisArg?: any): typeof callback {
-        return super.on(type.toString(), callback, thisArg);
+    update(elapseSeconds: number): void {
+        this._eventPool.update(elapseSeconds);
     }
 
-    off<TFunction extends (...any: any[]) => void>(type: number | string, callback?: TFunction, thisArg?: any): void {
-        return super.off(type.toString(), callback, thisArg);
+    shutDown(): void {
+        this._eventPool.shutDown();
     }
 
-    emit(type: number | string, arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any): void {
-        super.emit(type.toString(), arg0, arg1, arg2, arg3, arg4);
+    clear() {
+        this._eventPool.clear();
+    }
+
+    subscribe(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): void {
+        this._eventPool.subscribe(id, eventHandle, thisArg);
+    }
+
+    unsubscribe(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandle, thisArg);
+    }
+
+    unsubscribeTarget(target: object): void {
+        this._eventPool.unsubscribeTarget(target);
+    }
+
+    check(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): boolean {
+        return this._eventPool.check(id, eventHandle, thisArg);
+    }
+
+    fire(sender: object, e: GameEventArgs): void {
+        this._eventPool.fire(sender, e);
+    }
+
+    fireNow(sender: object, e: GameEventArgs): void {
+        this._eventPool.fireNow(sender, e);
     }
 }
-
-/** 消息分发中心 */
-export let NotifyCenter = new CustomEventTarget();
