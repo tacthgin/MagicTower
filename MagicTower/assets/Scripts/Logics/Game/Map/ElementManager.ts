@@ -1,32 +1,21 @@
-import { AnimationClip, assert, SpriteFrame } from "cc";
+import { AnimationClip, assert, Prefab, SpriteFrame } from "cc";
+import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 
 export class ElementManager {
-    private spriteFrames: { [key: string]: SpriteFrame } = {};
     /**id对应的动画 */
-    private animations: { [key: number | string]: AnimationClip } = {};
+    private static animations: { [key: number | string]: AnimationClip } = {};
 
-    static instance: ElementManager | null = null;
-
-    static getInstance() {
-        if (!ElementManager.instance) {
-            ElementManager.instance = new ElementManager();
-        }
-        return ElementManager.instance;
+    static async loadAsset() {
+        let resouceLoader = GameApp.ResourceManager.internalResourceLoader;
+        await resouceLoader.loadDir("Prefabs/Elements", Prefab);
+        await resouceLoader.loadDir("TiledMap/Images", SpriteFrame);
     }
 
-    async loadAsset() {
-        await GameManager.RESOURCE.loadPrefabDir("Prefabs/Elements");
-        let spriteFrames = await GameManager.RESOURCE.loadAssetDir("TiledMap/Images", SpriteFrame);
-        spriteFrames?.forEach((spriteFrame) => {
-            this.spriteFrames[spriteFrame.name] = spriteFrame;
-        });
+    static getElementSpriteFrame(name: string): SpriteFrame | null {
+        return GameApp.ResourceManager.internalResourceLoader.getAsset(`TiledMap/Images/${name}`);
     }
 
-    getElementSpriteFrame(name: string): SpriteFrame | null {
-        return this.spriteFrames[name] || null;
-    }
-
-    getElementAnimationClip(name: string) {
+    static getElementAnimationClip(name: string) {
         if (!this.animations[name]) {
             let spriteFrames = [];
             for (let i = 0; i < 2; i++) {

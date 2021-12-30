@@ -89,7 +89,7 @@ export class GameUI extends Component {
                 //装备
                 let index = propInfo.type - PropType.SWARD;
                 this.equipLabels[index].string = propInfo.name;
-                this.equipSprites[index].spriteFrame = ElementManager.getInstance().getElementSpriteFrame(propInfo.spriteId);
+                this.equipSprites[index].spriteFrame = ElementManager.getElementSpriteFrame(propInfo.spriteId);
                 break;
             case PropType.KEY:
                 //钥匙

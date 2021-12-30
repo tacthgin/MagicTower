@@ -11,9 +11,9 @@
 //         let json = GameManager.DATA.getJsonElement(layerName, id);
 //         if (json) {
 //             let name = json.spriteId;
-//             this.getComponent(Sprite)!.spriteFrame = ElementManager.getInstance().getElementSpriteFrame(`${name}_0`);
+//             this.getComponent(Sprite)!.spriteFrame = ElementManager.getElementSpriteFrame(`${name}_0`);
 //             if (this.animation.clips.length == 0) {
-//                 this.animation.createState(ElementManager.getInstance().getElementAnimationClip(name), name);
+//                 this.animation.createState(ElementManager.getElementAnimationClip(name), name);
 //             }
 //             this.animation.play(name);
 //         }
