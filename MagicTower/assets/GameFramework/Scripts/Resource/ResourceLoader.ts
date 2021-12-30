@@ -54,7 +54,7 @@ export class ResourceLoader implements IResourceLoader {
                 this._resourceLoaderHelp.load(
                     path,
                     assetType,
-                    (finished: number, total: number, item: AssetManager.RequestItem) => {
+                    (finished: number, total: number, item?: AssetManager.RequestItem) => {
                         onProgress && onProgress(finished, total, item);
                     },
                     (err: Error | null, data: T) => {
@@ -94,7 +94,7 @@ export class ResourceLoader implements IResourceLoader {
                 this._resourceLoaderHelp.loadDir(
                     path,
                     assetType,
-                    (finished: number, total: number, item: AssetManager.RequestItem) => {
+                    (finished: number, total: number, item?: AssetManager.RequestItem) => {
                         onProgress && onProgress(finished, total, item);
                     },
                     (err: Error | null, data: T[]) => {

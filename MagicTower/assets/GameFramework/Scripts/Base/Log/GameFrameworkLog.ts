@@ -30,6 +30,17 @@ export class GameFrameworkLog {
      * 打印信息级别的日志，用于记录常规日志信息
      * @param message 参数列表
      */
+    static log(...message: any[]): void {
+        if (!this.s_logHelp) {
+            return;
+        }
+        this.s_logHelp.log(GameFrameworkLogLevel.INFO, ...message);
+    }
+
+    /**
+     * 打印信息级别的日志，用于记录常规日志信息
+     * @param message 参数列表
+     */
     static info(...message: any[]): void {
         if (!this.s_logHelp) {
             return;

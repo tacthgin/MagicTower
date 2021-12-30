@@ -62,7 +62,7 @@ export class JsonUtility {
      * @param clone 是否克隆json元素
      * @returns json元素
      */
-    getJsonElement(path: string, elementName: string, clone: boolean = false): Object | null {
+    getJsonElement(path: string, elementName: number | string, clone: boolean = false): Object | null {
         let json = this.getJson(path);
         if (json) {
             let member = (json as any)[elementName];
