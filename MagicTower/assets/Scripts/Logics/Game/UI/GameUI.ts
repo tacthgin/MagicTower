@@ -1,13 +1,22 @@
 import { Component, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, Vec3, _decorator } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
+import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroEvent } from "../../../Model/HeroModel/HeroEvent";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { HeroAttrEventArgs, HeroPropEventArgs } from "../../../Model/HeroModel/HeroModelEventArgs";
-import { ElementManager } from "../Map/ElementManager";
+import { PropType } from "../../../Model/HeroModel/PropType";
+import { MapEvent } from "../../../Model/MapModel/MapEvent";
+import { MapModel } from "../../../Model/MapModel/MapModel";
+import { ElementFactory } from "../Map/ElementFactory";
 import { MonsterIcon } from "./MonsterIcon";
 import { PropButton } from "./PropButton";
 
 const { ccclass, property } = _decorator;
+
+const MAX_KEY_COUNT: number = 18;
+const STAIR_NAMES: string[] = ["上", "下"];
 
 @ccclass("GameUI")
 export class GameUI extends Component {
@@ -37,6 +46,7 @@ export class GameUI extends Component {
     private monsterIconPrefab: Prefab = null!;
 
     private heroModel: HeroModel = null!;
+    private mapModel: MapModel = null!;
     private keys: any = {};
     private propButtons: any = {};
     private monsterSprite: Node = null!;
@@ -46,6 +56,9 @@ export class GameUI extends Component {
         this.heroModel.subscribe(HeroEvent.HERO_ATTR, this.onHeroAttrChanged, this);
         this.heroModel.subscribe(HeroEvent.REFRESH_PROP, this.onRefreshProp, this);
         this.heroModel.subscribe(HeroEvent.REFRESH_EQUIP, this.onRefreshEquip, this);
+
+        this.mapModel = GameApp.getModel(MapModel);
+        this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onRefreshLevel, this);
         // NotifyCenter.on(GameEvent.REFRESH_LEVEL, this.onRefreshLevel, this);
         // NotifyCenter.on(GameEvent.REFRESH_ARCHIVE, this.onRefreshArchive, this);
         // NotifyCenter.on(GameEvent.MONSTER_FIGHT, this.onMonsterFight, this);
@@ -68,119 +81,132 @@ export class GameUI extends Component {
     }
 
     loadArchive() {
-        this.onRefreshArchive();
-        let mapData = GameManager.DATA.getData(MapData);
-        this.onRefreshLevel(mapData?.level);
+        this.refreshHeroAttr();
+        this.refreshProps();
+        this.refreshLevel(this.mapModel.level);
     }
 
-    onHeroAttrChanged(sender: object, event: HeroAttrEventArgs) {
+    private onHeroAttrChanged(sender: object, event: HeroAttrEventArgs) {
         this.heroAttrLabels[event.attr].string = event.attrValue.toString();
     }
 
-    onRefreshProp(sender: object, event: HeroPropEventArgs) {
-        let propInfo = Utility.Json.getJsonElement("prop", id);
-        switch (propInfo.type) {
-            case PropType.SWARD:
-            case PropType.SHIELD:
-                //装备
-                let index = propInfo.type - PropType.SWARD;
-                this.equipLabels[index].string = propInfo.name;
-                this.equipSprites[index].spriteFrame = ElementManager.getElementSpriteFrame(propInfo.spriteId);
-                break;
-            case PropType.KEY:
-                //钥匙
-                if (count < 0) {
-                    for (let i = 0; i < -count; i++) {
-                        this.removeKey(propInfo);
-                    }
-                } else {
-                    //钥匙最多18个
-                    let childrenCount = this.keyLayout.children.length;
-                    if (childrenCount + count > 18) {
-                        count = 18 - childrenCount;
-                    }
-                    for (let i = 0; i < count; i++) {
-                        this.createKey(propInfo);
-                    }
-                }
-                break;
-            case PropType.FEATHER:
-                let jsonData = Utility.Json.getJsonElement("prop", propInfo.id);
-                //up
-                let strs = ["上", "下"];
-                for (let i = 0; i < 2; i++) {
-                    let button = this.createPropButton(jsonData, 1);
-                    if (button) {
-                        let label = button.getChildByName("label")!;
-                        label.active = true;
-                        label.getComponent(Label)!.string = strs[i];
-                    }
-                }
-                break;
-            default:
-                if (!propInfo.consumption) {
-                    let propNum = this.heroModel.getPropNum(propInfo.id);
-                    if (propNum <= 0) {
-                        this.removePropButton(propInfo);
-                    } else if (!this.propButtons[propInfo.id]) {
-                        this.createPropButton(propInfo, propNum);
-                    } else {
-                        this.propButtons[propInfo.id].setNum(propNum);
-                    }
-                }
-                break;
-        }
-    }
-
-    onRefreshLevel(level: number) {
-        if (level == 0) {
-            this.levelLabel.string = "魔塔地下室";
+    private onRefreshProp(sender: object, event: HeroPropEventArgs) {
+        let propInfo = Utility.Json.getJsonElement("prop", event.propTypeOrId) as any;
+        if (propInfo) {
+            this.refreshProp(event.propTypeOrId, event.propValue);
         } else {
-            this.levelLabel.string = `魔塔第${Util.formatInt(level)}层`;
+            GameFrameworkLog.error(`prop id:${event.propTypeOrId} does not exist`);
         }
     }
 
-    onRefreshArchive() {
-        this.refreshHeroAttr();
-        let props = this.heroModel.getProps();
-        for (let id in props) {
-            this.onRefreshProp(parseInt(id), props[id]);
-        }
-        this.onRefreshEquip(PropType.SWARD);
-        this.onRefreshEquip(PropType.SHIELD);
+    private onRefreshEquip(sender: object, event: HeroPropEventArgs) {
+        this.refreshEquip(event.propTypeOrId, event.propValue);
     }
 
-    refreshHeroAttr() {
-        for (let key in HeroAttr) {
-            if (!isNaN(parseInt(key))) {
-                this.onHeroAttrChanged(parseInt(key) as any);
-            } else {
-                break;
-            }
-        }
+    private onRefreshLevel(sender: object, event: HeroPropEventArgs) {}
+
+    private onRefreshArchive() {
+        this.loadArchive();
     }
 
-    onRefreshEquip(propType: PropType) {
-        let id = this.heroModel.getEquips(propType);
-        let index = propType == PropType.SWARD ? 0 : 1;
-        if (id == 0) {
-            this.equipLabels[index].string = "无";
-            this.equipSprites[index].spriteFrame = null;
-        } else {
-            this.onRefreshProp(id);
-        }
-    }
-
-    onMovePath() {
+    private onMovePath() {
         this.refreshMonsterInfo();
     }
 
-    onMonsterFight(monsterInfo: any) {
+    private onMonsterFight(monsterInfo: any) {
         this.refreshHeroAttr();
         this.refreshMonsterInfo(monsterInfo);
     }
 
-    refreshMonsterInfo(monsterInfo: any = null) {
+    private refreshHeroAttr() {
+        for (let i = HeroAttr.HP; i <= HeroAttr.GOLD; ++i) {
+            this.heroAttrLabels[i].string = this.heroModel.getAttr(i).toString();
+        }
+    }
+
+    private refreshProps() {
+        this.heroModel.forEachProps((propId, count) => {
+            this.refreshProp(propId, count);
+        });
+        this.refreshEquip(PropType.SWARD, this.heroModel.getEquips(PropType.SWARD));
+        this.refreshEquip(PropType.SHIELD, this.heroModel.getEquips(PropType.SHIELD));
+    }
+
+    private refreshProp(propId: number | string, count: number = 1) {
+        let propInfo = Utility.Json.getJsonElement("prop", propId) as any;
+        if (propInfo) {
+            switch (propInfo.type) {
+                case PropType.KEY:
+                    //钥匙
+                    if (count < 0) {
+                        for (let i = 0; i < -count; i++) {
+                            this.removeKey(propInfo);
+                        }
+                    } else {
+                        //钥匙最多18个
+                        let childrenCount = this.keyLayout.children.length;
+                        if (childrenCount + count > MAX_KEY_COUNT) {
+                            count = MAX_KEY_COUNT - childrenCount;
+                        }
+                        for (let i = 0; i < count; i++) {
+                            this.createKey(propInfo);
+                        }
+                    }
+                    break;
+                case PropType.FEATHER:
+                    //up
+                    for (let i = 0; i < STAIR_NAMES.length; i++) {
+                        let button = this.createPropButton(propInfo, 1);
+                        if (button) {
+                            let label = button.getChildByName("label")!;
+                            label.active = true;
+                            label.getComponent(Label)!.string = STAIR_NAMES[i];
+                        }
+                    }
+                    break;
+                default:
+                    if (!propInfo.consumption) {
+                        let propNum = this.heroModel.getPropNum(propInfo.id);
+                        if (propNum <= 0) {
+                            this.removePropButton(propInfo);
+                        } else if (!this.propButtons[propInfo.id]) {
+                            this.createPropButton(propInfo, propNum);
+                        } else {
+                            this.propButtons[propInfo.id].setNum(propNum);
+                        }
+                    }
+                    break;
+            }
+        } else {
+            GameFrameworkLog.error(`prop id:${propId} does not exist`);
+        }
+    }
+
+    private refreshEquip(equipType: PropType, equipId: number) {
+        let index = equipType == PropType.SWARD ? 0 : 1;
+        if (equipId == 0) {
+            this.equipLabels[index].string = "无";
+            this.equipSprites[index].spriteFrame = null;
+        } else {
+            let equipInfo = Utility.Json.getJsonElement("prop", equipId) as any;
+            if (equipInfo) {
+                this.equipLabels[index].string = equipInfo.name;
+                this.equipSprites[index].spriteFrame = ElementFactory.getElementSpriteFrame(equipInfo.spriteId);
+            } else {
+                GameFrameworkLog.error(`prop id:${equipId} does not exist`);
+            }
+        }
+    }
+
+    private refreshLevel(level: number) {
+        if (level == 0) {
+            this.levelLabel.string = "魔塔地下室";
+        } else {
+            this.levelLabel.string = `魔塔第${Utility.Text.formatNumberWidth(level)}层`;
+        }
+    }
+
+    private refreshMonsterInfo(monsterInfo: any = null) {
         this.monsterLabels[0].string = monsterInfo ? monsterInfo.name : "怪物名字";
         this.monsterLabels[1].string = monsterInfo ? monsterInfo.hp.toString() : "生命";
         this.monsterLabels[2].string = monsterInfo ? monsterInfo.attack : "攻击";
@@ -191,7 +217,7 @@ export class GameUI extends Component {
         }
     }
 
-    createKey(propInfo: any) {
+    private createKey(propInfo: any) {
         let index = propInfo.id - 1;
         let key = GameManager.POOL.createPrefabNode(this.keyPrefab, null, true);
         if (key) {
@@ -203,7 +229,7 @@ export class GameUI extends Component {
         return key;
     }
 
-    removeKey(propInfo: any) {
+    private removeKey(propInfo: any) {
         if (this.keys.length == 0) return;
         let index = propInfo.id - 1;
         let key = this.keys[index].pop();
@@ -212,7 +238,7 @@ export class GameUI extends Component {
         }
     }
 
-    createPropButton(propInfo: any, num: number) {
+    private createPropButton(propInfo: any, num: number) {
         let propButton = GameManager.POOL.createPrefabNode(this.propButtonPrefab);
         if (propButton) {
             let control = propButton.getComponent(PropButton)!;
@@ -224,7 +250,7 @@ export class GameUI extends Component {
         return propButton;
     }
 
-    removePropButton(propInfo: any) {
+    private removePropButton(propInfo: any) {
         let propButton = this.propButtons[propInfo.id];
         if (propButton) {
             propButton.remove();

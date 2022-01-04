@@ -56,6 +56,11 @@ export interface ISoundManager {
     stopAllLoadedSounds(): void;
 
     /**
+     * 停止所有除了背景播放的声音
+     */
+    stopAllSoundsExceptBackground(): void;
+
+    /**
      * 是否有声音组
      * @param soundGroupName 声音组名字
      */

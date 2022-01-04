@@ -48,7 +48,7 @@ export class HeroPropEventArgs extends ModelEventArgs {
         return this._id;
     }
 
-    get propType(): PropType | number {
+    get propTypeOrId(): PropType | number {
         return this._propTypeOrId;
     }
 

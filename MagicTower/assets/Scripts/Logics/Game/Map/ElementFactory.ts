@@ -1,7 +1,7 @@
 import { AnimationClip, assert, Prefab, SpriteFrame } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 
-export class ElementManager {
+export class ElementFactory {
     /**id对应的动画 */
     private static animations: { [key: number | string]: AnimationClip } = {};
 

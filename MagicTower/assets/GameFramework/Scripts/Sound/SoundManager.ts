@@ -17,6 +17,7 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
     private _serialId: number = 0;
     private _backgroundSerialId: number = 0;
     private readonly _backgroundGroupName: string = "gameframework_background_sound_group";
+    private readonly _defaultGroupname: string = "gameframework_default_sound_group";
 
     constructor() {
         super();
@@ -55,7 +56,7 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
             throw new GameFrameworkError(`audio clip ${soundAssetPath} not exist`);
         }
 
-        soundGroupName = soundGroupName || soundAssetPath;
+        soundGroupName = soundGroupName || this._defaultGroupname;
         if (!this.hasSoundGroup(soundGroupName)) {
             this.addSoundGroup(soundGroupName);
         }
@@ -109,6 +110,14 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
     stopAllLoadedSounds(): void {
         for (let soundGroupInfo of this._soundGroups) {
             soundGroupInfo[1].stopAllLoadedSounds();
+        }
+    }
+
+    stopAllSoundsExceptBackground(): void {
+        for (let soundGroupInfo of this._soundGroups) {
+            if (soundGroupInfo[0] !== this._backgroundGroupName) {
+                soundGroupInfo[1].stopAllLoadedSounds();
+            }
         }
     }
 

@@ -67,7 +67,7 @@ export class HeroModel extends ModelBase {
         return this.position;
     }
 
-    weak() {
+    weak(): boolean {
         let info = Utility.Json.getJsonElement("global", "weakenAttr") as any;
         if (info) {
             this.heroAttr[HeroAttr.ATTACK] = info.attack;
@@ -76,28 +76,30 @@ export class HeroModel extends ModelBase {
             this.swardId = 0;
             this.shieldId = 0;
             this.save();
+            return true;
         } else {
             GameFrameworkLog.error(`can't find weakenAttr json`);
+            return false;
         }
     }
 
-    addProp(id: number, mapLevel: number, count: number = 1) {
+    addProp(id: number, mapLevel: number, count: number = 1): boolean {
         let prop = Utility.Json.getJsonElement("prop", id) as any;
         if (!prop) {
             GameFrameworkLog.error(`can't find prop id:${id}`);
-            return;
+            return false;
         }
 
         switch (prop.type) {
             case PropType.SWARD:
                 this.swardId = id;
                 this.setAttrDiff(HeroAttr.ATTACK, prop.value);
-                this.fireNow(HeroPropEventArgs.create(HeroEvent.REFRESH_EQUIP, PropType.SWARD, 1));
+                this.fireNow(HeroPropEventArgs.create(HeroEvent.REFRESH_EQUIP, PropType.SWARD, this.swardId));
                 break;
             case PropType.SHIELD:
                 this.shieldId = id;
                 this.setAttrDiff(HeroAttr.DEFENCE, prop.value);
-                this.fireNow(HeroPropEventArgs.create(HeroEvent.REFRESH_EQUIP, PropType.SHIELD, 1));
+                this.fireNow(HeroPropEventArgs.create(HeroEvent.REFRESH_EQUIP, PropType.SHIELD, this.shieldId));
                 break;
             default:
                 if (!prop.consumption) {
@@ -110,14 +112,18 @@ export class HeroModel extends ModelBase {
                 }
                 break;
         }
+
+        return true;
     }
 
     getPropNum(id: number | string): number {
         return this.props[id] || 0;
     }
 
-    getProps() {
-        return this.props;
+    forEachProps(callbackfn: (propId: number | string, count: number) => void, thisArg?: any) {
+        for (let id in this.props) {
+            callbackfn.call(thisArg, id, this.props[id]);
+        }
     }
 
     getEquips(propType: PropType) {
