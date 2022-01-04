@@ -15,7 +15,10 @@
     "testLoad": {
         "currentLevel": 1,
         "maps": {},
-        "heroPos": [7, 0],
+        "heroPos": {
+            "x": 7,
+            "y": 0
+        },
         "gold": 10000000,
         "attack": 100,
         "defence": 30,
@@ -33,9 +36,22 @@
     },
     "useTestLoad": true,
     "hero": {
-        "heroAttr": [1000, 100,100, 0],
-        "animation": ["player_up", "player_right", "player_down", "player_left"],
-        "pos": [5, 10],
+        "heroAttr": [
+            1000,
+            100,
+            100,
+            0
+        ],
+        "animation": [
+            "player_up",
+            "player_right",
+            "player_down",
+            "player_left"
+        ],
+        "pos": {
+            "x": 5,
+            "y": 10
+        },
         "direction": 2
     }
 }

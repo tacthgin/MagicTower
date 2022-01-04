@@ -1,4 +1,4 @@
-import { IVec2 } from "./IVec2";
+import { IVec2 } from "../../Base/GameStruct/IVec2";
 
 /**
  * A*地图接口

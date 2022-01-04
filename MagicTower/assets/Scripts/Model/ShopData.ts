@@ -47,7 +47,7 @@
 //     }
 
 //     load(data: any = null) {
-//         this.loadData(data || GameManager.DATA.getJsonElement("global", "shop"));
+//         this.loadData(data || Utility.Json.getJsonElement("global", "shop"));
 //         this.setProxy();
 //     }
 // }

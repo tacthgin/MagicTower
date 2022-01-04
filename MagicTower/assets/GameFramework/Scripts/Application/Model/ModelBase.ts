@@ -1,7 +1,9 @@
 import { EventHandle } from "../../Base/EventPool/EventHandle";
 import { EventPool } from "../../Base/EventPool/EventPool";
+import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { ISaveManager } from "../../Save/ISaveManager";
 import { IModel } from "./IModel";
+import { ModelContainer } from "./ModelContainer";
 import { ModelEventArgs } from "./ModelEventArgs";
 
 export abstract class ModelBase implements IModel {
@@ -12,18 +14,32 @@ export abstract class ModelBase implements IModel {
         this._eventPool = new EventPool<ModelEventArgs>();
     }
 
+    /**
+     * 模型优先级
+     */
     get priority(): number {
         return 0;
     }
 
+    /**
+     * 轮询模型
+     * @param elapseSeconds 逻辑流逝事件
+     */
     update(elapseSeconds: number) {
         this._eventPool.update(elapseSeconds);
     }
 
+    /**
+     * 关闭并清理模型
+     */
     shutDown() {
         this._eventPool.shutDown();
     }
 
+    /**
+     * 设置存储管理器
+     * @param saveManager 存储管理器
+     */
     setSaveManager(saveManager: ISaveManager): void {
         this._saveManager = saveManager;
     }
@@ -44,7 +60,40 @@ export abstract class ModelBase implements IModel {
         this._eventPool.unsubscribeTarget(target);
     }
 
-    save(): void {}
+    fire(event: ModelEventArgs) {
+        this._eventPool.fire(this, event);
+    }
 
-    load(localData: string): void {}
+    fireNow(event: ModelEventArgs) {
+        this._eventPool.fireNow(this, event);
+    }
+
+    /**
+     * 加载模型本地数据
+     * @param localData 模型本地数据
+     */
+    abstract load(localData: object | null): void;
+
+    /**
+     * 存储模型本地数据
+     */
+    protected save(): void {
+        if (!this._saveManager) {
+            throw new GameFrameworkError("you must set save manager first");
+        }
+        this._saveManager.setObject(ModelContainer.getClassName(this), this);
+    }
+
+    /**
+     * 按键值赋予模型数据
+     * @param data 数据
+     */
+    protected loadData(data: object): void {
+        for (let key in data) {
+            let thisInfo = this as any;
+            if (thisInfo[key] !== undefined) {
+                thisInfo[key] = (data as any)[key];
+            }
+        }
+    }
 }

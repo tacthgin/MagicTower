@@ -33,6 +33,18 @@ export class ModelContainer {
     }
 
     /**
+     * 根据model实例获取类名
+     * @param target model实例
+     */
+    static getClassName(target: ModelBase): string {
+        let name = this.s_nameConstructors.get(target.constructor as Constructor<ModelBase>);
+        if (name === undefined) {
+            throw new GameFrameworkError("model has not register");
+        }
+        return name;
+    }
+
+    /**
      * 轮询模型
      * @param elapseSeconds 逻辑流逝时间
      */
@@ -105,19 +117,16 @@ export class ModelContainer {
         }
         let modelInfos: Array<{
             model: ModelBase;
-            value: string;
+            value: object | null;
         }> = [];
 
-        this._saveManager.forEach((name: string, value: string) => {
-            let ctor = ModelContainer.s_modelConstructors.get(name);
-            if (ctor) {
-                let model = this.getModel(ctor);
-                modelInfos.push({
-                    model: model,
-                    value: value,
-                });
-            }
-        });
+        ModelContainer.s_modelConstructors.forEach((ctor, name) => {
+            let model = this.getModel(ctor)
+            modelInfos.push({
+                model: model,
+                value: this._saveManager?.getObject(name) || null
+            })
+        } )
 
         //模块根据优先级排序
         modelInfos.sort((l, r) => {

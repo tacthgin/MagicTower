@@ -21,7 +21,7 @@
 //     private collisionSystem: MapCollisionSystem = null!;
 
 //     init(collisionSystem: MapCollisionSystem, map: GameMap, hero: Hero, eventId: number | string) {
-//         this.eventInfo = GameManager.DATA.getJsonElement("event", eventId);
+//         this.eventInfo = Utility.Json.getJsonElement("event", eventId);
 //         this.map = map;
 //         this.hero = hero;
 //         this.globalConfig = GameManager.DATA.getJson("global");

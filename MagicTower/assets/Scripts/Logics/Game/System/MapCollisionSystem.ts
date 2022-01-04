@@ -4,7 +4,7 @@
 // import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
 // import { GameEvent } from "../../../Constant/GameEvent";
 // import { Door, DoorState, DoorType, Element, Monster, Npc, Stair, StairType } from "../../../Data/CustomData/Element";
-// import { HeroAttr, HeroData, PropType } from "../../../Data/CustomData/HeroData";
+// import { HeroAttr, HeroModel, PropType } from "../../../Data/CustomData/HeroModel";
 // import { LevelData } from "../../../Data/CustomData/LevelData";
 // import { MapData } from "../../../Data/CustomData/MapData";
 // import { ShopData } from "../../../Data/CustomData/ShopData";
@@ -38,7 +38,7 @@
 // export class MapCollisionSystem {
 //     private gameMap: GameMap = null!;
 //     private hero: Hero = null!;
-//     private heroData: HeroData = null!;
+//     private HeroModel: HeroModel = null!;
 //     private levelData: LevelData = null!;
 //     private canEndMoveTiles: Readonly<string[]> = ["prop", "stair"];
 //     private monsterFightSystem: MonsterFightSystem = new MonsterFightSystem();
@@ -50,7 +50,7 @@
 //     init(gameMap: GameMap, hero: Hero) {
 //         this.gameMap = gameMap;
 //         this.hero = hero;
-//         this.heroData = hero.heroData;
+//         this.HeroModel = hero.HeroModel;
 //         let mapData = GameManager.DATA.getData(MapData)!;
 //         this.levelData = mapData.getCurrentLevelData();
 //         this.registerEvent();
@@ -67,8 +67,8 @@
 
 //     private onMonsterDie(monster: Monster, magic: boolean) {
 //         //幸运金币
-//         let ratio = this.heroData.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
-//         this.heroData.setAttrDiff(HeroAttr.GOLD, monster.monsterInfo.gold * ratio);
+//         let ratio = this.HeroModel.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
+//         this.HeroModel.setAttrDiff(HeroAttr.GOLD, monster.monsterInfo.gold * ratio);
 //         this.disappear("monster", monster.index);
 //         this.elementActionComplete();
 //         //this.removeMonsterDoor();
@@ -113,7 +113,7 @@
 //     }
 
 //     appear(layerName: string, tileOrIndex: Vec2 | number, id: number, record: boolean = true) {
-//         let json = GameManager.DATA.getJsonElement(layerName, id);
+//         let json = Utility.Json.getJsonElement(layerName, id);
 //         if (json) {
 //             let { index, tile } = this.getTileOrIndex(tileOrIndex);
 //             let gid = this.gameMap.getGidByName(`${json.spriteId}_0`);
@@ -233,7 +233,7 @@
 //             case "prop":
 //                 {
 //                     GameManager.AUDIO.playEffect("eat");
-//                     this.heroData.addProp(jsonData.id, this.levelData.level);
+//                     this.HeroModel.addProp(jsonData.id, this.levelData.level);
 //                     this.disappear(layerName, tile);
 //                 }
 //                 return true;
@@ -250,7 +250,7 @@
 //                 break;
 //             case "monster":
 //                 {
-//                     if (!CalculateSystem.canHeroAttack(this.heroData, jsonData, !jsonData.firstAttack)) {
+//                     if (!CalculateSystem.canHeroAttack(this.HeroModel, jsonData, !jsonData.firstAttack)) {
 //                         GameManager.UI.showToast(`你打不过${jsonData.name}`);
 //                         return true;
 //                     }
@@ -298,8 +298,8 @@
 //             openDoor();
 //         } else if (doorInfo.isKeyDoor()) {
 //             let keyID = GameManager.DATA.getJsonParser("prop")?.getJsonElementByKey("value", doorInfo.id).id;
-//             if (keyID && this.heroData.getPropNum(keyID) > 0) {
-//                 this.heroData.addProp(keyID, 1, -1);
+//             if (keyID && this.HeroModel.getPropNum(keyID) > 0) {
+//                 this.HeroModel.addProp(keyID, 1, -1);
 //                 openDoor();
 //                 let eventInfo = this.levelData.getLayerInfo(layerName)["event"];
 //                 if (eventInfo && eventInfo.doorState == DoorState.DISAPPEAR_EVENT) {
@@ -347,7 +347,7 @@
 //         //return true;
 //         //} else if (!element.hide && !element.passive) {
 //         //let keyId = this.propParser.getKeyByDoor(element.id);
-//         //if (keyId && this.heroData.getPropNum(keyId) > 0) {
+//         //if (keyId && this.HeroModel.getPropNum(keyId) > 0) {
 //         //this.hero.removeProp(keyId);
 //         //this.removeElement(index, "door");
 //         //this.disappearDoorEventTrigger(index);
@@ -518,12 +518,12 @@
 //         switch (layerName) {
 //             case "floor":
 //                 if (this.levelData.level >= 40) {
-//                     return this.heroData.getAttr(HeroAttr.HP) > this.getWizardMagicDamage(this.gameMap.getTileIndex(tile));
+//                     return this.HeroModel.getAttr(HeroAttr.HP) > this.getWizardMagicDamage(this.gameMap.getTileIndex(tile));
 //                 }
 //                 return true;
 //             case "monster":
 //                 let jsonData = this.getJsonData(layerName, spriteName);
-//                 return CalculateSystem.canHeroAttack(this.heroData, jsonData, !jsonData.firstAttack);
+//                 return CalculateSystem.canHeroAttack(this.HeroModel, jsonData, !jsonData.firstAttack);
 //         }
 //         return this.canEndMoveTiles.includes(layerName!);
 //     }
@@ -533,7 +533,7 @@
 //         let stairs: Stair[] = this.levelData.getLayerInfo("stairs");
 //         if (stairs) {
 //             stairs.forEach((stair) => {
-//                 let diff = Math.abs(stair.index - this.gameMap.getTileIndex(this.heroData.getPosition()));
+//                 let diff = Math.abs(stair.index - this.gameMap.getTileIndex(this.HeroModel.getPosition()));
 //                 if (INDEX_DIFFS.indexOf(diff) != -1) {
 //                     return true;
 //                 }
@@ -661,22 +661,22 @@
 //     private gotoShop() {
 //         let shopData = GameManager.DATA.getData(ShopData)!;
 //         shopData.level = this.levelData.level;
-//         GameManager.UI.showDialog("ShopDialog", shopData, this.heroData.getAttr(HeroAttr.GOLD), (attr: string) => {
+//         GameManager.UI.showDialog("ShopDialog", shopData, this.HeroModel.getAttr(HeroAttr.GOLD), (attr: string) => {
 //             switch (attr) {
 //                 case "hp":
-//                     this.heroData.setAttrDiff(HeroAttr.HP, shopData.hp);
+//                     this.HeroModel.setAttrDiff(HeroAttr.HP, shopData.hp);
 //                     break;
 //                 case "attack":
-//                     this.heroData.setAttrDiff(HeroAttr.ATTACK, shopData.attack);
+//                     this.HeroModel.setAttrDiff(HeroAttr.ATTACK, shopData.attack);
 //                     break;
 //                 case "defence":
-//                     this.heroData.setAttrDiff(HeroAttr.DEFENCE, shopData.defence);
+//                     this.HeroModel.setAttrDiff(HeroAttr.DEFENCE, shopData.defence);
 //                     break;
 //                 default:
 //                     break;
 //             }
 //             if (attr != "no") {
-//                 this.heroData.setAttrDiff(HeroAttr.GOLD, shopData.buy());
+//                 this.HeroModel.setAttrDiff(HeroAttr.GOLD, shopData.buy());
 //             }
 //             this.elementActionComplete();
 //         }).then((control: any) => {
@@ -700,7 +700,7 @@
 //         }
 
 //         if (id) {
-//             let eventInfo = GameManager.DATA.getJsonElement("event", id);
+//             let eventInfo = Utility.Json.getJsonElement("event", id);
 //             if (!eventInfo.save || eventInfo.save == this.levelData.level) {
 //                 this.gameEventSystem.init(this, this.gameMap, this.hero, id).execute();
 //                 return false;
@@ -713,7 +713,7 @@
 
 //     haveMagicHurt(index: number) {
 //         //let magic = false;
-//         //if (!this.heroData.equipedDivineShield()) {
+//         //if (!this.HeroModel.equipedDivineShield()) {
 //         //if (this.monsterInfo.magicHurt.wizard) {
 //         //magic = this.monsterInfo.magicHurt.wizard[index] != undefined;
 //         //}
@@ -727,7 +727,7 @@
 //     /** 获取巫师的魔法伤害 */
 //     getWizardMagicDamage(index: number) {
 //         let totalDamage = 0;
-//         if (!this.heroData.equipedDivineShield()) {
+//         if (!this.HeroModel.equipedDivineShield()) {
 //             // if (this.monsterInfo.magicHurt.wizard) {
 //             //     let hurtInfo = this.monsterInfo.magicHurt.wizard[index];
 //             //     if (hurtInfo) {
@@ -746,7 +746,7 @@
 //             return false;
 //         }
 
-//         //if (!this.heroData.equipedDivineShield()) {
+//         //if (!this.HeroModel.equipedDivineShield()) {
 //         //if (this.monsterInfo.magicHurt.magic) {
 //         //如果通过魔法守卫中间
 //         //let hurtInfo = this.monsterInfo.magicHurt.magic[index];
@@ -758,7 +758,7 @@
 //         //}
 //         //if (this.monsterInfo.magicHurt.wizard) {
 //         //let wizardDamage = this.getWizardMagicDamage(index);
-//         //if (this.heroData.Hp <= wizardDamage) {
+//         //if (this.HeroModel.Hp <= wizardDamage) {
 //         //GameManager.getInstance().showToast("不能过去，你将被巫师杀死！");
 //         //return true;
 //         //}
@@ -810,9 +810,9 @@
 //     }
 
 //     removeHeroFaceWall() {
-//         //let heroData = this.heroData;
-//         //let direction = heroData.Direction;
-//         //let index = this.tileToIndex(heroData.Position) + HERO_FACE_DIRECTION[direction];
+//         //let HeroModel = this.HeroModel;
+//         //let direction = HeroModel.Direction;
+//         //let index = this.tileToIndex(HeroModel.Position) + HERO_FACE_DIRECTION[direction];
 //         //let element = this.getElement(index, "wall");
 //         //if (element && element.isWall()) {
 //         //this.removeElement(index, "wall");
@@ -831,7 +831,7 @@
 //         //return length > 0;
 //     }
 //     removeLava() {
-//         //let heroIndex = this.tileToIndex(this.heroData.Position);
+//         //let heroIndex = this.tileToIndex(this.HeroModel.Position);
 //         //HERO_FACE_DIRECTION.forEach((diff) => {
 //         //let index = heroIndex + diff;
 //         //let element = this.getElement(index, "wall");
@@ -842,7 +842,7 @@
 //     }
 
 //     bomb() {
-//         //let heroIndex = this.tileToIndex(this.heroData.Position);
+//         //let heroIndex = this.tileToIndex(this.HeroModel.Position);
 //         //let remove = false;
 //         //HERO_FACE_DIRECTION.forEach((diff) => {
 //         //let index = heroIndex + diff;
@@ -866,7 +866,7 @@
 //         //return remove;
 //     }
 //     centrosymmetricFly() {
-//         //let tile = this.heroData.Position;
+//         //let tile = this.HeroModel.Position;
 //         //let newTile = cc.v2(this.mapData.column - tile.x - 1, this.mapData.row - tile.y - 1);
 //         //if (this.getElement(this.tileToIndex(newTile)) == null) {
 //         //this.hero.location(newTile);
@@ -964,7 +964,7 @@
 //                 break;
 //             case 15:
 //                 {
-//                     // this.heroData.Hp += this.heroData.Attack + this.heroData.Defence;
+//                     // this.HeroModel.Hp += this.HeroModel.Attack + this.HeroModel.Defence;
 //                     // NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
 //                     // this.consumptionProp(propInfo);
 //                 }
@@ -992,7 +992,7 @@
 
 //     // consumptionProp(propInfo: any) {
 //     //     if (!propInfo.permanent) {
-//     //         this.heroData.addProp(propInfo.id, -1);
+//     //         this.HeroModel.addProp(propInfo.id, -1);
 //     //         NotifyCenter.emit(GameEvent.REFRESH_PROP, propInfo, -1);
 //     //     }
 //     // }

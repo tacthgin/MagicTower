@@ -31,7 +31,7 @@
 //         //} else {
 //         //let info = this.npc.talk();
 //         //this.npc.nextTalk();
-//         //this.hero.HeroData.recordTalk(this.npc.npcInfo.id, info.index);
+//         //this.hero.HeroModel.recordTalk(this.npc.npcInfo.id, info.index);
 //         //let npcInfo = this.npc.npcInfo;
 //         //this.map.showDialog("ChatDialog", info.talk, () => {
 //         //小偷
@@ -50,27 +50,27 @@
 //         //}
 //     }
 //     private npcTrade() {
-//         //let heroData = this.hero.HeroData;
+//         //let HeroModel = this.hero.HeroModel;
 //         //let npcPropInfo = this.npc.npcInfo.value;
-//         //heroData.Gold += npcPropInfo.gold || 0;
+//         //HeroModel.Gold += npcPropInfo.gold || 0;
 //         //if (npcPropInfo.attack) {
-//         //heroData.Attack += npcPropInfo.attack >= 1 ? npcPropInfo.attack : heroData.Attack * npcPropInfo.attack;
+//         //HeroModel.Attack += npcPropInfo.attack >= 1 ? npcPropInfo.attack : HeroModel.Attack * npcPropInfo.attack;
 //         //}
 //         //if (npcPropInfo.defence) {
-//         //heroData.Defence += npcPropInfo.defence >= 1 ? npcPropInfo.defence : heroData.Defence * npcPropInfo.defence;
+//         //HeroModel.Defence += npcPropInfo.defence >= 1 ? npcPropInfo.defence : HeroModel.Defence * npcPropInfo.defence;
 //         //}
 //         //商人交易
 //         //if (npcPropInfo.propGold) {
-//         //if (heroData.Gold + npcPropInfo.propGold < 0) {
+//         //if (HeroModel.Gold + npcPropInfo.propGold < 0) {
 //         //GameManager.getInstance().showToast("你的钱不够");
 //         //return;
 //         //}
-//         //heroData.Hp += npcPropInfo.hp || 0;
+//         //HeroModel.Hp += npcPropInfo.hp || 0;
 //         //let tradeSuccess = true;
 //         //if (npcPropInfo.prop) {
 //         //for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
 //         //如果没有物品就不能卖
-//         //if (npcPropInfo.prop[i + 1] < 0 && heroData.getPropNum(npcPropInfo.prop[i]) <= 0) {
+//         //if (npcPropInfo.prop[i + 1] < 0 && HeroModel.getPropNum(npcPropInfo.prop[i]) <= 0) {
 //         //tradeSuccess = false;
 //         //continue;
 //         //}
@@ -78,7 +78,7 @@
 //         //}
 //         //}
 //         //if (tradeSuccess) {
-//         //heroData.Gold += npcPropInfo.propGold;
+//         //HeroModel.Gold += npcPropInfo.propGold;
 //         //this.npc.consumeProp();
 //         //} else {
 //         //GameManager.getInstance().showToast("物品数量不够");

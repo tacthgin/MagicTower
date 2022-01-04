@@ -42,7 +42,7 @@
 // //     }
 
 // //     init(id: number) {
-// //         this._monsterInfo = GameManager.DATA.getJsonElement("monster", id, true);
+// //         this._monsterInfo = Utility.Json.getJsonElement("monster", id, true);
 // //         this._firstAttack = this._monsterInfo.firstAttack;
 // //         this.node.getComponent(UITransform).anchorY = this._monsterInfo.big ? 0.15 : 0.5;
 // //         this.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._monsterInfo.spriteId}_0`);

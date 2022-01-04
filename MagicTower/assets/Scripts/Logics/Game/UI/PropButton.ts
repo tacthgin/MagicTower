@@ -17,7 +17,7 @@ export class PropButton extends Component {
         if (this.propInfo.type == 9) {
             info = this.node.getChildByName("label")?.getComponent(Label)?.string == "上" ? "up" : "down";
         }
-        NotifyCenter.emit(GameEvent.USE_PROP, this.propInfo, info);
+        //NotifyCenter.emit(GameEvent.USE_PROP, this.propInfo, info);
     }
 
     setNum(num: number) {

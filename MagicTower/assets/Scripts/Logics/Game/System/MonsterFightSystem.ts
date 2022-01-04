@@ -24,10 +24,10 @@
 //      * @param magic 是否后续还有魔法伤害
 //      */
 //     execute(magic: boolean) {
-//         let heroData = this.hero.heroData;
+//         let HeroModel = this.hero.HeroModel;
 //         let monsterInfo = this.monster.monsterInfo;
-//         let count = CalculateSystem.getHeroAttackCount(heroData, monsterInfo);
-//         let damageInfo = CalculateSystem.perAttackDamage(heroData, monsterInfo);
+//         let count = CalculateSystem.getHeroAttackCount(HeroModel, monsterInfo);
+//         let damageInfo = CalculateSystem.perAttackDamage(HeroModel, monsterInfo);
 //         //谁先攻击 0英雄先攻击
 //         let i = monsterInfo.firstAttack ? 1 : 0;
 //         let scheduleCount = i == 0 ? count * 2 - 1 : count * 2;

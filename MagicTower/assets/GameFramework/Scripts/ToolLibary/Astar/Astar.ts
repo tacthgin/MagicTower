@@ -1,8 +1,8 @@
+import { IVec2 } from "../../Base/GameStruct/IVec2";
 import { AstarNode } from "./AstarNode";
 import { IAstar } from "./IAstar";
 import { IAstarHelp } from "./IAstarHelp";
 import { IAstarMap } from "./IAstarMap";
-import { IVec2 } from "./IVec2";
 
 export class Astar implements IAstar {
     /** 关闭列表的节点不会在用到 */

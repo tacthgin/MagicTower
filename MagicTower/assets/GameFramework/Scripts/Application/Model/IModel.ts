@@ -41,7 +41,14 @@ export interface IModel {
     unsubscribeTarget(target: object): void;
 
     /**
-     * 存储模型本地数据
+     * 轮询队列发送事件
+     * @param event 事件参数
      */
-    save(): void;
+    fire(event: ModelEventArgs): void;
+
+    /**
+     * 立刻发送事件
+     * @param event 事件参数
+     */
+    fireNow(event: ModelEventArgs): void;
 }

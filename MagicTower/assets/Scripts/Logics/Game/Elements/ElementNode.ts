@@ -8,7 +8,7 @@
 // @ccclass("ElementNode")
 // export class ElementNode extends Actor {
 //     init(layerName: string, id: number | string) {
-//         let json = GameManager.DATA.getJsonElement(layerName, id);
+//         let json = Utility.Json.getJsonElement(layerName, id);
 //         if (json) {
 //             let name = json.spriteId;
 //             this.getComponent(Sprite)!.spriteFrame = ElementManager.getElementSpriteFrame(`${name}_0`);

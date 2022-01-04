@@ -18,9 +18,9 @@
 
 //     init() {
 //         //let texts = [];
-//         //let records = DataManager.getCustomData("GameInfo").HeroData.getRecordTalk();
+//         //let records = DataManager.getCustomData("GameInfo").HeroModel.getRecordTalk();
 //         //records.forEach(record => {
-//         //let npc = GameManager.DATA.getJsonElement("npc", record.npcId);
+//         //let npc = Utility.Json.getJsonElement("npc", record.npcId);
 //         //texts.push(npc.talk[record.chatStep]);
 //         //});
 //         //if (texts.length > 0) {
@@ -77,9 +77,9 @@
 // //     init() {
 // //         let texts = [];
 // //
-// //         let records = DataManager.getCustomData("GameInfo").HeroData.getRecordTalk();
+// //         let records = DataManager.getCustomData("GameInfo").HeroModel.getRecordTalk();
 // //         records.forEach(record => {
-// //             let npc = GameManager.DATA.getJsonElement("npc", record.npcId);
+// //             let npc = Utility.Json.getJsonElement("npc", record.npcId);
 // //             texts.push(npc.talk[record.chatStep]);
 // //         });
 // //

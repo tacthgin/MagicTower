@@ -1,7 +1,7 @@
 // import { Label, _decorator } from "cc";
 // import { BaseDialog } from "../../Framework/Base/BaseDialog";
 // import { GameManager } from "../../Framework/Managers/GameManager";
-// import { HeroAttr, HeroData } from "../Data/CustomData/HeroData";
+// import { HeroAttr, HeroModel } from "../Data/CustomData/HeroModel";
 // import { ShopData } from "../Data/CustomData/ShopData";
 
 // const { ccclass, property } = _decorator;
@@ -25,7 +25,7 @@
 //         this.attr[1].string = `攻击力 + ${shopData.attack}`;
 //         this.attr[2].string = `防御力 + ${shopData.defence}`;
 //         this.callback = callback;
-//         let heroGold = GameManager.DATA.getData(HeroData)!.getAttr(HeroAttr.GOLD);
+//         let heroGold = GameManager.DATA.getData(HeroModel)!.getAttr(HeroAttr.GOLD);
 //         this.isGoldEnough = shopData.needGold <= heroGold;
 //     }
 

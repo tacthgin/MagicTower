@@ -3,7 +3,7 @@
 // import { GameManager } from "../../../../../Framework/Managers/GameManager";
 // import { NotifyCenter } from "../../../../../Framework/Managers/NotifyCenter";
 // import { GameEvent } from "../../../../Constant/GameEvent";
-// import { HeroAttr, HeroData } from "../../../../Data/CustomData/HeroData";
+// import { HeroAttr, HeroModel } from "../../../../Data/CustomData/HeroModel";
 // import { Lightning } from "../../Elements/Lightning";
 // import { AstarMoveType, GameMap } from "../GameMap";
 // import { Actor } from "./Actor";
@@ -25,7 +25,7 @@
 //     @property(Node)
 //     private heroNode: Node = null!;
 
-//     private _heroData: HeroData = null!;
+//     private _HeroModel: HeroModel = null!;
 //     private heroFSM: StateMachine = new StateMachine(this);
 //     private globalInfo: any = null;
 //     private map: GameMap = null!;
@@ -33,8 +33,8 @@
 //     private _heroTile: Vec2 = null!;
 //     private heroDirection: number = 0;
 
-//     get heroData() {
-//         return this._heroData;
+//     get HeroModel() {
+//         return this._HeroModel;
 //     }
 
 //     set heroMoving(value: boolean) {
@@ -52,7 +52,7 @@
 //     onLoad() {
 //         this.animation.on(Animation.EventType.FINISHED, this.onFinished, this);
 //         this.globalInfo = GameManager.DATA.getJson("global");
-//         this._heroData = GameManager.DATA.getData(HeroData)!;
+//         this._HeroModel = GameManager.DATA.getData(HeroModel)!;
 //     }
 
 //     onFinished() {
@@ -101,7 +101,7 @@
 
 //     private createAnimation() {
 //         let clips: (AnimationClip | null)[] = [];
-//         this._heroData.get("animation").forEach((animationName: any) => {
+//         this._HeroModel.get("animation").forEach((animationName: any) => {
 //             let spriteFrames = [];
 //             for (let i = 1; i < 3; i++) {
 //                 spriteFrames.push(GameManager.RESOURCE.getSpriteFrame(`${animationName}_${i}`)!);
@@ -126,7 +126,7 @@
 
 //     protected getAnimationName(state: ActorState): string {
 //         if (state == ActorState.MOVE) {
-//             return this._heroData.get("animation")[this.heroDirection];
+//             return this._HeroModel.get("animation")[this.heroDirection];
 //         }
 
 //         return "";
@@ -149,7 +149,7 @@
 
 //     /** 设置人物方向贴图 */
 //     setDirectionTexture() {
-//         this.heroNode.getComponent(Sprite)!.spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._heroData.get("animation")[this.heroDirection]}_0`);
+//         this.heroNode.getComponent(Sprite)!.spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this._HeroModel.get("animation")[this.heroDirection]}_0`);
 //     }
 
 //     /**
@@ -168,7 +168,7 @@
 //             }
 //             let tile = canEndMove ? endTile : path![path!.length - 1];
 //             if (tile) {
-//                 this._heroData.setPosition(tile, this.heroDirection);
+//                 this._HeroModel.setPosition(tile, this.heroDirection);
 //             }
 //             this.isHeroMoving = !collisionFunc(endTile);
 //             this.stand();
@@ -228,12 +228,12 @@
 
 //     location(tile: Vec2 | null) {
 //         if (tile) {
-//             this._heroData.setPosition(tile);
+//             this._HeroModel.setPosition(tile);
 //             this.toward(HeroDirecton.DOWN);
 //         } else {
-//             this.toward(this._heroData.get("direction"));
+//             this.toward(this._HeroModel.get("direction"));
 //         }
-//         this._heroTile = this._heroData.getPosition();
+//         this._heroTile = this._HeroModel.getPosition();
 //         let position = this.map.getPositionAt(this._heroTile) || Vec2.ZERO;
 //         this.node.position = v3(position.x, position.y);
 //     }
@@ -244,11 +244,11 @@
 //     }
 
 //     hurt(damage: number) {
-//         let hp = this._heroData.getAttr(HeroAttr.HP) - damage;
+//         let hp = this._HeroModel.getAttr(HeroAttr.HP) - damage;
 //         if (hp < 0) {
 //             hp = 0;
 //         }
-//         this._heroData.setAttrDiff(HeroAttr.HP, hp);
+//         this._HeroModel.setAttrDiff(HeroAttr.HP, hp);
 //     }
 
 //     magicLight(monsterIndexs: number[]) {
@@ -262,16 +262,16 @@
 
 //     magicDamage(monsterIndexs: number[], damage: number) {
 //         this.magicLight(monsterIndexs);
-//         let animationName = this._heroData.get("animation")[this._heroData.get("direction")];
+//         let animationName = this._HeroModel.get("animation")[this._HeroModel.get("direction")];
 //         this.animation.play(`${animationName}_once`);
 //         if (damage < 1) {
-//             this._heroData.setAttr(HeroAttr.HP, Math.ceil(this._heroData.getAttr(HeroAttr.HP) * damage));
+//             this._HeroModel.setAttr(HeroAttr.HP, Math.ceil(this._HeroModel.getAttr(HeroAttr.HP) * damage));
 //         } else {
-//             this._heroData.setAttrDiff(HeroAttr.HP, -damage);
+//             this._HeroModel.setAttrDiff(HeroAttr.HP, -damage);
 //         }
 //     }
 
 //     weak() {
-//         this._heroData.weak();
+//         this._HeroModel.weak();
 //     }
 // }

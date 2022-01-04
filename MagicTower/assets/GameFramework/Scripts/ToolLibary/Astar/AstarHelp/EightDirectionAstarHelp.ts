@@ -1,5 +1,5 @@
+import { IVec2 } from "../../../Base/GameStruct/IVec2";
 import { IAstarHelp } from "../IAstarHelp";
-import { IVec2 } from "../IVec2";
 
 /**
  * 八方向格子的A*辅助器

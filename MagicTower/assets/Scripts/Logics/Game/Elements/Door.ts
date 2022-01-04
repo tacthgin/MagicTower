@@ -53,7 +53,7 @@
 //     //     this._passive = false;
 //     //     this._appear = false;
 //     //     this._hide = false;
-//     //     this.doorInfo = GameManager.DATA.getJsonElement("door", id);
+//     //     this.doorInfo = Utility.Json.getJsonElement("door", id);
 //     //     this.getComponent(Sprite).spriteFrame = GameManager.RESOURCE.getSpriteFrame(`${this.doorInfo.spriteId}_0`);
 //     //     this.createAnimation(this.doorInfo.spriteId, this.doorInfo.spriteId, 4, AnimationClip.WrapMode.Normal, false, 17);
 //     //     this.createAnimation(`${this.doorInfo.spriteId}_reverse`, this.doorInfo.spriteId, 4, AnimationClip.WrapMode.Normal, true, 17);
