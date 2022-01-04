@@ -13,7 +13,7 @@ export interface IResourceLoaderHelp {
      * @param onProgress 资源加载进度回调
      * @param onComplete 资源完成加载回调
      */
-    load<T extends Asset>(path: string, type?: Constructor<T> | null, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): void;
+    load<T extends Asset>(path: string, type: Constructor<T> | null, onProgress: ResourceProgressCallback | null, onComplete: ResourceCompleteCallback<T> | null): void;
 
     /**
      * 加载文件夹资源
@@ -22,7 +22,7 @@ export interface IResourceLoaderHelp {
      * @param onProgress 资源加载进度回调
      * @param onComplete 资源完成加载回调
      */
-    loadDir<T extends Asset>(path: string, type?: Constructor<T> | null, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): void;
+    loadDir<T extends Asset>(path: string, type: Constructor<T> | null, onProgress: ResourceProgressCallback | null, onComplete: ResourceCompleteCallback<T[]> | null): void;
 
     /**
      * 获取已加载的资源

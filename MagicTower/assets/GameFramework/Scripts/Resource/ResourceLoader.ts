@@ -31,7 +31,7 @@ export class ResourceLoader implements IResourceLoader {
             if (asset) {
                 resolve(asset);
             } else {
-                this._resourceLoaderHelp.load(path, assetType, null, (err: Error | null, data: T) => {
+                this._resourceLoaderHelp.load(path, assetType || null, null, (err: Error | null, data: T) => {
                     if (err) {
                         GameFrameworkLog.error(err.message);
                         resolve(null);
@@ -53,7 +53,7 @@ export class ResourceLoader implements IResourceLoader {
             } else {
                 this._resourceLoaderHelp.load(
                     path,
-                    assetType,
+                    assetType || null,
                     (finished: number, total: number, item?: AssetManager.RequestItem) => {
                         onProgress && onProgress(finished, total, item);
                     },
@@ -72,7 +72,7 @@ export class ResourceLoader implements IResourceLoader {
             if (result) {
                 resolve(true);
             } else {
-                this._resourceLoaderHelp.loadDir(path, assetType, null, (err: Error | null, data: T[]) => {
+                this._resourceLoaderHelp.loadDir(path, assetType || null, null, (err: Error | null, data: T[]) => {
                     if (err) {
                         GameFrameworkLog.error(err.message);
                         resolve(false);
@@ -93,7 +93,7 @@ export class ResourceLoader implements IResourceLoader {
             } else {
                 this._resourceLoaderHelp.loadDir(
                     path,
-                    assetType,
+                    assetType || null,
                     (finished: number, total: number, item?: AssetManager.RequestItem) => {
                         onProgress && onProgress(finished, total, item);
                     },

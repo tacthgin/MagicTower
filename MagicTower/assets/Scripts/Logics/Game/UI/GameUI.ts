@@ -47,25 +47,24 @@ export class GameUI extends Component {
 
     private heroModel: HeroModel = null!;
     private mapModel: MapModel = null!;
-    private keys: any = {};
-    private propButtons: any = {};
+    private keys: Map<number, Array<Node>> = new Map<number, Array<Node>>();
+    private propButtons: Map<number, PropButton> = new Map<number, PropButton>();
     private monsterSprite: Node = null!;
 
     onLoad() {
-        this.heroModel = GameApp.getModel(HeroModel)!;
+        this.heroModel = GameApp.getModel(HeroModel);
         this.heroModel.subscribe(HeroEvent.HERO_ATTR, this.onHeroAttrChanged, this);
         this.heroModel.subscribe(HeroEvent.REFRESH_PROP, this.onRefreshProp, this);
         this.heroModel.subscribe(HeroEvent.REFRESH_EQUIP, this.onRefreshEquip, this);
 
         this.mapModel = GameApp.getModel(MapModel);
         this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onRefreshLevel, this);
-        // NotifyCenter.on(GameEvent.REFRESH_LEVEL, this.onRefreshLevel, this);
         // NotifyCenter.on(GameEvent.REFRESH_ARCHIVE, this.onRefreshArchive, this);
         // NotifyCenter.on(GameEvent.MONSTER_FIGHT, this.onMonsterFight, this);
         // NotifyCenter.on(GameEvent.MOVE_PATH, this.onMovePath, this);
 
         for (let i = 0; i < this.keySpriteFrames.length; i++) {
-            this.keys[i] = [];
+            this.keys.set(i, new Array<Node>());
         }
 
         this.monsterSprite = instantiate(this.monsterIconPrefab);
@@ -78,6 +77,7 @@ export class GameUI extends Component {
 
     onDestroy() {
         this.heroModel.unsubscribeTarget(this);
+        this.mapModel.unsubscribeTarget(this);
     }
 
     loadArchive() {
@@ -169,10 +169,13 @@ export class GameUI extends Component {
                         let propNum = this.heroModel.getPropNum(propInfo.id);
                         if (propNum <= 0) {
                             this.removePropButton(propInfo);
-                        } else if (!this.propButtons[propInfo.id]) {
-                            this.createPropButton(propInfo, propNum);
                         } else {
-                            this.propButtons[propInfo.id].setNum(propNum);
+                            let propButton = this.propButtons.get(propInfo.id);
+                            if (propButton) {
+                                propButton.setNum(propNum);
+                            } else {
+                                this.createPropButton(propInfo, propNum);
+                            }
                         }
                     }
                     break;
@@ -230,11 +233,12 @@ export class GameUI extends Component {
     }
 
     private removeKey(propInfo: any) {
-        if (this.keys.length == 0) return;
         let index = propInfo.id - 1;
-        let key = this.keys[index].pop();
-        if (key) {
-            key.getComponent(BasePoolNode).remove();
+        let keys = this.keys.get(index);
+        if (keys) {
+            let key = keys.pop();
+            if (key) {
+            }
         }
     }
 
@@ -245,16 +249,16 @@ export class GameUI extends Component {
             control.init(propInfo);
             control.setNum(num);
             propButton.parent = this.propButtonLayout;
-            this.propButtons[propInfo.id] = control;
+            this.propButtons.set(propInfo.id, control);
         }
         return propButton;
     }
 
     private removePropButton(propInfo: any) {
-        let propButton = this.propButtons[propInfo.id];
+        let propButton = this.propButtons.get(propInfo.id);
         if (propButton) {
+            this.propButtons.delete(propInfo.id);
             propButton.remove();
-            delete this.propButtons[propInfo.id];
         }
     }
 }
