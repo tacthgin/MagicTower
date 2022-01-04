@@ -44,16 +44,16 @@ export abstract class ModelBase implements IModel {
         this._saveManager = saveManager;
     }
 
-    check(id: number, eventHandle: EventHandle<ModelEventArgs>, thisArg?: any): boolean {
-        return this._eventPool.check(id, eventHandle, thisArg);
+    check<T extends ModelEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): boolean {
+        return this._eventPool.check(id, eventHandle as EventHandle<ModelEventArgs>, thisArg);
     }
 
-    subscribe(id: number, eventHandle: EventHandle<ModelEventArgs>, thisArg?: any): void {
-        this._eventPool.subscribe(id, eventHandle, thisArg);
+    subscribe<T extends ModelEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): void {
+        this._eventPool.subscribe(id, eventHandle as EventHandle<ModelEventArgs>, thisArg);
     }
 
-    unsubscribe(id: number, eventHandle: EventHandle<ModelEventArgs>, thisArg?: any): void {
-        this._eventPool.unsubscribe(id, eventHandle, thisArg);
+    unsubscribe<T extends ModelEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandle as EventHandle<ModelEventArgs>, thisArg);
     }
 
     unsubscribeTarget(target: object): void {

@@ -1,5 +1,8 @@
 import { Component, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, Vec3, _decorator } from "cc";
-import { GameEvent } from "../../../Constant/GameEvent";
+import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { HeroEvent } from "../../../Model/HeroModel/HeroEvent";
+import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { HeroAttrEventArgs, HeroPropEventArgs } from "../../../Model/HeroModel/HeroModelEventArgs";
 import { ElementManager } from "../Map/ElementManager";
 import { MonsterIcon } from "./MonsterIcon";
 import { PropButton } from "./PropButton";
@@ -33,20 +36,20 @@ export class GameUI extends Component {
     @property(Prefab)
     private monsterIconPrefab: Prefab = null!;
 
-    private HeroModel: HeroModel = null!;
+    private heroModel: HeroModel = null!;
     private keys: any = {};
     private propButtons: any = {};
     private monsterSprite: Node = null!;
 
     onLoad() {
-        this.HeroModel = GameManager.DATA.getData(HeroModel)!;
-        this.HeroModel.on(HeroEvent.HERO_ATTR, this.onHeroAttrChanged, this);
-        this.HeroModel.on(HeroEvent.REFRESH_PROP, this.onRefreshProp, this);
-        this.HeroModel.on(HeroEvent.REFRESH_EQUIP, this.onRefreshEquip, this);
-        NotifyCenter.on(GameEvent.REFRESH_LEVEL, this.onRefreshLevel, this);
-        NotifyCenter.on(GameEvent.REFRESH_ARCHIVE, this.onRefreshArchive, this);
-        NotifyCenter.on(GameEvent.MONSTER_FIGHT, this.onMonsterFight, this);
-        NotifyCenter.on(GameEvent.MOVE_PATH, this.onMovePath, this);
+        this.heroModel = GameApp.getModel(HeroModel)!;
+        this.heroModel.subscribe(HeroEvent.HERO_ATTR, this.onHeroAttrChanged, this);
+        this.heroModel.subscribe(HeroEvent.REFRESH_PROP, this.onRefreshProp, this);
+        this.heroModel.subscribe(HeroEvent.REFRESH_EQUIP, this.onRefreshEquip, this);
+        // NotifyCenter.on(GameEvent.REFRESH_LEVEL, this.onRefreshLevel, this);
+        // NotifyCenter.on(GameEvent.REFRESH_ARCHIVE, this.onRefreshArchive, this);
+        // NotifyCenter.on(GameEvent.MONSTER_FIGHT, this.onMonsterFight, this);
+        // NotifyCenter.on(GameEvent.MOVE_PATH, this.onMovePath, this);
 
         for (let i = 0; i < this.keySpriteFrames.length; i++) {
             this.keys[i] = [];
@@ -61,7 +64,7 @@ export class GameUI extends Component {
     }
 
     onDestroy() {
-        this.HeroModel.targetOff(this);
+        this.heroModel.unsubscribeTarget(this);
     }
 
     loadArchive() {
@@ -70,11 +73,11 @@ export class GameUI extends Component {
         this.onRefreshLevel(mapData?.level);
     }
 
-    onHeroAttrChanged(attr: HeroAttr) {
-        this.heroAttrLabels[attr].string = this.HeroModel.getAttr(attr).toString();
+    onHeroAttrChanged(sender: object, event: HeroAttrEventArgs) {
+        this.heroAttrLabels[event.attr].string = event.attrValue.toString();
     }
 
-    onRefreshProp(id: number | string, count: number = 1) {
+    onRefreshProp(sender: object, event: HeroPropEventArgs) {
         let propInfo = Utility.Json.getJsonElement("prop", id);
         switch (propInfo.type) {
             case PropType.SWARD:
@@ -116,7 +119,7 @@ export class GameUI extends Component {
                 break;
             default:
                 if (!propInfo.consumption) {
-                    let propNum = this.HeroModel.getPropNum(propInfo.id);
+                    let propNum = this.heroModel.getPropNum(propInfo.id);
                     if (propNum <= 0) {
                         this.removePropButton(propInfo);
                     } else if (!this.propButtons[propInfo.id]) {
@@ -139,7 +142,7 @@ export class GameUI extends Component {
 
     onRefreshArchive() {
         this.refreshHeroAttr();
-        let props = this.HeroModel.getProps();
+        let props = this.heroModel.getProps();
         for (let id in props) {
             this.onRefreshProp(parseInt(id), props[id]);
         }
@@ -158,7 +161,7 @@ export class GameUI extends Component {
     }
 
     onRefreshEquip(propType: PropType) {
-        let id = this.HeroModel.getEquips(propType);
+        let id = this.heroModel.getEquips(propType);
         let index = propType == PropType.SWARD ? 0 : 1;
         if (id == 0) {
             this.equipLabels[index].string = "无";

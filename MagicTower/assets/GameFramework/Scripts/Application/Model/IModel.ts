@@ -16,7 +16,7 @@ export interface IModel {
      * @param thisArg this参数
      * @returns 事件是否已经被订阅
      */
-    check(id: number, eventHandle: EventHandle<ModelEventArgs>, thisArg?: any): boolean;
+    check<T extends ModelEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): boolean;
 
     /**
      * 订阅事件
@@ -24,7 +24,7 @@ export interface IModel {
      * @param eventHandle 事件回调函数
      * @param thisArg this参数
      */
-    subscribe(id: number, eventHandle: EventHandle<ModelEventArgs>, thisArg?: any): void;
+    subscribe<T extends ModelEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): void;
 
     /**
      * 取消订阅事件
@@ -32,7 +32,7 @@ export interface IModel {
      * @param eventHandle 事件回调函数
      * @param thisArg this参数
      */
-    unsubscribe(id: number, eventHandle: EventHandle<ModelEventArgs>, thisArg?: any): void;
+    unsubscribe<T extends ModelEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): void;
 
     /**
      * 取消订阅者的所有订阅
