@@ -3,7 +3,23 @@ import { ISoundGroup } from "./ISoundGroup";
 import { ISoundHelp } from "./ISoundHelp";
 import { PlaySoundParams } from "./PlaySoundParams";
 
+/**
+ * 声音管理器接口
+ */
 export interface ISoundManager {
+    /**
+     * 背景音乐分组
+     */
+    readonly BACKGROUND_GROUP_NAME: string;
+
+    /**
+     * 声音默认组
+     */
+    readonly DEFAULT_GROUP_NAME: string;
+
+    /**
+     * 背景音乐序列id
+     */
     readonly backgroundSerialId: number;
     /**
      * 设置资源管理器

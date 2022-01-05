@@ -104,7 +104,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         return this.internalCreateObjectPool(constructor, name, false, autoReleaseInterval, capacity, expireTime, priority) as unknown as ObjectPoolBase;
     }
 
-    CreateMultiSpawnObjectPool<T extends ObjectBase>(
+    createMultiSpawnObjectPool<T extends ObjectBase>(
         constructor: Constructor<T>,
         name: string,
         autoReleaseInterval: number = this._defaultExpireTime,
@@ -115,7 +115,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         return this.internalCreateObjectPool(constructor, name, true, autoReleaseInterval, capacity, expireTime, priority);
     }
 
-    CreateMultiSpawnObjectPoolBase(
+    createMultiSpawnObjectPoolBase(
         constructor: Constructor<ObjectBase>,
         name: string,
         autoReleaseInterval: number = this._defaultExpireTime,

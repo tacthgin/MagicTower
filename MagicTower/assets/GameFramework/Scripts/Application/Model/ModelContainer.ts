@@ -9,10 +9,10 @@ import { ModelBase } from "./ModelBase";
  * model容器
  */
 export class ModelContainer {
-    private static s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();
-    private static s_nameConstructors: Map<Constructor<ModelBase>, string> = new Map<Constructor<ModelBase>, string>();
-    private _models: GameFrameworkLinkedList<ModelBase> = null!;
-    private _cachedModels: Map<Constructor<ModelBase>, ModelBase> = null!;
+    private static readonly s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();
+    private static readonly s_nameConstructors: Map<Constructor<ModelBase>, string> = new Map<Constructor<ModelBase>, string>();
+    private readonly _models: GameFrameworkLinkedList<ModelBase> = null!;
+    private readonly _cachedModels: Map<Constructor<ModelBase>, ModelBase> = null!;
     private _saveManager: ISaveManager | null = null;
 
     constructor() {
@@ -121,12 +121,12 @@ export class ModelContainer {
         }> = [];
 
         ModelContainer.s_modelConstructors.forEach((ctor, name) => {
-            let model = this.getModel(ctor)
+            let model = this.getModel(ctor);
             modelInfos.push({
                 model: model,
-                value: this._saveManager?.getObject(name) || null
-            })
-        } )
+                value: this._saveManager?.getObject(name) || null,
+            });
+        });
 
         //模块根据优先级排序
         modelInfos.sort((l, r) => {

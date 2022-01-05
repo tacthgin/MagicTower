@@ -29,7 +29,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     private _serialId: number = 0;
     private _shutDown: boolean = false;
     private _recyleQueue: Array<IUIForm> = null!;
-    static readonly defaultUIGroupName: string = "default_ui_group";
+    readonly defaultUIGroupName: string = "default_ui_group";
 
     constructor() {
         super();
@@ -239,7 +239,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         }
 
         if (!uiGroupName) {
-            uiGroupName = UIManager.defaultUIGroupName;
+            uiGroupName = this.defaultUIGroupName;
         }
 
         let uiGroup = this.getUIGroup(uiGroupName);

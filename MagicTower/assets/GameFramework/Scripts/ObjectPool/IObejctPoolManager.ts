@@ -72,7 +72,7 @@ export interface IObejctPoolManager {
      * @param expireTime 对象池过期时间戳
      * @param priority 对象池优先级
      */
-    CreateMultiSpawnObjectPool<T extends ObjectBase>(
+    createMultiSpawnObjectPool<T extends ObjectBase>(
         constructor: Constructor<T>,
         name: string,
         autoReleaseInterval?: number,
@@ -90,7 +90,7 @@ export interface IObejctPoolManager {
      * @param expireTime 对象池过期时间戳
      * @param priority 对象池优先级
      */
-    CreateMultiSpawnObjectPoolBase(constructor: Constructor<ObjectBase>, name: string, autoReleaseInterval?: number, capacity?: number, expireTime?: number, priority?: number): ObjectPoolBase;
+    createMultiSpawnObjectPoolBase(constructor: Constructor<ObjectBase>, name: string, autoReleaseInterval?: number, capacity?: number, expireTime?: number, priority?: number): ObjectPoolBase;
 
     /**
      * 释放对象池
