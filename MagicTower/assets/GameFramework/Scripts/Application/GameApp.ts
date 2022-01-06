@@ -6,6 +6,7 @@ import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
 import { WebLogHelp } from "../Base/Log/WebLogHelp";
 import { IEventManager } from "../Event/IEventManager";
 import { IFsmManager } from "../Fsm/IFsmManager";
+import { INodePoolManager } from "../NodePool/INodePoolManager";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { ISaveManager } from "../Save/ISaveManager";
@@ -51,6 +52,13 @@ export class GameApp extends Component {
      */
     static get ObjectPoolManager(): IObejctPoolManager {
         return GameFrameworkEntry.getModule<IObejctPoolManager>("ObjectPoolManager");
+    }
+
+    /**
+     * 对象池管理器
+     */
+    static get NodePoolManager(): INodePoolManager {
+        return GameFrameworkEntry.getModule<INodePoolManager>("NodePoolManager");
     }
 
     /**
@@ -116,10 +124,15 @@ export class GameApp extends Component {
         //设置log辅助
         GameFrameworkLog.setLogHelp(new WebLogHelp());
         let resourceManager = GameApp.ResourceManager;
+        let objectPoolManager = GameApp.ObjectPoolManager;
         //初始化ui模块
         let uiManager = GameApp.UIManager;
         uiManager.setResourceManager(resourceManager);
-        uiManager.setObjectPoolManager(GameApp.ObjectPoolManager);
+        uiManager.setObjectPoolManager(objectPoolManager);
+        //初始化节点对象池
+        let nodePoolManager = GameApp.NodePoolManager;
+        nodePoolManager.setResourceManager(resourceManager);
+        nodePoolManager.setObjectPoolManager(objectPoolManager);
         //初始化声音模块
         let soundManager = GameApp.SoundManager;
         soundManager.setResourceManager(resourceManager);
