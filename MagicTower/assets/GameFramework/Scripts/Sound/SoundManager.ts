@@ -24,10 +24,6 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         this._soundGroups = new Map<string, SoundGroup>();
     }
 
-    get priority(): number {
-        return 7;
-    }
-
     get backgroundSerialId(): number {
         return this._backgroundSerialId;
     }

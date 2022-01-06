@@ -248,7 +248,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         }
 
         let serialId = ++this._serialId;
-        let uiFromInstanceObject: UIFormInstanceObject | null = this._instancePool.spawn();
+        let uiFromInstanceObject: UIFormInstanceObject | null = this._instancePool.spawn(uiFormAssetName);
 
         if (!uiFromInstanceObject) {
             let asset = this._resourceManger.internalResourceLoader.getAsset(uiFormAssetName);
