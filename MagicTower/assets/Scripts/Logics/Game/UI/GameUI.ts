@@ -96,7 +96,8 @@ export class GameUI extends Component {
         this.monsterSprite.parent = this.monsterNode;
         this.monsterSprite.active = false;
 
-        GameApp.NodePoolManager.createNodePool(PropButton, "prop button");
+        GameApp.NodePoolManager.createNodePool(PropButton);
+        GameApp.NodePoolManager.createNodePool("key");
     }
 
     private onHeroAttrChanged(sender: object, event: HeroAttrEventArgs) {
@@ -145,7 +146,7 @@ export class GameUI extends Component {
         this.refreshEquip(PropType.SHIELD, this.heroModel.getEquips(PropType.SHIELD));
     }
 
-    private async refreshProp(propId: number | string, count: number = 1) {
+    private refreshProp(propId: number | string, count: number = 1) {
         let propInfo = Utility.Json.getJsonElement("prop", propId) as any;
         if (propInfo) {
             switch (propInfo.type) {
@@ -169,7 +170,7 @@ export class GameUI extends Component {
                 case PropType.FEATHER:
                     //up
                     for (let i = 0; i < STAIR_NAMES.length; i++) {
-                        let button = await this.createPropButton(propInfo, 1);
+                        let button = this.createPropButton(propInfo, 1);
                         if (button) {
                             let label = button.getChildByName("label")!;
                             label.active = true;
@@ -235,7 +236,7 @@ export class GameUI extends Component {
 
     private async createKey(propInfo: any) {
         let index = propInfo.id - 1;
-        let key = (await GameApp.NodePoolManager.createNode(null!, this.keyPrefab)) as Node;
+        let key = GameApp.NodePoolManager.createNode("key", this.keyPrefab) as Node;
         if (key) {
             key.getComponent(Sprite)!.spriteFrame = this.keySpriteFrames[index];
             key.setSiblingIndex(this.keySpriteFrames.length - index);
@@ -258,8 +259,8 @@ export class GameUI extends Component {
         }
     }
 
-    private async createPropButton(propInfo: any, num: number) {
-        let propButton = (await GameApp.NodePoolManager.createNode(PropButton, this.propButtonPrefab)) as Node;
+    private createPropButton(propInfo: any, num: number) {
+        let propButton = GameApp.NodePoolManager.createNode(PropButton, this.propButtonPrefab) as Node;
         if (propButton) {
             let control = propButton.getComponent(PropButton)!;
             control.init(propInfo);
@@ -274,7 +275,7 @@ export class GameUI extends Component {
         let propButton = this.propButtons.get(propInfo.id);
         if (propButton) {
             this.propButtons.delete(propInfo.id);
-            GameApp.NodePoolManager.releaseNode(propButton.node);
+            GameApp.NodePoolManager.releaseNode(PropButton, propButton.node);
         }
     }
 }
