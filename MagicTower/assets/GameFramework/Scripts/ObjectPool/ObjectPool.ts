@@ -169,8 +169,8 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
         return null;
     }
 
-    upspawn(obj: T): void {
-        let internalObject = this.getObject(obj);
+    upspawn(objectOrTarget: T | object): void {
+        let internalObject = this.getObject(objectOrTarget);
         if (internalObject) {
             internalObject.unspawn();
             if (this.count > this.capacity && internalObject.spawnCount <= 0) {

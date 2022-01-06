@@ -60,9 +60,9 @@ export interface IObjectPool<T extends ObjectBase> {
 
     /**
      * 回收对象
-     * @param obj
+     * @param objectOrTarget
      */
-    upspawn(obj: T): void;
+    upspawn(objectOrTarget: T | object): void;
 
     /**
      * 释放对象。
