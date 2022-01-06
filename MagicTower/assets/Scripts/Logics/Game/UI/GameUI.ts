@@ -1,7 +1,9 @@
 import { Component, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, Vec3, _decorator } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { GameEventArgs } from "../../../../GameFramework/Scripts/Event/GameEventArgs";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
+import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroEvent } from "../../../Model/HeroModel/HeroEvent";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
@@ -52,6 +54,24 @@ export class GameUI extends Component {
     private monsterSprite: Node = null!;
 
     onLoad() {
+        this.registerEvent();
+        this.initUI();
+        this.loadArchive();
+    }
+
+    onDestroy() {
+        this.heroModel.unsubscribeTarget(this);
+        this.mapModel.unsubscribeTarget(this);
+        GameApp.EventManager.unsubscribeTarget(this);
+    }
+
+    loadArchive() {
+        this.refreshHeroAttr();
+        this.refreshProps();
+        this.refreshLevel(this.mapModel.level);
+    }
+
+    private registerEvent() {
         this.heroModel = GameApp.getModel(HeroModel);
         this.heroModel.subscribe(HeroEvent.HERO_ATTR, this.onHeroAttrChanged, this);
         this.heroModel.subscribe(HeroEvent.REFRESH_PROP, this.onRefreshProp, this);
@@ -59,10 +79,14 @@ export class GameUI extends Component {
 
         this.mapModel = GameApp.getModel(MapModel);
         this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onRefreshLevel, this);
-        // NotifyCenter.on(GameEvent.REFRESH_ARCHIVE, this.onRefreshArchive, this);
-        // NotifyCenter.on(GameEvent.MONSTER_FIGHT, this.onMonsterFight, this);
-        // NotifyCenter.on(GameEvent.MOVE_PATH, this.onMovePath, this);
 
+        let eventManager = GameApp.EventManager;
+        eventManager.subscribe(GameEvent.REFRESH_ARCHIVE, this.onRefreshArchive, this);
+        eventManager.subscribe(GameEvent.MONSTER_FIGHT, this.onMonsterFight, this);
+        eventManager.subscribe(GameEvent.MOVE_PATH, this.onMovePath, this);
+    }
+
+    private initUI() {
         for (let i = 0; i < this.keySpriteFrames.length; i++) {
             this.keys.set(i, new Array<Node>());
         }
@@ -72,18 +96,7 @@ export class GameUI extends Component {
         this.monsterSprite.parent = this.monsterNode;
         this.monsterSprite.active = false;
 
-        this.loadArchive();
-    }
-
-    onDestroy() {
-        this.heroModel.unsubscribeTarget(this);
-        this.mapModel.unsubscribeTarget(this);
-    }
-
-    loadArchive() {
-        this.refreshHeroAttr();
-        this.refreshProps();
-        this.refreshLevel(this.mapModel.level);
+        GameApp.NodePoolManager.createNodePool(PropButton, "prop button");
     }
 
     private onHeroAttrChanged(sender: object, event: HeroAttrEventArgs) {
@@ -105,7 +118,7 @@ export class GameUI extends Component {
 
     private onRefreshLevel(sender: object, event: HeroPropEventArgs) {}
 
-    private onRefreshArchive() {
+    private onRefreshArchive(sender: object, event: GameEventArgs) {
         this.loadArchive();
     }
 
@@ -132,7 +145,7 @@ export class GameUI extends Component {
         this.refreshEquip(PropType.SHIELD, this.heroModel.getEquips(PropType.SHIELD));
     }
 
-    private refreshProp(propId: number | string, count: number = 1) {
+    private async refreshProp(propId: number | string, count: number = 1) {
         let propInfo = Utility.Json.getJsonElement("prop", propId) as any;
         if (propInfo) {
             switch (propInfo.type) {
@@ -156,7 +169,7 @@ export class GameUI extends Component {
                 case PropType.FEATHER:
                     //up
                     for (let i = 0; i < STAIR_NAMES.length; i++) {
-                        let button = this.createPropButton(propInfo, 1);
+                        let button = await this.createPropButton(propInfo, 1);
                         if (button) {
                             let label = button.getChildByName("label")!;
                             label.active = true;
@@ -220,14 +233,17 @@ export class GameUI extends Component {
         }
     }
 
-    private createKey(propInfo: any) {
+    private async createKey(propInfo: any) {
         let index = propInfo.id - 1;
-        let key = GameManager.POOL.createPrefabNode(this.keyPrefab, null, true);
+        let key = (await GameApp.NodePoolManager.createNode(null!, this.keyPrefab)) as Node;
         if (key) {
             key.getComponent(Sprite)!.spriteFrame = this.keySpriteFrames[index];
             key.setSiblingIndex(this.keySpriteFrames.length - index);
             key.parent = this.keyLayout;
-            this.keys[index].push(key);
+            let keys = this.keys.get(index);
+            if (keys) {
+                keys.push(key);
+            }
         }
         return key;
     }
@@ -242,8 +258,8 @@ export class GameUI extends Component {
         }
     }
 
-    private createPropButton(propInfo: any, num: number) {
-        let propButton = GameManager.POOL.createPrefabNode(this.propButtonPrefab);
+    private async createPropButton(propInfo: any, num: number) {
+        let propButton = (await GameApp.NodePoolManager.createNode(PropButton, this.propButtonPrefab)) as Node;
         if (propButton) {
             let control = propButton.getComponent(PropButton)!;
             control.init(propInfo);
@@ -258,7 +274,7 @@ export class GameUI extends Component {
         let propButton = this.propButtons.get(propInfo.id);
         if (propButton) {
             this.propButtons.delete(propInfo.id);
-            propButton.remove();
+            GameApp.NodePoolManager.releaseNode(propButton.node);
         }
     }
 }

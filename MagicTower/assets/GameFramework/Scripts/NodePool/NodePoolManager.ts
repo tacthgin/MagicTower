@@ -145,4 +145,8 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
 
         return nodeObject.target;
     }
+
+    releaseNode(node: object): boolean {
+        return true;
+    }
 }

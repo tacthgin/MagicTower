@@ -23,4 +23,6 @@ export interface INodePoolManager {
     createNodePool<T extends NodeBase>(nodeConstructor: Constructor<T>, nodePoolName: string): IObjectPool<NodeObject>;
 
     createNode<T extends NodeBase>(nodeConstructor: Constructor<T>, assetOrAssetPath: object | string, name?: string, userData?: object): Promise<object>;
+
+    releaseNode(node: object): boolean;
 }
