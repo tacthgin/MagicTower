@@ -20,9 +20,11 @@ export interface INodePoolManager {
 
     getNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): IObjectPool<NodeObject> | null;
 
-    createNodePool<T extends NodeBase>(nodeConstructor: Constructor<T>, nodePoolName: string): IObjectPool<NodeObject>;
+    createNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): IObjectPool<NodeObject>;
 
-    createNode<T extends NodeBase>(nodeConstructor: Constructor<T>, assetOrAssetPath: object | string, name?: string, userData?: object): Promise<object>;
+    createNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): object;
 
-    releaseNode(node: object): boolean;
+    createNodeWithPath<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, assetPath: string, name?: string): Promise<object>;
+
+    releaseNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, node: object): boolean;
 }

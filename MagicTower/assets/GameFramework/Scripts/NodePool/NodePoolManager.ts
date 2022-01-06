@@ -13,7 +13,7 @@ import { NodeObject } from "./NodeObject";
 
 @GameFrameworkEntry.registerModule("NodePoolManager")
 export class NodePoolManager extends GameFrameworkModule implements INodePoolManager {
-    private readonly _nodePools: Map<Constructor<NodeBase>, ObjectPoolBase> = null!;
+    private readonly _nodePools: Map<Constructor<NodeBase> | string, ObjectPoolBase> = null!;
     private _resourceManager: IResourceManager | null = null;
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _nodeHelp: INodeHelp | null = null;
@@ -52,50 +52,24 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
     }
 
     hasNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): boolean {
-        if (typeof nodeConstructorOrNodePoolName === "string") {
-            if (!nodeConstructorOrNodePoolName) {
-                throw new GameFrameworkError("node pool name is invalid");
-            }
-
-            for (let pair of this._nodePools) {
-                if (pair[1].name === nodeConstructorOrNodePoolName) {
-                    return true;
-                }
-            }
-        } else {
-            return this._nodePools.has(nodeConstructorOrNodePoolName);
-        }
-
-        return false;
+        return this._nodePools.has(nodeConstructorOrNodePoolName);
     }
 
     getNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): IObjectPool<NodeObject> | null {
-        if (typeof nodeConstructorOrNodePoolName === "string") {
-            if (!nodeConstructorOrNodePoolName) {
-                throw new GameFrameworkError("node pool name is invalid");
-            }
-
-            for (let pair of this._nodePools) {
-                if (pair[1].name === nodeConstructorOrNodePoolName) {
-                    return pair[1] as unknown as IObjectPool<NodeObject>;
-                }
-            }
-        } else {
-            let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName);
-            if (objectPool) {
-                return objectPool as unknown as IObjectPool<NodeObject>;
-            }
+        let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName);
+        if (objectPool) {
+            return objectPool as unknown as IObjectPool<NodeObject>;
         }
 
         return null;
     }
 
-    createNodePool<T extends NodeBase>(nodeConstructor: Constructor<T>, nodePoolName: string): IObjectPool<NodeObject> {
-        if (!nodePoolName) {
+    createNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): IObjectPool<NodeObject> {
+        if (typeof nodeConstructorOrNodePoolName === "string" && !nodeConstructorOrNodePoolName) {
             throw new GameFrameworkError("node pool name is invalid");
         }
 
-        let objectPool = this._nodePools.get(nodeConstructor);
+        let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName);
         if (objectPool) {
             throw new GameFrameworkError(`node pool is exist`);
         }
@@ -104,22 +78,18 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             throw new GameFrameworkError("you must set object pool manager first");
         }
 
-        objectPool = this._objectPoolManager.createSingleSpawnObjectPoolBase(NodeObject, nodePoolName);
-        this._nodePools.set(nodeConstructor, objectPool);
+        objectPool = this._objectPoolManager.createSingleSpawnObjectPoolBase(NodeObject, "");
+        this._nodePools.set(nodeConstructorOrNodePoolName, objectPool);
 
         return objectPool as unknown as IObjectPool<NodeObject>;
     }
 
-    async createNode<T extends NodeBase>(nodeConstructor: Constructor<T>, assetOrAssetPath: object | string, name?: string, userData?: object): Promise<object> {
-        if (!this._resourceManager) {
-            throw new GameFrameworkError("you must set resource manager first");
-        }
-
+    async createNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): Promise<object> {
         if (!this._nodeHelp) {
             throw new GameFrameworkError("you must set node help first");
         }
 
-        let objectPool = this._nodePools.get(nodeConstructor) as unknown as IObjectPool<NodeObject>;
+        let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName) as unknown as IObjectPool<NodeObject>;
         if (!objectPool) {
             throw new GameFrameworkError("object pool is not exist, you must create first");
         }
@@ -128,25 +98,35 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
 
         let nodeObject = objectPool.spawn(name);
         if (!nodeObject) {
-            if (typeof assetOrAssetPath === "string") {
-                let asset = this._resourceManager.internalResourceLoader.getAsset(assetOrAssetPath);
-                if (!asset) {
-                    asset = await this._resourceManager.internalResourceLoader.loadAsset(assetOrAssetPath);
-                    if (!asset) {
-                        throw new GameFrameworkError(`${assetOrAssetPath} asset is invalid`);
-                    }
-                }
-                nodeObject = NodeObject.create(name, this._nodeHelp.instantiateNode(asset), this._nodeHelp);
-            } else {
-                nodeObject = NodeObject.create(name, this._nodeHelp.instantiateNode(assetOrAssetPath), this._nodeHelp);
-            }
+            nodeObject = NodeObject.create(name, this._nodeHelp.instantiateNode(asset), this._nodeHelp);
             objectPool.register(nodeObject, true);
         }
 
         return nodeObject.target;
     }
 
-    releaseNode(node: object): boolean {
-        return true;
+    async createNodeWithPath<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, assetPath: string, name?: string): Promise<object> {
+        if (!this._resourceManager) {
+            throw new GameFrameworkError("you must set resource manager first");
+        }
+
+        let asset = this._resourceManager.internalResourceLoader.getAsset(assetPath);
+        if (!asset) {
+            asset = await this._resourceManager.internalResourceLoader.loadAsset(assetPath);
+            if (!asset) {
+                throw new GameFrameworkError(`${assetPath} asset is invalid`);
+            }
+        }
+
+        return this.createNode(nodeConstructorOrNodePoolName, asset, name);
+    }
+
+    releaseNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, node: object): boolean {
+        let objectPool = this.getNodePool(nodeConstructorOrNodePoolName);
+        if (objectPool) {
+            objectPool.upspawn(node);
+            return true;
+        }
+        return false;
     }
 }

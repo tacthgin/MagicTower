@@ -16,6 +16,7 @@ import { IUIManager } from "../UI/IUIManager";
 import { Utility } from "../Utility/Utility";
 import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
+import { CNodeHelp } from "./NodePool/CNodeHelp";
 import { SoundController } from "./Sound/SoundController";
 
 const { ccclass, executionOrder } = _decorator;
@@ -133,6 +134,7 @@ export class GameApp extends Component {
         let nodePoolManager = GameApp.NodePoolManager;
         nodePoolManager.setResourceManager(resourceManager);
         nodePoolManager.setObjectPoolManager(objectPoolManager);
+        nodePoolManager.setNodeHelp(new CNodeHelp());
         //初始化声音模块
         let soundManager = GameApp.SoundManager;
         soundManager.setResourceManager(resourceManager);
