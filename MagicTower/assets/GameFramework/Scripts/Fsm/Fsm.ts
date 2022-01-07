@@ -6,7 +6,7 @@ import { FsmBase } from "./FsmBase";
 import { FsmState } from "./FsmState";
 import { IFsm } from "./IFsm";
 
-export class Fsm<T extends Constructor<T>> extends FsmBase implements IFsm<T> {
+export class Fsm<T extends {}> extends FsmBase implements IFsm<T> {
     private _owner: T | null = null;
     private readonly _states: Map<Constructor<FsmState<T>>, FsmState<T>> = null!;
     private _datas: Map<string, Variable<Object>> | null = null;
@@ -63,7 +63,7 @@ export class Fsm<T extends Constructor<T>> extends FsmBase implements IFsm<T> {
      * @param states 有限状态机状态
      * @returns 有限状态机
      */
-    static create<T extends Constructor<T>>(name: string, owner: T, states: FsmState<T>[]): Fsm<T> {
+    static create<T extends {}>(name: string, owner: T, states: FsmState<T>[]): Fsm<T> {
         if (!name) {
             throw new GameFrameworkError("name is invalid");
         }

@@ -37,14 +37,14 @@ export class FsmManager extends GameFrameworkModule implements IFsmManager {
         this._fsms.clear();
     }
 
-    hasFsm<T extends Constructor<T>>(nameOrOwner: string | T): boolean {
+    hasFsm<T extends {}>(nameOrOwner: string | T): boolean {
         if (typeof nameOrOwner === "string" && !nameOrOwner) {
             throw new GameFrameworkError("name is invalid");
         }
         return this._constructorOrNameToPair.has(nameOrOwner);
     }
 
-    getFsm<T extends Constructor<T>>(nameOrOwner: string | T): IFsm<T> | null {
+    getFsm<T extends {}>(nameOrOwner: string | T): IFsm<T> | null {
         let fsm = this.internalGetFsm(nameOrOwner);
         if (fsm) {
             return fsm as unknown as IFsm<T>;
@@ -65,7 +65,7 @@ export class FsmManager extends GameFrameworkModule implements IFsmManager {
         return fsms;
     }
 
-    createFsm<T extends Constructor<T>>(name: string, owner: T, states: FsmState<T>[]): IFsm<T> {
+    createFsm<T extends {}>(name: string, owner: T, states: FsmState<T>[]): IFsm<T> {
         if (this.hasFsm(name)) {
             throw new GameFrameworkError(`already exist fsm: ${name}`);
         }
@@ -77,7 +77,7 @@ export class FsmManager extends GameFrameworkModule implements IFsmManager {
         return fsm;
     }
 
-    destroyFsm<T extends Constructor<T>>(nameOrOwnerOrFsm: string | T | FsmBase | IFsm<T>): boolean {
+    destroyFsm<T extends {}>(nameOrOwnerOrFsm: string | T | FsmBase | IFsm<T>): boolean {
         let constructorNamePair: ConstructorNamePair<object> | null | undefined = null;
         if (nameOrOwnerOrFsm instanceof FsmBase) {
             constructorNamePair = this._constructorOrNameToPair.get(nameOrOwnerOrFsm.name);
@@ -98,7 +98,7 @@ export class FsmManager extends GameFrameworkModule implements IFsmManager {
         return false;
     }
 
-    private internalGetFsm<T extends Constructor<T>>(nameOrOwner: string | T): FsmBase | null {
+    private internalGetFsm<T extends {}>(nameOrOwner: string | T): FsmBase | null {
         let pair = this._constructorOrNameToPair.get(nameOrOwner);
         if (pair) {
             let fsm = this._fsms.get(pair);

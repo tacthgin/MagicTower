@@ -3,7 +3,7 @@ import { IRerference } from "../Base/ReferencePool/IRerference";
 import { Variable } from "../Base/Variable/Variable";
 import { FsmState } from "./FsmState";
 
-export interface IFsm<T extends Constructor<T>> extends IRerference {
+export interface IFsm<T extends {}> extends IRerference {
     /**
      * 获取有限状态机名称
      */

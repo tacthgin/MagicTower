@@ -2,7 +2,7 @@ import { Constructor } from "../Base/DataStruct/Constructor";
 import { Fsm } from "./Fsm";
 import { IFsm } from "./IFsm";
 
-export abstract class FsmState<T extends Constructor<T>> {
+export abstract class FsmState<T extends {}> {
     onInit(fsm: IFsm<T>): void {}
 
     onEnter(fsm: IFsm<T>): void {}
