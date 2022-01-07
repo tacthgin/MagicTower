@@ -1,8 +1,7 @@
 import { director, js, math, size, TiledLayer, TiledMap, TiledMapAsset, v2, Vec2, _decorator } from "cc";
-import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
-import { IAstarMap } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAstarMap";
-import { LevelData } from "../../../Model/MapModel/Data/LevelData";
-import { IGameMap } from "./GameMap/IGameMap";
+import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
+import { LevelData } from "../../../../Model/MapModel/Data/LevelData";
+import { IGameMap } from "./IGameMap";
 
 const { ccclass } = _decorator;
 

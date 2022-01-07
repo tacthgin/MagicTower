@@ -1448,7 +1448,6 @@
       "__id__": 40
     },
     "_enabled": true,
-    "__prefab": null,
     "layer": {
       "__id__": 41
     },
@@ -3622,12 +3621,14 @@
       "b": 0,
       "a": 76
     },
-    "_autoAdapt": true,
+    "_fixedArea": false,
     "_pcf": 0,
     "_bias": 1,
     "_normalBias": 0,
     "_near": 1,
     "_far": 30,
+    "_shadowDistance": 100,
+    "_invisibleOcclusionRange": 200,
     "_orthoSize": 5,
     "_maxReceived": 4,
     "_size": {

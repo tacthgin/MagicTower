@@ -1,4 +1,4 @@
-import { AnimationClip, assert, Prefab, SpriteFrame } from "cc";
+import { AnimationClip, Prefab, SpriteFrame, TiledMapAsset } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 
 export class ElementFactory {
@@ -8,11 +8,16 @@ export class ElementFactory {
     static async loadAsset() {
         let resouceLoader = GameApp.ResourceManager.internalResourceLoader;
         await resouceLoader.loadDir("Prefabs/Elements", Prefab);
-        await resouceLoader.loadDir("TiledMap/Images", SpriteFrame);
+        await resouceLoader.loadDir("TiledMap", TiledMapAsset);
+        //await resouceLoader.loadDir("TiledMap/Images", SpriteFrame);
     }
 
     static getElementSpriteFrame(name: string): SpriteFrame | null {
         return GameApp.ResourceManager.internalResourceLoader.getAsset(`TiledMap/Images/${name}`);
+    }
+
+    static getHeroSpriteFrame(name: string): SpriteFrame | null {
+        return GameApp.ResourceManager.internalResourceLoader.getAsset(`Sprites/${name}`);
     }
 
     static getElementAnimationClip(name: string) {

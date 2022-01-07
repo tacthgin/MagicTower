@@ -23,6 +23,7 @@ export class HeroModel extends ModelBase {
     private swardId: number = 0;
     private shieldId: number = 0;
     private props: { [key: number | string]: number } = {};
+    private animtion: string[] = null!;
 
     constructor() {
         super();
@@ -149,6 +150,22 @@ export class HeroModel extends ModelBase {
 
     equipedDivineShield() {
         return this.props.shieldId == PropId.DIVINE_SHIELD;
+    }
+
+    getDireciton() {
+        return this.direction;
+    }
+
+    getAnimation() {
+        return this.animtion;
+    }
+
+    getHeroSpeed() {
+        let heroSpeed = Utility.Json.getJsonElement("global", "heroSpeed");
+        if (heroSpeed) {
+            return heroSpeed as number;
+        }
+        return 0;
     }
 
     private useTestLoad() {
