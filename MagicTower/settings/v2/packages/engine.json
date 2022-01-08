@@ -99,7 +99,8 @@
       "profiler",
       "audio",
       "tween",
-      "tiled-map"
+      "tiled-map",
+      "marionette"
     ],
     "noDeprecatedFeatures": {
       "value": true,
