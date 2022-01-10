@@ -43,7 +43,7 @@ export class GameMap extends TiledMap implements IGameMap {
 
     init(tiledMapAsset: TiledMapAsset | null) {
         if (!tiledMapAsset || !tiledMapAsset.isValid) {
-            console.error(`${tiledMapAsset ? tiledMapAsset.name : "空的资源"}不合法`);
+            GameFrameworkLog.error(`${tiledMapAsset ? tiledMapAsset.name : "空的资源"}不合法`);
             return;
         }
         this.tmxAsset = tiledMapAsset;
@@ -131,7 +131,7 @@ export class GameMap extends TiledMap implements IGameMap {
                 this.updateAnimationTiles(layerName, tile, gid);
             }
         } else {
-            console.error(`找不到layer:${layerName}`);
+            GameFrameworkLog.error(`找不到layer:${layerName}`);
         }
     }
 

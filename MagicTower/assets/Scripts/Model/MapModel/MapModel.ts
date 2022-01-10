@@ -1,5 +1,9 @@
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
+import { StairType } from "./Data/Elements/Stair";
+import { LevelData } from "./Data/LevelData";
+import { LevelTempData } from "./Data/LevelTempData";
+import { MapSwitchLevelEventArgs } from "./MapModelEventArgs";
 
 @ModelContainer.registerModel("MapModel")
 export class MapModel extends ModelBase {
@@ -21,13 +25,13 @@ export class MapModel extends ModelBase {
     setLevelDiff(diff: number) {
         let newLevel = this.data.currentLevel + diff;
         if (newLevel > 50 || newLevel < 0) {
-            console.error(`level${newLevel}不合法`);
+            GameFrameworkLog.error(`level${newLevel}不合法`);
             return;
         }
         let currentLevel = this.data.currentLevel;
         this.data.currentLevel = newLevel;
         //如果是上去的，英雄站到下楼梯的旁边
-        this.emit(MapEvent.SWITCH_LEVEL, currentLevel, diff > 0 ? StairType.Down : StairType.UP);
+        this.fireNow(MapSwitchLevelEventArgs.create(currentLevel, diff > 0 ? StairType.Down : StairType.UP));
     }
 
     getCurrentLevelData(): LevelData {

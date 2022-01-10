@@ -1,6 +1,7 @@
 import { director, js, math, size, TiledLayer, TiledMap, TiledMapAsset, v2, Vec2, _decorator } from "cc";
+import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
-import { IAstarMap } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAstarMap";
+import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { IGameMap } from "./GameMap/IGameMap";
 
@@ -8,10 +9,7 @@ const { ccclass } = _decorator;
 
 const MAP_ANIMATION_INTERVAL = 0.1;
 
-export enum AstarMoveType {
-    HERO,
-    MONSTER,
-}
+type CheckType = (position: IVec2) => boolean;
 
 @ccclass("GameMap")
 export class GameMap extends TiledMap implements IGameMap {
@@ -19,16 +17,11 @@ export class GameMap extends TiledMap implements IGameMap {
     private animationTiles: any = {};
     /** 单双计数 */
     private animationCount: number = 0;
-    /** a*行走方式 */
-    private _astarMoveType: AstarMoveType = AstarMoveType.HERO;
     private levelData: LevelData | null = null;
     private gameSize: math.Size = null!;
     private gidToSpriteNameMap: { [key: number]: string } = {};
     private spriteNameToGidMap: { [key: string]: number } = {};
-
-    public set astarMoveType(value: AstarMoveType) {
-        this._astarMoveType = value;
-    }
+    private checkDelegate: CheckType | null = null;
 
     get width(): number {
         return this.getMapSize().width;
@@ -44,7 +37,7 @@ export class GameMap extends TiledMap implements IGameMap {
 
     init(tiledMapAsset: TiledMapAsset | null) {
         if (!tiledMapAsset || !tiledMapAsset.isValid) {
-            console.error(`${tiledMapAsset ? tiledMapAsset.name : "空的资源"}不合法`);
+            GameFrameworkLog.error(`${tiledMapAsset ? tiledMapAsset.name : "空的资源"}不合法`);
             return;
         }
         this.tmxAsset = tiledMapAsset;
@@ -132,7 +125,7 @@ export class GameMap extends TiledMap implements IGameMap {
                 this.updateAnimationTiles(layerName, tile, gid);
             }
         } else {
-            console.error(`找不到layer:${layerName}`);
+            GameFrameworkLog.error(`找不到layer:${layerName}`);
         }
     }
 
@@ -263,29 +256,13 @@ export class GameMap extends TiledMap implements IGameMap {
     }
 
     check(position: IVec2): boolean {
-        throw new Error("Method not implemented.");
+        if (!this.checkDelegate) {
+            throw new GameFrameworkError("check delegate is invalid");
+        }
+        return this.checkDelegate(position);
     }
 
-    isEmpty(tile: Vec2, endTile: Vec2): boolean {
-        let { layerName } = this.getTileInfo(tile);
-        switch (this._astarMoveType) {
-            case AstarMoveType.HERO:
-                {
-                    if (!this.levelData?.canHeroMove(tile)) return false;
-
-                    if (!tile.equals(endTile)) {
-                        //中途过程遇到事件也可以走
-                        return layerName == "floor" || layerName == "event" || layerName == "prop";
-                    }
-                }
-                break;
-            case AstarMoveType.MONSTER: {
-                return layerName == "floor" || layerName == "monster" || layerName == "event" || layerName == "stair";
-            }
-            default:
-                break;
-        }
-
-        return true;
+    setCheckDelegate(callbackfn: CheckType) {
+        this.checkDelegate = callbackfn;
     }
 }

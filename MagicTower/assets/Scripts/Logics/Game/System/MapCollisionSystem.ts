@@ -2,6 +2,7 @@ import { math, Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "
 import { CommonAstar } from "../../../../Framework/Lib/Custom/Astar";
 import { GameManager } from "../../../../Framework/Managers/GameManager";
 import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
+import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { GameEvent } from "../../../Constant/GameEvent";
 import { Door, DoorState, DoorType, Element, Monster, Npc, Stair, StairType } from "../../../Data/CustomData/Element";
@@ -122,10 +123,10 @@ export class MapCollisionSystem {
                 this.gameMap.setTileGIDAt(layerName, tile, gid);
                 record && this.levelData.setAppear(layerName, index, gid);
             } else {
-                console.error("appear gid 找不到");
+                GameFrameworkLog.error("appear gid 找不到");
             }
         } else {
-            console.error("appear error id:", id);
+            GameFrameworkLog.error("appear error id:", id);
         }
     }
 
@@ -156,7 +157,7 @@ export class MapCollisionSystem {
                 }
             }
         } else {
-            console.error("move gid 找不到");
+            GameFrameworkLog.error("move gid 找不到");
         }
     }
 
@@ -997,4 +998,25 @@ export class MapCollisionSystem {
     //         NotifyCenter.emit(GameEvent.REFRESH_PROP, propInfo, -1);
     //     }
     // }
+
+    // let { layerName } = this.getTileInfo(tile);
+    //     switch (this._astarMoveType) {
+    //         case AstarMoveType.HERO:
+    //             {
+    //                 if (!this.levelData?.canHeroMove(tile)) return false;
+
+    //                 if (!tile.equals(endTile)) {
+    //                     //中途过程遇到事件也可以走
+    //                     return layerName == "floor" || layerName == "event" || layerName == "prop";
+    //                 }
+    //             }
+    //             break;
+    //         case AstarMoveType.MONSTER: {
+    //             return layerName == "floor" || layerName == "monster" || layerName == "event" || layerName == "stair";
+    //         }
+    //         default:
+    //             break;
+    //     }
+
+    //     return true;
 }

@@ -1,8 +1,15 @@
 import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, UITransform, v2, v3, Vec2, _decorator } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
+import { MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
+import { GameEvent } from "../../Event/GameEvent";
+import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
+import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
+import { MapCollisionSystem } from "../System/MapCollisionSystem";
 import { GameMap } from "./GameMap";
+import { Hero } from "./Hero/Hero";
 
 const { ccclass, type } = _decorator;
 
@@ -33,11 +40,17 @@ export class LevelManager extends Component {
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
 
         this.mapModel = GameApp.getModel(MapModel)!;
-
         this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onSwitchLevel, this);
-        NotifyCenter.on(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
-        NotifyCenter.on(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
-        NotifyCenter.on(GameEvent.USE_PROP, this.onUseProp, this);
+
+        let eventManager = GameApp.EventManager;
+        eventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
+        eventManager.subscribe(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
+        eventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
+    }
+
+    onDestroy() {
+        this.mapModel.unsubscribeTarget(this);
+        GameApp.EventManager.unsubscribeTarget(this);
     }
 
     start() {
@@ -94,24 +107,24 @@ export class LevelManager extends Component {
         return this.maps[this.mapModel.level] || null;
     }
 
-    private onSwitchLevel(oldLevel: number, type: StairType) {
-        this.maps[oldLevel].node.active = false;
+    private onSwitchLevel(sender: object, eventArgs: MapSwitchLevelEventArgs) {
+        this.maps[eventArgs.level].node.active = false;
         let newMap = this.createMap(this.mapModel.level);
         newMap.node.active = true;
         let levelData = this.mapModel.getCurrentLevelData();
-        this.showHero(newMap.getTile(levelData.getStair(type)!.standLocation));
+        this.showHero(newMap.getTile(levelData.getStair(eventArgs.stairType)!.standLocation));
     }
 
-    private onUseProp(propInfo: any, extraInfo: any) {
-        this.collisionSystem.useProp(propInfo, extraInfo);
+    private onUseProp(sender: object, eventArgs: UsePropEventArgs) {
+        this.collisionSystem.useProp(eventArgs.propInfo, eventArgs.extraInfo);
     }
 
-    private onSceneAppear(level: number, tile: Vec2) {
+    private onSceneAppear(sender: object, eventArgs: SceneAppearEventArgs) {
         this.maps[this.mapModel.level].node.active = false;
-        this.mapModel.level = level;
+        this.mapModel.level = eventArgs.level;
         let newMap = this.createMap(this.mapModel.level);
         newMap.node.active = true;
-        this.showHero(tile);
+        this.showHero(eventArgs.tile);
     }
 
     private showHero(tile: Vec2 | null = null) {
@@ -127,7 +140,7 @@ export class LevelManager extends Component {
     private moveHero(touchPos: Vec2) {
         let currentMap: GameMap | null = this.getCurrentMap();
         if (!currentMap) {
-            console.error("当前移动没有地图");
+            GameFrameworkLog.error("当前移动没有地图");
             return;
         }
         if (!this.hero.heroMoving) {
@@ -147,13 +160,6 @@ export class LevelManager extends Component {
                 //GameManager.UI.showToast("无效路径");
             }
         }
-    }
-
-    private printPath(path: Vec2[]) {
-        path.forEach((element) => {
-            console.log(element.x, element.y);
-        });
-        console.log("************************");
     }
 
     /** 碰撞结束 */
