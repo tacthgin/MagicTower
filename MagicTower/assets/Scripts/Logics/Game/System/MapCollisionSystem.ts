@@ -1,4 +1,6 @@
 import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "cc";
+import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 
 const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
     npc: AstarMoveType.MONSTER,
@@ -19,7 +21,8 @@ const DIRECTION_INDEX_DIFFS: Readonly<{ [key: string]: Vec2 }> = {
 /** 英雄面朝方向上，右，下，左 */
 let HERO_FACE_DIRECTION: Readonly<number[]> = [-11, 1, 11, -1];
 
-export class MapCollisionSystem {
+@CommandManager.register("MapCollisionSystem")
+export class MapCollisionSystem extends SystemBase {
     private gameMap: GameMap = null!;
     private hero: Hero = null!;
     private HeroModel: HeroModel = null!;
@@ -1001,4 +1004,8 @@ export class MapCollisionSystem {
     //     }
 
     //     return true;
+
+    clear(): void {
+        throw new Error("Method not implemented.");
+    }
 }
