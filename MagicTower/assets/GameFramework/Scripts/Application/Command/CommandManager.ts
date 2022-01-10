@@ -6,6 +6,7 @@ import { IObjectPool } from "../../ObjectPool/IObjectPool";
 import { CommandBase } from "./CommandBase";
 import { CommandObject } from "./CommandObject";
 import { ICommandManager } from "./ICommandManager";
+import { SystemBase } from "./SystemBase";
 
 export class CommandManager implements ICommandManager {
     private static readonly s_nameConstructors: Map<Constructor<CommandBase>, string> = new Map<Constructor<CommandBase>, string>();
@@ -78,7 +79,7 @@ export class CommandManager implements ICommandManager {
     }
 
     /**
-     * 模型注册装饰函数
+     * 注册装饰函数
      * @param className 类名
      * @returns
      */
@@ -124,7 +125,7 @@ export class CommandManager implements ICommandManager {
         return commandObject.target as CommandBase;
     }
 
-    createSystem(systemConstructor: Constructor<CommandBase>): CommandBase {
+    createSystem(systemConstructor: Constructor<SystemBase>): SystemBase {
         if (!this._objectPoolManager) {
             throw new GameFrameworkError("you must set object pool manager first");
         }
@@ -140,6 +141,6 @@ export class CommandManager implements ICommandManager {
             this._systemPool.register(commandObject, true);
         }
 
-        return commandObject.target as CommandBase;
+        return commandObject.target as SystemBase;
     }
 }
