@@ -1,22 +1,4 @@
-import { math, Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "cc";
-import { CommonAstar } from "../../../../Framework/Lib/Custom/Astar";
-import { GameManager } from "../../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
-import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
-import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
-import { GameEvent } from "../../../Constant/GameEvent";
-import { Door, DoorState, DoorType, Element, Monster, Npc, Stair, StairType } from "../../../Data/CustomData/Element";
-import { HeroAttr, HeroModel, PropType } from "../../../Data/CustomData/HeroModel";
-import { LevelData } from "../../../Data/CustomData/LevelData";
-import { MapData } from "../../../Data/CustomData/MapData";
-import { ShopData } from "../../../Data/CustomData/ShopData";
-import { ElementNode } from "../Elements/ElementNode";
-import { Hero } from "../Map/Actor/Hero";
-import { AstarMoveType, GameMap } from "../Map/GameMap";
-import { CalculateSystem } from "./CalculateSystem";
-import { GameEventSystem } from "./GameEventSystem";
-import { MonsterFightSystem } from "./MonsterFightSystem";
-import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
+import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "cc";
 
 const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
     npc: AstarMoveType.MONSTER,

@@ -1,4 +1,4 @@
-import { Component, game, _decorator } from "cc";
+import { Component, game, TiledUserNodeData, _decorator } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
@@ -14,6 +14,8 @@ import { WebSaveHelp } from "../Save/WebSaveHelp";
 import { ISoundManager } from "../Sound/ISoundManager";
 import { IUIManager } from "../UI/IUIManager";
 import { Utility } from "../Utility/Utility";
+import { CommandManager } from "./Command/CommandManager";
+import { ICommandManager } from "./Command/ICommandManager";
 import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
 import { CNodeHelp } from "./NodePool/CNodeHelp";
@@ -29,6 +31,7 @@ const { ccclass, executionOrder } = _decorator;
 export class GameApp extends Component {
     private static _instance: GameApp | null = null;
     private _modelContainer: ModelContainer = null!;
+    private _commandManager: CommandManager = null!;
 
     static get instance(): GameApp {
         return this._instance!;
@@ -99,6 +102,14 @@ export class GameApp extends Component {
         return GameApp.instance._modelContainer.getModel(constructor) as T;
     }
 
+    /**
+     * 命令管理器
+     * @returns 命令管理器
+     */
+    static CommandManager(): ICommandManager {
+        return GameApp.instance._commandManager;
+    }
+
     onLoad() {
         if (GameApp._instance) {
             this.destroy();
@@ -112,6 +123,9 @@ export class GameApp extends Component {
 
     onDestroy() {
         GameApp._instance = null;
+        this._modelContainer.shutDown();
+        this._commandManager.shutDown();
+        GameFrameworkEntry.shutDown();
     }
 
     private initialize() {
@@ -119,6 +133,8 @@ export class GameApp extends Component {
         this.initalizeFramework();
         //初始化model
         this.initializeModel();
+        //初始化command
+        this.initializeCommand();
     }
 
     private initalizeFramework() {
@@ -156,8 +172,14 @@ export class GameApp extends Component {
         this._modelContainer.setSaveManager(GameApp.SaveManager);
     }
 
+    private initializeCommand() {
+        this._commandManager = new CommandManager();
+        this._commandManager.setObjectPoolManager(GameApp.ObjectPoolManager);
+    }
+
     update(elapseSeconds: number) {
         GameFrameworkEntry.update(elapseSeconds);
+        this._commandManager.update(elapseSeconds);
         this._modelContainer.update(elapseSeconds);
     }
 }
