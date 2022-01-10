@@ -51,4 +51,9 @@ export interface IModel {
      * @param event 事件参数
      */
     fireNow(event: ModelEventArgs): void;
+
+    /**
+     * 存储模型本地数据
+     */
+    save(): void;
 }

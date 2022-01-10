@@ -13,7 +13,7 @@ export interface IEventManager {
      * @param eventHandle 事件处理函数
      * @param thisArg 传递的this指针
      */
-    subscribe(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): void;
+    subscribe<T extends GameEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): void;
 
     /**
      * 取消订阅事件处理函数
@@ -21,7 +21,7 @@ export interface IEventManager {
      * @param eventHandle 事件处理函数
      * @param thisArg 传递的this指针
      */
-    unsubscribe(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): void;
+    unsubscribe<T extends GameEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): void;
 
     /**
      * 取消订阅该目标下的所有事件处理函数
@@ -35,7 +35,7 @@ export interface IEventManager {
      * @param eventHandle 事件处理函数
      * @param thisArg 传递的this指针
      */
-    check(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): boolean;
+    check<T extends GameEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): boolean;
 
     /**
      * 每帧分发事件

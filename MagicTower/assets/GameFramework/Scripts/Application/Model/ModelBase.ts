@@ -3,14 +3,16 @@ import { EventPool } from "../../Base/EventPool/EventPool";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { ISaveManager } from "../../Save/ISaveManager";
 import { IModel } from "./IModel";
+import { LoadBase } from "./LoadBase";
 import { ModelContainer } from "./ModelContainer";
 import { ModelEventArgs } from "./ModelEventArgs";
 
-export abstract class ModelBase implements IModel {
+export abstract class ModelBase extends LoadBase implements IModel {
     private _saveManager: ISaveManager | null = null;
     private _eventPool: EventPool<ModelEventArgs> = null!;
 
     constructor() {
+        super();
         this._eventPool = new EventPool<ModelEventArgs>();
     }
 
@@ -77,23 +79,10 @@ export abstract class ModelBase implements IModel {
     /**
      * 存储模型本地数据
      */
-    protected save(): void {
+    save(): void {
         if (!this._saveManager) {
             throw new GameFrameworkError("you must set save manager first");
         }
         this._saveManager.setObject(ModelContainer.getClassName(this), this);
-    }
-
-    /**
-     * 按键值赋予模型数据
-     * @param data 数据
-     */
-    protected loadData(data: object): void {
-        for (let key in data) {
-            let thisInfo = this as any;
-            if (thisInfo[key] !== undefined) {
-                thisInfo[key] = (data as any)[key];
-            }
-        }
     }
 }

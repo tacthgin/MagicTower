@@ -30,20 +30,20 @@ export class EventManager extends GameFrameworkModule implements IEventManager {
         this._eventPool.clear();
     }
 
-    subscribe(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): void {
-        this._eventPool.subscribe(id, eventHandle, thisArg);
+    subscribe<T extends GameEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): void {
+        this._eventPool.subscribe(id, eventHandle as EventHandle<GameEventArgs>, thisArg);
     }
 
-    unsubscribe(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): void {
-        this._eventPool.unsubscribe(id, eventHandle, thisArg);
+    unsubscribe<T extends GameEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandle as EventHandle<GameEventArgs>, thisArg);
     }
 
     unsubscribeTarget(target: object): void {
         this._eventPool.unsubscribeTarget(target);
     }
 
-    check(id: number, eventHandle: EventHandle<GameEventArgs>, thisArg?: any): boolean {
-        return this._eventPool.check(id, eventHandle, thisArg);
+    check<T extends GameEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): boolean {
+        return this._eventPool.check(id, eventHandle as EventHandle<GameEventArgs>, thisArg);
     }
 
     fire(sender: object, e: GameEventArgs): void {
