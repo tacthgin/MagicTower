@@ -1,5 +1,6 @@
-import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, v3, Vec2, _decorator } from "cc";
+import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, v2, v3, Vec2, _decorator } from "cc";
 import { GameApp } from "../../../../../GameFramework/Scripts/Application/GameApp";
+import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { IFsm } from "../../../../../GameFramework/Scripts/Fsm/IFsm";
 import { HeroAttr } from "../../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../../Model/HeroModel/HeroModel";
@@ -66,7 +67,7 @@ export class Hero extends Component {
         this.heroFSM.start(IdleState);
     }
 
-    init(map: IGameMap, tile: Vec2 | null = null) {
+    init(map: IGameMap, tile: IVec2 | null = null) {
         this.setOwnerMap(map);
         this.location(tile);
     }
@@ -160,7 +161,7 @@ export class Hero extends Component {
      * @param endTile 终点tile
      * @param collisionFunc 与其他元素碰撞交互函数
      */
-    autoMove(path: Vec2[], canEndMove: boolean, endTile: Vec2, collisionFunc: Function) {
+    autoMove(path: IVec2[], canEndMove: boolean, endTile: Vec2, collisionFunc: Function) {
         let moveComplete = () => {
             if (!canEndMove) {
                 this.toward(endTile);
@@ -193,15 +194,16 @@ export class Hero extends Component {
         //NotifyCenter.emit(GameEvent.MOVE_PATH);
     }
 
-    movePath(path: Vec2[], speed: number, moveCallback: Function) {
+    movePath(path: IVec2[], speed: number, moveCallback: Function) {
         let moveActions: Tween<Node>[] = [];
         let stop = false;
-        let moveAction = (tile: Vec2, end: boolean = false) => {
+        let moveAction = (tile: IVec2, end: boolean = false) => {
             let position = this.map.getPositionAt(tile) || Vec2.ZERO;
+            let currentTile = v2(tile.x, tile.y);
             return tween()
                 .call(() => {
                     let result = new Vec2();
-                    this.heroDirection = this.getDirection(Vec2.subtract(result, tile, this._heroTile));
+                    this.heroDirection = this.getDirection(Vec2.subtract(result, currentTile, this._heroTile));
                     if (!stop) {
                         //动作停止callFunc依然会调用一次;
                         this.heroFSM.currentState?.changeState(this.heroFSM, MoveState);
@@ -209,7 +211,7 @@ export class Hero extends Component {
                 })
                 .to(speed, { position: v3(position.x, position.y) })
                 .call(() => {
-                    this._heroTile = tile;
+                    this._heroTile = currentTile;
                     stop = moveCallback(tile, end);
                 });
         };
@@ -228,7 +230,7 @@ export class Hero extends Component {
         this.heroFSM.currentState?.changeState(this.heroFSM, IdleState);
     }
 
-    location(tile: Vec2 | null) {
+    location(tile: IVec2 | null) {
         if (tile) {
             this._heroModel.setPosition(tile);
             this.toward(HeroDirection.DOWN);

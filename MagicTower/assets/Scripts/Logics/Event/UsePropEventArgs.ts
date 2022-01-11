@@ -3,7 +3,6 @@ import { GameEventArgs } from "../../../GameFramework/Scripts/Event/GameEventArg
 import { GameEvent } from "./GameEvent";
 
 export class UsePropEventArgs extends GameEventArgs {
-    private _id: number = -1;
     private _propInfo: any = null;
     private _extraInfo: any = null;
 
@@ -27,7 +26,6 @@ export class UsePropEventArgs extends GameEventArgs {
     }
 
     clear(): void {
-        this._id = -1;
         this._propInfo = null;
         this._extraInfo = null;
     }

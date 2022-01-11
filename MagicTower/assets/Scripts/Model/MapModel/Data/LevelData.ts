@@ -111,7 +111,7 @@ export class LevelData extends LoadBase {
         this.saveMapData();
     }
 
-    canHeroMove(tile: Vec2) {
+    canHeroMove(index: number) {
         //if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroModel.Hp <= this.getWizardMagicDamage(index)) return false;
         return true;
     }

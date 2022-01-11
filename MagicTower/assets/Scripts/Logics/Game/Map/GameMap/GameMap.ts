@@ -1,16 +1,13 @@
 import { director, js, math, size, TiledLayer, TiledMap, TiledMapAsset, v2, Vec2, _decorator } from "cc";
+import { GameFrameworkError } from "../../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
+import { GameFrameworkLog } from "../../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { LevelData } from "../../../../Model/MapModel/Data/LevelData";
-import { IGameMap } from "./IGameMap";
+import { CheckType, IGameMap } from "./IGameMap";
 
 const { ccclass } = _decorator;
 
 const MAP_ANIMATION_INTERVAL = 0.1;
-
-export enum AstarMoveType {
-    HERO,
-    MONSTER,
-}
 
 @ccclass("GameMap")
 export class GameMap extends TiledMap implements IGameMap {
@@ -18,16 +15,10 @@ export class GameMap extends TiledMap implements IGameMap {
     private animationTiles: any = {};
     /** 单双计数 */
     private animationCount: number = 0;
-    /** a*行走方式 */
-    private _astarMoveType: AstarMoveType = AstarMoveType.HERO;
-    private levelData: LevelData | null = null;
     private gameSize: math.Size = null!;
     private gidToSpriteNameMap: { [key: number]: string } = {};
     private spriteNameToGidMap: { [key: string]: number } = {};
-
-    public set astarMoveType(value: AstarMoveType) {
-        this._astarMoveType = value;
-    }
+    private checkDelegate: CheckType | null = null;
 
     get width(): number {
         return this.getMapSize().width;
@@ -55,28 +46,28 @@ export class GameMap extends TiledMap implements IGameMap {
     }
 
     /** tile索引 */
-    getTileIndex(tile: Vec2) {
+    getTileIndex(tile: IVec2): number {
         return Math.floor(tile.y) * this.getMapSize().width + Math.floor(tile.x);
     }
 
     /** 索引转到tile */
-    getTile(index: number) {
+    getTile(index: number): IVec2 {
         let size = this.getMapSize();
         return new Vec2(index % size.width, Math.floor(index / size.width));
     }
 
     /** cocos坐标转换为屏幕坐标 */
-    toScreen(position: Vec2) {
+    toScreen(position: IVec2): IVec2 {
         return v2(this.gameSize.width * 0.5 + position.x, this.gameSize.height * 0.5 - position.y);
     }
 
     /** cocos坐标转换为tile坐标 */
-    toTile(position: Vec2) {
+    toTile(position: IVec2) {
         position = this.toScreen(position);
         return v2(Math.floor(position.x / this._tileSize.width), Math.floor(position.y / this._tileSize.height));
     }
 
-    getPositionAt(tile: Vec2) {
+    getPositionAt(tile: IVec2) {
         let layers = this.getLayers();
         if (layers[0]) {
             /** 只能获取gl坐标 */
@@ -90,7 +81,7 @@ export class GameMap extends TiledMap implements IGameMap {
         }
     }
 
-    getTileInfo(tile: Vec2, layerName?: string) {
+    getTileInfo(tile: IVec2, layerName?: string) {
         let layer: TiledLayer | null = null;
         let selectGid: number = 0;
         if (layerName) {
@@ -116,7 +107,7 @@ export class GameMap extends TiledMap implements IGameMap {
         return {};
     }
 
-    setTileGIDAt(layerName: string, tile: Vec2, gid: number | null) {
+    setTileGIDAt(layerName: string, tile: IVec2, gid: number | null) {
         if (gid == null) return;
         let layer = this.getLayer(layerName);
         if (layer) {
@@ -135,7 +126,7 @@ export class GameMap extends TiledMap implements IGameMap {
         }
     }
 
-    getTileGIDAt(layerName: string, tile: Vec2) {
+    getTileGIDAt(layerName: string, tile: IVec2) {
         let layer = this.getLayer(layerName);
         return layer ? layer.getTileGIDAt(tile.x, tile.y) : null;
     }
@@ -167,7 +158,7 @@ export class GameMap extends TiledMap implements IGameMap {
         return this.gidToSpriteNameMap[gid] || null;
     }
 
-    private updateAnimationTiles(layerName: string, tile: Vec2, gid: number) {
+    private updateAnimationTiles(layerName: string, tile: IVec2, gid: number) {
         let animationTiles = this.animationTiles[layerName];
 
         if (animationTiles) {
@@ -258,33 +249,16 @@ export class GameMap extends TiledMap implements IGameMap {
                 this.setTileGIDAt(layerName, this.getTile(index), 0);
             });
         }
-        this.levelData = levelData;
     }
 
     check(position: IVec2): boolean {
-        throw new Error("Method not implemented.");
+        if (!this.checkDelegate) {
+            throw new GameFrameworkError("check delegate is invalid");
+        }
+        return this.checkDelegate(position);
     }
 
-    isEmpty(tile: Vec2, endTile: Vec2): boolean {
-        let { layerName } = this.getTileInfo(tile);
-        switch (this._astarMoveType) {
-            case AstarMoveType.HERO:
-                {
-                    if (!this.levelData?.canHeroMove(tile)) return false;
-
-                    if (!tile.equals(endTile)) {
-                        //中途过程遇到事件也可以走
-                        return layerName == "floor" || layerName == "event" || layerName == "prop";
-                    }
-                }
-                break;
-            case AstarMoveType.MONSTER: {
-                return layerName == "floor" || layerName == "monster" || layerName == "event" || layerName == "stair";
-            }
-            default:
-                break;
-        }
-
-        return true;
+    setCheckDelegate(callbackfn: CheckType) {
+        this.checkDelegate = callbackfn;
     }
 }

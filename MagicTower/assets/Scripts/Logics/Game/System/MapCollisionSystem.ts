@@ -1,6 +1,11 @@
 import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
+import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { PropType } from "../../../Model/HeroModel/PropType";
+import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
+import { GameEvent } from "../../Event/GameEvent";
+import { MoveSystem } from "./MoveSystem";
 
 const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
     npc: AstarMoveType.MONSTER,
@@ -28,28 +33,36 @@ export class MapCollisionSystem extends SystemBase {
     private HeroModel: HeroModel = null!;
     private levelData: LevelData = null!;
     private canEndMoveTiles: Readonly<string[]> = ["prop", "stair"];
-    private monsterFightSystem: MonsterFightSystem = new MonsterFightSystem();
-    private npcInteractiveSystem: NpcInteractiveSystem = new NpcInteractiveSystem();
-    private gameEventSystem: GameEventSystem = new GameEventSystem();
+    private monsterFightSystem: MonsterFightSystem | null = null;
+    private npcInteractiveSystem: NpcInteractiveSystem | null = null;
+    private gameEventSystem: GameEventSystem | null = null;
+    private moveSystem: MoveSystem | null = null;
     private levelEvent: any = {};
     private dialogPos: Vec3 = null!;
 
-    init(gameMap: GameMap, hero: Hero) {
+    constructor() {
+        super();
+        this.monsterFightSystem = GameApp.CommandManager.createSystem(MonsterFightSystem);
+        this.npcInteractiveSystem = GameApp.CommandManager.createSystem(NpcInteractiveSystem);
+        this.gameEventSystem = GameApp.CommandManager.createSystem(GameEventSystem);
+        this.moveSystem = GameApp.CommandManager.createSystem(MoveSystem);
+        this.registerEvent();
+    }
+
+    initliaze(gameMap: GameMap, hero: Hero) {
         this.gameMap = gameMap;
         this.hero = hero;
         this.HeroModel = hero.HeroModel;
         let mapData = GameManager.DATA.getData(MapData)!;
         this.levelData = mapData.getCurrentLevelData();
-        this.registerEvent();
+
         if (!this.dialogPos) {
             this.dialogPos = this.gameMap.getComponent(UITransform)?.convertToWorldSpaceAR(Vec3.ZERO)!;
         }
     }
 
     private registerEvent() {
-        if (!NotifyCenter.hasEventListener(GameEvent.MONSTER_DIE, this.onMonsterDie, this)) {
-            NotifyCenter.on(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
-        }
+        GameApp.EventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
     }
 
     private onMonsterDie(monster: Monster, magic: boolean) {
@@ -984,28 +997,9 @@ export class MapCollisionSystem extends SystemBase {
     //     }
     // }
 
-    // let { layerName } = this.getTileInfo(tile);
-    //     switch (this._astarMoveType) {
-    //         case AstarMoveType.HERO:
-    //             {
-    //                 if (!this.levelData?.canHeroMove(tile)) return false;
-
-    //                 if (!tile.equals(endTile)) {
-    //                     //中途过程遇到事件也可以走
-    //                     return layerName == "floor" || layerName == "event" || layerName == "prop";
-    //                 }
-    //             }
-    //             break;
-    //         case AstarMoveType.MONSTER: {
-    //             return layerName == "floor" || layerName == "monster" || layerName == "event" || layerName == "stair";
-    //         }
-    //         default:
-    //             break;
-    //     }
-
-    //     return true;
-
     clear(): void {
-        throw new Error("Method not implemented.");
+        GameApp.CommandManager.destroySystem(this.monsterFightSystem);
+        GameApp.CommandManager.destroySystem(this.npcInteractiveSystem);
+        GameApp.CommandManager.destroySystem(this.gameEventSystem);
     }
 }

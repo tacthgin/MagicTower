@@ -106,7 +106,7 @@ export class GameApp extends Component {
      * 命令管理器
      * @returns 命令管理器
      */
-    static CommandManager(): ICommandManager {
+    static get CommandManager(): ICommandManager {
         return GameApp.instance._commandManager;
     }
 

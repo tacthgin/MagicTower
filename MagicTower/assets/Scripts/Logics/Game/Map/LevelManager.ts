@@ -1,5 +1,6 @@
 import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, UITransform, v2, v3, Vec2, _decorator } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
@@ -8,7 +9,8 @@ import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
 import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
 import { MapCollisionSystem } from "../System/MapCollisionSystem";
-import { GameMap } from "./GameMap";
+import { MoveSystem } from "../System/MoveSystem";
+import { GameMap } from "./GameMap/GameMap";
 import { Hero } from "./Hero/Hero";
 
 const { ccclass, type } = _decorator;
@@ -32,7 +34,8 @@ export class LevelManager extends Component {
     private mapModel: MapModel = null!;
     /** 触摸id */
     private touchId: number | null = null;
-    private collisionSystem: MapCollisionSystem = new MapCollisionSystem();
+    private collisionSystem: MapCollisionSystem = null!;
+    private moveSystem: MoveSystem = null!;
 
     onLoad() {
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
@@ -46,6 +49,9 @@ export class LevelManager extends Component {
         eventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
         eventManager.subscribe(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
         eventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
+
+        this.collisionSystem = GameApp.CommandManager.createSystem(MapCollisionSystem);
+        this.moveSystem = GameApp.CommandManager.createSystem(MoveSystem);
     }
 
     onDestroy() {
@@ -127,7 +133,7 @@ export class LevelManager extends Component {
         this.showHero(eventArgs.tile);
     }
 
-    private showHero(tile: Vec2 | null = null) {
+    private showHero(tile: IVec2 | null = null) {
         if (!this.hero) {
             let heroNode = instantiate(this.heroPrefab);
             this.hero = heroNode.getComponent(Hero)!;
@@ -146,8 +152,8 @@ export class LevelManager extends Component {
         if (!this.hero.heroMoving) {
             let localPos = currentMap.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(touchPos.x, touchPos.y));
             let endTile = currentMap.toTile(v2(localPos?.x, localPos?.y));
-            currentMap.astarMoveType = AstarMoveType.HERO;
-            let path = CommonAstar.getPath(currentMap, this.hero.heroTile, endTile);
+            let path = this.moveSystem.getPath(this.hero.heroTile, endTile);
+
             if (path) {
                 let canEndMove = this.collisionSystem.canEndTileMove(endTile);
                 if (!canEndMove) {

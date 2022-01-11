@@ -1,3 +1,4 @@
+import { GameFrameworkError } from "../../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { Utility } from "../../../../../GameFramework/Scripts/Utility/Utility";
 import { Element } from "./Element";
 
@@ -8,12 +9,27 @@ export enum MonsterType {
     MAGIC_GUARD = 130,
 }
 
+export interface MonsterInfo {
+    hp: number;
+    attack: number;
+    defence: number;
+    gold: number;
+    name: string;
+    id: string | number;
+    boss: boolean;
+    spriteId: number;
+    firstAttack: boolean;
+}
+
 export class Monster extends Element {
-    private _monsterInfo: any = null;
+    private _monsterInfo: MonsterInfo = null!;
 
     set id(value: number) {
         this._id = value;
-        this._monsterInfo = Utility.Json.getJsonElement("monster", this._id, true);
+        this._monsterInfo = Utility.Json.getJsonElement("monster", this._id, true) as MonsterInfo;
+        if (!this._monsterInfo) {
+            throw new GameFrameworkError("cant find monster info");
+        }
     }
 
     get monsterInfo() {
@@ -25,7 +41,7 @@ export class Monster extends Element {
     }
 
     get boss(): boolean {
-        return this._monsterInfo.boss;
+        return this._monsterInfo!.boss;
     }
 
     hurt(damage: number) {
@@ -40,5 +56,9 @@ export class Monster extends Element {
         this._monsterInfo.attack *= ratio;
         this._monsterInfo.defence *= ratio;
         this._monsterInfo.hp *= ratio;
+    }
+
+    clear(): void {
+        this._monsterInfo = null!;
     }
 }
