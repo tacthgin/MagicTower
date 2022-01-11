@@ -1,11 +1,7 @@
 /**处理地图上的事件 */
 
 import { tween } from "cc";
-import { GameManager } from "../../../../Framework/Managers/GameManager";
-import { NotifyCenter } from "../../../../Framework/Managers/NotifyCenter";
-import { GameEvent } from "../../../Constant/GameEvent";
-import { Hero } from "../Map/Actor/Hero";
-import { GameMap } from "../Map/GameMap";
+import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { MapCollisionSystem } from "./MapCollisionSystem";
 
 export class GameEventSystem {

@@ -5,6 +5,7 @@ import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { PropType } from "../../../Model/HeroModel/PropType";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { GameEvent } from "../../Event/GameEvent";
+import { MonsterFightSystem } from "./MonsterFightSystem";
 import { MoveSystem } from "./MoveSystem";
 
 const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
@@ -33,10 +34,10 @@ export class MapCollisionSystem extends SystemBase {
     private HeroModel: HeroModel = null!;
     private levelData: LevelData = null!;
     private canEndMoveTiles: Readonly<string[]> = ["prop", "stair"];
-    private monsterFightSystem: MonsterFightSystem | null = null;
-    private npcInteractiveSystem: NpcInteractiveSystem | null = null;
-    private gameEventSystem: GameEventSystem | null = null;
-    private moveSystem: MoveSystem | null = null;
+    private monsterFightSystem: MonsterFightSystem = null!;
+    private npcInteractiveSystem: NpcInteractiveSystem = null!;
+    private gameEventSystem: GameEventSystem = null!;
+    private moveSystem: MoveSystem = null!;
     private levelEvent: any = {};
     private dialogPos: Vec3 = null!;
 
@@ -998,8 +999,10 @@ export class MapCollisionSystem extends SystemBase {
     // }
 
     clear(): void {
+        GameApp.EventManager.unsubscribeTarget(this);
         GameApp.CommandManager.destroySystem(this.monsterFightSystem);
         GameApp.CommandManager.destroySystem(this.npcInteractiveSystem);
         GameApp.CommandManager.destroySystem(this.gameEventSystem);
+        GameApp.CommandManager.destroySystem(this.moveSystem);
     }
 }

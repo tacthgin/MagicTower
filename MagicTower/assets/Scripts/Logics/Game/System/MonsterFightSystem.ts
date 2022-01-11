@@ -12,14 +12,14 @@ const ATTACK_INTERVAL = 0.1;
 
 @CommandManager.register("MonsterFightSystem")
 export class MonsterFightSystem extends SystemBase {
-    private hero: Hero | null = null;
-    private monster: Monster | null = null;
+    private hero: Hero = null!;
+    private monster: Monster = null!;
     private attackCount: number = 0;
     private heroFirst: boolean = false;
     private damageInfo: {
         heroDamage: number;
         monsterDamage: number;
-    } | null = null;
+    } = null!;
     private attackInterval: number = 0;
     private fightAfterMagic: boolean = false;
 
@@ -50,7 +50,7 @@ export class MonsterFightSystem extends SystemBase {
     }
 
     update(elapseSeconds: number): void {
-        if (this.attackCount > 0 && this.hero && this.monster && this.damageInfo) {
+        if (this.attackCount > 0) {
             this.attackInterval += elapseSeconds;
             if (this.attackInterval > ATTACK_INTERVAL) {
                 this.attackInterval -= ATTACK_INTERVAL;
@@ -75,8 +75,9 @@ export class MonsterFightSystem extends SystemBase {
     }
 
     clear(): void {
-        this.hero = null;
-        this.monster = null;
+        this.hero = null!;
+        this.monster = null!;
+        this.damageInfo = null!;
         this.attackCount = 0;
         this.heroFirst = false;
         this.attackInterval = 0;
