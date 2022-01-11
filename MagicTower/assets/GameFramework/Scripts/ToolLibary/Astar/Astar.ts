@@ -37,6 +37,14 @@ export class Astar implements IAstar {
     }
 
     /**
+     * 设置A*地图
+     * @param astarMap 地图
+     */
+    setAstarMap(astarMap: IAstarMap) {
+        this._astarMap = astarMap;
+    }
+
+    /**
      * 设置A*辅助器
      * @param astarHelp
      */

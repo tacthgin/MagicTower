@@ -1,5 +1,6 @@
 import { IVec2 } from "../../Base/GameStruct/IVec2";
 import { IAstarHelp } from "./IAstarHelp";
+import { IAstarMap } from "./IAstarMap";
 
 /**
  * A*接口
@@ -9,6 +10,12 @@ export interface IAstar {
      * 缓存的节点个数
      */
     readonly astarNodeCount: number;
+
+    /**
+     * 设置A*地图
+     * @param astarMap 地图
+     */
+    setAstarMap(astarMap: IAstarMap): void;
 
     /**
      * 设置A*辅助器
