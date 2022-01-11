@@ -1,5 +1,6 @@
 import { Constructor } from "../../Base/DataStruct/Constructor";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
+import { GameFrameworkLinkedList } from "../../Base/GameFrameworkLinkedList";
 import { ReferencePool } from "../../Base/ReferencePool/ReferencePool";
 import { IObejctPoolManager } from "../../ObjectPool/IObejctPoolManager";
 import { IObjectPool } from "../../ObjectPool/IObjectPool";
@@ -9,10 +10,15 @@ import { ICommandManager } from "./ICommandManager";
 import { SystemBase } from "./SystemBase";
 
 export class CommandManager implements ICommandManager {
-    private static readonly s_nameConstructors: Map<Constructor<CommandBase>, string> = new Map<Constructor<CommandBase>, string>();
+    private static readonly s_nameConstructors: Map<Constructor<CommandBase | SystemBase>, string> = new Map<Constructor<CommandBase | SystemBase>, string>();
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _commandPool: IObjectPool<CommandObject> = null!;
     private _systemPool: IObjectPool<CommandObject> = null!;
+    private _updateSystemPool: GameFrameworkLinkedList<SystemBase> = null!;
+
+    constructor() {
+        this._updateSystemPool = new GameFrameworkLinkedList<SystemBase>();
+    }
 
     set commandAutoRelaseInterval(value: number) {
         this._commandPool.autoReleaseInterval = value;
@@ -83,8 +89,8 @@ export class CommandManager implements ICommandManager {
      * @param className 类名
      * @returns
      */
-    static register(className: string): (target: Constructor<CommandBase>) => void {
-        return (target: Constructor<CommandBase>) => {
+    static register(className: string): (target: Constructor<CommandBase | SystemBase>) => void {
+        return (target: Constructor<CommandBase | SystemBase>) => {
             this.s_nameConstructors.set(target, className);
         };
     }
@@ -93,12 +99,18 @@ export class CommandManager implements ICommandManager {
      * 轮询命令
      * @param elapseSeconds 逻辑流逝时间
      */
-    update(elapseSeconds: number) {}
+    update(elapseSeconds: number) {
+        for (let system of this._updateSystemPool) {
+            system.update(elapseSeconds);
+        }
+    }
 
     /**
      * 关闭命令管理器
      */
-    shutDown() {}
+    shutDown() {
+        this._updateSystemPool.clear();
+    }
 
     setObjectPoolManager(objectPoolManager: IObejctPoolManager): void {
         this._objectPoolManager = objectPoolManager;
@@ -106,7 +118,7 @@ export class CommandManager implements ICommandManager {
         this._systemPool = this._objectPoolManager.createSingleSpawnObjectPool(CommandObject, "system pool");
     }
 
-    createCommand(commandConstructor: Constructor<CommandBase>): CommandBase {
+    createCommand<T extends CommandBase>(commandConstructor: Constructor<T>): T {
         if (!this._objectPoolManager) {
             throw new GameFrameworkError("you must set object pool manager first");
         }
@@ -122,10 +134,14 @@ export class CommandManager implements ICommandManager {
             this._commandPool.register(commandObject, true);
         }
 
-        return commandObject.target as CommandBase;
+        return commandObject.target as T;
     }
 
-    createSystem(systemConstructor: Constructor<SystemBase>): SystemBase {
+    destroyCommand<T extends CommandBase>(command: T): void {
+        this._systemPool.upspawn(command);
+    }
+
+    createSystem<T extends SystemBase>(systemConstructor: Constructor<T>): T {
         if (!this._objectPoolManager) {
             throw new GameFrameworkError("you must set object pool manager first");
         }
@@ -141,6 +157,13 @@ export class CommandManager implements ICommandManager {
             this._systemPool.register(commandObject, true);
         }
 
-        return commandObject.target as SystemBase;
+        this._updateSystemPool.addLast(commandObject.target as T);
+
+        return commandObject.target as T;
+    }
+
+    destroySystem<T extends SystemBase>(system: T): void {
+        this._systemPool.upspawn(system);
+        this._updateSystemPool.remove(system);
     }
 }

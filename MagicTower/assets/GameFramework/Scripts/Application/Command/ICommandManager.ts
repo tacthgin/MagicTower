@@ -1,7 +1,11 @@
 import { Constructor } from "../../Base/DataStruct/Constructor";
 import { IObejctPoolManager } from "../../ObjectPool/IObejctPoolManager";
 import { CommandBase } from "./CommandBase";
+import { SystemBase } from "./SystemBase";
 
+/**
+ * 命令管理器接口
+ */
 export interface ICommandManager {
     /**
      * 设置或者获取命令对象池自动释放间隔
@@ -54,12 +58,24 @@ export interface ICommandManager {
      * @param commandConstructor 命令构造器
      * @returns 命令
      */
-    createCommand(commandConstructor: Constructor<CommandBase>): CommandBase;
+    createCommand<T extends CommandBase>(commandConstructor: Constructor<T>): T;
+
+    /**
+     * 清理命令
+     * @param command 命令
+     */
+    destroyCommand<T extends CommandBase>(command: T): void;
 
     /**
      * 根据系统构造器获取系统
      * @param systemConstructor 系统构造器
      * @returns 系统
      */
-    createSystem(systemConstructor: Constructor<CommandBase>): CommandBase;
+    createSystem<T extends SystemBase>(systemConstructor: Constructor<T>): T;
+
+    /**
+     * 清理系统
+     * @param system 系统
+     */
+    destroySystem<T extends SystemBase>(system: T): void;
 }
