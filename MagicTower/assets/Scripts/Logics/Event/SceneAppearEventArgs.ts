@@ -1,11 +1,11 @@
-import { Vec2 } from "cc";
+import { IVec2 } from "../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { ReferencePool } from "../../../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
 import { GameEventArgs } from "../../../GameFramework/Scripts/Event/GameEventArgs";
 import { GameEvent } from "./GameEvent";
 
 export class SceneAppearEventArgs extends GameEventArgs {
     private _level: number = 0;
-    private _tile: Vec2 = Vec2.ZERO;
+    private _tile: IVec2 | null = null;
 
     get id(): number {
         return GameEvent.SCENE_APPEAR;
@@ -15,11 +15,11 @@ export class SceneAppearEventArgs extends GameEventArgs {
         return this._level;
     }
 
-    get tile(): Vec2 {
-        return this._tile;
+    get tile(): IVec2 {
+        return this._tile!;
     }
 
-    static create(level: number, tile: Vec2): SceneAppearEventArgs {
+    static create(level: number, tile: IVec2): SceneAppearEventArgs {
         let sceneAppearEventArgs = ReferencePool.acquire(SceneAppearEventArgs);
         sceneAppearEventArgs._level = level;
         sceneAppearEventArgs._tile = tile;
@@ -28,6 +28,6 @@ export class SceneAppearEventArgs extends GameEventArgs {
 
     clear(): void {
         this._level = 0;
-        this._tile = Vec2.ZERO;
+        this._tile = null;
     }
 }

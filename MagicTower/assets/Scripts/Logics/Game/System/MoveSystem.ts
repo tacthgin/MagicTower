@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
@@ -20,7 +19,7 @@ export class MoveSystem extends SystemBase {
     private _astar: IAstar | null = null;
     private _gameMap: IGameMap | null = null;
     private _levelData: LevelData | null = null;
-    private _endTile: Vec2 = null!;
+    private _endTile: IVec2 = null!;
 
     constructor() {
         super();
@@ -41,7 +40,7 @@ export class MoveSystem extends SystemBase {
         this._astarMoveType = astarMoveType;
     }
 
-    getPath(beginTile: Vec2, endTile: Vec2) {
+    getPath(beginTile: IVec2, endTile: IVec2) {
         if (!this._gameMap || !this._levelData || !this._astar) {
             throw new GameFrameworkError("you must set game map first");
         }

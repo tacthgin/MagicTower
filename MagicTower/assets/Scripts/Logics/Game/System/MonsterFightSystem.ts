@@ -14,14 +14,6 @@ const ATTACK_INTERVAL = 0.1;
 export class MonsterFightSystem extends SystemBase {
     private hero: Hero = null!;
     private monster: Monster = null!;
-    private attackCount: number = 0;
-    private heroFirst: boolean = false;
-    private damageInfo: {
-        heroDamage: number;
-        monsterDamage: number;
-    } = null!;
-    private attackInterval: number = 0;
-    private fightAfterMagic: boolean = false;
 
     initliaze(hero: Hero, monster: Monster) {
         this.hero = hero;
@@ -36,51 +28,43 @@ export class MonsterFightSystem extends SystemBase {
         if (!this.hero || !this.monster) {
             throw new GameFrameworkError("you must initliaze monster fight system");
         }
-        this.fightAfterMagic = magic;
+
         let heroModel = this.hero.heroModel;
         let monsterInfo = this.monster.monsterInfo;
         let count = CalculateSystem.getHeroAttackCount(heroModel, monsterInfo);
-        this.damageInfo = CalculateSystem.perAttackDamage(heroModel, monsterInfo);
+        let damageInfo = CalculateSystem.perAttackDamage(heroModel, monsterInfo);
         //谁先攻击 0英雄先攻击
-        this.heroFirst = !!monsterInfo.firstAttack;
-        this.attackCount = this.heroFirst ? count * 2 : count * 2 + 1;
+        let heroFirst = !monsterInfo.firstAttack;
+        let attackCount = heroFirst ? count * 2 : count * 2 + 1;
         //先贴图怪物信息
         GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(this.monster.monsterInfo));
-        return false;
-    }
-
-    update(elapseSeconds: number): void {
-        if (this.attackCount > 0) {
-            this.attackInterval += elapseSeconds;
-            if (this.attackInterval > ATTACK_INTERVAL) {
-                this.attackInterval -= ATTACK_INTERVAL;
-                if (this.heroFirst) {
+        this.schedule(
+            () => {
+                if (heroFirst) {
                     this.hero.showAttack(true);
-                    this.monster.hurt(this.damageInfo.monsterDamage);
+                    this.monster.hurt(damageInfo.monsterDamage);
                     GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(this.monster.monsterInfo));
                 } else {
                     this.hero.showAttack(false);
                     //怪物死了
                     if (this.monster.monsterInfo.hp == 0) {
-                        GameApp.EventManager.fireNow(this, MonsterDieEventArgs.create(this.monster, this.fightAfterMagic));
+                        GameApp.EventManager.fireNow(this, MonsterDieEventArgs.create(this.monster, magic));
                     } else {
-                        this.hero.hurt(this.damageInfo.heroDamage);
+                        this.hero.hurt(damageInfo.heroDamage);
                     }
                 }
 
-                this.heroFirst = !this.heroFirst;
-                --this.attackCount;
-            }
-        }
+                heroFirst = !heroFirst;
+            },
+            ATTACK_INTERVAL,
+            attackCount
+        );
+        return false;
     }
 
     clear(): void {
+        super.clear();
         this.hero = null!;
         this.monster = null!;
-        this.damageInfo = null!;
-        this.attackCount = 0;
-        this.heroFirst = false;
-        this.attackInterval = 0;
-        this.fightAfterMagic = false;
     }
 }

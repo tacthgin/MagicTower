@@ -1,26 +1,29 @@
 /**处理地图上的事件 */
 
 import { tween } from "cc";
+import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
+import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
+import { CommonEventArgs } from "../../Event/CommonEventArgs";
+import { GameEvent } from "../../Event/GameEvent";
+import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
 import { MapCollisionSystem } from "./MapCollisionSystem";
 
-export class GameEventSystem {
+@CommandManager.register("GameEventSystem")
+export class GameEventSystem extends SystemBase {
     private eventInfo: any = null;
     private chatStep: number = 0;
     private appearStep: number = 0;
     private disappearStep: number = 0;
     private moveStep: number = 0;
     private step: number = 0;
-    private map: GameMap = null!;
     private globalConfig: any = null;
-    private hero: Hero = null!;
     private collisionSystem: MapCollisionSystem = null!;
 
-    init(collisionSystem: MapCollisionSystem, map: GameMap, hero: Hero, eventId: number | string) {
+    init(collisionSystem: MapCollisionSystem, eventId: number | string) {
         this.eventInfo = Utility.Json.getJsonElement("event", eventId);
-        this.map = map;
-        this.hero = hero;
-        this.globalConfig = GameManager.DATA.getJson("global");
+        this.globalConfig = Utility.Json.getJson("global");
         this.collisionSystem = collisionSystem;
         // if (this.eventInfo.monsterDoor) {
         // this.map.monsterDoor = this.eventInfo.monsterDoor;
@@ -75,20 +78,16 @@ export class GameEventSystem {
             }
         } else {
             //this.map.clearGameEventSystem();
-            NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
+            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         }
     }
 
-    private scheduleExecute(interval: number) {
-        this.map.scheduleOnce(this.execute.bind(this), interval);
-    }
-
     private chat() {
-        GameManager.UI.showDialog("ChatDialog", this.eventInfo.chat[this.chatStep++], () => {
-            this.execute();
-        }).then((control: any) => {
-            //control.node.position = this.map.dialogPos;
-        });
+        // GameManager.UI.showDialog("ChatDialog", this.eventInfo.chat[this.chatStep++], () => {
+        //     this.execute();
+        // }).then((control: any) => {
+        //     //control.node.position = this.map.dialogPos;
+        // });
     }
 
     private move() {
@@ -101,14 +100,13 @@ export class GameEventSystem {
                 this.collisionSystem.move(layer, moveInfo[1], moveInfo[2], moveData.speed, moveInfo[0]);
             });
         }
-
-        this.scheduleExecute(moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
+        this.scheduleOnce(this.execute, moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
     }
 
     private specialMove() {
         let info = this.eventInfo.specialMove;
         this.collisionSystem.specialMove(info);
-        this.scheduleExecute(info.interval);
+        this.scheduleOnce(this.execute, info.interval);
     }
 
     private appear() {
@@ -131,7 +129,7 @@ export class GameEventSystem {
             }
         }
 
-        this.scheduleExecute(appearInfo.interval);
+        this.scheduleOnce(this.execute, appearInfo.interval);
     }
 
     private disappear() {
@@ -152,13 +150,13 @@ export class GameEventSystem {
             // monster.beAttack();
         }
 
-        this.scheduleExecute(this.globalConfig.fadeInterval + 0.05);
+        this.scheduleOnce(this.execute, this.globalConfig.fadeInterval + 0.05);
     }
 
     private sceneAppear() {
         let info = this.eventInfo.sceneAppear;
         this.hero.weak();
-        NotifyCenter.emit(GameEvent.SCENE_APPEAR, info[0], this.map.getTile(info[1]));
+        GameApp.EventManager.fireNow(this, SceneAppearEventArgs.create(info[0], this.map.getTile(info[1])));
         this.execute();
     }
 

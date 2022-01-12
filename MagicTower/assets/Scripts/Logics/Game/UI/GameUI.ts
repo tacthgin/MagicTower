@@ -3,14 +3,16 @@ import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { GameEventArgs } from "../../../../GameFramework/Scripts/Event/GameEventArgs";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
-import { GameEvent } from "../../../Constant/GameEvent";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroEvent } from "../../../Model/HeroModel/HeroEvent";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { HeroAttrEventArgs, HeroPropEventArgs } from "../../../Model/HeroModel/HeroModelEventArgs";
 import { PropType } from "../../../Model/HeroModel/PropType";
+import { MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
+import { GameEvent } from "../../Event/GameEvent";
+import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { ElementFactory } from "../Map/ElementFactory";
 import { MonsterIcon } from "./MonsterIcon";
 import { PropButton } from "./PropButton";
@@ -127,9 +129,9 @@ export class GameUI extends Component {
         this.refreshMonsterInfo();
     }
 
-    private onMonsterFight(monsterInfo: any) {
+    private onMonsterFight(sender: object, eventArgs: MonsterFightEventArgs) {
         this.refreshHeroAttr();
-        this.refreshMonsterInfo(monsterInfo);
+        this.refreshMonsterInfo(eventArgs.monsterInfo);
     }
 
     private refreshHeroAttr() {
@@ -223,14 +225,14 @@ export class GameUI extends Component {
         }
     }
 
-    private refreshMonsterInfo(monsterInfo: any = null) {
+    private refreshMonsterInfo(monsterInfo: MonsterInfo | null = null) {
         this.monsterLabels[0].string = monsterInfo ? monsterInfo.name : "怪物名字";
         this.monsterLabels[1].string = monsterInfo ? monsterInfo.hp.toString() : "生命";
-        this.monsterLabels[2].string = monsterInfo ? monsterInfo.attack : "攻击";
-        this.monsterLabels[3].string = monsterInfo ? monsterInfo.defence : "防御";
+        this.monsterLabels[2].string = monsterInfo ? monsterInfo.attack.toString() : "攻击";
+        this.monsterLabels[3].string = monsterInfo ? monsterInfo.defence.toString() : "防御";
         this.monsterSprite.active = monsterInfo != null;
         if (monsterInfo) {
-            this.monsterSprite.getComponent(MonsterIcon)?.init(monsterInfo.id);
+            this.monsterSprite.getComponent(MonsterIcon)?.init(parseInt(monsterInfo.id));
         }
     }
 

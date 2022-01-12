@@ -1,4 +1,3 @@
-import { Vec2 } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { LoadBase } from "../../../../GameFramework/Scripts/Application/Model/LoadBase";
 import { MapModel } from "../MapModel";

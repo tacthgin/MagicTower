@@ -15,7 +15,7 @@ export interface MonsterInfo {
     defence: number;
     gold: number;
     name: string;
-    id: string | number;
+    id: string;
     boss: boolean;
     spriteId: number;
     firstAttack: boolean;

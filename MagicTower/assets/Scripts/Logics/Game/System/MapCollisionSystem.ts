@@ -2,11 +2,23 @@ import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
+import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
+import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
+import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropType } from "../../../Model/HeroModel/PropType";
+import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
+import { LevelData } from "../../../Model/MapModel/Data/LevelData";
+import { MapModel } from "../../../Model/MapModel/MapModel";
 import { GameEvent } from "../../Event/GameEvent";
+import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
+import { IGameMap } from "../Map/GameMap/IGameMap";
+import { CalculateSystem } from "./CalculateSystem";
 import { MonsterFightSystem } from "./MonsterFightSystem";
 import { MoveSystem } from "./MoveSystem";
+import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
 
 const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
     npc: AstarMoveType.MONSTER,
@@ -29,10 +41,11 @@ let HERO_FACE_DIRECTION: Readonly<number[]> = [-11, 1, 11, -1];
 
 @CommandManager.register("MapCollisionSystem")
 export class MapCollisionSystem extends SystemBase {
-    private gameMap: GameMap = null!;
-    private hero: Hero = null!;
-    private HeroModel: HeroModel = null!;
+    private gameMap: IGameMap = null!;
+    private heroModel: HeroModel = null!;
+    private mapModel: MapModel = null!;
     private levelData: LevelData = null!;
+
     private canEndMoveTiles: Readonly<string[]> = ["prop", "stair"];
     private monsterFightSystem: MonsterFightSystem = null!;
     private npcInteractiveSystem: NpcInteractiveSystem = null!;
@@ -43,34 +56,30 @@ export class MapCollisionSystem extends SystemBase {
 
     constructor() {
         super();
+        this.registerEvent();
         this.monsterFightSystem = GameApp.CommandManager.createSystem(MonsterFightSystem);
         this.npcInteractiveSystem = GameApp.CommandManager.createSystem(NpcInteractiveSystem);
         this.gameEventSystem = GameApp.CommandManager.createSystem(GameEventSystem);
         this.moveSystem = GameApp.CommandManager.createSystem(MoveSystem);
-        this.registerEvent();
+
+        this.heroModel = GameApp.getModel(HeroModel);
+        this.mapModel = GameApp.getModel(MapModel);
     }
 
-    initliaze(gameMap: GameMap, hero: Hero) {
+    initliaze(gameMap: IGameMap) {
         this.gameMap = gameMap;
-        this.hero = hero;
-        this.HeroModel = hero.HeroModel;
-        let mapData = GameManager.DATA.getData(MapData)!;
-        this.levelData = mapData.getCurrentLevelData();
-
-        if (!this.dialogPos) {
-            this.dialogPos = this.gameMap.getComponent(UITransform)?.convertToWorldSpaceAR(Vec3.ZERO)!;
-        }
+        this.levelData = this.mapModel.getCurrentLevelData();
     }
 
     private registerEvent() {
         GameApp.EventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
     }
 
-    private onMonsterDie(monster: Monster, magic: boolean) {
+    private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
         //幸运金币
-        let ratio = this.HeroModel.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
-        this.HeroModel.setAttrDiff(HeroAttr.GOLD, monster.monsterInfo.gold * ratio);
-        this.disappear("monster", monster.index);
+        let ratio = this.heroModel.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
+        this.heroModel.setAttrDiff(HeroAttr.GOLD, eventArgs.monster.monsterInfo.gold * ratio);
+        this.disappear("monster", eventArgs.monster.index);
         this.elementActionComplete();
         //this.removeMonsterDoor();
         //this.monsterEventTrigger(index);
@@ -99,8 +108,8 @@ export class MapCollisionSystem extends SystemBase {
         // }
     }
 
-    private getTileOrIndex(tileOrIndex: Vec2 | number) {
-        let tile: Vec2 | null = null;
+    private getTileOrIndex(tileOrIndex: IVec2 | number) {
+        let tile: IVec2 = null!;
         let index: number = -1;
         if (typeof tileOrIndex == "number") {
             tile = this.gameMap.getTile(tileOrIndex);
@@ -131,7 +140,9 @@ export class MapCollisionSystem extends SystemBase {
 
     disappear(layerName: string, tileOrIndex: Vec2 | number, record: boolean = true) {
         let { index, tile } = this.getTileOrIndex(tileOrIndex);
-        this.gameMap.setTileGIDAt(layerName, tile, 0);
+        if (tile) {
+            this.gameMap.setTileGIDAt(layerName, tile, 0);
+        }
         record && this.levelData.setDisappear(layerName, index);
     }
 
@@ -215,7 +226,7 @@ export class MapCollisionSystem extends SystemBase {
             case "prop":
             case "monster":
             case "door":
-                return GameManager.DATA.getJsonParser(layerName)?.getJsonElementByKey("spriteId", name);
+                return Utility.Json.getJsonKeyCache(layerName, "spriteId", name);
             default:
                 return null;
         }
@@ -233,8 +244,8 @@ export class MapCollisionSystem extends SystemBase {
         switch (layerName) {
             case "prop":
                 {
-                    GameManager.AUDIO.playEffect("eat");
-                    this.HeroModel.addProp(jsonData.id, this.levelData.level);
+                    GameApp.SoundManager.playSound("Sounds/eat");
+                    this.heroModel.addProp(jsonData.id, this.levelData.level);
                     this.disappear(layerName, tile);
                 }
                 return true;
@@ -244,15 +255,14 @@ export class MapCollisionSystem extends SystemBase {
             case "stair":
                 let stair = this.levelData.getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
                 if (stair) {
-                    let mapData = GameManager.DATA.getData(MapData)!;
-                    mapData.setLevelDiff(stair.levelDiff);
+                    this.mapModel.setLevelDiff(stair.levelDiff);
                     return true;
                 }
                 break;
             case "monster":
                 {
-                    if (!CalculateSystem.canHeroAttack(this.HeroModel, jsonData, !jsonData.firstAttack)) {
-                        GameManager.UI.showToast(`你打不过${jsonData.name}`);
+                    if (!CalculateSystem.canHeroAttack(this.heroModel, jsonData, !jsonData.firstAttack)) {
+                        //GameManager.UI.showToast(`你打不过${jsonData.name}`);
                         return true;
                     }
                     let monster = new Monster();
@@ -299,8 +309,8 @@ export class MapCollisionSystem extends SystemBase {
             openDoor();
         } else if (doorInfo.isKeyDoor()) {
             let keyID = GameManager.DATA.getJsonParser("prop")?.getJsonElementByKey("value", doorInfo.id).id;
-            if (keyID && this.HeroModel.getPropNum(keyID) > 0) {
-                this.HeroModel.addProp(keyID, 1, -1);
+            if (keyID && this.heroModel.getPropNum(keyID) > 0) {
+                this.heroModel.addProp(keyID, 1, -1);
                 openDoor();
                 let eventInfo = this.levelData.getLayerInfo(layerName)["event"];
                 if (eventInfo && eventInfo.doorState == DoorState.DISAPPEAR_EVENT) {
@@ -348,7 +358,7 @@ export class MapCollisionSystem extends SystemBase {
         //return true;
         //} else if (!element.hide && !element.passive) {
         //let keyId = this.propParser.getKeyByDoor(element.id);
-        //if (keyId && this.HeroModel.getPropNum(keyId) > 0) {
+        //if (keyId && this.heroModel.getPropNum(keyId) > 0) {
         //this.hero.removeProp(keyId);
         //this.removeElement(index, "door");
         //this.disappearDoorEventTrigger(index);
@@ -519,12 +529,12 @@ export class MapCollisionSystem extends SystemBase {
         switch (layerName) {
             case "floor":
                 if (this.levelData.level >= 40) {
-                    return this.HeroModel.getAttr(HeroAttr.HP) > this.getWizardMagicDamage(this.gameMap.getTileIndex(tile));
+                    return this.heroModel.getAttr(HeroAttr.HP) > this.getWizardMagicDamage(this.gameMap.getTileIndex(tile));
                 }
                 return true;
             case "monster":
                 let jsonData = this.getJsonData(layerName, spriteName);
-                return CalculateSystem.canHeroAttack(this.HeroModel, jsonData, !jsonData.firstAttack);
+                return CalculateSystem.canHeroAttack(this.heroModel, jsonData, !jsonData.firstAttack);
         }
         return this.canEndMoveTiles.includes(layerName!);
     }
@@ -534,7 +544,7 @@ export class MapCollisionSystem extends SystemBase {
         let stairs: Stair[] = this.levelData.getLayerInfo("stairs");
         if (stairs) {
             stairs.forEach((stair) => {
-                let diff = Math.abs(stair.index - this.gameMap.getTileIndex(this.HeroModel.getPosition()));
+                let diff = Math.abs(stair.index - this.gameMap.getTileIndex(this.heroModel.getPosition()));
                 if (INDEX_DIFFS.indexOf(diff) != -1) {
                     return true;
                 }
@@ -662,22 +672,22 @@ export class MapCollisionSystem extends SystemBase {
     private gotoShop() {
         let shopData = GameManager.DATA.getData(ShopData)!;
         shopData.level = this.levelData.level;
-        GameManager.UI.showDialog("ShopDialog", shopData, this.HeroModel.getAttr(HeroAttr.GOLD), (attr: string) => {
+        GameManager.UI.showDialog("ShopDialog", shopData, this.heroModel.getAttr(HeroAttr.GOLD), (attr: string) => {
             switch (attr) {
                 case "hp":
-                    this.HeroModel.setAttrDiff(HeroAttr.HP, shopData.hp);
+                    this.heroModel.setAttrDiff(HeroAttr.HP, shopData.hp);
                     break;
                 case "attack":
-                    this.HeroModel.setAttrDiff(HeroAttr.ATTACK, shopData.attack);
+                    this.heroModel.setAttrDiff(HeroAttr.ATTACK, shopData.attack);
                     break;
                 case "defence":
-                    this.HeroModel.setAttrDiff(HeroAttr.DEFENCE, shopData.defence);
+                    this.heroModel.setAttrDiff(HeroAttr.DEFENCE, shopData.defence);
                     break;
                 default:
                     break;
             }
             if (attr != "no") {
-                this.HeroModel.setAttrDiff(HeroAttr.GOLD, shopData.buy());
+                this.heroModel.setAttrDiff(HeroAttr.GOLD, shopData.buy());
             }
             this.elementActionComplete();
         }).then((control: any) => {
@@ -714,7 +724,7 @@ export class MapCollisionSystem extends SystemBase {
 
     haveMagicHurt(index: number) {
         //let magic = false;
-        //if (!this.HeroModel.equipedDivineShield()) {
+        //if (!this.heroModel.equipedDivineShield()) {
         //if (this.monsterInfo.magicHurt.wizard) {
         //magic = this.monsterInfo.magicHurt.wizard[index] != undefined;
         //}
@@ -728,7 +738,7 @@ export class MapCollisionSystem extends SystemBase {
     /** 获取巫师的魔法伤害 */
     getWizardMagicDamage(index: number) {
         let totalDamage = 0;
-        if (!this.HeroModel.equipedDivineShield()) {
+        if (!this.heroModel.equipedDivineShield()) {
             // if (this.monsterInfo.magicHurt.wizard) {
             //     let hurtInfo = this.monsterInfo.magicHurt.wizard[index];
             //     if (hurtInfo) {
@@ -747,7 +757,7 @@ export class MapCollisionSystem extends SystemBase {
             return false;
         }
 
-        //if (!this.HeroModel.equipedDivineShield()) {
+        //if (!this.heroModel.equipedDivineShield()) {
         //if (this.monsterInfo.magicHurt.magic) {
         //如果通过魔法守卫中间
         //let hurtInfo = this.monsterInfo.magicHurt.magic[index];
@@ -759,7 +769,7 @@ export class MapCollisionSystem extends SystemBase {
         //}
         //if (this.monsterInfo.magicHurt.wizard) {
         //let wizardDamage = this.getWizardMagicDamage(index);
-        //if (this.HeroModel.Hp <= wizardDamage) {
+        //if (this.heroModel.Hp <= wizardDamage) {
         //GameManager.getInstance().showToast("不能过去，你将被巫师杀死！");
         //return true;
         //}
@@ -811,7 +821,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     removeHeroFaceWall() {
-        //let HeroModel = this.HeroModel;
+        //let HeroModel = this.heroModel;
         //let direction = HeroModel.Direction;
         //let index = this.tileToIndex(HeroModel.Position) + HERO_FACE_DIRECTION[direction];
         //let element = this.getElement(index, "wall");
@@ -832,7 +842,7 @@ export class MapCollisionSystem extends SystemBase {
         //return length > 0;
     }
     removeLava() {
-        //let heroIndex = this.tileToIndex(this.HeroModel.Position);
+        //let heroIndex = this.tileToIndex(this.heroModel.Position);
         //HERO_FACE_DIRECTION.forEach((diff) => {
         //let index = heroIndex + diff;
         //let element = this.getElement(index, "wall");
@@ -843,7 +853,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     bomb() {
-        //let heroIndex = this.tileToIndex(this.HeroModel.Position);
+        //let heroIndex = this.tileToIndex(this.heroModel.Position);
         //let remove = false;
         //HERO_FACE_DIRECTION.forEach((diff) => {
         //let index = heroIndex + diff;
@@ -867,7 +877,7 @@ export class MapCollisionSystem extends SystemBase {
         //return remove;
     }
     centrosymmetricFly() {
-        //let tile = this.HeroModel.Position;
+        //let tile = this.heroModel.Position;
         //let newTile = cc.v2(this.mapData.column - tile.x - 1, this.mapData.row - tile.y - 1);
         //if (this.getElement(this.tileToIndex(newTile)) == null) {
         //this.hero.location(newTile);
@@ -965,8 +975,7 @@ export class MapCollisionSystem extends SystemBase {
                 break;
             case 15:
                 {
-                    // this.HeroModel.Hp += this.HeroModel.Attack + this.HeroModel.Defence;
-                    // NotifyCenter.emit(GameEvent.HERO_ATTR_CHANGED);
+                    // this.heroModel.Hp += this.heroModel.Attack + this.heroModel.Defence;
                     // this.consumptionProp(propInfo);
                 }
                 break;
@@ -993,7 +1002,7 @@ export class MapCollisionSystem extends SystemBase {
 
     // consumptionProp(propInfo: any) {
     //     if (!propInfo.permanent) {
-    //         this.HeroModel.addProp(propInfo.id, -1);
+    //         this.heroModel.addProp(propInfo.id, -1);
     //         NotifyCenter.emit(GameEvent.REFRESH_PROP, propInfo, -1);
     //     }
     // }
