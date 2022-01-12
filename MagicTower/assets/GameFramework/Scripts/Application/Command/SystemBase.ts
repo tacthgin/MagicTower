@@ -1,11 +1,4 @@
 import { IRerference } from "../../Base/ReferencePool/IRerference";
+import { ScheduleBase } from "../Base/ScheduleBase";
 
-export abstract class SystemBase implements IRerference {
-    abstract clear(): void;
-
-    /**
-     * 轮询系统
-     * @param elapseSeconds 逻辑流逝时间
-     */
-    update(elapseSeconds: number): void {}
-}
+export abstract class SystemBase extends ScheduleBase implements IRerference {}

@@ -2,12 +2,12 @@ import { EventHandle } from "../../Base/EventPool/EventHandle";
 import { EventPool } from "../../Base/EventPool/EventPool";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { ISaveManager } from "../../Save/ISaveManager";
+import { ScheduleBase } from "../Base/ScheduleBase";
 import { IModel } from "./IModel";
-import { LoadBase } from "./LoadBase";
 import { ModelContainer } from "./ModelContainer";
 import { ModelEventArgs } from "./ModelEventArgs";
 
-export abstract class ModelBase extends LoadBase implements IModel {
+export abstract class ModelBase extends ScheduleBase implements IModel {
     private _saveManager: ISaveManager | null = null;
     private _eventPool: EventPool<ModelEventArgs> = null!;
 
@@ -28,6 +28,7 @@ export abstract class ModelBase extends LoadBase implements IModel {
      * @param elapseSeconds 逻辑流逝事件
      */
     update(elapseSeconds: number) {
+        super.update(elapseSeconds);
         this._eventPool.update(elapseSeconds);
     }
 
@@ -35,6 +36,7 @@ export abstract class ModelBase extends LoadBase implements IModel {
      * 关闭并清理模型
      */
     shutDown() {
+        super.clear();
         this._eventPool.shutDown();
     }
 
@@ -84,5 +86,18 @@ export abstract class ModelBase extends LoadBase implements IModel {
             throw new GameFrameworkError("you must set save manager first");
         }
         this._saveManager.setObject(ModelContainer.getClassName(this), this);
+    }
+
+    /**
+     * 按键值赋予模型数据
+     * @param data 数据
+     */
+    protected loadData(data: object): void {
+        for (let key in data) {
+            let thisInfo = this as any;
+            if (thisInfo[key] !== undefined) {
+                thisInfo[key] = (data as any)[key];
+            }
+        }
     }
 }
