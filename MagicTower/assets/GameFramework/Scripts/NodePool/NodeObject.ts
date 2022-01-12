@@ -2,6 +2,9 @@ import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { ObjectBase } from "../ObjectPool/ObjectBase";
 import { INodeHelp } from "./INodeHelp";
 
+/**
+ * 节点对象
+ */
 export class NodeObject extends ObjectBase {
     private _nodeHelper: INodeHelp | null = null;
 

@@ -11,6 +11,9 @@ import { INodePoolManager } from "./INodePoolManager";
 import { NodeBase } from "./NodeBase";
 import { NodeObject } from "./NodeObject";
 
+/**
+ * 节点池管理器
+ */
 @GameFrameworkEntry.registerModule("NodePoolManager")
 export class NodePoolManager extends GameFrameworkModule implements INodePoolManager {
     private readonly _nodePools: Map<Constructor<NodeBase> | string, ObjectPoolBase> = null!;
@@ -27,17 +30,9 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         return 2;
     }
 
-    update(elapseSeconds: number): void {
-        this._nodePools.forEach((objectPool: ObjectPoolBase) => {
-            objectPool.update(elapseSeconds);
-        });
-    }
+    update(elapseSeconds: number): void {}
 
-    shutDown(): void {
-        this._nodePools.forEach((objectPool: ObjectPoolBase) => {
-            objectPool.shutDown();
-        });
-    }
+    shutDown(): void {}
 
     setResourceManager(resourceManager: IResourceManager): void {
         this._resourceManager = resourceManager;
@@ -78,10 +73,27 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             throw new GameFrameworkError("you must set object pool manager first");
         }
 
-        objectPool = this._objectPoolManager.createSingleSpawnObjectPoolBase(NodeObject, "");
+        objectPool = this._objectPoolManager.createSingleSpawnObjectPoolBase(NodeObject, this.internalGetPoolName(nodeConstructorOrNodePoolName));
         this._nodePools.set(nodeConstructorOrNodePoolName, objectPool);
 
         return objectPool as unknown as IObjectPool<NodeObject>;
+    }
+
+    destroyNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): boolean {
+        if (typeof nodeConstructorOrNodePoolName === "string" && !nodeConstructorOrNodePoolName) {
+            throw new GameFrameworkError("node pool name is invalid");
+        }
+
+        if (!this._objectPoolManager) {
+            throw new GameFrameworkError("you must set object pool manager first");
+        }
+
+        let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName);
+        if (objectPool) {
+            return this._objectPoolManager.destroyObjectPool(NodeObject, this.internalGetPoolName(nodeConstructorOrNodePoolName));
+        }
+
+        return false;
     }
 
     async createNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): Promise<object> {
@@ -128,5 +140,9 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             return true;
         }
         return false;
+    }
+
+    private internalGetPoolName<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string) {
+        return typeof nodeConstructorOrNodePoolName === "string" ? nodeConstructorOrNodePoolName : nodeConstructorOrNodePoolName.name;
     }
 }
