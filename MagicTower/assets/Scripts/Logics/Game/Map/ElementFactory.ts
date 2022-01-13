@@ -6,18 +6,18 @@ export class ElementFactory {
     private static animations: { [key: number | string]: AnimationClip } = {};
 
     static async loadAsset() {
-        let resouceLoader = GameApp.ResourceManager.internalResourceLoader;
+        let resouceLoader = GameApp.ResourceManager;
         await resouceLoader.loadDir("Prefabs/Elements", Prefab);
         await resouceLoader.loadDir("TiledMap", TiledMapAsset);
         //await resouceLoader.loadDir("TiledMap/Images", SpriteFrame);
     }
 
     static getElementSpriteFrame(name: string): SpriteFrame | null {
-        return GameApp.ResourceManager.internalResourceLoader.getAsset(`TiledMap/Images/${name}`);
+        return GameApp.ResourceManager.getAsset(`TiledMap/Images/${name}`);
     }
 
     static getHeroSpriteFrame(name: string): SpriteFrame | null {
-        return GameApp.ResourceManager.internalResourceLoader.getAsset(`Sprites/${name}`);
+        return GameApp.ResourceManager.getAsset(`Sprites/${name}`);
     }
 
     static getElementAnimationClip(name: string) {

@@ -9,7 +9,7 @@ export class PropButton extends Component {
 
     init(propInfo: any) {
         this.propInfo = propInfo;
-        this.getComponent(Sprite)!.spriteFrame = GameApp.ResourceManager.internalResourceLoader.getAsset(`Sprites/${propInfo.spriteId}`);
+        this.getComponent(Sprite)!.spriteFrame = GameApp.ResourceManager.getAsset(`Sprites/${propInfo.spriteId}`);
     }
 
     onPropButtonClick() {
