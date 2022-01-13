@@ -1,23 +1,21 @@
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
+import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
-import { CommonEventArgs } from "../../Event/CommonEventArgs";
-import { GameEvent } from "../../Event/GameEvent";
-import { Hero } from "../Map/Hero/Hero";
+import { MapCollisionSystem } from "./MapCollisionSystem";
 
 @CommandManager.register("NpcInteractiveSystem")
 export class NpcInteractiveSystem extends SystemBase {
-    clear(): void {
-        throw new Error("Method not implemented.");
-    }
     private npc: Npc = null!;
-    private hero: Hero = null!;
+    private heroModel: HeroModel = null!;
+    private mapCollisionSystem: MapCollisionSystem = null!;
 
-    init(hero: Hero, npc: Npc) {
+    initliaze(npc: Npc, mapCollisionSystem: MapCollisionSystem) {
         this.npc = npc;
-        this.hero = hero;
-        return this;
+        this.mapCollisionSystem = mapCollisionSystem;
+        this.heroModel = GameApp.getModel(HeroModel);
     }
 
     execute() {
@@ -34,8 +32,11 @@ export class NpcInteractiveSystem extends SystemBase {
         } else {
             let info = this.npc.talk();
             this.npc.nextTalk();
-            // this.hero.HeroModel.recordTalk(this.npc.npcInfo.id, info.index);
-            // let npcInfo = this.npc.npcInfo;
+            if (typeof info.index != "string") {
+                this.heroModel.recordTalk(parseInt(this.npc.npcInfo.id), info.index);
+            }
+
+            let npcInfo = this.npc.npcInfo;
             // this.map.showDialog("ChatDialog", info.talk, () => {
             //     //小偷
             //     if (npcInfo.type == 1) {
@@ -53,44 +54,43 @@ export class NpcInteractiveSystem extends SystemBase {
         }
     }
     private npcTrade() {
-        // let HeroModel = this.hero.HeroModel;
-        // let npcPropInfo = this.npc.npcInfo.value;
-        // HeroModel.Gold += npcPropInfo.gold || 0;
-        // if (npcPropInfo.attack) {
-        //     HeroModel.Attack += npcPropInfo.attack >= 1 ? npcPropInfo.attack : HeroModel.Attack * npcPropInfo.attack;
-        // }
-        // if (npcPropInfo.defence) {
-        //     HeroModel.Defence += npcPropInfo.defence >= 1 ? npcPropInfo.defence : HeroModel.Defence * npcPropInfo.defence;
-        // }
-        // //商人交易
-        // if (npcPropInfo.propGold) {
-        //     if (HeroModel.Gold + npcPropInfo.propGold < 0) {
-        //         //GameManager.getInstance().showToast("你的钱不够");
-        //         return;
-        //     }
-        //     HeroModel.Hp += npcPropInfo.hp || 0;
-        //     let tradeSuccess = true;
-        //     if (npcPropInfo.prop) {
-        //         for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
-        //             //如果没有物品就不能卖
-        //             if (npcPropInfo.prop[i + 1] < 0 && HeroModel.getPropNum(npcPropInfo.prop[i]) <= 0) {
-        //                 tradeSuccess = false;
-        //                 continue;
-        //             }
-        //             this.hero.addProp(npcPropInfo.prop[i], npcPropInfo.prop[i + 1]);
-        //         }
-        //     }
-        //     if (tradeSuccess) {
-        //         HeroModel.Gold += npcPropInfo.propGold;
-        //         this.npc.consumeProp();
-        //     } else {
-        //         //GameManager.getInstance().showToast("物品数量不够");
-        //     }
-        // } else if (npcPropInfo.prop) {
-        //     for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
-        //         this.hero.addProp(npcPropInfo.prop[i], npcPropInfo.prop[i + 1]);
-        //     }
-        // }
+        let npcPropInfo = this.npc.npcInfo.value;
+        this.heroModel.setAttrDiff(HeroAttr.GOLD, npcPropInfo.gold || 0);
+        if (npcPropInfo.attack) {
+            this.heroModel.setAttrDiff(HeroAttr.ATTACK, npcPropInfo.attack >= 1 ? npcPropInfo.attack : this.heroModel.getAttr(HeroAttr.ATTACK) * npcPropInfo.attack);
+        }
+        if (npcPropInfo.defence) {
+            this.heroModel.setAttrDiff(HeroAttr.DEFENCE, npcPropInfo.defence >= 1 ? npcPropInfo.defence : this.heroModel.getAttr(HeroAttr.DEFENCE) * npcPropInfo.defence);
+        }
+        //商人交易
+        if (npcPropInfo.propGold) {
+            if (this.heroModel.getAttr(HeroAttr.GOLD) + npcPropInfo.propGold < 0) {
+                //GameManager.getInstance().showToast("你的钱不够");
+                return;
+            }
+            this.heroModel.setAttrDiff(HeroAttr.HP, npcPropInfo.hp || 0);
+            let tradeSuccess = true;
+            if (npcPropInfo.prop) {
+                for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
+                    //如果没有物品就不能卖
+                    if (npcPropInfo.prop[i + 1] < 0 && this.heroModel.getPropNum(npcPropInfo.prop[i]) <= 0) {
+                        tradeSuccess = false;
+                        continue;
+                    }
+                    this.heroModel.addProp(npcPropInfo.prop[i], 0, npcPropInfo.prop[i + 1]);
+                }
+            }
+            if (tradeSuccess) {
+                this.heroModel.setAttrDiff(HeroAttr.GOLD, npcPropInfo.propGold || 0);
+                this.npc.consumeProp();
+            } else {
+                //GameManager.getInstance().showToast("物品数量不够");
+            }
+        } else if (npcPropInfo.prop) {
+            for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
+                this.heroModel.addProp(npcPropInfo.prop[i], 0, npcPropInfo.prop[i + 1]);
+            }
+        }
     }
     private npcMove() {
         // let wallIndex = this.npc.getWallIndex();
@@ -127,9 +127,16 @@ export class NpcInteractiveSystem extends SystemBase {
         //     GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         // }
     }
+
     private interactiveComplete() {
         // if (this.npc.talkEnd()) {
         //     this.map.removeElement(this.index, "npc");
         // }
+    }
+
+    clear(): void {
+        this.npc = null!;
+        this.heroModel = null!;
+        this.mapCollisionSystem = null!;
     }
 }

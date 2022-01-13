@@ -58,13 +58,16 @@ export class GameUI extends Component {
     onLoad() {
         this.registerEvent();
         this.initUI();
-        this.loadArchive();
     }
 
     onDestroy() {
         this.heroModel.unsubscribeTarget(this);
         this.mapModel.unsubscribeTarget(this);
         GameApp.EventManager.unsubscribeTarget(this);
+    }
+
+    start() {
+        this.loadArchive();
     }
 
     loadArchive() {

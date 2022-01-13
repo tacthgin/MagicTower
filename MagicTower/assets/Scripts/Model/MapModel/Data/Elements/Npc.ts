@@ -1,9 +1,37 @@
+import { GameFrameworkError } from "../../../../../GameFramework/Scripts/Base/GameFrameworkError";
+import { Utility } from "../../../../../GameFramework/Scripts/Utility/Utility";
 import { Element } from "./Element";
 
+export interface NpcInfo {
+    id: string;
+    type: number;
+    spriteId: string;
+    value: any;
+    desc: string;
+    wall: number[];
+    move: number[];
+    talk: string[];
+    unlimit: boolean;
+    eventTalk: string | null;
+    event: number;
+}
+
 export class Npc extends Element {
-    private _npcInfo: any = null;
+    private _npcInfo: NpcInfo = null!;
     private stepIndex: number = 0;
     private moveIndex: number = 0;
+
+    set id(value: number) {
+        this._id = value;
+        this._npcInfo = Utility.Json.getJsonElement("npc", this._id, true) as NpcInfo;
+        if (!this._npcInfo) {
+            throw new GameFrameworkError("cant find npc info");
+        }
+    }
+
+    get npcInfo(): NpcInfo {
+        return this._npcInfo;
+    }
 
     get onceStep() {
         return this._npcInfo.talk.length == 1;

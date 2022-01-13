@@ -21,7 +21,7 @@ export class GameEventSystem extends SystemBase {
     private globalConfig: any = null;
     private collisionSystem: MapCollisionSystem = null!;
 
-    init(collisionSystem: MapCollisionSystem, eventId: number | string) {
+    initliaze(collisionSystem: MapCollisionSystem, eventId: number | string) {
         this.eventInfo = Utility.Json.getJsonElement("event", eventId);
         this.globalConfig = Utility.Json.getJson("global");
         this.collisionSystem = collisionSystem;

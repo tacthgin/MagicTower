@@ -49,7 +49,11 @@ export class HeroModel extends ModelBase {
     }
 
     setAttrDiff(attr: HeroAttr, diff: number) {
-        this.setAttr(attr, this.heroAttr[attr] + diff);
+        let value = this.heroAttr[attr] + diff;
+        if (value < 0) {
+            value = 0;
+        }
+        this.setAttr(attr, value);
     }
 
     getAttr(attr: HeroAttr) {

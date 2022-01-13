@@ -2,6 +2,8 @@ import { CommandManager } from "../../../../GameFramework/Scripts/Application/Co
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
+import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
+import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
@@ -29,7 +31,7 @@ export class MonsterFightSystem extends SystemBase {
             throw new GameFrameworkError("you must initliaze monster fight system");
         }
 
-        let heroModel = this.hero.heroModel;
+        let heroModel = GameApp.getModel(HeroModel);
         let monsterInfo = this.monster.monsterInfo;
         let count = CalculateSystem.getHeroAttackCount(heroModel, monsterInfo);
         let damageInfo = CalculateSystem.perAttackDamage(heroModel, monsterInfo);
@@ -50,7 +52,7 @@ export class MonsterFightSystem extends SystemBase {
                     if (this.monster.monsterInfo.hp == 0) {
                         GameApp.EventManager.fireNow(this, MonsterDieEventArgs.create(this.monster, magic));
                     } else {
-                        this.hero.hurt(damageInfo.heroDamage);
+                        heroModel.setAttrDiff(HeroAttr.HP, -damageInfo.heroDamage);
                     }
                 }
 

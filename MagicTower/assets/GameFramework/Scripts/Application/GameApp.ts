@@ -1,4 +1,4 @@
-import { Component, game, TiledUserNodeData, _decorator } from "cc";
+import { Component, game, _decorator } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
@@ -98,7 +98,7 @@ export class GameApp extends Component {
      * @param constructor
      * @returns
      */
-    static getModel<T extends IModel>(constructor: Constructor<IModel>): T {
+    static getModel<T extends IModel>(constructor: Constructor<T>): T {
         return GameApp.instance._modelContainer.getModel(constructor) as T;
     }
 

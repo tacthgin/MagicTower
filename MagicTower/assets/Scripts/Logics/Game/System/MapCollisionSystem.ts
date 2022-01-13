@@ -10,8 +10,10 @@ import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropType } from "../../../Model/HeroModel/PropType";
 import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
+import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
+import { ShopModel } from "../../../Model/ShopModel/ShopModel";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { IGameMap } from "../Map/GameMap/IGameMap";
@@ -240,7 +242,7 @@ export class MapCollisionSystem extends SystemBase {
     collision(tile: Vec2) {
         let { layerName, spriteName } = this.gameMap.getTileInfo(tile);
         if (!layerName) return true;
-        let jsonData = this.getJsonData(layerName, spriteName);
+        let jsonData = this.getJsonData(layerName, spriteName) as any;
         switch (layerName) {
             case "prop":
                 {
@@ -670,29 +672,29 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private gotoShop() {
-        let shopData = GameManager.DATA.getData(ShopData)!;
-        shopData.level = this.levelData.level;
-        GameManager.UI.showDialog("ShopDialog", shopData, this.heroModel.getAttr(HeroAttr.GOLD), (attr: string) => {
-            switch (attr) {
-                case "hp":
-                    this.heroModel.setAttrDiff(HeroAttr.HP, shopData.hp);
-                    break;
-                case "attack":
-                    this.heroModel.setAttrDiff(HeroAttr.ATTACK, shopData.attack);
-                    break;
-                case "defence":
-                    this.heroModel.setAttrDiff(HeroAttr.DEFENCE, shopData.defence);
-                    break;
-                default:
-                    break;
-            }
-            if (attr != "no") {
-                this.heroModel.setAttrDiff(HeroAttr.GOLD, shopData.buy());
-            }
-            this.elementActionComplete();
-        }).then((control: any) => {
-            //control.node.position = this._dialogPos;
-        });
+        let shopModel = GameApp.getModel(ShopModel);
+        shopModel.level = this.levelData.level;
+        // GameManager.UI.showDialog("ShopDialog", shopModel, this.heroModel.getAttr(HeroAttr.GOLD), (attr: string) => {
+        //     switch (attr) {
+        //         case "hp":
+        //             this.heroModel.setAttrDiff(HeroAttr.HP, shopModel.hp);
+        //             break;
+        //         case "attack":
+        //             this.heroModel.setAttrDiff(HeroAttr.ATTACK, shopModel.attack);
+        //             break;
+        //         case "defence":
+        //             this.heroModel.setAttrDiff(HeroAttr.DEFENCE, shopModel.defence);
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        //     if (attr != "no") {
+        //         this.heroModel.setAttrDiff(HeroAttr.GOLD, shopModel.buy());
+        //     }
+        //     this.elementActionComplete();
+        // }).then((control: any) => {
+        //     //control.node.position = this._dialogPos;
+        // });
     }
 
     private eventCollision(eventID: number | string | Vec2) {
