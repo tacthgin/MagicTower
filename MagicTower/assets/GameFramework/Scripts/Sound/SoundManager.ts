@@ -47,7 +47,7 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         if (!this._resourceManager) {
             throw new GameFrameworkError("resource mamager not exist");
         }
-        let audioClip = await this._resourceManager.internalResourceLoader.loadAsset(soundAssetPath);
+        let audioClip = await this._resourceManager.loadAsset(soundAssetPath);
         if (!audioClip) {
             throw new GameFrameworkError(`audio clip ${soundAssetPath} not exist`);
         }

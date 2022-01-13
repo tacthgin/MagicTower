@@ -122,9 +122,9 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             throw new GameFrameworkError("you must set resource manager first");
         }
 
-        let asset = this._resourceManager.internalResourceLoader.getAsset(assetPath);
+        let asset = this._resourceManager.getAsset(assetPath);
         if (!asset) {
-            asset = await this._resourceManager.internalResourceLoader.loadAsset(assetPath);
+            asset = await this._resourceManager.loadAsset(assetPath);
             if (!asset) {
                 throw new GameFrameworkError(`${assetPath} asset is invalid`);
             }

@@ -10,6 +10,7 @@ export interface IResourceLoader {
      * 使用Promise加载单一资源
      * @param path 资源路径
      * @param assetType 资源类型
+     * @returns 需要加载的资源
      */
     loadAsset<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<T | null>;
 
@@ -19,6 +20,7 @@ export interface IResourceLoader {
      * @param assetType 资源类型
      * @param onProgress 资源加载进度回调
      * @param onComplete 资源加载完成回调
+     * @returns 是否加载成功
      */
     loadAssetWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): Promise<boolean>;
 
@@ -36,6 +38,7 @@ export interface IResourceLoader {
      * @param assetType 资源类型
      * @param onProgress 资源加载进度回调
      * @param onComplete 资源加载完成回调
+     * @returns 是否加载成功
      */
     loadDirWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): Promise<boolean>;
 
@@ -43,6 +46,7 @@ export interface IResourceLoader {
      * 获取已经缓存的资源
      * @param path 资源路径
      * @param assetType 资源类型
+     * @returns 资源
      */
     getAsset<T extends Asset>(path: string, assetType?: Constructor<T>): T | null;
 

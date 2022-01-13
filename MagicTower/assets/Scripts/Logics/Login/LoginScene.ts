@@ -36,7 +36,7 @@ export class LoginScene extends Component {
         for (let i = 0; i < resouceInfos.length; i++) {
             let info = resouceInfos[i];
             let step = (i + 1) / resouceInfos.length;
-            await GameApp.ResourceManager.internalResourceLoader.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number) => {
+            await GameApp.ResourceManager.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number) => {
                 this.progressLabel.string = `${(finished / total) * step * 100}%`;
             });
         }
