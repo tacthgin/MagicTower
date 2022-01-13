@@ -18,14 +18,14 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
     private _remoteAssets: Map<string, Asset> = null!;
     private _resourceHelpPath: IResourcePathHelp = null!;
     private readonly _bundleRegExp: RegExp = /^\$\w+\//;
+    private _internaleResourceLoaderName: string = null!;
 
     constructor() {
         super();
         this._resourceLoaders = new Map<string, ResourceLoader>();
         this._remoteAssets = new Map<string, Asset>();
         this._resourceHelpPath = new ResourcePathHelp();
-        this.createResourceLoader("resources", resources);
-        GameFrameworkLog.log(this.internalGetBundleName("$adadada//dadadada/dadada"), "1111111");
+        this.setInternalResourceLoader();
     }
 
     update(elapseSeconds: number): void {}
@@ -121,6 +121,15 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         throw new Error("Method not implemented.");
     }
 
+    private setInternalResourceLoader(): void {
+        this._internaleResourceLoaderName = "resources";
+
+        if (this.getResourceLoader(this._internaleResourceLoaderName)) {
+            throw new GameFrameworkError("internal resource loader already set");
+        }
+        this.createResourceLoader(this._internaleResourceLoaderName, resources);
+    }
+
     private createResourceLoader(name: string, bundle: IResourceLoaderHelp): void {
         let resourceLoader = this._resourceLoaders.get(name);
         if (resourceLoader) {
@@ -154,7 +163,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
 
     private internalGetBundle(path: string): { resourceLoader: IResourceLoader; path: string } {
         let bundleInfo = this.internalGetBundleName(path);
-        let bundleName = "resources";
+        let bundleName = this._internaleResourceLoaderName;
         if (bundleInfo) {
             bundleName = bundleInfo.bundleName;
             path = bundleInfo.path;
