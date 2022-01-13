@@ -100,7 +100,8 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
     }
 
     getAsset<T extends Asset>(path: string, assetType?: Constructor<T>): T | null {
-        throw new Error("Method not implemented.");
+        let resourceLoaderInfo = this.internalGetBundle(path);
+        return resourceLoaderInfo.resourceLoader.getAsset(resourceLoaderInfo.path, assetType);
     }
 
     getRemoteAsset(url: string): Asset | null {
@@ -118,9 +119,13 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
     }
 
     releaseDir(path: string): void {
-        throw new Error("Method not implemented.");
+        let resourceLoaderInfo = this.internalGetBundle(path);
+        resourceLoaderInfo.resourceLoader.releaseDir(resourceLoaderInfo.path);
     }
 
+    /**
+     * 设置内置的资源加载器
+     */
     private setInternalResourceLoader(): void {
         this._internaleResourceLoaderName = "resources";
 
@@ -130,6 +135,11 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         this.createResourceLoader(this._internaleResourceLoaderName, resources);
     }
 
+    /**
+     * 创建资源加载器
+     * @param name 资源加载器名称
+     * @param bundle 资源加载器
+     */
     private createResourceLoader(name: string, bundle: IResourceLoaderHelp): void {
         let resourceLoader = this._resourceLoaders.get(name);
         if (resourceLoader) {
@@ -139,6 +149,11 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         this._resourceLoaders.set(name, resourceLoader);
     }
 
+    /**
+     * 获取资源加载器名称
+     * @param bundleNameOrUrl 资源加载器名称或者url
+     * @returns
+     */
     private getBundleName(bundleNameOrUrl: string): string {
         if (bundleNameOrUrl.startsWith("http")) {
             return bundleNameOrUrl.substring(bundleNameOrUrl.lastIndexOf("/") + 1);
@@ -146,6 +161,11 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         return bundleNameOrUrl;
     }
 
+    /**
+     * 根据路径获取资源加载器名称
+     * @param path 路径
+     * @returns 获取的资源加载器名称和新的路径
+     */
     private internalGetBundleName(path: string): { bundleName: string; path: string } | null {
         if (!path) {
             throw new GameFrameworkError("path is invalid");
@@ -161,6 +181,11 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         return null;
     }
 
+    /**
+     * 根据路径获取资源加载器
+     * @param path 路径
+     * @returns 资源加载器和新的路径
+     */
     private internalGetBundle(path: string): { resourceLoader: IResourceLoader; path: string } {
         let bundleInfo = this.internalGetBundleName(path);
         let bundleName = this._internaleResourceLoaderName;

@@ -115,7 +115,7 @@ export class GameEventSystem extends SystemBase {
             for (let layer in appearInfo.layer) {
                 let layerInfo = appearInfo.layer[layer];
                 for (let i = 0; i < layerInfo.length; i++) {
-                    this.map.scheduleOnce(() => {
+                    this.scheduleOnce(() => {
                         this.collisionSystem.appear(layer, layerInfo[i][0], layerInfo[i][1]);
                     }, appearInfo.delay[i]);
                 }

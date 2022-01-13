@@ -20,10 +20,10 @@ import { MonsterFightSystem } from "./MonsterFightSystem";
 import { MoveSystem } from "./MoveSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
 
-const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
-    npc: AstarMoveType.MONSTER,
-    monster: AstarMoveType.MONSTER,
-};
+// const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
+//     npc: AstarMoveType.MONSTER,
+//     monster: AstarMoveType.MONSTER,
+// };
 
 /** 在楼梯旁的index差值 */
 const INDEX_DIFFS: Readonly<number[]> = [1, 11];

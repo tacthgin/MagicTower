@@ -89,7 +89,7 @@ export class LevelManager extends Component {
             mapNode.position = v3(0, 0, 0);
             mapNode.parent = this.layer;
             let gameMap = mapNode.getComponent(GameMap)!;
-            gameMap.init(GameApp.ResourceManager.internalResourceLoader.getAsset(`TiledMap/${level}`, TiledMapAsset));
+            gameMap.init(GameApp.ResourceManager.getAsset(`TiledMap/${level}`, TiledMapAsset));
             this.maps[level] = gameMap;
 
             let levelData = this.mapModel.getLevelData(level);
