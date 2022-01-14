@@ -168,7 +168,7 @@ export class MapCollisionSystem extends SystemBase {
                     path.pop();
                 }
                 this.hero.autoMove(path, canEndMove, endTile, (tile: Vec2) => {
-                    return this.collisionSystem.collision(tile);
+                    return this.collision(tile);
                 });
             } else {
                 //GameManager.UI.showToast("无效路径");

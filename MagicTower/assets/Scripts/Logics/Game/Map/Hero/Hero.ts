@@ -127,7 +127,7 @@ export class Hero extends Component {
      * 人物朝向
      * @param info info为vec2，人物朝向的点，info为nubmer直接传入方向
      */
-    toward(info: Vec2 | number) {
+    toward(info: IVec2 | number) {
         if (typeof info == "number") {
             this.heroDirection = info;
         } else {
@@ -150,7 +150,7 @@ export class Hero extends Component {
      * @param endTile 终点tile
      * @param collisionFunc 与其他元素碰撞交互函数
      */
-    autoMove(path: IVec2[], canEndMove: boolean, endTile: Vec2, collisionFunc: Function) {
+    autoMove(path: IVec2[], canEndMove: boolean, endTile: IVec2, collisionFunc: Function) {
         let moveComplete = () => {
             if (!canEndMove) {
                 this.toward(endTile);
