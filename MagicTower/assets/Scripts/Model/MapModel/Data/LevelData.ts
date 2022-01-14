@@ -135,4 +135,8 @@ export class LevelData extends LoadBase {
             this.setDisappear(layerName, index);
         }
     }
+
+    getWizardMagicDamage(index: number): number {
+        return 0;
+    }
 }

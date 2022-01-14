@@ -8,6 +8,9 @@ import { MapSwitchLevelEventArgs } from "./MapModelEventArgs";
 
 @ModelContainer.registerModel("MapModel")
 export class MapModel extends ModelBase {
+    private readonly MIN_LEVEL: number = 0;
+    private readonly MAX_LEVEL: number = 50;
+
     protected data: any = {
         currentLevel: 1,
         maps: {},
@@ -23,9 +26,15 @@ export class MapModel extends ModelBase {
         return this.data.currentLevel;
     }
 
-    setLevelDiff(diff: number) {
+    canSwitchLevel(diff: number, useFeather: boolean = false): boolean {
+        let minLevel = useFeather ? this.MIN_LEVEL : 1;
+        let level = this.level + diff;
+        return level >= minLevel && level <= this.MAX_LEVEL;
+    }
+
+    setLevelDiff(diff: number): void {
         let newLevel = this.data.currentLevel + diff;
-        if (newLevel > 50 || newLevel < 0) {
+        if (newLevel > this.MAX_LEVEL || newLevel < this.MIN_LEVEL) {
             GameFrameworkLog.error(`level${newLevel}不合法`);
             return;
         }

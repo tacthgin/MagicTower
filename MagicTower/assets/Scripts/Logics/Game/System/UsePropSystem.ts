@@ -1,13 +1,18 @@
+import { v2 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropInfo, PropType } from "../../../Model/HeroModel/Prop";
+import { Door } from "../../../Model/MapModel/Data/Elements/Door";
+import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { IGameMap } from "../Map/GameMap/IGameMap";
+import { Hero } from "../Map/Hero/Hero";
 import { MapCollisionSystem } from "./MapCollisionSystem";
 
 /** 在楼梯旁的index差值 */
@@ -22,6 +27,7 @@ export class UsePropSystem extends SystemBase {
     private mapModel: MapModel = null!;
     private levelData: LevelData = null!;
     private gameMap: IGameMap = null!;
+    private hero: Hero = null!;
     private mapCollisionSystem: MapCollisionSystem = null!;
 
     initliaze(gameMap: IGameMap) {
@@ -46,7 +52,7 @@ export class UsePropSystem extends SystemBase {
             case PropType.FLYING_WAND:
                 {
                     if (this.isHeroNextToStair()) {
-                        if (this.switchLevelTip(extraInfo)) {
+                        if (this.switchLevelTip(extraInfo == "up" ? 1 : -1)) {
                             return;
                         }
                         let stairType = extraInfo == "up" ? StairType.UP : StairType.Down;
@@ -82,40 +88,37 @@ export class UsePropSystem extends SystemBase {
                 break;
             case PropType.BOMB:
                 {
-                    // if (currentMap.bomb()) {
-                    //     this.consumptionProp(propInfo);
-                    // }
+                    if (this.bomb()) {
+                        this.consumptionProp(propInfo);
+                    }
                 }
                 break;
             case PropType.MAGIC_KEY:
                 {
-                    // if (currentMap.removeYellowDoors()) {
-                    //     this.consumptionProp(propInfo);
-                    // }
+                    if (this.removeYellowDoors()) {
+                        this.consumptionProp(propInfo);
+                    }
                 }
                 break;
             case PropType.HOLY_WATER:
                 {
-                    // this.heroModel.Hp += this.heroModel.Attack + this.heroModel.Defence;
-                    // this.consumptionProp(propInfo);
+                    this.heroModel.setAttrDiff(HeroAttr.HP, this.heroModel.getAttr(HeroAttr.ATTACK) + this.heroModel.getAttr(HeroAttr.DEFENCE));
+                    this.consumptionProp(propInfo);
                 }
                 break;
             case PropType.FEATHER:
                 {
-                    // if (this.switchLevelTip(propInfo.value == 1 ? "up" : "down")) {
-                    //     return;
-                    // }
-                    // this.level = this.level + propInfo.value;
-                    // this.switchLevelHero(propInfo.value == 1 ? "down" : "up");
-                    // this.consumptionProp(propInfo);
+                    if (this.switchLevelTip(propInfo.value, true)) {
+                        return;
+                    }
+                    this.mapModel.setLevelDiff(propInfo.value);
                 }
                 break;
             case PropType.CENTER_FEATHER:
                 {
-                    //中心对称飞行棋
-                    // if (currentMap.centrosymmetricFly()) {
-                    //     this.consumptionProp(propInfo);
-                    // }
+                    if (this.centrosymmetricFly()) {
+                        this.consumptionProp(propInfo);
+                    }
                 }
                 break;
         }
@@ -135,14 +138,9 @@ export class UsePropSystem extends SystemBase {
         return false;
     }
 
-    private switchLevelTip(swtichType: string) {
-        let tip = null;
-        if (swtichType == "down" && this.mapModel.level == 1) {
-            tip = "你已经到最下面一层了";
-        } else if (swtichType == "up" && this.mapModel.level == 50) {
-            tip = "你已经到最上面一层了";
-        }
-        if (tip) {
+    private switchLevelTip(diff: number, useFeather: boolean = false) {
+        let tip = diff == -1 ? "你已经到最下面一层了" : "你已经到最上面一层了";
+        if (this.mapModel.canSwitchLevel(diff, useFeather)) {
             //GameManager.UI.showToast(tip);
             return true;
         }
@@ -199,41 +197,50 @@ export class UsePropSystem extends SystemBase {
     }
 
     /**
-     * 炸药
+     * 炸药，炸死怪物
+     * @returns 是否移除成功
      */
-    private bomb() {
-        //let heroIndex = this.tileToIndex(this.heroModel.Position);
-        //let remove = false;
-        //HERO_FACE_DIRECTION.forEach((diff) => {
-        //let index = heroIndex + diff;
-        //let element = this.getElement(index, "monster");
-        //if (element && !element.isBoss()) {
-        //this.removeElement(index, "monster");
-        //remove = true;
-        //}
-        //});
-        //return remove;
+    private bomb(): boolean {
+        let heroIndex = this.gameMap.getTileIndex(this.heroModel.getPosition());
+        let isRemove = false;
+        HERO_FACE_DIRECTION.forEach((diff) => {
+            let index = heroIndex + diff;
+            let element: Monster = this.levelData.getLayerElement("monster", index);
+            if (element && !element.boss) {
+                this.mapCollisionSystem.disappear("monster", index);
+                isRemove = true;
+            }
+        });
+        return isRemove;
     }
 
-    private removeYellowDoors() {
-        //let doorLayer = this.layers["door"];
-        //let remove = false;
-        //for (let index in doorLayer) {
-        //if (doorLayer[index].isYellow()) {
-        //this.removeElement(index, "door");
-        //remove = true;
-        //}
-        //}
-        //return remove;
+    /**
+     * 移除整个地图所有的黄色门
+     * @returns 是否移除成功
+     */
+    private removeYellowDoors(): boolean {
+        let isRemove = false;
+        this.gameMap.forEachLayer("door", (gid, index) => {
+            let door: Door = this.levelData.getLayerElement("door", index);
+            if (door && Door.isYellow(door.id)) {
+                this.mapCollisionSystem.disappear("door", index);
+                isRemove = true;
+            }
+        });
+        return isRemove;
     }
 
-    private centrosymmetricFly() {
-        //let tile = this.heroModel.Position;
-        //let newTile = cc.v2(this.mapData.column - tile.x - 1, this.mapData.row - tile.y - 1);
-        //if (this.getElement(this.tileToIndex(newTile)) == null) {
-        //this.hero.location(newTile);
-        //return true;
-        //}
-        //return false;
+    /**
+     * 中心对称飞行
+     * @returns 是否飞行成功
+     */
+    private centrosymmetricFly(): boolean {
+        let tile = this.heroModel.getPosition();
+        let newTile = v2(this.gameMap.width - tile.x - 1, this.gameMap.height - tile.y - 1);
+        if (this.gameMap.getTileInfo(newTile) == null) {
+            this.hero.location(newTile);
+            return true;
+        }
+        return false;
     }
 }

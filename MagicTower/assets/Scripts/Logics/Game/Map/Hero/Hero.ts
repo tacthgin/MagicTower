@@ -4,6 +4,8 @@ import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec
 import { IFsm } from "../../../../../GameFramework/Scripts/Fsm/IFsm";
 import { HeroAttr } from "../../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../../Model/HeroModel/HeroModel";
+import { CommonEventArgs } from "../../../Event/CommonEventArgs";
+import { GameEvent } from "../../../Event/GameEvent";
 import { Lightning } from "../../Elements/Lightning";
 import { ElementFactory } from "../ElementFactory";
 import { IGameMap } from "../GameMap/IGameMap";
@@ -26,24 +28,11 @@ export class Hero extends Component {
     private _heroModel: HeroModel = null!;
     private heroFSM: IFsm<Hero> = null!;
     private map: IGameMap = null!;
-    private isHeroMoving: boolean = false;
     private _heroTile: Vec2 = null!;
     private heroDirection: number = 0;
 
     constructor() {
         super();
-    }
-
-    get heroModel() {
-        return this._heroModel;
-    }
-
-    set heroMoving(value: boolean) {
-        this.isHeroMoving = value;
-    }
-
-    get heroMoving() {
-        return this.isHeroMoving;
     }
 
     get heroTile() {
@@ -59,7 +48,7 @@ export class Hero extends Component {
 
     onFinished() {
         this.setDirectionTexture();
-        this.heroMoving = true;
+        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
     }
 
     start() {
@@ -246,14 +235,6 @@ export class Hero extends Component {
     showAttack(active: boolean) {
         this.attackIcon.active = active;
         this.heroNode.active = !active;
-    }
-
-    hurt(damage: number) {
-        let hp = this._heroModel.getAttr(HeroAttr.HP) - damage;
-        if (hp < 0) {
-            hp = 0;
-        }
-        this._heroModel.setAttrDiff(HeroAttr.HP, hp);
     }
 
     magicLight(monsterIndexs: number[]) {

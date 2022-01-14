@@ -29,7 +29,7 @@ export class GameMap extends TiledMap implements IGameMap {
     }
 
     start() {
-        this.openTileAnimation(["obstacle", "monster", "npc"]);
+        this.openTileAnimation(["obstacle", "monster", "npc", "lava"]);
     }
 
     init(tiledMapAsset: TiledMapAsset | null) {

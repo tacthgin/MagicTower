@@ -7,6 +7,7 @@ import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/Gam
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { PropType } from "../../../Model/HeroModel/Prop";
 import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
@@ -15,18 +16,15 @@ import { MapModel } from "../../../Model/MapModel/MapModel";
 import { ShopModel } from "../../../Model/ShopModel/ShopModel";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
+import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
 import { IGameMap } from "../Map/GameMap/IGameMap";
+import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 import { GameEventSystem } from "./GameEventSystem";
 import { MonsterFightSystem } from "./MonsterFightSystem";
-import { MoveSystem } from "./MoveSystem";
+import { AstarMoveType, MoveSystem } from "./MoveSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
 import { UsePropSystem } from "./UsePropSystem";
-
-// const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
-//     npc: AstarMoveType.MONSTER,
-//     monster: AstarMoveType.MONSTER,
-// };
 
 /** 地块4个方向 */
 const DIRECTION_INDEX_DIFFS: Readonly<{ [key: string]: Vec2 }> = {
@@ -39,11 +37,11 @@ const DIRECTION_INDEX_DIFFS: Readonly<{ [key: string]: Vec2 }> = {
 @CommandManager.register("MapCollisionSystem")
 export class MapCollisionSystem extends SystemBase {
     private gameMap: IGameMap = null!;
+    private hero: Hero = null!;
     private heroModel: HeroModel = null!;
     private mapModel: MapModel = null!;
     private levelData: LevelData = null!;
 
-    private canEndMoveTiles: Readonly<string[]> = ["prop", "stair"];
     private monsterFightSystem: MonsterFightSystem = null!;
     private npcInteractiveSystem: NpcInteractiveSystem = null!;
     private gameEventSystem: GameEventSystem = null!;
@@ -51,6 +49,7 @@ export class MapCollisionSystem extends SystemBase {
     private usePropSystem: UsePropSystem = null!;
     private levelEvent: any = {};
     private dialogPos: Vec3 = null!;
+    private canHeroMoving: boolean = true;
 
     constructor() {
         super();
@@ -65,15 +64,16 @@ export class MapCollisionSystem extends SystemBase {
         this.mapModel = GameApp.getModel(MapModel);
     }
 
-    initliaze(gameMap: IGameMap) {
+    initliaze(gameMap: IGameMap, hero: Hero) {
         this.gameMap = gameMap;
+        this.hero = hero;
         this.levelData = this.mapModel.getCurrentLevelData();
     }
 
     private registerEvent() {
         let eventManager = GameApp.EventManager;
         eventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
-        eventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
+        eventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
         eventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
     }
 
@@ -108,6 +108,14 @@ export class MapCollisionSystem extends SystemBase {
         // } else {
         //     this.elementActionComplete();
         // }
+    }
+
+    private onCollisionComplete() {
+        this.canHeroMoving = true;
+    }
+
+    private onUseProp(sender: object, eventArgs: UsePropEventArgs) {
+        this.usePropSystem.useProp(eventArgs.propInfo, eventArgs.extraInfo);
     }
 
     private getTileOrIndex(tileOrIndex: IVec2 | number) {
@@ -146,6 +154,26 @@ export class MapCollisionSystem extends SystemBase {
             this.gameMap.setTileGIDAt(layerName, tile, 0);
         }
         record && this.levelData.setDisappear(layerName, index);
+    }
+
+    moveHero(position: IVec2) {
+        if (!this.canHeroMoving) {
+            let localPos = (this.gameMap as any).node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(position.x, position.y));
+            let endTile = this.gameMap.toTile(v2(localPos?.x, localPos?.y));
+            this.moveSystem.setAstarMoveType(AstarMoveType.HERO);
+            let path = this.moveSystem.getPath(this.hero.heroTile, endTile);
+            if (path) {
+                let canEndMove = this.moveSystem.canEndTileMove(endTile);
+                if (!canEndMove) {
+                    path.pop();
+                }
+                this.hero.autoMove(path, canEndMove, endTile, (tile: Vec2) => {
+                    return this.collisionSystem.collision(tile);
+                });
+            } else {
+                //GameManager.UI.showToast("无效路径");
+            }
+        }
     }
 
     async move(layerName: string, src: number, dst: number, speed: number, delay: number) {
@@ -523,25 +551,6 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     /**
-     * 是否终点tile可以移动
-     * @param tile tile坐标
-     */
-    canEndTileMove(tile: Vec2) {
-        let { layerName, spriteName } = this.gameMap.getTileInfo(tile);
-        switch (layerName) {
-            case "floor":
-                if (this.levelData.level >= 40) {
-                    return this.heroModel.getAttr(HeroAttr.HP) > this.getWizardMagicDamage(this.gameMap.getTileIndex(tile));
-                }
-                return true;
-            case "monster":
-                let jsonData = this.getJsonData(layerName, spriteName);
-                return CalculateSystem.canHeroAttack(this.heroModel, jsonData, !jsonData.firstAttack);
-        }
-        return this.canEndMoveTiles.includes(layerName!);
-    }
-
-    /**
      * 地图上转移元素
      * @param srcIndex 原始位置
      * @param dstIndex 目标位置
@@ -650,7 +659,7 @@ export class MapCollisionSystem extends SystemBase {
         //}
     }
 
-    private changePathCoord(path: Vec2[]) {
+    private changePathCoord(path: IVec2[]) {
         for (let i = 0; i < path.length; i++) {
             path[i] = this.gameMap.getPositionAt(path[i])!;
         }
@@ -807,26 +816,6 @@ export class MapCollisionSystem extends SystemBase {
         //return parseInt(l.id) - parseInt(r.id);
         //});
     }
-
-    
-    
-    
-
-    // getSwitchLevel(stair: Stair) {
-    //     let symbol = stair.stairType == "up" ? 1 : -1;
-    //     return this.level + symbol * stair.levelDiff;
-    // }
-    // switchLevelHero(stairType: string) {
-    //     if (this.showMap()) {
-    //         let standIndex = currentMap.getStair(stairType).standIndex;
-    //         this.showHero(currentMap.indexToTile(standIndex));
-    //     }
-    // }
-    // private switchLevel(stair: Stair) {
-    //     this.level = this.getSwitchLevel(stair);
-    //     //上了楼，勇士站在下楼梯的旁边
-    //     this.switchLevelHero(stair.stairType == "up" ? "down" : "up");
-    // }
 
     clear(): void {
         GameApp.EventManager.unsubscribeTarget(this);

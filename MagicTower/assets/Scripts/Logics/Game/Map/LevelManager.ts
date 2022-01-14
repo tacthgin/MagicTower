@@ -1,4 +1,4 @@
-import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, UITransform, v2, v3, Vec2, _decorator } from "cc";
+import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, v3, Vec2, _decorator } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
@@ -8,7 +8,6 @@ import { MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventAr
 import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
 import { MapCollisionSystem } from "../System/MapCollisionSystem";
-import { MoveSystem } from "../System/MoveSystem";
 import { GameMap } from "./GameMap/GameMap";
 import { Hero } from "./Hero/Hero";
 
@@ -33,27 +32,27 @@ export class LevelManager extends Component {
     private mapModel: MapModel = null!;
     /** 触摸id */
     private touchId: number | null = null;
+    /** 地图主逻辑系统 */
     private collisionSystem: MapCollisionSystem = null!;
-    private moveSystem: MoveSystem = null!;
 
     onLoad() {
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
 
-        this.mapModel = GameApp.getModel(MapModel)!;
+        this.mapModel = GameApp.getModel(MapModel);
         this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onSwitchLevel, this);
 
         let eventManager = GameApp.EventManager;
         eventManager.subscribe(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
 
         this.collisionSystem = GameApp.CommandManager.createSystem(MapCollisionSystem);
-        this.moveSystem = GameApp.CommandManager.createSystem(MoveSystem);
     }
 
     onDestroy() {
         this.mapModel.unsubscribeTarget(this);
         GameApp.EventManager.unsubscribeTarget(this);
+        GameApp.CommandManager.destroySystem(this.collisionSystem);
     }
 
     start() {
@@ -134,6 +133,7 @@ export class LevelManager extends Component {
         let map = this.maps[this.mapModel.level];
         this.hero.node.parent = map.node;
         this.hero.init(map, tile);
+        this.collisionSystem.initliaze(map, this.hero);
     }
 
     private moveHero(touchPos: Vec2) {
@@ -142,27 +142,6 @@ export class LevelManager extends Component {
             GameFrameworkLog.error("当前移动没有地图");
             return;
         }
-        if (!this.hero.heroMoving) {
-            let localPos = currentMap.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(touchPos.x, touchPos.y));
-            let endTile = currentMap.toTile(v2(localPos?.x, localPos?.y));
-            let path = this.moveSystem.getPath(this.hero.heroTile, endTile);
-
-            if (path) {
-                let canEndMove = this.collisionSystem.canEndTileMove(endTile);
-                if (!canEndMove) {
-                    path.pop();
-                }
-                this.hero.autoMove(path, canEndMove, endTile, (tile: Vec2) => {
-                    return this.collisionSystem.collision(tile);
-                });
-            } else {
-                //GameManager.UI.showToast("无效路径");
-            }
-        }
-    }
-
-    /** 碰撞结束 */
-    private collisionComplete() {
-        this.hero.heroMoving = false;
+        this.collisionSystem.moveHero(touchPos);
     }
 }
