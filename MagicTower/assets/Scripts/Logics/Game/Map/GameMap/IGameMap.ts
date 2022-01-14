@@ -90,4 +90,13 @@ export interface IGameMap extends IAstarMap {
      * @returns 资源名字
      */
     getNameByGid(gid: number): string | null;
+
+    /**
+     * 遍历层的元素
+     * @param layerName 层名
+     * @param callbackfn 回调函数 gid为tile的gid值，index为tile的索引值
+     * @param thisArg this参数
+     * @rerturns 是否遍历成功
+     */
+    forEachLayer(layerName: string, callbackfn: (gid: number, index: number) => void, thisArg?: any): boolean;
 }

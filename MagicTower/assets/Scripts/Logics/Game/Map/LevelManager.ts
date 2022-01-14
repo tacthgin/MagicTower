@@ -7,7 +7,6 @@ import { MapModel } from "../../../Model/MapModel/MapModel";
 import { MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
-import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
 import { MapCollisionSystem } from "../System/MapCollisionSystem";
 import { MoveSystem } from "../System/MoveSystem";
 import { GameMap } from "./GameMap/GameMap";
@@ -46,9 +45,7 @@ export class LevelManager extends Component {
         this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onSwitchLevel, this);
 
         let eventManager = GameApp.EventManager;
-        eventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
         eventManager.subscribe(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
-        eventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
 
         this.collisionSystem = GameApp.CommandManager.createSystem(MapCollisionSystem);
         this.moveSystem = GameApp.CommandManager.createSystem(MoveSystem);
@@ -119,10 +116,6 @@ export class LevelManager extends Component {
         newMap.node.active = true;
         let levelData = this.mapModel.getCurrentLevelData();
         this.showHero(newMap.getTile(levelData.getStair(eventArgs.stairType)!.standLocation));
-    }
-
-    private onUseProp(sender: object, eventArgs: UsePropEventArgs) {
-        this.collisionSystem.useProp(eventArgs.propInfo, eventArgs.extraInfo);
     }
 
     private onSceneAppear(sender: object, eventArgs: SceneAppearEventArgs) {

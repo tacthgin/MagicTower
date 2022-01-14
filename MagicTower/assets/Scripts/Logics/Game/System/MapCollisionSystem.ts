@@ -7,7 +7,6 @@ import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/Gam
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
-import { PropType } from "../../../Model/HeroModel/PropType";
 import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
@@ -18,17 +17,16 @@ import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { CalculateSystem } from "./CalculateSystem";
+import { GameEventSystem } from "./GameEventSystem";
 import { MonsterFightSystem } from "./MonsterFightSystem";
 import { MoveSystem } from "./MoveSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
+import { UsePropSystem } from "./UsePropSystem";
 
 // const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
 //     npc: AstarMoveType.MONSTER,
 //     monster: AstarMoveType.MONSTER,
 // };
-
-/** 在楼梯旁的index差值 */
-const INDEX_DIFFS: Readonly<number[]> = [1, 11];
 
 /** 地块4个方向 */
 const DIRECTION_INDEX_DIFFS: Readonly<{ [key: string]: Vec2 }> = {
@@ -37,9 +35,6 @@ const DIRECTION_INDEX_DIFFS: Readonly<{ [key: string]: Vec2 }> = {
     "-11": v2(0, -1),
     "11": v2(0, 1),
 };
-
-/** 英雄面朝方向上，右，下，左 */
-let HERO_FACE_DIRECTION: Readonly<number[]> = [-11, 1, 11, -1];
 
 @CommandManager.register("MapCollisionSystem")
 export class MapCollisionSystem extends SystemBase {
@@ -53,6 +48,7 @@ export class MapCollisionSystem extends SystemBase {
     private npcInteractiveSystem: NpcInteractiveSystem = null!;
     private gameEventSystem: GameEventSystem = null!;
     private moveSystem: MoveSystem = null!;
+    private usePropSystem: UsePropSystem = null!;
     private levelEvent: any = {};
     private dialogPos: Vec3 = null!;
 
@@ -63,6 +59,7 @@ export class MapCollisionSystem extends SystemBase {
         this.npcInteractiveSystem = GameApp.CommandManager.createSystem(NpcInteractiveSystem);
         this.gameEventSystem = GameApp.CommandManager.createSystem(GameEventSystem);
         this.moveSystem = GameApp.CommandManager.createSystem(MoveSystem);
+        this.usePropSystem = GameApp.CommandManager.createSystem(UsePropSystem);
 
         this.heroModel = GameApp.getModel(HeroModel);
         this.mapModel = GameApp.getModel(MapModel);
@@ -74,7 +71,10 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private registerEvent() {
-        GameApp.EventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
+        let eventManager = GameApp.EventManager;
+        eventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
+        eventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.collisionComplete, this);
+        eventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
     }
 
     private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
@@ -541,20 +541,6 @@ export class MapCollisionSystem extends SystemBase {
         return this.canEndMoveTiles.includes(layerName!);
     }
 
-    /** 勇士在楼梯旁边 */
-    isHeroNextToStair() {
-        let stairs: Stair[] = this.levelData.getLayerInfo("stairs");
-        if (stairs) {
-            stairs.forEach((stair) => {
-                let diff = Math.abs(stair.index - this.gameMap.getTileIndex(this.heroModel.getPosition()));
-                if (INDEX_DIFFS.indexOf(diff) != -1) {
-                    return true;
-                }
-            });
-        }
-        return false;
-    }
-
     /**
      * 地图上转移元素
      * @param srcIndex 原始位置
@@ -822,71 +808,9 @@ export class MapCollisionSystem extends SystemBase {
         //});
     }
 
-    removeHeroFaceWall() {
-        //let HeroModel = this.heroModel;
-        //let direction = HeroModel.Direction;
-        //let index = this.tileToIndex(HeroModel.Position) + HERO_FACE_DIRECTION[direction];
-        //let element = this.getElement(index, "wall");
-        //if (element && element.isWall()) {
-        //this.removeElement(index, "wall");
-        //return true;
-        //}
-        //return false;
-    }
-    removeAllWalls() {
-        //let wallLayer = this.layers["wall"];
-        //let length = Object.keys(wallLayer).length;
-        //for (let index in wallLayer) {
-        //if (wallLayer[index].isWall()) {
-        //this.removeElement(index, "wall");
-        //}
-        //}
-        //return length > 0;
-    }
-    removeLava() {
-        //let heroIndex = this.tileToIndex(this.heroModel.Position);
-        //HERO_FACE_DIRECTION.forEach((diff) => {
-        //let index = heroIndex + diff;
-        //let element = this.getElement(index, "wall");
-        //if (element && element.isLava()) {
-        //this.removeElement(index, "wall");
-        //}
-        //});
-    }
-
-    bomb() {
-        //let heroIndex = this.tileToIndex(this.heroModel.Position);
-        //let remove = false;
-        //HERO_FACE_DIRECTION.forEach((diff) => {
-        //let index = heroIndex + diff;
-        //let element = this.getElement(index, "monster");
-        //if (element && !element.isBoss()) {
-        //this.removeElement(index, "monster");
-        //remove = true;
-        //}
-        //});
-        //return remove;
-    }
-    removeYellowDoors() {
-        //let doorLayer = this.layers["door"];
-        //let remove = false;
-        //for (let index in doorLayer) {
-        //if (doorLayer[index].isYellow()) {
-        //this.removeElement(index, "door");
-        //remove = true;
-        //}
-        //}
-        //return remove;
-    }
-    centrosymmetricFly() {
-        //let tile = this.heroModel.Position;
-        //let newTile = cc.v2(this.mapData.column - tile.x - 1, this.mapData.row - tile.y - 1);
-        //if (this.getElement(this.tileToIndex(newTile)) == null) {
-        //this.hero.location(newTile);
-        //return true;
-        //}
-        //return false;
-    }
+    
+    
+    
 
     // getSwitchLevel(stair: Stair) {
     //     let symbol = stair.stairType == "up" ? 1 : -1;
@@ -902,111 +826,6 @@ export class MapCollisionSystem extends SystemBase {
     //     this.level = this.getSwitchLevel(stair);
     //     //上了楼，勇士站在下楼梯的旁边
     //     this.switchLevelHero(stair.stairType == "up" ? "down" : "up");
-    // }
-
-    // switchLevelTip(swtichType: string) {
-    //     let tip = null;
-    //     if (swtichType == "down" && this.level == 1) {
-    //         tip = "你已经到最下面一层了";
-    //     } else if (swtichType == "up" && this.level == 50) {
-    //         tip = "你已经到最上面一层了";
-    //     }
-    //     if (tip) {
-    //         GameManager.UI.showToast(tip);
-    //         return true;
-    //     }
-    //     return false;
-    // }
-
-    useProp(propInfo: any, extraInfo: any) {
-        switch (propInfo.type) {
-            case 7:
-                //currentMap.showDialog("MonsterHandBook", currentMap.getMonsters());
-                break;
-            case 8:
-                //currentMap.showDialog("RecordBook");
-                break;
-            case PropType.FLYING_WAND:
-                {
-                    //飞行魔杖
-                    // if (this.isHeroNextToStair()) {
-                    //     if (this.switchLevelTip(extraInfo)) {
-                    //         return;
-                    //     }
-                    //     let stair = currentMap.getStair(extraInfo);
-                    //     if (this.maps[this.getSwitchLevel(stair)]) {
-                    //         this.switchLevel(stair);
-                    //     }
-                    // } else {
-                    //     GameManager.UI.showToast("在楼梯旁边才可以使用");
-                    // }
-                }
-                break;
-            case 10:
-                {
-                    // if (currentMap.removeHeroFaceWall()) {
-                    //     this.consumptionProp(propInfo);
-                    // }
-                }
-                break;
-            case 11:
-                {
-                    // if (currentMap.removeAllWalls()) {
-                    //     this.consumptionProp(propInfo);
-                    // }
-                }
-                break;
-            case 12:
-                {
-                    // currentMap.removeLava();
-                }
-                break;
-            case 13:
-                {
-                    // if (currentMap.bomb()) {
-                    //     this.consumptionProp(propInfo);
-                    // }
-                }
-                break;
-            case 14:
-                {
-                    // if (currentMap.removeYellowDoors()) {
-                    //     this.consumptionProp(propInfo);
-                    // }
-                }
-                break;
-            case 15:
-                {
-                    // this.heroModel.Hp += this.heroModel.Attack + this.heroModel.Defence;
-                    // this.consumptionProp(propInfo);
-                }
-                break;
-            case 18:
-                {
-                    // if (this.switchLevelTip(propInfo.value == 1 ? "up" : "down")) {
-                    //     return;
-                    // }
-                    // this.level = this.level + propInfo.value;
-                    // this.switchLevelHero(propInfo.value == 1 ? "down" : "up");
-                    // this.consumptionProp(propInfo);
-                }
-                break;
-            case 19:
-                {
-                    //中心对称飞行棋
-                    // if (currentMap.centrosymmetricFly()) {
-                    //     this.consumptionProp(propInfo);
-                    // }
-                }
-                break;
-        }
-    }
-
-    // consumptionProp(propInfo: any) {
-    //     if (!propInfo.permanent) {
-    //         this.heroModel.addProp(propInfo.id, -1);
-    //         NotifyCenter.emit(GameEvent.REFRESH_PROP, propInfo, -1);
-    //     }
     // }
 
     clear(): void {

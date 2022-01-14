@@ -7,7 +7,7 @@ import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroEvent } from "../../../Model/HeroModel/HeroEvent";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { HeroAttrEventArgs, HeroPropEventArgs } from "../../../Model/HeroModel/HeroModelEventArgs";
-import { PropType } from "../../../Model/HeroModel/PropType";
+import { PropType } from "../../../Model/HeroModel/Prop";
 import { MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";

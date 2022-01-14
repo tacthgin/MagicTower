@@ -158,6 +158,55 @@ export class GameMap extends TiledMap implements IGameMap {
         return this.gidToSpriteNameMap[gid] || null;
     }
 
+    /** 开启tile动画 */
+    openTileAnimation(layerNames: string[]) {
+        this.animationTiles = this.getAnimationTiles(layerNames);
+        if (this.canOpenTileAnimation()) {
+            this.schedule(this.tilesAnimationTimer, MAP_ANIMATION_INTERVAL);
+        }
+    }
+
+    loadLevelData(levelData: LevelData) {
+        for (let layerName in levelData.appearTile) {
+            let appearInfo = levelData.appearTile[layerName];
+            for (let index in appearInfo) {
+                this.setTileGIDAt(layerName, this.getTile(parseInt(index)), appearInfo[index]);
+            }
+        }
+
+        for (let layerName in levelData.disappearTile) {
+            let disappearInfo: number[] = levelData.disappearTile[layerName];
+            disappearInfo.forEach((index) => {
+                this.setTileGIDAt(layerName, this.getTile(index), 0);
+            });
+        }
+    }
+
+    check(position: IVec2): boolean {
+        if (!this.checkDelegate) {
+            throw new GameFrameworkError("check delegate is invalid");
+        }
+        return this.checkDelegate(position);
+    }
+
+    setCheckDelegate(callbackfn: CheckType) {
+        this.checkDelegate = callbackfn;
+    }
+
+    forEachLayer(layerName: string, callbackfn: (gid: number, index: number) => void, thisArg?: any) {
+        let tiles = this.getLayersTiles(layerName);
+        if (tiles) {
+            tiles.forEach((value: number, index: number) => {
+                if (value != 0) {
+                    callbackfn.call(thisArg, value, index);
+                }
+            });
+            return true;
+        }
+
+        return false;
+    }
+
     private updateAnimationTiles(layerName: string, tile: IVec2, gid: number) {
         let animationTiles = this.animationTiles[layerName];
 
@@ -211,14 +260,6 @@ export class GameMap extends TiledMap implements IGameMap {
         return false;
     }
 
-    /** 开启tile动画 */
-    openTileAnimation(layerNames: string[]) {
-        this.animationTiles = this.getAnimationTiles(layerNames);
-        if (this.canOpenTileAnimation()) {
-            this.schedule(this.tilesAnimationTimer, MAP_ANIMATION_INTERVAL);
-        }
-    }
-
     private tilesAnimationTimer(dt: number) {
         this.animationCount = 1 - this.animationCount;
         let gidDiff = this.animationCount == 1 ? 1 : -1;
@@ -233,32 +274,5 @@ export class GameMap extends TiledMap implements IGameMap {
                 layer?.markForUpdateRenderData(true);
             }
         }
-    }
-
-    loadLevelData(levelData: LevelData) {
-        for (let layerName in levelData.appearTile) {
-            let appearInfo = levelData.appearTile[layerName];
-            for (let index in appearInfo) {
-                this.setTileGIDAt(layerName, this.getTile(parseInt(index)), appearInfo[index]);
-            }
-        }
-
-        for (let layerName in levelData.disappearTile) {
-            let disappearInfo: number[] = levelData.disappearTile[layerName];
-            disappearInfo.forEach((index) => {
-                this.setTileGIDAt(layerName, this.getTile(index), 0);
-            });
-        }
-    }
-
-    check(position: IVec2): boolean {
-        if (!this.checkDelegate) {
-            throw new GameFrameworkError("check delegate is invalid");
-        }
-        return this.checkDelegate(position);
-    }
-
-    setCheckDelegate(callbackfn: CheckType) {
-        this.checkDelegate = callbackfn;
     }
 }

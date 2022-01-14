@@ -6,8 +6,7 @@ import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "./HeroAttr";
 import { HeroEvent } from "./HeroEvent";
 import { HeroAttrEventArgs, HeroPropEventArgs } from "./HeroModelEventArgs";
-import { PropId } from "./PropId";
-import { PropType } from "./PropType";
+import { PropId, PropType } from "./Prop";
 
 type TalkInfo = {
     npcID: number;

@@ -5,7 +5,7 @@ import { GameEvent } from "./GameEvent";
 
 export class SceneAppearEventArgs extends GameEventArgs {
     private _level: number = 0;
-    private _tile: IVec2 | null = null;
+    private _tile: IVec2 = null!;
 
     get id(): number {
         return GameEvent.SCENE_APPEAR;
@@ -16,7 +16,7 @@ export class SceneAppearEventArgs extends GameEventArgs {
     }
 
     get tile(): IVec2 {
-        return this._tile!;
+        return this._tile;
     }
 
     static create(level: number, tile: IVec2): SceneAppearEventArgs {
@@ -28,6 +28,6 @@ export class SceneAppearEventArgs extends GameEventArgs {
 
     clear(): void {
         this._level = 0;
-        this._tile = null;
+        this._tile = null!;
     }
 }

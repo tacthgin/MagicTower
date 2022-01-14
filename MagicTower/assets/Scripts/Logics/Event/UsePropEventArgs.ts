@@ -1,24 +1,25 @@
 import { ReferencePool } from "../../../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
 import { GameEventArgs } from "../../../GameFramework/Scripts/Event/GameEventArgs";
+import { PropInfo } from "../../Model/HeroModel/Prop";
 import { GameEvent } from "./GameEvent";
 
 export class UsePropEventArgs extends GameEventArgs {
-    private _propInfo: any = null;
-    private _extraInfo: any = null;
+    private _propInfo: PropInfo = null!;
+    private _extraInfo: string = null!;
 
     get id(): number {
         return GameEvent.USE_PROP;
     }
 
-    get extraInfo(): any {
+    get extraInfo(): string {
         return this._extraInfo;
     }
 
-    get propInfo(): any {
+    get propInfo(): PropInfo {
         return this._propInfo;
     }
 
-    static create(propInfo: any, extraInfo: any): UsePropEventArgs {
+    static create(propInfo: PropInfo, extraInfo: string): UsePropEventArgs {
         let usePropEventArgs = ReferencePool.acquire(UsePropEventArgs);
         usePropEventArgs._propInfo = propInfo;
         usePropEventArgs._extraInfo = extraInfo;
@@ -26,7 +27,7 @@ export class UsePropEventArgs extends GameEventArgs {
     }
 
     clear(): void {
-        this._propInfo = null;
-        this._extraInfo = null;
+        this._propInfo = null!;
+        this._extraInfo = null!;
     }
 }

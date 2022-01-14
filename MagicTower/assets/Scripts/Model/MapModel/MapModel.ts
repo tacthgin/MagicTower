@@ -1,5 +1,6 @@
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
+import { GameFrameworkLog } from "../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { StairType } from "./Data/Elements/Stair";
 import { LevelData } from "./Data/LevelData";
 import { LevelTempData } from "./Data/LevelTempData";

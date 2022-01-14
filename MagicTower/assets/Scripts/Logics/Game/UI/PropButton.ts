@@ -1,23 +1,26 @@
 import { _decorator, Component, Label, Sprite } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { GameEvent } from "../../../Constant/GameEvent";
+import { PropInfo, PropType } from "../../../Model/HeroModel/Prop";
+import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
+import { ElementFactory } from "../Map/ElementFactory";
+
 const { ccclass, property } = _decorator;
 
 @ccclass("PropButton")
 export class PropButton extends Component {
-    private propInfo: any = null;
+    private propInfo: PropInfo = null!;
 
-    init(propInfo: any) {
+    init(propInfo: PropInfo) {
         this.propInfo = propInfo;
-        this.getComponent(Sprite)!.spriteFrame = GameApp.ResourceManager.getAsset(`Sprites/${propInfo.spriteId}`);
+        this.getComponent(Sprite)!.spriteFrame = ElementFactory.getElementSpriteFrame(`${propInfo.spriteId}`);
     }
 
     onPropButtonClick() {
-        let info = null;
-        if (this.propInfo.type == 9) {
+        let info: string = "";
+        if (this.propInfo.type == PropType.FLYING_WAND) {
             info = this.node.getChildByName("label")?.getComponent(Label)?.string == "上" ? "up" : "down";
         }
-        //NotifyCenter.emit(GameEvent.USE_PROP, this.propInfo, info);
+        GameApp.EventManager.fireNow(this, UsePropEventArgs.create(this.propInfo, info));
     }
 
     setNum(num: number) {

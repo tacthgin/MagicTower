@@ -2,7 +2,7 @@ import { ModelEventArgs } from "../../../GameFramework/Scripts/Application/Model
 import { ReferencePool } from "../../../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
 import { HeroAttr } from "./HeroAttr";
 import { HeroEvent } from "./HeroEvent";
-import { PropType } from "./PropType";
+import { PropType } from "./Prop";
 
 /**
  * 英雄属性事件参数
