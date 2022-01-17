@@ -87,8 +87,13 @@ export class MoveSystem extends SystemBase {
                 return true;
             case "monster":
                 if (spriteName) {
-                    let jsonData = Utility.Json.getJsonKeyCache(layerName, spriteName);
-                    return CalculateSystem.canHeroAttack(this._heroModel, jsonData, !jsonData.firstAttack);
+                    let monsterInfo = this._levelData.getLayerElement("monster", this._gameMap.getTileIndex(tile));
+                    if (monsterInfo) {
+                        let jsonData = Utility.Json.getJsonKeyCache(layerName, spriteName, monsterInfo.id) as any;
+                        return CalculateSystem.canHeroAttack(this._heroModel, jsonData, !jsonData.firstAttack);
+                    } else {
+                        return true;
+                    }
                 } else {
                     throw new GameFrameworkError("move to monster invailid");
                 }

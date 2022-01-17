@@ -14,6 +14,7 @@ import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { ShopModel } from "../../../Model/ShopModel/ShopModel";
+import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
@@ -170,6 +171,7 @@ export class MapCollisionSystem extends SystemBase {
                 this.hero.autoMove(path, canEndMove, endTile, (tile: Vec2) => {
                     return this.collision(tile);
                 });
+                GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
             } else {
                 //GameManager.UI.showToast("无效路径");
             }

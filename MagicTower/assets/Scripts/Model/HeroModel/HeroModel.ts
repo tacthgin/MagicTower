@@ -171,6 +171,14 @@ export class HeroModel extends ModelBase {
         return 0;
     }
 
+    magicDamage(damage: number) {
+        if (damage < 1) {
+            this.setAttr(HeroAttr.HP, Math.ceil(this.getAttr(HeroAttr.HP) * damage));
+        } else {
+            this.setAttrDiff(HeroAttr.HP, -damage);
+        }
+    }
+
     private useTestLoad() {
         let useTestload = Utility.Json.getJsonElement("global", "useTestLoad");
         if (useTestload) {

@@ -2,7 +2,6 @@ import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, v2, v3
 import { GameApp } from "../../../../../GameFramework/Scripts/Application/GameApp";
 import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { IFsm } from "../../../../../GameFramework/Scripts/Fsm/IFsm";
-import { HeroAttr } from "../../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../../Model/HeroModel/HeroModel";
 import { CommonEventArgs } from "../../../Event/CommonEventArgs";
 import { GameEvent } from "../../../Event/GameEvent";
@@ -46,9 +45,8 @@ export class Hero extends Component {
         GameApp.NodePoolManager.createNodePool(Lightning);
     }
 
-    onFinished() {
-        this.setDirectionTexture();
-        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+    onDestroy() {
+        GameApp.NodePoolManager.destroyNodePool(Lightning);
     }
 
     start() {
@@ -90,39 +88,6 @@ export class Hero extends Component {
         return HeroDirection.DOWN;
     }
 
-    private createAnimation() {
-        let clips: (AnimationClip | null)[] = [];
-        this._heroModel.getAnimation().forEach((animationName: any) => {
-            let spriteFrames = [];
-            for (let i = 1; i < 3; i++) {
-                spriteFrames.push(ElementFactory.getHeroSpriteFrame(`${animationName}_${i}`)!);
-            }
-            let clip = AnimationClip.createWithSpriteFrames(spriteFrames, 4);
-            if (clip) {
-                clip.name = animationName;
-                clip.wrapMode = AnimationClip.WrapMode.Loop;
-                clips.push(clip);
-            }
-
-            clip = AnimationClip.createWithSpriteFrames(spriteFrames, 8);
-            if (clip) {
-                clip.name = `${animationName}_once`;
-                clip.wrapMode = AnimationClip.WrapMode.Normal;
-                clips.push(clip);
-            }
-        });
-
-        this.animation.clips = clips;
-    }
-
-    protected getAnimationName(state: any): string {
-        if (state == MoveState) {
-            return this._heroModel.getAnimation()[this.heroDirection];
-        }
-
-        return "";
-    }
-
     /**
      * 人物朝向
      * @param info info为vec2，人物朝向的点，info为nubmer直接传入方向
@@ -161,10 +126,10 @@ export class Hero extends Component {
             if (tile) {
                 this._heroModel.setPosition(tile, this.heroDirection);
             }
-            this.isHeroMoving = !collisionFunc(endTile);
+            collisionFunc(endTile);
             this.stand();
         };
-        this.isHeroMoving = true;
+
         if (path.length == 0) {
             moveComplete();
         } else {
@@ -179,8 +144,6 @@ export class Hero extends Component {
                 return false;
             });
         }
-        GameApp.EventManager.fireNow(this, null!);
-        //NotifyCenter.emit(GameEvent.MOVE_PATH);
     }
 
     movePath(path: IVec2[], speed: number, moveCallback: Function) {
@@ -246,18 +209,47 @@ export class Hero extends Component {
         });
     }
 
-    magicDamage(monsterIndexs: number[], damage: number) {
+    magicDamage(monsterIndexs: number[]) {
         this.magicLight(monsterIndexs);
         let animationName = this._heroModel.getAnimation()[this._heroModel.getDireciton()];
         this.animation.play(`${animationName}_once`);
-        if (damage < 1) {
-            this._heroModel.setAttr(HeroAttr.HP, Math.ceil(this._heroModel.getAttr(HeroAttr.HP) * damage));
-        } else {
-            this._heroModel.setAttrDiff(HeroAttr.HP, -damage);
-        }
     }
 
-    weak() {
-        this._heroModel.weak();
+    private createAnimation() {
+        let clips: (AnimationClip | null)[] = [];
+        this._heroModel.getAnimation().forEach((animationName: any) => {
+            let spriteFrames = [];
+            for (let i = 1; i < 3; i++) {
+                spriteFrames.push(ElementFactory.getHeroSpriteFrame(`${animationName}_${i}`)!);
+            }
+            let clip = AnimationClip.createWithSpriteFrames(spriteFrames, 4);
+            if (clip) {
+                clip.name = animationName;
+                clip.wrapMode = AnimationClip.WrapMode.Loop;
+                clips.push(clip);
+            }
+
+            clip = AnimationClip.createWithSpriteFrames(spriteFrames, 8);
+            if (clip) {
+                clip.name = `${animationName}_once`;
+                clip.wrapMode = AnimationClip.WrapMode.Normal;
+                clips.push(clip);
+            }
+        });
+
+        this.animation.clips = clips;
+    }
+
+    protected getAnimationName(state: any): string {
+        if (state == MoveState) {
+            return this._heroModel.getAnimation()[this.heroDirection];
+        }
+
+        return "";
+    }
+
+    private onFinished() {
+        this.setDirectionTexture();
+        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
     }
 }
