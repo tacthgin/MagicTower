@@ -3,8 +3,6 @@ import { GameApp } from "../../../../../GameFramework/Scripts/Application/GameAp
 import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { IFsm } from "../../../../../GameFramework/Scripts/Fsm/IFsm";
 import { HeroModel } from "../../../../Model/HeroModel/HeroModel";
-import { CommonEventArgs } from "../../../Event/CommonEventArgs";
-import { GameEvent } from "../../../Event/GameEvent";
 import { Lightning } from "../../Elements/Lightning";
 import { ElementFactory } from "../ElementFactory";
 import { IGameMap } from "../GameMap/IGameMap";
@@ -39,13 +37,13 @@ export class Hero extends Component {
     }
 
     onLoad() {
-        this.animation.on(Animation.EventType.FINISHED, this.onFinished, this);
         this._heroModel = GameApp.getModel(HeroModel);
         this.heroFSM = GameApp.FsmManager.createFsm("hero fsm", this, [new IdleState(), new MoveState(), new AttackState()]);
         GameApp.NodePoolManager.createNodePool(Lightning);
     }
 
     onDestroy() {
+        GameApp.FsmManager.destroyFsm("hero fsm");
         GameApp.NodePoolManager.destroyNodePool(Lightning);
     }
 
@@ -105,6 +103,7 @@ export class Hero extends Component {
 
     /** 设置人物方向贴图 */
     setDirectionTexture() {
+        this.animation.stop();
         this.heroNode.getComponent(Sprite)!.spriteFrame = ElementFactory.getHeroSpriteFrame(`${this._heroModel.getAnimation()[this.heroDirection]}_0`);
     }
 
@@ -122,7 +121,7 @@ export class Hero extends Component {
             } else {
                 this.toward(this.heroDirection);
             }
-            let tile = canEndMove ? endTile : path![path!.length - 1];
+            let tile = canEndMove ? endTile : path[path.length - 1];
             if (tile) {
                 this._heroModel.setPosition(tile, this.heroDirection);
             }
@@ -130,20 +129,16 @@ export class Hero extends Component {
             this.stand();
         };
 
-        if (path.length == 0) {
-            moveComplete();
-        } else {
-            this.movePath(path, this._heroModel.getHeroSpeed(), (tile: Vec2, end: boolean) => {
-                if (end) {
-                    moveComplete();
-                } else if (!collisionFunc(tile)) {
-                    //碰到区块处理事件停止;
-                    this.stand();
-                    return true;
-                }
-                return false;
-            });
-        }
+        this.movePath(path, this._heroModel.getHeroSpeed(), (tile: Vec2, end: boolean) => {
+            if (end) {
+                moveComplete();
+            } else if (!collisionFunc(tile)) {
+                //碰到区块处理事件停止;
+                this.stand();
+                return true;
+            }
+            return false;
+        });
     }
 
     movePath(path: IVec2[], speed: number, moveCallback: Function) {
@@ -215,6 +210,16 @@ export class Hero extends Component {
         this.animation.play(`${animationName}_once`);
     }
 
+    playAnimation() {
+        let animationName = this.getAnimationName(this.heroFSM.currentState);
+        if (animationName) {
+            // let animationState = this.animation.getState(animationName);
+            // if (animationState.clip.name == animationName) {
+            // }
+            this.animation.play(animationName);
+        }
+    }
+
     private createAnimation() {
         let clips: (AnimationClip | null)[] = [];
         this._heroModel.getAnimation().forEach((animationName: any) => {
@@ -241,15 +246,10 @@ export class Hero extends Component {
     }
 
     protected getAnimationName(state: any): string {
-        if (state == MoveState) {
+        if (state instanceof MoveState) {
             return this._heroModel.getAnimation()[this.heroDirection];
         }
 
         return "";
-    }
-
-    private onFinished() {
-        this.setDirectionTexture();
-        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
     }
 }

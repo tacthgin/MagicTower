@@ -28,10 +28,6 @@ export class GameMap extends TiledMap implements IGameMap {
         return this.getMapSize().height;
     }
 
-    start() {
-        this.openTileAnimation(["obstacle", "monster", "npc", "lava"]);
-    }
-
     init(tiledMapAsset: TiledMapAsset | null) {
         if (!tiledMapAsset || !tiledMapAsset.isValid) {
             GameFrameworkLog.error(`${tiledMapAsset ? tiledMapAsset.name : "空的资源"}不合法`);
