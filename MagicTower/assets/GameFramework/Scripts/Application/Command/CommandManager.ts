@@ -130,7 +130,7 @@ export class CommandManager implements ICommandManager {
 
         let commandObject: CommandObject | null = this._commandPool.spawn(name);
         if (!commandObject) {
-            commandObject = CommandObject.create(ReferencePool.acquire(commandConstructor));
+            commandObject = CommandObject.create(name, ReferencePool.acquire(commandConstructor));
             this._commandPool.register(commandObject, true);
         }
 
@@ -153,7 +153,7 @@ export class CommandManager implements ICommandManager {
 
         let commandObject: CommandObject | null = this._systemPool.spawn(name);
         if (!commandObject) {
-            commandObject = CommandObject.create(ReferencePool.acquire(systemConstructor));
+            commandObject = CommandObject.create(name, ReferencePool.acquire(systemConstructor));
             this._systemPool.register(commandObject, true);
         }
 

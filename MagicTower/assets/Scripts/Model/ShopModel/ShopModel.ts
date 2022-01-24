@@ -47,6 +47,13 @@ export class ShopModel extends ModelBase {
     }
 
     load(data: any = null) {
-        this.loadData(data || Utility.Json.getJsonElement("global", "shop"));
+        if (!data) {
+            data = Utility.Json.getJsonElement("global", "shop");
+            for (let key in data) {
+                (this as any)[`_${key}`] = data[key];
+            }
+        } else {
+            this.loadData(data);
+        }
     }
 }

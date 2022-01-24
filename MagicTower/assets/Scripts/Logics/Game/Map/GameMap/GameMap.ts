@@ -58,12 +58,12 @@ export class GameMap extends TiledMap implements IGameMap {
     }
 
     /** cocos坐标转换为tile坐标 */
-    toTile(position: IVec2) {
+    toTile(position: IVec2): IVec2 {
         position = this.toScreen(position);
         return v2(Math.floor(position.x / this._tileSize.width), Math.floor(position.y / this._tileSize.height));
     }
 
-    getPositionAt(tile: IVec2) {
+    getPositionAt(tile: IVec2): IVec2 | null {
         let layers = this.getLayers();
         if (layers[0]) {
             /** 只能获取gl坐标 */

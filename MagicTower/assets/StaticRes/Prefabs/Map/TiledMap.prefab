@@ -14,6 +14,7 @@
     "__type__": "cc.Node",
     "_name": "TiledMap",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": null,
     "_children": [],
     "_active": true,
@@ -84,7 +85,7 @@
     "fileId": "a2UFag3ptKgoD5Gu9Hc2u7"
   },
   {
-    "__type__": "94ee8xlZjtNmYYCgBVNnjvU",
+    "__type__": "8d96a7wjaNOXJWzZXHzf4SE",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -101,7 +102,7 @@
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "ecXieXhGVO+qezRilCYTG5"
+    "fileId": "ddATq1ynZEz40JgWDWfPWg"
   },
   {
     "__type__": "cc.PrefabInfo",

@@ -13,6 +13,7 @@ export class LoginScene extends Component {
 
     async start() {
         await this.loadResources();
+        GameApp.instance.loadLocalModel();
         this.gotoGameScene();
     }
 

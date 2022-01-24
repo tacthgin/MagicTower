@@ -128,13 +128,21 @@ export class GameApp extends Component {
         GameFrameworkEntry.shutDown();
     }
 
+    loadLocalModel() {
+        try {
+            this._modelContainer.loadLocalModel();
+        } catch (error) {
+            GameFrameworkLog.error("load local model failed:", error);
+        }
+    }
+
     private initialize() {
         //初始化框架
         this.initalizeFramework();
-        //初始化model
-        this.initializeModel();
         //初始化command
         this.initializeCommand();
+        //初始化model
+        this.initializeModel();
     }
 
     private initalizeFramework() {
