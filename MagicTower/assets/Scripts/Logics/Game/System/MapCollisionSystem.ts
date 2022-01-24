@@ -69,6 +69,7 @@ export class MapCollisionSystem extends SystemBase {
         this.gameMap = gameMap;
         this.hero = hero;
         this.levelData = this.mapModel.getCurrentLevelData();
+        this.moveSystem.initliaze(this.gameMap, this.levelData);
     }
 
     private registerEvent() {
@@ -133,7 +134,7 @@ export class MapCollisionSystem extends SystemBase {
         return { tile: tile, index: index };
     }
 
-    appear(layerName: string, tileOrIndex: Vec2 | number, id: number, record: boolean = true) {
+    appear(layerName: string, tileOrIndex: IVec2 | number, id: number, record: boolean = true) {
         let json = Utility.Json.getJsonElement(layerName, id) as any;
         if (json) {
             let { index, tile } = this.getTileOrIndex(tileOrIndex);
@@ -149,7 +150,7 @@ export class MapCollisionSystem extends SystemBase {
         }
     }
 
-    disappear(layerName: string, tileOrIndex: Vec2 | number, record: boolean = true) {
+    disappear(layerName: string, tileOrIndex: IVec2 | number, record: boolean = true) {
         let { index, tile } = this.getTileOrIndex(tileOrIndex);
         if (tile) {
             this.gameMap.setTileGIDAt(layerName, tile, 0);
@@ -158,7 +159,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     moveHero(position: IVec2) {
-        if (!this.canHeroMoving) {
+        if (this.canHeroMoving) {
             let localPos = (this.gameMap as any).node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(position.x, position.y));
             let endTile = this.gameMap.toTile(v2(localPos?.x, localPos?.y));
             this.moveSystem.setAstarMoveType(AstarMoveType.HERO);
@@ -168,8 +169,25 @@ export class MapCollisionSystem extends SystemBase {
                 if (!canEndMove) {
                     path.pop();
                 }
-                this.hero.autoMove(path, canEndMove, endTile, (tile: Vec2) => {
-                    return this.collision(tile);
+
+                this.hero.movePath(path, (tile: IVec2, end: boolean) => {
+                    if (end) {
+                        if (!canEndMove) {
+                            this.hero.toward(endTile);
+                        } else {
+                            this.hero.toward();
+                        }
+                        let tile = canEndMove ? endTile : path[path.length - 1];
+                        if (tile) {
+                            this.heroModel.setPosition(tile, this.hero.heroDirection);
+                        }
+                        this.collision(endTile);
+                        this.hero.stand();
+                    } else if (!this.collision(tile)) {
+                        this.hero.stand();
+                        return true;
+                    }
+                    return false;
                 });
                 GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
             } else {
@@ -269,7 +287,7 @@ export class MapCollisionSystem extends SystemBase {
      * @param tile 交互坐标
      * @returns true表示交互结束，false表示交互正在进行
      */
-    collision(tile: Vec2) {
+    collision(tile: IVec2) {
         let { layerName, spriteName } = this.gameMap.getTileInfo(tile);
         if (!layerName) return true;
         let jsonData = this.getJsonData(layerName, spriteName) as any;

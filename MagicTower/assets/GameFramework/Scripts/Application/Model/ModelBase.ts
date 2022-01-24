@@ -1,6 +1,7 @@
 import { EventHandle } from "../../Base/EventPool/EventHandle";
 import { EventPool } from "../../Base/EventPool/EventPool";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
+import { GameFrameworkLog } from "../../Base/Log/GameFrameworkLog";
 import { ISaveManager } from "../../Save/ISaveManager";
 import { ScheduleBase } from "../Base/ScheduleBase";
 import { IModel } from "./IModel";
@@ -85,7 +86,8 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
         if (!this._saveManager) {
             throw new GameFrameworkError("you must set save manager first");
         }
-        this._saveManager.setObject(ModelContainer.getClassName(this), this);
+        //let saveObject = {};
+        //this._saveManager.setObject(ModelContainer.getClassName(this), this);
     }
 
     /**

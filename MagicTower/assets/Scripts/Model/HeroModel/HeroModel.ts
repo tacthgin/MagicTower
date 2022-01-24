@@ -22,7 +22,7 @@ export class HeroModel extends ModelBase {
     private swardId: number = 0;
     private shieldId: number = 0;
     private props: { [key: number | string]: number } = {};
-    private animtion: string[] = null!;
+    private animation: string[] = null!;
 
     constructor() {
         super();
@@ -160,7 +160,7 @@ export class HeroModel extends ModelBase {
     }
 
     getAnimation() {
-        return this.animtion;
+        return this.animation;
     }
 
     getHeroSpeed() {

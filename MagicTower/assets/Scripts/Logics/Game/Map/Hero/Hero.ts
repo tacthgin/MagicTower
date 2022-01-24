@@ -1,6 +1,7 @@
 import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, v2, v3, Vec2, _decorator } from "cc";
 import { GameApp } from "../../../../../GameFramework/Scripts/Application/GameApp";
 import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
+import { GameFrameworkLog } from "../../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { IFsm } from "../../../../../GameFramework/Scripts/Fsm/IFsm";
 import { HeroModel } from "../../../../Model/HeroModel/HeroModel";
 import { Lightning } from "../../Elements/Lightning";
@@ -19,14 +20,15 @@ export class Hero extends Component {
     private attackIcon: Node = null!;
     @property(Node)
     private heroNode: Node = null!;
-    @property(Node)
+    @property(Animation)
     private animation: Animation = null!;
 
     private _heroModel: HeroModel = null!;
-    private heroFSM: IFsm<Hero> = null!;
-    private map: IGameMap = null!;
+    private _heroFSM: IFsm<Hero> = null!;
+    private _map: IGameMap = null!;
     private _heroTile: Vec2 = null!;
-    private heroDirection: number = 0;
+    private _heroDirection: number = 0;
+    private _currentAnimationName: string = "";
 
     constructor() {
         super();
@@ -36,9 +38,17 @@ export class Hero extends Component {
         return this._heroTile;
     }
 
+    set heroDirection(value: number) {
+        this._heroDirection = value;
+    }
+
+    get heroDirection() {
+        return this._heroDirection;
+    }
+
     onLoad() {
         this._heroModel = GameApp.getModel(HeroModel);
-        this.heroFSM = GameApp.FsmManager.createFsm("hero fsm", this, [new IdleState(), new MoveState(), new AttackState()]);
+        this._heroFSM = GameApp.FsmManager.createFsm("hero fsm", this, [new IdleState(), new MoveState(), new AttackState()]);
         GameApp.NodePoolManager.createNodePool(Lightning);
     }
 
@@ -49,7 +59,7 @@ export class Hero extends Component {
 
     start() {
         this.createAnimation();
-        this.heroFSM.start(IdleState);
+        this._heroFSM.start(IdleState);
     }
 
     init(map: IGameMap, tile: IVec2 | null = null) {
@@ -58,7 +68,7 @@ export class Hero extends Component {
     }
 
     setOwnerMap(map: IGameMap) {
-        this.map = map;
+        this._map = map;
     }
 
     /**
@@ -90,70 +100,41 @@ export class Hero extends Component {
      * 人物朝向
      * @param info info为vec2，人物朝向的点，info为nubmer直接传入方向
      */
-    toward(info: IVec2 | number) {
-        if (typeof info == "number") {
-            this.heroDirection = info;
-        } else {
-            let result = new Vec2();
-            Vec2.subtract(result, info, this._heroTile);
-            this.heroDirection = this.getDirection(result);
+    toward(info: IVec2 | number | null = null) {
+        if (info) {
+            if (typeof info == "number") {
+                this._heroDirection = info;
+            } else {
+                let result = new Vec2();
+                Vec2.subtract(result, info, this._heroTile);
+                this._heroDirection = this.getDirection(result);
+            }
         }
+
         this.setDirectionTexture();
     }
 
     /** 设置人物方向贴图 */
     setDirectionTexture() {
         this.animation.stop();
-        this.heroNode.getComponent(Sprite)!.spriteFrame = ElementFactory.getHeroSpriteFrame(`${this._heroModel.getAnimation()[this.heroDirection]}_0`);
+        this._currentAnimationName = "";
+        this.heroNode.getComponent(Sprite)!.spriteFrame = ElementFactory.getHeroSpriteFrame(`${this._heroModel.getAnimation()[this._heroDirection]}_0`);
     }
 
-    /**
-     * 自动行走
-     * @param path 路径
-     * @param canEndMove 终点是否能行走
-     * @param endTile 终点tile
-     * @param collisionFunc 与其他元素碰撞交互函数
-     */
-    autoMove(path: IVec2[], canEndMove: boolean, endTile: IVec2, collisionFunc: Function) {
-        let moveComplete = () => {
-            if (!canEndMove) {
-                this.toward(endTile);
-            } else {
-                this.toward(this.heroDirection);
-            }
-            let tile = canEndMove ? endTile : path[path.length - 1];
-            if (tile) {
-                this._heroModel.setPosition(tile, this.heroDirection);
-            }
-            collisionFunc(endTile);
-            this.stand();
-        };
-
-        this.movePath(path, this._heroModel.getHeroSpeed(), (tile: Vec2, end: boolean) => {
-            if (end) {
-                moveComplete();
-            } else if (!collisionFunc(tile)) {
-                //碰到区块处理事件停止;
-                this.stand();
-                return true;
-            }
-            return false;
-        });
-    }
-
-    movePath(path: IVec2[], speed: number, moveCallback: Function) {
+    movePath(path: IVec2[], moveCallback: (tile: IVec2, end: boolean) => boolean) {
         let moveActions: Tween<Node>[] = [];
         let stop = false;
+        let speed = this._heroModel.getHeroSpeed();
         let moveAction = (tile: IVec2, end: boolean = false) => {
-            let position = this.map.getPositionAt(tile) || Vec2.ZERO;
+            let position = this._map.getPositionAt(tile) || Vec2.ZERO;
             let currentTile = v2(tile.x, tile.y);
             return tween()
                 .call(() => {
                     let result = new Vec2();
-                    this.heroDirection = this.getDirection(Vec2.subtract(result, currentTile, this._heroTile));
+                    this._heroDirection = this.getDirection(Vec2.subtract(result, currentTile, this._heroTile));
                     if (!stop) {
                         //动作停止callFunc依然会调用一次;
-                        this.heroFSM.currentState?.changeState(this.heroFSM, MoveState);
+                        this._heroFSM.currentState?.changeState(this._heroFSM, MoveState);
                     }
                 })
                 .to(speed, { position: v3(position.x, position.y) })
@@ -174,7 +155,7 @@ export class Hero extends Component {
 
     stand() {
         Tween.stopAllByTarget(this.node);
-        this.heroFSM.currentState?.changeState(this.heroFSM, IdleState);
+        this._heroFSM.currentState?.changeState(this._heroFSM, IdleState);
     }
 
     location(tile: IVec2 | null) {
@@ -186,7 +167,7 @@ export class Hero extends Component {
         }
         let heroPosition = this._heroModel.getPosition();
         this._heroTile = new Vec2(heroPosition.x, heroPosition.y);
-        let position = this.map.getPositionAt(this._heroTile) || Vec2.ZERO;
+        let position = this._map.getPositionAt(this._heroTile) || Vec2.ZERO;
         this.node.position = v3(position.x, position.y);
     }
 
@@ -196,7 +177,7 @@ export class Hero extends Component {
     }
 
     magicLight(monsterIndexs: number[]) {
-        let heroIndex = this.map.getTileIndex(this._heroTile);
+        let heroIndex = this._map.getTileIndex(this._heroTile);
         monsterIndexs.forEach(async (index) => {
             let lightning = (await GameApp.NodePoolManager.createNodeWithPath(Lightning, "Prefabs/Element/Lightning")) as Node;
             lightning.parent = this.node;
@@ -208,14 +189,13 @@ export class Hero extends Component {
         this.magicLight(monsterIndexs);
         let animationName = this._heroModel.getAnimation()[this._heroModel.getDireciton()];
         this.animation.play(`${animationName}_once`);
+        this._currentAnimationName = "";
     }
 
     playAnimation() {
-        let animationName = this.getAnimationName(this.heroFSM.currentState);
-        if (animationName) {
-            // let animationState = this.animation.getState(animationName);
-            // if (animationState.clip.name == animationName) {
-            // }
+        let animationName = this.getAnimationName(this._heroFSM.currentState);
+        if (animationName && this._currentAnimationName != animationName) {
+            this._currentAnimationName = animationName;
             this.animation.play(animationName);
         }
     }
@@ -247,7 +227,7 @@ export class Hero extends Component {
 
     protected getAnimationName(state: any): string {
         if (state instanceof MoveState) {
-            return this._heroModel.getAnimation()[this.heroDirection];
+            return this._heroModel.getAnimation()[this._heroDirection];
         }
 
         return "";

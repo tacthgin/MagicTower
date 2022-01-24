@@ -1,6 +1,7 @@
 import { AudioClip, Component, director, JsonAsset, Label, SpriteFrame, _decorator } from "cc";
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
+import { ElementFactory } from "../Game/Map/ElementFactory";
 
 const { ccclass, property } = _decorator;
 
@@ -14,6 +15,8 @@ export class LoginScene extends Component {
     async start() {
         await this.loadResources();
         GameApp.instance.loadLocalModel();
+        await ElementFactory.loadAsset();
+        this.progressLabel.string = `100%`;
         this.gotoGameScene();
     }
 
@@ -38,7 +41,7 @@ export class LoginScene extends Component {
             let info = resouceInfos[i];
             let step = (i + 1) / resouceInfos.length;
             await GameApp.ResourceManager.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number) => {
-                this.progressLabel.string = `${(finished / total) * step * 100}%`;
+                this.progressLabel.string = `${((finished / total) * step * 100 * 0.8).toFixed(2)}%`;
             });
         }
     }

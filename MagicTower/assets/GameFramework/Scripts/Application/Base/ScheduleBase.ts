@@ -5,7 +5,7 @@ import { ScheduleInfo } from "./ScheduleInfo";
 
 export class ScheduleBase {
     private _scheduleHandles: GameFrameworkLinkedList<ScheduleInfo> = null!;
-    private static DEFAULT_FRAME_SECONDS: number = 0.016;
+    private static readonly DEFAULT_FRAME_SECONDS: number = 0.016;
 
     constructor() {
         this._scheduleHandles = new GameFrameworkLinkedList<ScheduleInfo>();

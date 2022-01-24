@@ -14,6 +14,7 @@
     "__type__": "cc.Node",
     "_name": "DoorAnimationReverseNode",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": null,
     "_children": [],
     "_active": true,
@@ -180,7 +181,7 @@
     "fileId": "e40lHqBr5NGIZPf5MFxKQX"
   },
   {
-    "__type__": "fc22478KTBItJZoMT/tGC8S",
+    "__type__": "a3ae6SII2pJpqmHpa2yPB8O",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -194,7 +195,7 @@
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "27noEzLahMH6c3kRlhGPVa"
+    "fileId": "f22uGqnZlD9qZqu5TLHuHM"
   },
   {
     "__type__": "cc.PrefabInfo",

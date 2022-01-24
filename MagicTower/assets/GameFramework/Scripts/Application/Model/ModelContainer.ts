@@ -122,6 +122,7 @@ export class ModelContainer {
 
         ModelContainer.s_modelConstructors.forEach((ctor, name) => {
             let model = this.getModel(ctor);
+            model.setSaveManager(this._saveManager!);
             modelInfos.push({
                 model: model,
                 value: this._saveManager?.getObject(name) || null,

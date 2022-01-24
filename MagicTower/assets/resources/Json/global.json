@@ -15,7 +15,7 @@
     "testLoad": {
         "currentLevel": 1,
         "maps": {},
-        "heroPos": {
+        "position": {
             "x": 7,
             "y": 0
         },
@@ -48,7 +48,7 @@
             "player_down",
             "player_left"
         ],
-        "pos": {
+        "position": {
             "x": 5,
             "y": 10
         },

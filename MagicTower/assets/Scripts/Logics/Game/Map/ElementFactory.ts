@@ -13,11 +13,11 @@ export class ElementFactory {
     }
 
     static getElementSpriteFrame(name: string): SpriteFrame | null {
-        return GameApp.ResourceManager.getAsset(`TiledMap/Images/${name}`);
+        return GameApp.ResourceManager.getAsset(`TiledMap/Images/${name}`, SpriteFrame);
     }
 
     static getHeroSpriteFrame(name: string): SpriteFrame | null {
-        return GameApp.ResourceManager.getAsset(`Sprites/${name}`);
+        return GameApp.ResourceManager.getAsset(`Sprites/${name}`, SpriteFrame);
     }
 
     static getElementAnimationClip(name: string) {

@@ -96,7 +96,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         return false;
     }
 
-    async createNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): Promise<object> {
+    createNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): object {
         if (!this._nodeHelp) {
             throw new GameFrameworkError("you must set node help first");
         }
