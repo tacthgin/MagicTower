@@ -110,8 +110,6 @@ export class Hero extends Component {
                 this._heroDirection = this.getDirection(result);
             }
         }
-
-        this.setDirectionTexture();
     }
 
     /** 设置人物方向贴图 */

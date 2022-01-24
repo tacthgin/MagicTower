@@ -1,4 +1,4 @@
-import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3 } from "cc";
+import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3, Node } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -18,6 +18,9 @@ import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
+import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
+import { DoorAnimationReverseNode } from "../Elements/DoorAnimaitonReverseNode";
+import { ElementNode } from "../Elements/ElementNode";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
@@ -254,17 +257,20 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private async createElement() {
-        return await GameManager.POOL.createPoolNode(`Prefabs/Elements/ElementNode`);
+        return await GameApp.NodePoolManager.createNodeWithPath(ElementNode, `Prefabs/Elements/ElementNode`);
     }
 
-    private async createDoorAnimation(id: number | string, tile: Vec2, reverse: boolean, callback: Function | null = null) {
+    private async createDoorAnimation(id: number | string, tile: IVec2, reverse: boolean, callback: Function | null = null) {
         let name = reverse ? "DoorAnimationReverseNode" : "DoorAnimationNode";
-        let node = await GameManager.POOL.createPoolNode(`Prefabs/Elements/${name}`);
+        let constructor = reverse ? DoorAnimationReverseNode : DoorAnimationNode;
+        let node = (await GameApp.NodePoolManager.createNodeWithPath(constructor, `Prefabs/Elements/${name}`)) as Node;
         if (node) {
             let position = this.gameMap.getPositionAt(tile);
-            node.position = v3(position?.x, position?.y);
-            node.parent = this.gameMap.node;
-            (node.getComponent(name) as any).init(`door${id}`, callback);
+            if (position) {
+                node.position = v3(position?.x, position?.y);
+                node.parent = (this.gameMap as any).node;
+                node.getComponent(constructor)?.init(`door${id}`, callback);
+            }
         }
     }
 
@@ -294,7 +300,7 @@ export class MapCollisionSystem extends SystemBase {
         switch (layerName) {
             case "prop":
                 {
-                    GameApp.SoundManager.playSound("Sounds/eat");
+                    GameApp.SoundManager.playSound("Sound/eat");
                     this.heroModel.addProp(jsonData.id, this.levelData.level);
                     this.disappear(layerName, tile);
                 }
@@ -339,7 +345,7 @@ export class MapCollisionSystem extends SystemBase {
         return false;
     }
 
-    private doorCollision(tile: Vec2, layerName: string) {
+    private doorCollision(tile: IVec2, layerName: string) {
         let tileIndex = this.gameMap.getTileIndex(tile);
 
         let doorInfo: Door = this.levelData.getLayerElement(layerName, tileIndex);
