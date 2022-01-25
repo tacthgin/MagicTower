@@ -62,7 +62,7 @@ export class ScheduleBase {
      * @param elapseSeconds 逻辑流逝时间
      */
     update(elapseSeconds: number): void {
-        if (this._scheduleHandles.first) {
+        if (this._scheduleHandles.size != 0) {
             let current: LinkedListNode<ScheduleInfo> | null = this._scheduleHandles.first;
             let next: LinkedListNode<ScheduleInfo> | null = null;
             while (current) {
