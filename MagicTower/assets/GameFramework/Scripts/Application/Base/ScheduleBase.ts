@@ -62,14 +62,16 @@ export class ScheduleBase {
      * @param elapseSeconds 逻辑流逝时间
      */
     update(elapseSeconds: number): void {
-        let current = this._scheduleHandles.first;
-        let next: LinkedListNode<ScheduleInfo> | null = null;
-        while (current) {
-            current.value.update(elapseSeconds);
-            if (current.value.isStoped()) {
-                next = current.next;
-                this._scheduleHandles.remove(current);
-                current = next;
+        if (this._scheduleHandles.first) {
+            let current: LinkedListNode<ScheduleInfo> | null = this._scheduleHandles.first;
+            let next: LinkedListNode<ScheduleInfo> | null = null;
+            while (current) {
+                current.value.update(elapseSeconds);
+                if (current.value.isStoped()) {
+                    next = current.next;
+                    this._scheduleHandles.remove(current);
+                    current = next;
+                }
             }
         }
     }
