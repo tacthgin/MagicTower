@@ -64,7 +64,7 @@ export class LevelData extends LoadBase {
         return this;
     }
 
-    loadProperties(properties: any, data: any = null) {
+    loadProperties(properties: any, data: { tiles: { [key: string]: number[] }; parseGid: Function } | null = null) {
         let propertiesInfo = null;
 
         let parsers: { [key: string]: Function } = {
@@ -76,8 +76,9 @@ export class LevelData extends LoadBase {
             let func = parsers[layerName];
             if (func) {
                 propertiesInfo = properties[layerName];
-                let tilesData = data ? data[layerName] : null;
-                func.call(this, propertiesInfo, tilesData);
+                let tilesData = data ? data.tiles[layerName] : null;
+                let praseGidFn = data ? data.parseGid : null;
+                func.call(this, propertiesInfo, tilesData, praseGidFn);
             }
         }
     }

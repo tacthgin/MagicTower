@@ -37,17 +37,15 @@ export class Stair extends Element {
         return this._hide;
     }
 
-    static parse(propertiesInfo: any, data: any) {
+    static parse(propertiesInfo: any, tiles: number[] | null = null, parseGidFn: Function | null = null) {
         let tileIndexes: number[] = [];
-        if (data) {
-            let tiles: number[] = data.tiles;
-            let parseGid = data.parseGid;
+        if (tiles && parseGidFn) {
             for (let i = 0; i < tiles.length; i++) {
                 if (tiles[i] == 0) {
                     continue;
                 }
 
-                let name = parseGid(tiles[i]);
+                let name = parseGidFn(tiles[i]);
                 if (name) {
                     name = name.split("_")[1];
                     tileIndexes[name == "up" ? StairType.UP : StairType.Down] = i;

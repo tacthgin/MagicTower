@@ -60,19 +60,17 @@ export class Door extends Element {
         return id == DoorType.YELLOW;
     }
 
-    static parse(propertiesInfo: any, data: any = null): any {
+    static parse(propertiesInfo: any, tiles: number[] | null = null, parseGidFn: Function | null = null): any {
         let doorInfos: any = {};
         let propertiesValue: string = null!;
         let condition: number[] = [];
-        if (data) {
-            let tiles: number[] = data.tiles;
-            let parseGid = data.parseGid;
+        if (tiles && parseGidFn) {
             for (let i = 0; i < tiles.length; i++) {
                 if (tiles[i] == 0) {
                     continue;
                 }
                 condition.push(i);
-                let name = parseGid(tiles[i]);
+                let name = parseGidFn(tiles[i]);
                 if (name) {
                     name = name.split("_")[0];
                     let doorJson = Utility.Json.getJsonKeyCache("door", "spriteId", name) as any;
@@ -135,7 +133,7 @@ export class Door extends Element {
                             case "hide":
                                 door.doorState = key == "appear" ? DoorState.APPEAR : DoorState.HIDE;
                                 let index = parseInt(propertiesValue);
-                                door.gid = data.tiles[index];
+                                door.gid = tiles![index];
                                 break;
                         }
                         doorInfos[propertiesValue] = door;

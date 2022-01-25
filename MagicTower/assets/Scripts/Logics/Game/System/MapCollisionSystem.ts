@@ -257,7 +257,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private async createElement() {
-        return await GameApp.NodePoolManager.createNodeWithPath(ElementNode, `Prefabs/Elements/ElementNode`);
+        return (await GameApp.NodePoolManager.createNodeWithPath(ElementNode, `Prefabs/Elements/ElementNode`)) as Node;
     }
 
     private async createDoorAnimation(id: number | string, tile: IVec2, reverse: boolean, callback: Function | null = null) {
