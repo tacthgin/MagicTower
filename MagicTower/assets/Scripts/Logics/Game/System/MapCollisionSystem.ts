@@ -2,14 +2,20 @@ import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3, Node } from "
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { Constructor } from "../../../../GameFramework/Scripts/Base/DataStruct/Constructor";
+import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { IObjectPool } from "../../../../GameFramework/Scripts/ObjectPool/IObjectPool";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropType } from "../../../Model/HeroModel/Prop";
-import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
+import { Door, DoorState, DoorType } from "../../../Model/MapModel/Data/Elements/Door";
+import { Element } from "../../../Model/MapModel/Data/Elements/Element";
+import { ElementObject } from "../../../Model/MapModel/Data/Elements/ElementObject";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
+import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
 import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
@@ -21,6 +27,7 @@ import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
 import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
 import { DoorAnimationReverseNode } from "../Elements/DoorAnimaitonReverseNode";
 import { ElementNode } from "../Elements/ElementNode";
+import { ElementFactory } from "../Map/ElementFactory";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
@@ -66,6 +73,10 @@ export class MapCollisionSystem extends SystemBase {
 
         this.heroModel = GameApp.getModel(HeroModel);
         this.mapModel = GameApp.getModel(MapModel);
+
+        GameApp.NodePoolManager.createNodePool(DoorAnimationNode);
+        GameApp.NodePoolManager.createNodePool(DoorAnimationReverseNode);
+        ElementFactory.initliaze();
     }
 
     initliaze(gameMap: IGameMap, hero: Hero) {
@@ -87,6 +98,7 @@ export class MapCollisionSystem extends SystemBase {
         let ratio = this.heroModel.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
         this.heroModel.setAttrDiff(HeroAttr.GOLD, eventArgs.monster.monsterInfo.gold * ratio);
         this.disappear("monster", eventArgs.monster.index);
+        ElementFactory.releaseElementData(eventArgs.monster);
         this.elementActionComplete();
         //this.removeMonsterDoor();
         //this.monsterEventTrigger(index);
@@ -167,7 +179,7 @@ export class MapCollisionSystem extends SystemBase {
             let endTile = this.gameMap.toTile(v2(localPos?.x, localPos?.y));
             this.moveSystem.setAstarMoveType(AstarMoveType.HERO);
             let path = this.moveSystem.getPath(this.hero.heroTile, endTile);
-            if (path) {
+            if (path.length > 0) {
                 let canEndMove = this.moveSystem.canEndTileMove(endTile);
                 if (!canEndMove) {
                     path.pop();
@@ -321,15 +333,18 @@ export class MapCollisionSystem extends SystemBase {
                         //GameManager.UI.showToast(`你打不过${jsonData.name}`);
                         return true;
                     }
-                    let monster = new Monster();
+
+                    let monster = ElementFactory.createElementData(Monster, "monster");
                     monster.id = parseInt(jsonData.id);
                     monster.index = this.gameMap.getTileIndex(tile);
-                    this.monsterFightSystem.init(this.gameMap, this.hero, monster).execute(/*this.haveMagicHurt(index)*/ false);
+                    this.monsterFightSystem.initliaze(this.hero, monster);
+                    this.monsterFightSystem.execute(/*this.haveMagicHurt(index)*/ false);
                 }
                 break;
             case "npc":
-                let npc = new Npc();
-                this.npcInteractiveSystem.init(this.gameMap, this.hero, npc);
+                let npc = ElementFactory.createElementData(Npc, "npc");
+                this.npcInteractiveSystem.initliaze(npc, this);
+                this.npcInteractiveSystem.execute();
                 break;
             case "building":
                 this.gotoShop();
@@ -355,7 +370,7 @@ export class MapCollisionSystem extends SystemBase {
 
         let openDoor = () => {
             this.createDoorAnimation(doorInfo.id, tile, false, () => {
-                NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
+                GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
             });
             this.levelData.deleteLayerElement(layerName, tileIndex);
             this.gameMap.setTileGIDAt(layerName, tile, 0);
@@ -364,7 +379,11 @@ export class MapCollisionSystem extends SystemBase {
         if (doorInfo.canWallOpen()) {
             openDoor();
         } else if (doorInfo.isKeyDoor()) {
-            let keyID = GameManager.DATA.getJsonParser("prop")?.getJsonElementByKey("value", doorInfo.id).id;
+            let doorJson = Utility.Json.getJsonKeyCache("prop", "value", doorInfo.id) as any;
+            if (!doorJson) {
+                throw new GameFrameworkError("door json is invaild");
+            }
+            let keyID = doorJson.id;
             if (keyID && this.heroModel.getPropNum(keyID) > 0) {
                 this.heroModel.addProp(keyID, 1, -1);
                 openDoor();
@@ -427,7 +446,7 @@ export class MapCollisionSystem extends SystemBase {
         //return true;
     }
 
-    private invisibleDoorCollision(tile: Vec2) {
+    private invisibleDoorCollision(tile: IVec2) {
         let layerName = "door";
         let doorLayerInfo = this.levelData.getLayerInfo(layerName);
         if (!doorLayerInfo) {
@@ -456,8 +475,10 @@ export class MapCollisionSystem extends SystemBase {
             if (doorInfo && doorInfo.doorState == DoorState.APPEAR) {
                 this.createDoorAnimation(doorInfo.id, tile, true, () => {
                     this.gameMap.setTileGIDAt(layerName, tile, doorInfo.gid);
-                    NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
+                    GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
                 });
+            } else {
+                return true;
             }
         }
 
@@ -718,7 +739,7 @@ export class MapCollisionSystem extends SystemBase {
         // });
     }
 
-    private eventCollision(eventID: number | string | Vec2) {
+    private eventCollision(eventID: number | string | IVec2) {
         let id: number | string | null = null;
         if (eventID instanceof Vec2) {
             let index = this.gameMap.getTileIndex(eventID);
@@ -775,7 +796,7 @@ export class MapCollisionSystem extends SystemBase {
         return totalDamage;
     }
 
-    private floorCollision(tile: Vec2) {
+    private floorCollision(tile: IVec2) {
         if (!this.invisibleDoorCollision(tile)) {
             return false;
         }
@@ -824,7 +845,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private elementActionComplete() {
-        NotifyCenter.emit(GameEvent.COLLISION_COMPLETE);
+        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
     }
 
     getMonsters() {
@@ -849,5 +870,8 @@ export class MapCollisionSystem extends SystemBase {
         GameApp.CommandManager.destroySystem(this.npcInteractiveSystem);
         GameApp.CommandManager.destroySystem(this.gameEventSystem);
         GameApp.CommandManager.destroySystem(this.moveSystem);
+        GameApp.NodePoolManager.destroyNodePool(DoorAnimationNode);
+        GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
+        ElementFactory.clear();
     }
 }

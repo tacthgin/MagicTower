@@ -260,6 +260,7 @@ export class GameUI extends Component {
         if (keys) {
             let key = keys.pop();
             if (key) {
+                GameApp.NodePoolManager.releaseNode("key", key);
             }
         }
     }

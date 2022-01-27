@@ -15,6 +15,10 @@ export class NodeObject extends ObjectBase {
         return nodeObejct;
     }
 
+    onUnspawn(): void {
+        this._nodeHelper?.releaseNode(this.target);
+    }
+
     clear(): void {
         super.clear();
         this._nodeHelper?.releaseNode(this.target);

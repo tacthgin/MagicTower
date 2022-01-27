@@ -78,7 +78,10 @@ export class LevelData extends LoadBase {
                 propertiesInfo = properties[layerName];
                 let tilesData = data ? data.tiles[layerName] : null;
                 let praseGidFn = data ? data.parseGid : null;
-                func.call(this, propertiesInfo, tilesData, praseGidFn);
+                let result = func.call(this, propertiesInfo, tilesData, praseGidFn);
+                if (result) {
+                    this.layerInfo[layerName] = result;
+                }
             }
         }
     }

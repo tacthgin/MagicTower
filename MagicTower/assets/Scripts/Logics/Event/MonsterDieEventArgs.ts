@@ -8,7 +8,7 @@ export class MonsterDieEventArgs extends GameEventArgs {
     private _fightAfterMagic: boolean = false;
 
     get id(): number {
-        return GameEvent.MONSTER_FIGHT;
+        return GameEvent.MONSTER_DIE;
     }
 
     get monster(): Monster {

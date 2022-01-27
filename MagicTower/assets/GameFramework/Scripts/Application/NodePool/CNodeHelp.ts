@@ -1,4 +1,4 @@
-import { instantiate, Node } from "cc";
+import { instantiate, isValid, Node } from "cc";
 import { INodeHelp } from "../../NodePool/INodeHelp";
 
 export class CNodeHelp implements INodeHelp {
@@ -7,6 +7,8 @@ export class CNodeHelp implements INodeHelp {
     }
 
     releaseNode(node: object): void {
-        (node as Node).removeFromParent();
+        if ((node as Node).parent) {
+            (node as Node).removeFromParent();
+        }
     }
 }

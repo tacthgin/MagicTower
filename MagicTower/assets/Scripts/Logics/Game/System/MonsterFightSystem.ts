@@ -10,7 +10,7 @@ import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 
-const ATTACK_INTERVAL = 0.1;
+const ATTACK_INTERVAL = 1;
 
 @CommandManager.register("MonsterFightSystem")
 export class MonsterFightSystem extends SystemBase {

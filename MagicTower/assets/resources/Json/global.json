@@ -16,8 +16,8 @@
         "currentLevel": 1,
         "maps": {},
         "position": {
-            "x": 5,
-            "y": 10
+            "x": 7,
+            "y": 0
         },
         "gold": 10000000,
         "attack": 100,
@@ -34,7 +34,7 @@
         "attack": 2,
         "defence": 4
     },
-    "useTestLoad": false,
+    "useTestLoad": true,
     "hero": {
         "heroAttr": [
             1000,

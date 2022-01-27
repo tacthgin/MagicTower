@@ -76,7 +76,7 @@ export class Door extends Element {
                     let doorJson = Utility.Json.getJsonKeyCache("door", "spriteId", name) as any;
                     if (doorJson && (doorJson.id <= DoorType.RED || doorJson.id == DoorType.WALL)) {
                         let door = new Door();
-                        door.id = doorJson.id;
+                        door.id = parseInt(doorJson.id);
                         doorInfos[i] = door;
                     }
                 }
