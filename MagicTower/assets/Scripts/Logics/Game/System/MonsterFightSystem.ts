@@ -2,7 +2,6 @@ import { CommandManager } from "../../../../GameFramework/Scripts/Application/Co
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
-import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
@@ -11,7 +10,7 @@ import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 
-const ATTACK_INTERVAL = 1;
+const ATTACK_INTERVAL = 0.1;
 
 @CommandManager.register("MonsterFightSystem")
 export class MonsterFightSystem extends SystemBase {
@@ -43,7 +42,6 @@ export class MonsterFightSystem extends SystemBase {
         GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(this.monster.monsterInfo));
         this.schedule(
             () => {
-                GameFrameworkLog.log("show attack", Date.now());
                 if (heroFirst) {
                     this.hero.showAttack(true);
                     this.monster.hurt(damageInfo.monsterDamage);
