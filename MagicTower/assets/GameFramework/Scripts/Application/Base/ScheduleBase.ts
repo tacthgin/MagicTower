@@ -71,6 +71,8 @@ export class ScheduleBase {
                     next = current.next;
                     this._scheduleHandles.remove(current);
                     current = next;
+                } else {
+                    current = current.next;
                 }
             }
         }
