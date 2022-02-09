@@ -152,14 +152,19 @@ export class CommandManager implements ICommandManager {
         }
 
         let commandObject: CommandObject | null = this._systemPool.spawn(name);
+        let system: T | null = null;
         if (!commandObject) {
-            commandObject = CommandObject.create(name, ReferencePool.acquire(systemConstructor));
+            system = ReferencePool.acquire(systemConstructor);
+            commandObject = CommandObject.create(name, system);
             this._systemPool.register(commandObject, true);
+        } else {
+            system = commandObject.target as T;
         }
 
-        this._updateSystemPool.addLast(commandObject.target as T);
+        this._updateSystemPool.addLast(system);
+        system.awake();
 
-        return commandObject.target as T;
+        return system;
     }
 
     destroySystem<T extends SystemBase>(system: T): void {
