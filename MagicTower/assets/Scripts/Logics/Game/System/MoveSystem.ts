@@ -1,15 +1,21 @@
+import { Tween, tween, UITransform, v2, v3, Node, UIOpacity } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
+import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { AstarFactory } from "../../../../GameFramework/Scripts/ToolLibary/Astar/AstarFactory";
 import { IAstar } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAstar";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
+import { CommonEventArgs } from "../../Event/CommonEventArgs";
+import { GameEvent } from "../../Event/GameEvent";
+import { ElementNode } from "../Elements/ElementNode";
 import { IGameMap } from "../Map/GameMap/IGameMap";
+import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 
 export enum AstarMoveType {
@@ -31,17 +37,21 @@ export class MoveSystem extends SystemBase {
     private _levelData: LevelData = null!;
     private _endTile: IVec2 = null!;
     private _heroModel: HeroModel = null!;
+    private _hero: Hero = null!;
+    private _canHeroMoving: boolean = true;
     private static canEndMoveTiles: Readonly<string[]> = ["prop", "stair"];
 
-    constructor() {
-        super();
+    awake(): void {
         this._heroModel = GameApp.getModel(HeroModel);
+        GameApp.EventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
     }
 
-    initliaze(gameMap: IGameMap, levelData: LevelData) {
+    initliaze(gameMap: IGameMap, levelData: LevelData, hero: Hero) {
         this._gameMap = gameMap;
         this._gameMap.setCheckDelegate(this.check.bind(this));
         this._levelData = levelData;
+        this._hero = hero;
+
         if (!this._astar) {
             this._astar = AstarFactory.createCrossAstar(this._gameMap);
         } else {
@@ -49,11 +59,119 @@ export class MoveSystem extends SystemBase {
         }
     }
 
-    setAstarMoveType(astarMoveType: AstarMoveType) {
+    moveHero(position: IVec2, collisionFunc: (tile: IVec2) => boolean) {
+        if (this._canHeroMoving) {
+            let localPos = (this._gameMap as any).node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(position.x, position.y));
+            let endTile = this._gameMap.toTile(v2(localPos?.x, localPos?.y));
+            this.setAstarMoveType(AstarMoveType.HERO);
+            let path = this.getPath(this._hero.heroTile, endTile);
+            if (path.length > 0) {
+                let canEndMove = this.canEndTileMove(endTile);
+                if (!canEndMove) {
+                    path.pop();
+                }
+
+                this._hero.movePath(path, (tile: IVec2, end: boolean) => {
+                    if (end) {
+                        if (!canEndMove) {
+                            this._hero.toward(endTile);
+                        } else {
+                            this._hero.toward();
+                        }
+                        let tile = canEndMove ? endTile : path[path.length - 1];
+                        if (tile) {
+                            this._heroModel.setPosition(tile, this._hero.heroDirection);
+                        }
+                        collisionFunc(endTile);
+                        this._hero.stand();
+                    } else if (!collisionFunc(tile)) {
+                        this._hero.stand();
+                        return true;
+                    }
+                    return false;
+                });
+                GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
+            } else {
+                //GameManager.UI.showToast("无效路径");
+            }
+        }
+    }
+
+    async move(layerName: string, src: number, dst: number, speed: number, delay: number) {
+        let tile = this._gameMap.getTile(src);
+        let gid = this._gameMap.getTileGIDAt(layerName, tile);
+        if (gid) {
+            let element = await this.createElement();
+            if (element) {
+                this._levelData.move(layerName, src, dst, gid);
+                this._gameMap.setTileGIDAt(layerName, tile, 0);
+                this.setAstarMoveType(LAYER_TO_MOVE[layerName]);
+                let path = this.getPath(this._gameMap.getTile(src), this._gameMap.getTile(dst));
+                if (path) {
+                    let moveFunc = () => {
+                        element.getComponent(ElementNode)?.movePath(this.changePathCoord(path), speed);
+                    };
+                    if (delay != 0) {
+                        tween(element).delay(delay).call(moveFunc).start();
+                    } else {
+                        tween(element).call(moveFunc).start();
+                    }
+                }
+            }
+        } else {
+            GameFrameworkLog.error("move gid 找不到");
+        }
+    }
+
+    specialMove(info: any) {
+        if (info.type == "spawn") {
+            let moveAction: Tween<unknown> = null!;
+            let fadeAction: Tween<unknown> = null!;
+            for (let actionName in info) {
+                switch (actionName) {
+                    case "move":
+                        {
+                            let tile = this._gameMap.getTile(info[actionName].to);
+                            moveAction = tween().to(info.interval, { position: this._gameMap.getPositionAt(tile) });
+                        }
+                        break;
+                    case "fadeOut":
+                        {
+                            fadeAction = tween().to(info.interval, { opacity: 0 });
+                        }
+                        break;
+                }
+            }
+            if (info.move) {
+                info.move.from.forEach(async (index: number) => {
+                    this._gameMap.setTileGIDAt("monster", this._gameMap.getTile(index), 0);
+                    let element = await this.createElement();
+                    if (element) {
+                        tween(element).then(moveAction).start();
+                        tween(element.getComponent(UIOpacity)).then(fadeAction).start();
+                    }
+                });
+            }
+        }
+    }
+
+    clear(): void {
+        this._astarMoveType = AstarMoveType.NONE;
+        this._astar = null;
+        this._gameMap = null!;
+        this._levelData = null!;
+        GameApp.EventManager.unsubscribeTarget(this);
+    }
+
+    private onCollisionComplete() {
+        this._canHeroMoving = true;
+    }
+
+    private setAstarMoveType(astarMoveType: AstarMoveType) {
         this._astarMoveType = astarMoveType;
     }
 
-    getPath(beginTile: IVec2, endTile: IVec2) {
+    private getPath(beginTile: IVec2, endTile: IVec2) {
         if (!this._gameMap || !this._levelData || !this._astar) {
             throw new GameFrameworkError("you must set game map first");
         }
@@ -66,18 +184,11 @@ export class MoveSystem extends SystemBase {
         return this._astar.makePath(beginTile, endTile);
     }
 
-    clear(): void {
-        this._astarMoveType = AstarMoveType.NONE;
-        this._astar = null;
-        this._gameMap = null!;
-        this._levelData = null!;
-    }
-
     /**
      * 是否终点tile可以移动
      * @param tile tile坐标
      */
-    canEndTileMove(tile: IVec2) {
+    private canEndTileMove(tile: IVec2) {
         let { layerName, spriteName } = this._gameMap.getTileInfo(tile);
         switch (layerName) {
             case "floor":
@@ -130,5 +241,16 @@ export class MoveSystem extends SystemBase {
         }
 
         return true;
+    }
+
+    private changePathCoord(path: IVec2[]) {
+        for (let i = 0; i < path.length; i++) {
+            path[i] = this._gameMap.getPositionAt(path[i])!;
+        }
+        return path;
+    }
+
+    private async createElement() {
+        return (await GameApp.NodePoolManager.createNodeWithPath(ElementNode, `Prefabs/Elements/ElementNode`)) as Node;
     }
 }

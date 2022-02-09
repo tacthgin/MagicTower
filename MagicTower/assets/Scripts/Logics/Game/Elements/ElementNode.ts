@@ -1,4 +1,5 @@
-import { Component, Sprite, Animation, _decorator } from "cc";
+import { Component, Sprite, Animation, _decorator, Tween, tween, Node } from "cc";
+import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { ElementFactory } from "../Map/ElementFactory";
 
@@ -19,5 +20,16 @@ export class ElementNode extends Component {
             }
             this.animation.play(name);
         }
+    }
+
+    movePath(path: IVec2[], speed: number) {
+        let moveActions: Tween<Node>[] = [];
+
+        for (let i = 0; i < path.length - 1; i++) {
+            moveActions.push(tween().to(speed, { position: path[i] }));
+        }
+        tween(this.node)
+            .sequence(...moveActions)
+            .start();
     }
 }

@@ -1,22 +1,17 @@
-import { Tween, tween, UIOpacity, UITransform, v2, v3, Vec2, Vec3, Node } from "cc";
+import { v2, Vec2, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { Constructor } from "../../../../GameFramework/Scripts/Base/DataStruct/Constructor";
-import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
-import { IObjectPool } from "../../../../GameFramework/Scripts/ObjectPool/IObjectPool";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropType } from "../../../Model/HeroModel/Prop";
-import { Door, DoorState, DoorType } from "../../../Model/MapModel/Data/Elements/Door";
 import { Element } from "../../../Model/MapModel/Data/Elements/Element";
-import { ElementObject } from "../../../Model/MapModel/Data/Elements/ElementObject";
-import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
-import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
-import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
+import { Monster, MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
+import { Npc, NpcInfo } from "../../../Model/MapModel/Data/Elements/Npc";
+import { StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { ShopModel } from "../../../Model/ShopModel/ShopModel";
@@ -24,16 +19,14 @@ import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
-import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
-import { DoorAnimationReverseNode } from "../Elements/DoorAnimaitonReverseNode";
-import { ElementNode } from "../Elements/ElementNode";
 import { ElementFactory } from "../Map/ElementFactory";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
+import { DoorSystem } from "./DoorSystem";
 import { GameEventSystem } from "./GameEventSystem";
 import { MonsterFightSystem } from "./MonsterFightSystem";
-import { AstarMoveType, MoveSystem } from "./MoveSystem";
+import { MoveSystem } from "./MoveSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
 import { UsePropSystem } from "./UsePropSystem";
 
@@ -58,24 +51,21 @@ export class MapCollisionSystem extends SystemBase {
     private gameEventSystem: GameEventSystem = null!;
     private moveSystem: MoveSystem = null!;
     private usePropSystem: UsePropSystem = null!;
+    private doorSystem: DoorSystem = null!;
     private levelEvent: any = {};
     private dialogPos: Vec3 = null!;
-    private canHeroMoving: boolean = true;
 
-    constructor() {
-        super();
-        this.registerEvent();
+    awake(): void {
         this.monsterFightSystem = GameApp.CommandManager.createSystem(MonsterFightSystem);
         this.npcInteractiveSystem = GameApp.CommandManager.createSystem(NpcInteractiveSystem);
         this.gameEventSystem = GameApp.CommandManager.createSystem(GameEventSystem);
         this.moveSystem = GameApp.CommandManager.createSystem(MoveSystem);
         this.usePropSystem = GameApp.CommandManager.createSystem(UsePropSystem);
+        this.doorSystem = GameApp.CommandManager.createSystem(DoorSystem);
 
         this.heroModel = GameApp.getModel(HeroModel);
         this.mapModel = GameApp.getModel(MapModel);
 
-        GameApp.NodePoolManager.createNodePool(DoorAnimationNode);
-        GameApp.NodePoolManager.createNodePool(DoorAnimationReverseNode);
         ElementFactory.initliaze();
     }
 
@@ -83,14 +73,14 @@ export class MapCollisionSystem extends SystemBase {
         this.gameMap = gameMap;
         this.hero = hero;
         this.levelData = this.mapModel.getCurrentLevelData();
-        this.moveSystem.initliaze(this.gameMap, this.levelData);
+        this.moveSystem.initliaze(this.gameMap, this.levelData, hero);
+        this.doorSystem.initliaze(this.gameMap, this.levelData);
     }
 
     private registerEvent() {
         let eventManager = GameApp.EventManager;
         eventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
-        eventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
-        eventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
+        
     }
 
     private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
@@ -125,14 +115,6 @@ export class MapCollisionSystem extends SystemBase {
         // } else {
         //     this.elementActionComplete();
         // }
-    }
-
-    private onCollisionComplete() {
-        this.canHeroMoving = true;
-    }
-
-    private onUseProp(sender: object, eventArgs: UsePropEventArgs) {
-        this.usePropSystem.useProp(eventArgs.propInfo, eventArgs.extraInfo);
     }
 
     private getTileOrIndex(tileOrIndex: IVec2 | number) {
@@ -173,119 +155,6 @@ export class MapCollisionSystem extends SystemBase {
         record && this.levelData.setDisappear(layerName, index);
     }
 
-    moveHero(position: IVec2) {
-        if (this.canHeroMoving) {
-            let localPos = (this.gameMap as any).node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(position.x, position.y));
-            let endTile = this.gameMap.toTile(v2(localPos?.x, localPos?.y));
-            this.moveSystem.setAstarMoveType(AstarMoveType.HERO);
-            let path = this.moveSystem.getPath(this.hero.heroTile, endTile);
-            if (path.length > 0) {
-                let canEndMove = this.moveSystem.canEndTileMove(endTile);
-                if (!canEndMove) {
-                    path.pop();
-                }
-
-                this.hero.movePath(path, (tile: IVec2, end: boolean) => {
-                    if (end) {
-                        if (!canEndMove) {
-                            this.hero.toward(endTile);
-                        } else {
-                            this.hero.toward();
-                        }
-                        let tile = canEndMove ? endTile : path[path.length - 1];
-                        if (tile) {
-                            this.heroModel.setPosition(tile, this.hero.heroDirection);
-                        }
-                        this.collision(endTile);
-                        this.hero.stand();
-                    } else if (!this.collision(tile)) {
-                        this.hero.stand();
-                        return true;
-                    }
-                    return false;
-                });
-                GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
-            } else {
-                //GameManager.UI.showToast("无效路径");
-            }
-        }
-    }
-
-    async move(layerName: string, src: number, dst: number, speed: number, delay: number) {
-        let tile = this.gameMap.getTile(src);
-        let gid = this.gameMap.getTileGIDAt(layerName, tile);
-        if (gid) {
-            let element = await this.createElement();
-            if (element) {
-                this.levelData.move(layerName, src, dst, gid);
-                this.gameMap.setTileGIDAt(layerName, tile, 0);
-                let path = CommonAstar.getPath(this.gameMap, this.gameMap.getTile(src), this.gameMap.getTile(dst));
-                if (path) {
-                    let moveFunc = () => {
-                        element?.getComponent(ElementNode)?.movePath(this.changePathCoord(path!), speed);
-                    };
-                    if (delay != 0) {
-                        tween(element).delay(delay).call(moveFunc).start();
-                    } else {
-                        tween(element).call(moveFunc).start();
-                    }
-                }
-            }
-        } else {
-            GameFrameworkLog.error("move gid 找不到");
-        }
-    }
-
-    specialMove(info: any) {
-        if (info.type == "spawn") {
-            let moveAction: Tween<unknown> = null!;
-            let fadeAction: Tween<unknown> = null!;
-            for (let actionName in info) {
-                switch (actionName) {
-                    case "move":
-                        {
-                            let tile = this.gameMap.getTile(info[actionName].to);
-                            moveAction = tween().to(info.interval, { position: this.gameMap.getPositionAt(tile) });
-                        }
-                        break;
-                    case "fadeOut":
-                        {
-                            fadeAction = tween().to(info.interval, { opacity: 0 });
-                        }
-                        break;
-                }
-            }
-            if (info.move) {
-                info.move.from.forEach(async (index: number) => {
-                    this.gameMap.setTileGIDAt("monster", this.gameMap.getTile(index), 0);
-                    let element = await this.createElement();
-                    if (element) {
-                        tween(element).then(moveAction).start();
-                        tween(element.getComponent(UIOpacity)).then(fadeAction).start();
-                    }
-                });
-            }
-        }
-    }
-
-    private async createElement() {
-        return (await GameApp.NodePoolManager.createNodeWithPath(ElementNode, `Prefabs/Elements/ElementNode`)) as Node;
-    }
-
-    private async createDoorAnimation(id: number | string, tile: IVec2, reverse: boolean, callback: Function | null = null) {
-        let name = reverse ? "DoorAnimationReverseNode" : "DoorAnimationNode";
-        let constructor = reverse ? DoorAnimationReverseNode : DoorAnimationNode;
-        let node = (await GameApp.NodePoolManager.createNodeWithPath(constructor, `Prefabs/Elements/${name}`)) as Node;
-        if (node) {
-            let position = this.gameMap.getPositionAt(tile);
-            if (position) {
-                node.position = v3(position?.x, position?.y);
-                node.parent = (this.gameMap as any).node;
-                node.getComponent(constructor)?.init(`door${id}`, callback);
-            }
-        }
-    }
-
     /** 根据图片名字获取json数据 */
     private getJsonData(layerName: string, spriteFrameName: string | null | undefined) {
         if (!spriteFrameName) return null;
@@ -300,6 +169,10 @@ export class MapCollisionSystem extends SystemBase {
         }
     }
 
+    moveHero(position: IVec2) {
+        this.moveSystem.moveHero(position, this.collision.bind(this));
+    }
+
     /**
      * 英雄和地图元素的交互
      * @param tile 交互坐标
@@ -311,40 +184,31 @@ export class MapCollisionSystem extends SystemBase {
         let jsonData = this.getJsonData(layerName, spriteName) as any;
         switch (layerName) {
             case "prop":
-                {
-                    GameApp.SoundManager.playSound("Sound/eat");
-                    this.heroModel.addProp(jsonData.id, this.levelData.level);
-                    this.disappear(layerName, tile);
-                }
-                return true;
-            case "door":
-                //这里只处理可见的门逻辑
-                return this.doorCollision(tile, layerName);
-            case "stair":
-                let stair = this.levelData.getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
-                if (stair) {
-                    this.mapModel.setLevelDiff(stair.levelDiff);
+                if (jsonData) {
+                    this.eatProp(layerName, tile, jsonData.id);
                     return true;
+                } else {
+                    GameFrameworkLog.error("prop json is not exist");
                 }
                 break;
+            case "door":
+                //这里只处理可见的门逻辑
+                return this.doorSystem.doorCollision(tile, layerName);
+            case "stair":
+                return this.goStair(spriteName!);
             case "monster":
-                {
-                    if (!CalculateSystem.canHeroAttack(this.heroModel, jsonData, !jsonData.firstAttack)) {
-                        //GameManager.UI.showToast(`你打不过${jsonData.name}`);
-                        return true;
-                    }
-
-                    let monster = ElementFactory.createElementData(Monster, "monster");
-                    monster.id = parseInt(jsonData.id);
-                    monster.index = this.gameMap.getTileIndex(tile);
-                    this.monsterFightSystem.initliaze(this.hero, monster);
-                    this.monsterFightSystem.execute(/*this.haveMagicHurt(index)*/ false);
+                if (jsonData) {
+                    return this.fightMonster(jsonData, tile);
+                } else {
+                    GameFrameworkLog.error("monster json is not exist");
                 }
                 break;
             case "npc":
-                let npc = ElementFactory.createElementData(Npc, "npc");
-                this.npcInteractiveSystem.initliaze(npc, this);
-                this.npcInteractiveSystem.execute();
+                if (jsonData) {
+                    return this.interactiveNpc(jsonData, tile);
+                } else {
+                    GameFrameworkLog.error("npc json is not exist");
+                }
                 break;
             case "building":
                 this.gotoShop();
@@ -360,129 +224,96 @@ export class MapCollisionSystem extends SystemBase {
         return false;
     }
 
-    private doorCollision(tile: IVec2, layerName: string) {
-        let tileIndex = this.gameMap.getTileIndex(tile);
+    private eatProp(layerName: string, tile: IVec2, id: number) {
+        GameApp.SoundManager.playSound("Sound/eat");
+        this.heroModel.addProp(id, this.levelData.level);
+        this.disappear(layerName, tile);
+    }
 
-        let doorInfo: Door = this.levelData.getLayerElement(layerName, tileIndex);
-        if (!doorInfo) {
+    private goStair(spriteName: string) {
+        let stair = this.levelData.getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
+        if (stair) {
+            this.mapModel.setLevelDiff(stair.levelDiff);
             return true;
         }
 
-        let openDoor = () => {
-            this.createDoorAnimation(doorInfo.id, tile, false, () => {
-                GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-            });
-            this.levelData.deleteLayerElement(layerName, tileIndex);
-            this.gameMap.setTileGIDAt(layerName, tile, 0);
-        };
+        return false;
+    }
 
-        if (doorInfo.canWallOpen()) {
-            openDoor();
-        } else if (doorInfo.isKeyDoor()) {
-            let doorJson = Utility.Json.getJsonKeyCache("prop", "value", doorInfo.id) as any;
-            if (!doorJson) {
-                throw new GameFrameworkError("door json is invaild");
-            }
-            let keyID = doorJson.id;
-            if (keyID && this.heroModel.getPropNum(keyID) > 0) {
-                this.heroModel.addProp(keyID, 1, -1);
-                openDoor();
-                let eventInfo = this.levelData.getLayerInfo(layerName)["event"];
-                if (eventInfo && eventInfo.doorState == DoorState.DISAPPEAR_EVENT) {
-                    let existCondition = eventInfo.condition[0];
-                    if (existCondition) {
-                        let index = existCondition.indexOf(tileIndex);
-                        if (index != -1) {
-                            eventInfo.condition[0] = null;
-                        } else {
-                            let disappearCondition: number[] = eventInfo.condition[1];
-                            index = disappearCondition.indexOf(tileIndex);
-                            if (index != -1) {
-                                disappearCondition.splice(index, 1);
-                                if (disappearCondition.length == 0) {
-                                    this.eventCollision(eventInfo.value);
-                                }
-                            }
-                        }
-                    }
+    private fightMonster(monsterJson: MonsterInfo, tile: IVec2) {
+        if (!CalculateSystem.canHeroAttack(this.heroModel, monsterJson, !monsterJson.firstAttack)) {
+            //GameManager.UI.showToast(`你打不过${monsterJson.name}`);
+            return true;
+        }
+
+        let monster = ElementFactory.createElementData(Monster, "monster");
+        monster.id = parseInt(monsterJson.id);
+        monster.index = this.gameMap.getTileIndex(tile);
+        this.monsterFightSystem.initliaze(this.hero, monster);
+        this.monsterFightSystem.execute(/*this.haveMagicHurt(index)*/ false);
+        return false;
+    }
+
+    private interactiveNpc(npcJson: NpcInfo, tile: IVec2) {
+        let npc = ElementFactory.createElementData(Npc, "npc");
+        npc.id = parseInt(npcJson.id);
+        npc.index = this.gameMap.getTileIndex(tile);
+        this.npcInteractiveSystem.initliaze(npc, this);
+        this.npcInteractiveSystem.execute();
+        return false;
+    }
+
+    private gotoShop() {
+        let shopModel = GameApp.getModel(ShopModel);
+        shopModel.level = this.levelData.level;
+        // GameManager.UI.showDialog("ShopDialog", shopModel, this.heroModel.getAttr(HeroAttr.GOLD), (attr: string) => {
+        //     switch (attr) {
+        //         case "hp":
+        //             this.heroModel.setAttrDiff(HeroAttr.HP, shopModel.hp);
+        //             break;
+        //         case "attack":
+        //             this.heroModel.setAttrDiff(HeroAttr.ATTACK, shopModel.attack);
+        //             break;
+        //         case "defence":
+        //             this.heroModel.setAttrDiff(HeroAttr.DEFENCE, shopModel.defence);
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        //     if (attr != "no") {
+        //         this.heroModel.setAttrDiff(HeroAttr.GOLD, shopModel.buy());
+        //     }
+        //     this.elementActionComplete();
+        // }).then((control: any) => {
+        //     //control.node.position = this._dialogPos;
+        // });
+    }
+
+    eventCollision(eventID: number | string | IVec2) {
+        let id: number | string | null = null;
+        if (typeof eventID == "number" || typeof eventID == "string") {
+            id = eventID;
+        } else {
+            let index = this.gameMap.getTileIndex(eventID);
+            let eventInfo = this.levelData.getLayerInfo("event");
+            if (eventInfo) {
+                let event: Element = eventInfo[index];
+                if (event) {
+                    id = event.id;
                 }
             }
         }
 
-        return true;
-
-        //if (element.canWallOpen()) {
-        //墙门
-        //this.removeElement(index, "door");
-        //return false;
-        //} else if (element.appear) {
-        //if (!element.node.active) {
-        //隐藏的墙门
-        //element.add();
-        //门事件
-        //if (this.doorInfo.appearEventDoor) {
-        //for (let eventID in this.doorInfo.appearEventDoor) {
-        //let indexs = this.doorInfo.appearEventDoor[eventID];
-        //indexs.splice(indexs.indexOf(index), 1);
-        //if (indexs.length != 0) {
-        //this.eventCollision(eventID);
-        //}
-        //}
-        //}
-        //}
-        //return true;
-        //} else if (!element.hide && !element.passive) {
-        //let keyId = this.propParser.getKeyByDoor(element.id);
-        //if (keyId && this.heroModel.getPropNum(keyId) > 0) {
-        //this.hero.removeProp(keyId);
-        //this.removeElement(index, "door");
-        //this.disappearDoorEventTrigger(index);
-        //SoundManager.playEffect("door");
-        //return false;
-        //} else {
-        //GameManager.getInstance().showToast("你无法打开这个门");
-        //}
-        //}
-        //return true;
-    }
-
-    private invisibleDoorCollision(tile: IVec2) {
-        let layerName = "door";
-        let doorLayerInfo = this.levelData.getLayerInfo(layerName);
-        if (!doorLayerInfo) {
-            return true;
-        }
-        let tileIndex = this.gameMap.getTileIndex(tile);
-
-        let eventInfo: Door = doorLayerInfo["event"];
-        if (eventInfo && eventInfo.doorState == DoorState.APPEAR_EVENT) {
-            //墙门出现事件
-            this.createDoorAnimation(DoorType.WALL, tile, false, () => {
-                this.gameMap.setTileGIDAt(layerName, tile, this.gameMap.getGidByName(`door${DoorType.WALL}`));
-            });
-
-            let condition: number[] = eventInfo.condition;
-            let index = condition.indexOf(tileIndex);
-            if (index != -1) {
-                condition.splice(index, 1);
-            }
-            this.levelData.saveMapData();
-            if (condition.length == 0) {
-                this.eventCollision(eventInfo.value);
-            }
-        } else {
-            let doorInfo: Door = this.levelData.getLayerElement(layerName, tileIndex);
-            if (doorInfo && doorInfo.doorState == DoorState.APPEAR) {
-                this.createDoorAnimation(doorInfo.id, tile, true, () => {
-                    this.gameMap.setTileGIDAt(layerName, tile, doorInfo.gid);
-                    GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-                });
+        if (id) {
+            let eventInfo = Utility.Json.getJsonElement("event", id) as any;
+            if (!eventInfo.save || eventInfo.save == this.levelData.level) {
+                this.gameEventSystem.initliaze(this, id).execute();
+                return false;
             } else {
-                return true;
+                this.levelEvent[eventInfo.save] = id;
             }
         }
-
-        return false;
+        return true;
     }
 
     show() {
@@ -706,66 +537,6 @@ export class MapCollisionSystem extends SystemBase {
         //}
     }
 
-    private changePathCoord(path: IVec2[]) {
-        for (let i = 0; i < path.length; i++) {
-            path[i] = this.gameMap.getPositionAt(path[i])!;
-        }
-        return path;
-    }
-
-    private gotoShop() {
-        let shopModel = GameApp.getModel(ShopModel);
-        shopModel.level = this.levelData.level;
-        // GameManager.UI.showDialog("ShopDialog", shopModel, this.heroModel.getAttr(HeroAttr.GOLD), (attr: string) => {
-        //     switch (attr) {
-        //         case "hp":
-        //             this.heroModel.setAttrDiff(HeroAttr.HP, shopModel.hp);
-        //             break;
-        //         case "attack":
-        //             this.heroModel.setAttrDiff(HeroAttr.ATTACK, shopModel.attack);
-        //             break;
-        //         case "defence":
-        //             this.heroModel.setAttrDiff(HeroAttr.DEFENCE, shopModel.defence);
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        //     if (attr != "no") {
-        //         this.heroModel.setAttrDiff(HeroAttr.GOLD, shopModel.buy());
-        //     }
-        //     this.elementActionComplete();
-        // }).then((control: any) => {
-        //     //control.node.position = this._dialogPos;
-        // });
-    }
-
-    private eventCollision(eventID: number | string | IVec2) {
-        let id: number | string | null = null;
-        if (eventID instanceof Vec2) {
-            let index = this.gameMap.getTileIndex(eventID);
-            let eventInfo = this.levelData.getLayerInfo("event");
-            if (eventInfo) {
-                let event: Element = eventInfo[index];
-                if (event) {
-                    id = event.id;
-                }
-            }
-        } else {
-            id = eventID;
-        }
-
-        if (id) {
-            let eventInfo = Utility.Json.getJsonElement("event", id) as any;
-            if (!eventInfo.save || eventInfo.save == this.levelData.level) {
-                this.gameEventSystem.init(this, this.gameMap, this.hero, id).execute();
-                return false;
-            } else {
-                this.levelEvent[eventInfo.save] = id;
-            }
-        }
-        return true;
-    }
-
     haveMagicHurt(index: number) {
         //let magic = false;
         //if (!this.heroModel.equipedDivineShield()) {
@@ -797,7 +568,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private floorCollision(tile: IVec2) {
-        if (!this.invisibleDoorCollision(tile)) {
+        if (!this.doorSystem.invisibleDoorCollision(tile)) {
             return false;
         }
 
@@ -870,8 +641,7 @@ export class MapCollisionSystem extends SystemBase {
         GameApp.CommandManager.destroySystem(this.npcInteractiveSystem);
         GameApp.CommandManager.destroySystem(this.gameEventSystem);
         GameApp.CommandManager.destroySystem(this.moveSystem);
-        GameApp.NodePoolManager.destroyNodePool(DoorAnimationNode);
-        GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
+        GameApp.CommandManager.destroySystem(this.doorSystem);
         ElementFactory.clear();
     }
 }

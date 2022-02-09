@@ -11,9 +11,10 @@ import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
+import { GameEvent } from "../../Event/GameEvent";
+import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
-import { MapCollisionSystem } from "./MapCollisionSystem";
 
 /** 在楼梯旁的index差值 */
 const INDEX_DIFFS: Readonly<number[]> = [1, 11];
@@ -28,7 +29,10 @@ export class UsePropSystem extends SystemBase {
     private levelData: LevelData = null!;
     private gameMap: IGameMap = null!;
     private hero: Hero = null!;
-    private mapCollisionSystem: MapCollisionSystem = null!;
+
+    awake(): void {
+        GameApp.EventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
+    }
 
     initliaze(gameMap: IGameMap) {
         this.heroModel = GameApp.getModel(HeroModel);
@@ -39,6 +43,11 @@ export class UsePropSystem extends SystemBase {
 
     clear(): void {
         this.heroModel = null!;
+        this.mapModel = null!;
+        this.levelData = null!;
+        this.gameMap = null!;
+        this.hero = null!;
+        GameApp.EventManager.unsubscribeTarget(this);
     }
 
     useProp(propInfo: PropInfo, extraInfo: string) {
@@ -122,6 +131,10 @@ export class UsePropSystem extends SystemBase {
                 }
                 break;
         }
+    }
+
+    private onUseProp(sender: object, eventArgs: UsePropEventArgs) {
+        this.useProp(eventArgs.propInfo, eventArgs.extraInfo);
     }
 
     /** 勇士在楼梯旁边 */
