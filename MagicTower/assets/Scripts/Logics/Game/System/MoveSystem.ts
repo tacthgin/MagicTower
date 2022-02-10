@@ -44,6 +44,7 @@ export class MoveSystem extends SystemBase {
     awake(): void {
         this._heroModel = GameApp.getModel(HeroModel);
         GameApp.EventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
+        GameApp.EventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
     }
 
     initliaze(gameMap: IGameMap, levelData: LevelData, hero: Hero) {

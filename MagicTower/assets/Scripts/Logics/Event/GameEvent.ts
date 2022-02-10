@@ -13,6 +13,7 @@ export enum GameEvent {
     MONSTER_FIGHT,
     /** 场景出现 */
     SCENE_APPEAR,
+    SCENE_DISAPPEAR,
     /** 人物移动     */
     MOVE_PATH,
     /** 使用道具 */
@@ -22,4 +23,6 @@ export enum GameEvent {
     COMMAND_DISAPPEAR,
     COMMAND_APPEAR,
     COMMAND_EVENT,
+    COMMAND_COLLISION,
+    COMMAND_MOVE,
 }

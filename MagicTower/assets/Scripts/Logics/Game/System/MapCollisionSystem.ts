@@ -17,6 +17,7 @@ import { MapModel } from "../../../Model/MapModel/MapModel";
 import { ShopModel } from "../../../Model/ShopModel/ShopModel";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventArgs";
+import { EventCollisionEventArgs } from "../../Event/EventCollisionEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { ElementFactory } from "../Map/ElementFactory";
@@ -139,6 +140,7 @@ export class MapCollisionSystem extends SystemBase {
         eventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
         eventManager.subscribe(GameEvent.COMMAND_APPEAR, this.onCommandAppear, this);
         eventManager.subscribe(GameEvent.COMMAND_DISAPPEAR, this.onCommandDisappear, this);
+        eventManager.subscribe(GameEvent.COMMAND_EVENT, this.onCommandEvent, this);
     }
 
     private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
@@ -181,6 +183,10 @@ export class MapCollisionSystem extends SystemBase {
 
     private onCommandDisappear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
         this.disappear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.record);
+    }
+
+    private onCommandEvent(sender: object, eventArgs: EventCollisionEventArgs) {
+        this.eventCollision(eventArgs.eventIdOrTile);
     }
 
     private getTileOrIndex(tileOrIndex: IVec2 | number) {

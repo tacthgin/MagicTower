@@ -1,6 +1,5 @@
 /**处理地图上的事件 */
 
-import { tween } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -8,7 +7,11 @@ import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
-import { MapCollisionSystem } from "./MapCollisionSystem";
+import { AppearCommand } from "../Command/AppearCommand";
+import { CollisionCommand } from "../Command/CollisionCommand";
+import { DisappearCommand } from "../Command/DisappearCommand";
+import { IGameMap } from "../Map/GameMap/IGameMap";
+import { Hero } from "../Map/Hero/Hero";
 
 @CommandManager.register("GameEventSystem")
 export class GameEventSystem extends SystemBase {
@@ -19,16 +22,16 @@ export class GameEventSystem extends SystemBase {
     private moveStep: number = 0;
     private step: number = 0;
     private globalConfig: any = null;
-    private collisionSystem: MapCollisionSystem = null!;
+    private gameMap: IGameMap = null!;
+    private hero: Hero = null!;
 
-    initliaze(collisionSystem: MapCollisionSystem, eventId: number | string) {
+    initliaze(gameMap: IGameMap, eventId: number | string) {
         this.eventInfo = Utility.Json.getJsonElement("event", eventId);
         this.globalConfig = Utility.Json.getJson("global");
-        this.collisionSystem = collisionSystem;
+        this.gameMap = gameMap;
         // if (this.eventInfo.monsterDoor) {
-        // this.map.monsterDoor = this.eventInfo.monsterDoor;
+        // this.gameMap.monsterDoor = this.eventInfo.monsterDoor;
         // }
-        return this;
     }
 
     executeComplete() {
@@ -52,10 +55,10 @@ export class GameEventSystem extends SystemBase {
                     this.disappear();
                     break;
                 case "do":
-                    this.collisionSystem.collision(this.map.getTile(this.eventInfo.do));
+                    GameApp.CommandManager.createCommand(CollisionCommand).execute(this.gameMap.getTile(this.eventInfo.do));
                     break;
                 case "show":
-                    //this.map.getElement(this.eventInfo.show).add();
+                    //this.gameMap.getElement(this.eventInfo.show).add();
                     this.execute();
                 case "appear":
                     this.appear();
@@ -73,11 +76,11 @@ export class GameEventSystem extends SystemBase {
                     this.clearNpcEvent();
                     break;
                 case "weak":
-                    //this.map.getElement(this.eventInfo.weak[0], "monster").weak(this.eventInfo.weak[1]);
+                    //this.gameMap.getElement(this.eventInfo.weak[0], "monster").weak(this.eventInfo.weak[1]);
                     break;
             }
         } else {
-            //this.map.clearGameEventSystem();
+            //this.gameMap.clearGameEventSystem();
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         }
     }
@@ -86,7 +89,7 @@ export class GameEventSystem extends SystemBase {
         // GameManager.UI.showDialog("ChatDialog", this.eventInfo.chat[this.chatStep++], () => {
         //     this.execute();
         // }).then((control: any) => {
-        //     //control.node.position = this.map.dialogPos;
+        //     //control.node.position = this.gameMap.dialogPos;
         // });
     }
 
@@ -97,6 +100,7 @@ export class GameEventSystem extends SystemBase {
             //moveinfo 格式[0, 38, 5]第一个延时，第二个当前坐标，第三个终点坐标
             let move = movePath[layer];
             move.forEach((moveInfo: number[]) => {
+                CommandManager
                 this.collisionSystem.move(layer, moveInfo[1], moveInfo[2], moveData.speed, moveInfo[0]);
             });
         }
@@ -116,7 +120,7 @@ export class GameEventSystem extends SystemBase {
                 let layerInfo = appearInfo.layer[layer];
                 for (let i = 0; i < layerInfo.length; i++) {
                     this.scheduleOnce(() => {
-                        this.collisionSystem.appear(layer, layerInfo[i][0], layerInfo[i][1]);
+                        GameApp.CommandManager.createCommand(AppearCommand).execute(layer, layerInfo[i][0], layerInfo[i][1]);
                     }, appearInfo.delay[i]);
                 }
             }
@@ -124,7 +128,7 @@ export class GameEventSystem extends SystemBase {
             for (let layer in appearInfo.layer) {
                 let layerInfo = appearInfo.layer[layer];
                 layerInfo.forEach((elementInfo: number[]) => {
-                    this.collisionSystem.appear(layer, elementInfo[0], elementInfo[1]);
+                    GameApp.CommandManager.createCommand(AppearCommand).execute(layer, elementInfo[0], elementInfo[1]);
                 });
             }
         }
@@ -136,7 +140,7 @@ export class GameEventSystem extends SystemBase {
         let info = this.eventInfo.disappear[this.disappearStep++];
         for (let layer in info) {
             info[layer].forEach((index: number) => {
-                this.collisionSystem.disappear(layer, index);
+                GameApp.CommandManager.createCommand(DisappearCommand).execute(layer, index);
             });
         }
         this.execute();
@@ -146,7 +150,7 @@ export class GameEventSystem extends SystemBase {
         if (info.hero) {
             this.hero.magicLight(info.hero);
         } else if (info.monster) {
-            // let monster = this.map.getElement(info.monster, "monster");
+            // let monster = this.gameMap.getElement(info.monster, "monster");
             // monster.beAttack();
         }
 
@@ -156,21 +160,19 @@ export class GameEventSystem extends SystemBase {
     private sceneAppear() {
         let info = this.eventInfo.sceneAppear;
         this.hero.weak();
-        GameApp.EventManager.fireNow(this, SceneAppearEventArgs.create(info[0], this.map.getTile(info[1])));
+        GameApp.EventManager.fireNow(this, SceneAppearEventArgs.create(info[0], this.gameMap.getTile(info[1])));
         this.execute();
     }
 
     private sceneDisappear() {
-        tween(this.map.node!.parent!.parent)
-            .to(1, { opacity: 0 })
-            .call(() => {
-                this.execute();
-            })
-            .start();
+        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.SCENE_DISAPPEAR));
+        this.scheduleOnce(() => {
+            this.execute();
+        }, 1);
     }
 
     clearNpcEvent() {
-        //this.map.getElement(this.eventInfo.clearNpcEvent, "npc").clearEvent();
+        //this.gameMap.getElement(this.eventInfo.clearNpcEvent, "npc").clearEvent();
         this.execute();
     }
 }

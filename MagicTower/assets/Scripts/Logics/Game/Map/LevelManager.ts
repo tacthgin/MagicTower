@@ -1,10 +1,11 @@
-import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, v3, Vec2, _decorator } from "cc";
+import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, tween, UIOpacity, v3, Vec2, _decorator } from "cc";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
+import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
 import { MapCollisionSystem } from "../System/MapCollisionSystem";
@@ -45,6 +46,7 @@ export class LevelManager extends Component {
 
         let eventManager = GameApp.EventManager;
         eventManager.subscribe(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
+        eventManager.subscribe(GameEvent.SCENE_DISAPPEAR, this.onSceneDisappear, this);
 
         this.collisionSystem = GameApp.CommandManager.createSystem(MapCollisionSystem);
     }
@@ -124,6 +126,10 @@ export class LevelManager extends Component {
         let newMap = this.createMap(this.mapModel.level);
         newMap.node.active = true;
         this.showHero(eventArgs.tile);
+    }
+
+    private onSceneDisappear(sender: object, eventArgs: CommonEventArgs) {
+        tween(this.node.getComponent(UIOpacity)).to(1, { opacity: 0 }).start();
     }
 
     private showHero(tile: IVec2 | null = null) {
