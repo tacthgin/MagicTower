@@ -16,9 +16,9 @@ import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { ShopModel } from "../../../Model/ShopModel/ShopModel";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
+import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
-import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
 import { ElementFactory } from "../Map/ElementFactory";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
@@ -66,6 +66,7 @@ export class MapCollisionSystem extends SystemBase {
         this.heroModel = GameApp.getModel(HeroModel);
         this.mapModel = GameApp.getModel(MapModel);
 
+        this.registerEvent();
         ElementFactory.initliaze();
     }
 
@@ -75,98 +76,7 @@ export class MapCollisionSystem extends SystemBase {
         this.levelData = this.mapModel.getCurrentLevelData();
         this.moveSystem.initliaze(this.gameMap, this.levelData, hero);
         this.doorSystem.initliaze(this.gameMap, this.levelData);
-    }
-
-    private registerEvent() {
-        let eventManager = GameApp.EventManager;
-        eventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
-        
-    }
-
-    private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
-        //幸运金币
-        let ratio = this.heroModel.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
-        this.heroModel.setAttrDiff(HeroAttr.GOLD, eventArgs.monster.monsterInfo.gold * ratio);
-        this.disappear("monster", eventArgs.monster.index);
-        ElementFactory.releaseElementData(eventArgs.monster);
-        this.elementActionComplete();
-        //this.removeMonsterDoor();
-        //this.monsterEventTrigger(index);
-        //this.removeMagicHurt(index, monster);
-        // if (monster.monsterInfo.big) {
-        //     this.monsterInfo.bigMonster = null;
-        // }
-        // if (this.doorInfo.monsterCondition) {
-        //     let doorIndex = this.doorInfo.monsterCondition[index];
-        //     if (doorIndex) {
-        //         let door = this.getElement(doorIndex, "door");
-        //         if (door) {
-        //             door.condition = null;
-        //         }
-        //     }
-        //     delete this.doorInfo.monsterCondition[index];
-        // }
-        // if (monster.monsterInfo.eventID) {
-        //     this.eventCollision(monster.monsterInfo.eventID);
-        // } else if (this.gameEventSystem && !this.gameEventSystem.executeComplete()) {
-        //     this.gameEventSystem.execute();
-        // } else if (magic) {
-        //     this.floorCollision(index);
-        // } else {
-        //     this.elementActionComplete();
-        // }
-    }
-
-    private getTileOrIndex(tileOrIndex: IVec2 | number) {
-        let tile: IVec2 = null!;
-        let index: number = -1;
-        if (typeof tileOrIndex == "number") {
-            tile = this.gameMap.getTile(tileOrIndex);
-            index = tileOrIndex;
-        } else {
-            tile = tileOrIndex;
-            index = this.gameMap.getTileIndex(tileOrIndex);
-        }
-
-        return { tile: tile, index: index };
-    }
-
-    appear(layerName: string, tileOrIndex: IVec2 | number, id: number, record: boolean = true) {
-        let json = Utility.Json.getJsonElement(layerName, id) as any;
-        if (json) {
-            let { index, tile } = this.getTileOrIndex(tileOrIndex);
-            let gid = this.gameMap.getGidByName(`${json.spriteId}_0`);
-            if (gid) {
-                this.gameMap.setTileGIDAt(layerName, tile, gid);
-                record && this.levelData.setAppear(layerName, index, gid);
-            } else {
-                GameFrameworkLog.error("appear gid 找不到");
-            }
-        } else {
-            GameFrameworkLog.error("appear error id:", id);
-        }
-    }
-
-    disappear(layerName: string, tileOrIndex: IVec2 | number, record: boolean = true) {
-        let { index, tile } = this.getTileOrIndex(tileOrIndex);
-        if (tile) {
-            this.gameMap.setTileGIDAt(layerName, tile, 0);
-        }
-        record && this.levelData.setDisappear(layerName, index);
-    }
-
-    /** 根据图片名字获取json数据 */
-    private getJsonData(layerName: string, spriteFrameName: string | null | undefined) {
-        if (!spriteFrameName) return null;
-        let name = spriteFrameName.split("_")[0];
-        switch (layerName) {
-            case "prop":
-            case "monster":
-            case "door":
-                return Utility.Json.getJsonKeyCache(layerName, "spriteId", name);
-            default:
-                return null;
-        }
+        this.usePropSystem.initliaze(this.gameMap);
     }
 
     moveHero(position: IVec2) {
@@ -222,6 +132,107 @@ export class MapCollisionSystem extends SystemBase {
                 return true;
         }
         return false;
+    }
+
+    private registerEvent() {
+        let eventManager = GameApp.EventManager;
+        eventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
+        eventManager.subscribe(GameEvent.COMMAND_APPEAR, this.onCommandAppear, this);
+        eventManager.subscribe(GameEvent.COMMAND_DISAPPEAR, this.onCommandDisappear, this);
+    }
+
+    private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
+        //幸运金币
+        let ratio = this.heroModel.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
+        this.heroModel.setAttrDiff(HeroAttr.GOLD, eventArgs.monster.monsterInfo.gold * ratio);
+        this.disappear("monster", eventArgs.monster.index);
+        ElementFactory.releaseElementData(eventArgs.monster);
+        this.elementActionComplete();
+        //this.removeMonsterDoor();
+        //this.monsterEventTrigger(index);
+        //this.removeMagicHurt(index, monster);
+        // if (monster.monsterInfo.big) {
+        //     this.monsterInfo.bigMonster = null;
+        // }
+        // if (this.doorInfo.monsterCondition) {
+        //     let doorIndex = this.doorInfo.monsterCondition[index];
+        //     if (doorIndex) {
+        //         let door = this.getElement(doorIndex, "door");
+        //         if (door) {
+        //             door.condition = null;
+        //         }
+        //     }
+        //     delete this.doorInfo.monsterCondition[index];
+        // }
+        // if (monster.monsterInfo.eventID) {
+        //     this.eventCollision(monster.monsterInfo.eventID);
+        // } else if (this.gameEventSystem && !this.gameEventSystem.executeComplete()) {
+        //     this.gameEventSystem.execute();
+        // } else if (magic) {
+        //     this.floorCollision(index);
+        // } else {
+        //     this.elementActionComplete();
+        // }
+    }
+
+    private onCommandAppear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
+        this.appear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.elementId, eventArgs.record);
+    }
+
+    private onCommandDisappear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
+        this.disappear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.record);
+    }
+
+    private getTileOrIndex(tileOrIndex: IVec2 | number) {
+        let tile: IVec2 = null!;
+        let index: number = -1;
+        if (typeof tileOrIndex == "number") {
+            tile = this.gameMap.getTile(tileOrIndex);
+            index = tileOrIndex;
+        } else {
+            tile = tileOrIndex;
+            index = this.gameMap.getTileIndex(tileOrIndex);
+        }
+
+        return { tile: tile, index: index };
+    }
+
+    private appear(layerName: string, tileOrIndex: IVec2 | number, id: number, record: boolean = true) {
+        let json = Utility.Json.getJsonElement(layerName, id) as any;
+        if (json) {
+            let { index, tile } = this.getTileOrIndex(tileOrIndex);
+            let gid = this.gameMap.getGidByName(`${json.spriteId}_0`);
+            if (gid) {
+                this.gameMap.setTileGIDAt(layerName, tile, gid);
+                record && this.levelData.setAppear(layerName, index, gid);
+            } else {
+                GameFrameworkLog.error("appear gid 找不到");
+            }
+        } else {
+            GameFrameworkLog.error("appear error id:", id);
+        }
+    }
+
+    private disappear(layerName: string, tileOrIndex: IVec2 | number, record: boolean = true) {
+        let { index, tile } = this.getTileOrIndex(tileOrIndex);
+        if (tile) {
+            this.gameMap.setTileGIDAt(layerName, tile, 0);
+        }
+        record && this.levelData.setDisappear(layerName, index);
+    }
+
+    /** 根据图片名字获取json数据 */
+    private getJsonData(layerName: string, spriteFrameName: string | null | undefined) {
+        if (!spriteFrameName) return null;
+        let name = spriteFrameName.split("_")[0];
+        switch (layerName) {
+            case "prop":
+            case "monster":
+            case "door":
+                return Utility.Json.getJsonKeyCache(layerName, "spriteId", name);
+            default:
+                return null;
+        }
     }
 
     private eatProp(layerName: string, tile: IVec2, id: number) {

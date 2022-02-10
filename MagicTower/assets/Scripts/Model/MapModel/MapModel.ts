@@ -32,6 +32,11 @@ export class MapModel extends ModelBase {
         return level >= minLevel && level <= this.MAX_LEVEL;
     }
 
+    canReachLevel(diff: number): boolean {
+        let level = this.level + diff;
+        return !!this.data.maps[level];
+    }
+
     setLevelDiff(diff: number): void {
         let newLevel = this.data.currentLevel + diff;
         if (newLevel > this.MAX_LEVEL || newLevel < this.MIN_LEVEL) {

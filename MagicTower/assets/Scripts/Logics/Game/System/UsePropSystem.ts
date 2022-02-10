@@ -13,6 +13,7 @@ import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { GameEvent } from "../../Event/GameEvent";
 import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
+import { DisappearCommand } from "../Command/DisappearCommand";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 
@@ -139,22 +140,26 @@ export class UsePropSystem extends SystemBase {
 
     /** 勇士在楼梯旁边 */
     private isHeroNextToStair(): boolean {
-        let stairs: Stair[] = this.levelData.getLayerInfo("stairs");
+        let stairs: Stair[] = this.levelData.getLayerInfo("stair");
         if (stairs) {
-            stairs.forEach((stair) => {
-                let diff = Math.abs(stair.index - this.gameMap.getTileIndex(this.heroModel.getPosition()));
+            for (let i = 0; i < stairs.length; i++) {
+                let diff = Math.abs(stairs[i].index - this.gameMap.getTileIndex(this.heroModel.getPosition()));
                 if (INDEX_DIFFS.indexOf(diff) != -1) {
                     return true;
                 }
-            });
+            }
         }
         return false;
     }
 
     private switchLevelTip(diff: number, useFeather: boolean = false) {
         let tip = diff == -1 ? "你已经到最下面一层了" : "你已经到最上面一层了";
-        if (this.mapModel.canSwitchLevel(diff, useFeather)) {
+        if (!this.mapModel.canSwitchLevel(diff, useFeather)) {
             //GameManager.UI.showToast(tip);
+            GameFrameworkLog.log(tip);
+            return true;
+        } else if (!this.mapModel.canReachLevel(diff)) {
+            GameFrameworkLog.log("你还未到达过该层");
             return true;
         }
         return false;
@@ -179,7 +184,7 @@ export class UsePropSystem extends SystemBase {
         let index = this.gameMap.getTileIndex(this.heroModel.getPosition()) + HERO_FACE_DIRECTION[direction];
         let wallGid = this.gameMap.getTileGIDAt("wall", this.gameMap.getTile(index));
         if (wallGid) {
-            this.mapCollisionSystem.disappear("wall", index);
+            GameApp.CommandManager.createCommand(DisappearCommand).execute("wall", index);
             return true;
         }
         return false;
@@ -191,7 +196,7 @@ export class UsePropSystem extends SystemBase {
      */
     private removeAllWalls(): boolean {
         return this.gameMap.forEachLayer("wall", (gid, index) => {
-            this.mapCollisionSystem.disappear("wall", index);
+            GameApp.CommandManager.createCommand(DisappearCommand).execute("wall", index);
         });
     }
 
@@ -204,7 +209,7 @@ export class UsePropSystem extends SystemBase {
             let index = heroIndex + diff;
             let wallGid = this.gameMap.getTileGIDAt("lava", this.gameMap.getTile(index));
             if (wallGid) {
-                this.mapCollisionSystem.disappear("lava", index);
+                GameApp.CommandManager.createCommand(DisappearCommand).execute("lava", index);
             }
         });
     }
@@ -220,7 +225,7 @@ export class UsePropSystem extends SystemBase {
             let index = heroIndex + diff;
             let element: Monster = this.levelData.getLayerElement("monster", index);
             if (element && !element.boss) {
-                this.mapCollisionSystem.disappear("monster", index);
+                GameApp.CommandManager.createCommand(DisappearCommand).execute("monster", index);
                 isRemove = true;
             }
         });
@@ -236,7 +241,7 @@ export class UsePropSystem extends SystemBase {
         this.gameMap.forEachLayer("door", (gid, index) => {
             let door: Door = this.levelData.getLayerElement("door", index);
             if (door && Door.isYellow(door.id)) {
-                this.mapCollisionSystem.disappear("door", index);
+                GameApp.CommandManager.createCommand(DisappearCommand).execute("door", index);
                 isRemove = true;
             }
         });

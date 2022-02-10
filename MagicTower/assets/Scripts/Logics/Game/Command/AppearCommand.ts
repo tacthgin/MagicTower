@@ -5,10 +5,10 @@ import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 
-@CommandManager.register("DisappearCommand")
-export class DisappearCommand extends CommandBase {
-    execute(layerName: string, tileOrIndex: IVec2 | number, record: boolean = true): void {
-        GameApp.EventManager.fireNow(this, DisappearOrAppearEventArgs.create(GameEvent.COMMAND_DISAPPEAR, layerName, tileOrIndex, 0, record));
+@CommandManager.register("AppearCommand")
+export class AppearCommand extends CommandBase {
+    execute(layerName: string, tileOrIndex: IVec2 | number, elementId: number, record: boolean = true): void {
+        GameApp.EventManager.fireNow(this, DisappearOrAppearEventArgs.create(GameEvent.COMMAND_APPEAR, layerName, tileOrIndex, elementId, record));
         GameApp.CommandManager.destroyCommand(this);
     }
 

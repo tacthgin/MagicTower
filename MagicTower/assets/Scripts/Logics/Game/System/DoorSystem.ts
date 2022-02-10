@@ -10,6 +10,7 @@ import { Door, DoorState, DoorType } from "../../../Model/MapModel/Data/Elements
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
+import { EventCollisionCommand } from "../Command/EventCollisionCommand";
 import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
 import { DoorAnimationReverseNode } from "../Elements/DoorAnimaitonReverseNode";
 import { IGameMap } from "../Map/GameMap/IGameMap";
@@ -19,19 +20,22 @@ export class DoorSystem extends SystemBase {
     private gameMap: IGameMap = null!;
     private levelData: LevelData = null!;
 
-    constructor() {
-        super();
+    awake(): void {
+        GameApp.NodePoolManager.createNodePool(DoorAnimationNode);
+        GameApp.NodePoolManager.createNodePool(DoorAnimationReverseNode);
     }
 
     initliaze(gameMap: IGameMap, levelData: LevelData) {
         this.gameMap = gameMap;
         this.levelData = levelData;
-        if (!GameApp.NodePoolManager.hasNodePool(DoorAnimationNode)) {
-            GameApp.NodePoolManager.createNodePool(DoorAnimationNode);
-            GameApp.NodePoolManager.createNodePool(DoorAnimationReverseNode);
-        }
     }
 
+    /**
+     * 可见的门碰撞处理
+     * @param tile 门位置
+     * @param layerName 层名
+     * @returns 是否该格子可走
+     */
     doorCollision(tile: IVec2, layerName: string) {
         let tileIndex = this.gameMap.getTileIndex(tile);
 
@@ -60,40 +64,6 @@ export class DoorSystem extends SystemBase {
         }
 
         return true;
-
-        //if (element.canWallOpen()) {
-        //墙门
-        //this.removeElement(index, "door");
-        //return false;
-        //} else if (element.appear) {
-        //if (!element.node.active) {
-        //隐藏的墙门
-        //element.add();
-        //门事件
-        //if (this.doorInfo.appearEventDoor) {
-        //for (let eventID in this.doorInfo.appearEventDoor) {
-        //let indexs = this.doorInfo.appearEventDoor[eventID];
-        //indexs.splice(indexs.indexOf(index), 1);
-        //if (indexs.length != 0) {
-        //this.eventCollision(eventID);
-        //}
-        //}
-        //}
-        //}
-        //return true;
-        //} else if (!element.hide && !element.passive) {
-        //let keyId = this.propParser.getKeyByDoor(element.id);
-        //if (keyId && this.heroModel.getPropNum(keyId) > 0) {
-        //this.hero.removeProp(keyId);
-        //this.removeElement(index, "door");
-        //this.disappearDoorEventTrigger(index);
-        //SoundManager.playEffect("door");
-        //return false;
-        //} else {
-        //GameManager.getInstance().showToast("你无法打开这个门");
-        //}
-        //}
-        //return true;
     }
 
     invisibleDoorCollision(tile: IVec2) {
@@ -162,7 +132,7 @@ export class DoorSystem extends SystemBase {
                 if (index != -1) {
                     disappearCondition.splice(index, 1);
                     if (disappearCondition.length == 0) {
-                        //this.eventCollision(eventInfo.value);
+                        GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventInfo.value);
                     }
                 }
             }
@@ -186,7 +156,7 @@ export class DoorSystem extends SystemBase {
         }
         this.levelData.saveMapData();
         if (condition.length == 0) {
-            //this.eventCollision(eventInfo.value);
+            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventInfo.value);
         }
     }
 }

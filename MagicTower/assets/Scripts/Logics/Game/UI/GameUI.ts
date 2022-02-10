@@ -172,7 +172,7 @@ export class GameUI extends Component {
                         }
                     }
                     break;
-                case PropType.FEATHER:
+                case PropType.FLYING_WAND:
                     //up
                     for (let i = 0; i < STAIR_NAMES.length; i++) {
                         let button = this.createPropButton(propInfo, 1);

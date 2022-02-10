@@ -66,30 +66,40 @@ export class MoveSystem extends SystemBase {
             this.setAstarMoveType(AstarMoveType.HERO);
             let path = this.getPath(this._hero.heroTile, endTile);
             if (path.length > 0) {
+                this._canHeroMoving = false;
                 let canEndMove = this.canEndTileMove(endTile);
                 if (!canEndMove) {
                     path.pop();
                 }
 
-                this._hero.movePath(path, (tile: IVec2, end: boolean) => {
-                    if (end) {
-                        if (!canEndMove) {
-                            this._hero.toward(endTile);
-                        } else {
-                            this._hero.toward();
-                        }
-                        let tile = canEndMove ? endTile : path[path.length - 1];
-                        if (tile) {
-                            this._heroModel.setPosition(tile, this._hero.heroDirection);
-                        }
-                        collisionFunc(endTile);
-                        this._hero.stand();
-                    } else if (!collisionFunc(tile)) {
-                        this._hero.stand();
-                        return true;
+                let moveComplete = () => {
+                    if (!canEndMove) {
+                        this._hero.toward(endTile);
+                    } else {
+                        this._hero.toward();
                     }
-                    return false;
-                });
+                    let tile = canEndMove ? endTile : path[path.length - 1];
+                    if (tile) {
+                        this._heroModel.setPosition(tile, this._hero.heroDirection);
+                    }
+                    this._canHeroMoving = collisionFunc(endTile);
+                    this._hero.stand();
+                };
+
+                if (path.length > 0) {
+                    this._hero.movePath(path, (tile: IVec2, end: boolean) => {
+                        if (end) {
+                            moveComplete();
+                        } else if (!collisionFunc(tile)) {
+                            this._hero.stand();
+                            return true;
+                        }
+                        return false;
+                    });
+                } else {
+                    moveComplete();
+                }
+
                 GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
             } else {
                 //GameManager.UI.showToast("无效路径");
