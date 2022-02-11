@@ -39,7 +39,7 @@ export class DoorSystem extends SystemBase {
     doorCollision(tile: IVec2, layerName: string) {
         let tileIndex = this.gameMap.getTileIndex(tile);
 
-        let doorInfo: Door = this.levelData.getLayerElement(layerName, tileIndex);
+        let doorInfo = this.levelData.getLayerElement<Door>(layerName, tileIndex);
         if (!doorInfo) {
             return true;
         }
@@ -78,10 +78,10 @@ export class DoorSystem extends SystemBase {
         if (eventInfo && eventInfo.doorState == DoorState.APPEAR_EVENT) {
             this.appearEventCollision(eventInfo, tile);
         } else {
-            let doorInfo: Door = this.levelData.getLayerElement(layerName, tileIndex);
+            let doorInfo = this.levelData.getLayerElement<Door>(layerName, tileIndex);
             if (doorInfo && doorInfo.doorState == DoorState.APPEAR) {
                 this.createDoorAnimation(doorInfo.id, tile, true, () => {
-                    this.gameMap.setTileGIDAt(layerName, tile, doorInfo.gid);
+                    this.gameMap.setTileGIDAt(layerName, tile, doorInfo!.gid);
                     GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
                 });
             } else {

@@ -96,9 +96,11 @@ export class Npc extends Element {
     static parse(propertiesInfo: any, tiles: number[] | null = null, parseGidFn: Function | null = null): any {
         let npcInfos: any = {};
         for (let key in propertiesInfo) {
-            
-           
+            let npc = new Npc();
+            npc.id = propertiesInfo[key];
+            npc.index = parseInt(key);
+            npcInfos[key] = npc;
         }
-        return doorInfos;
+        return npcInfos;
     }
 }

@@ -10,6 +10,7 @@ import { IAstar } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAsta
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
@@ -209,10 +210,10 @@ export class MoveSystem extends SystemBase {
                 return true;
             case "monster":
                 if (spriteName) {
-                    let monsterInfo = this._levelData.getLayerElement("monster", this._gameMap.getTileIndex(tile));
+                    let name = spriteName.split("_")[0];
+                    let monsterInfo = Utility.Json.getJsonKeyCache(layerName, "spriteId", name) as MonsterInfo;
                     if (monsterInfo) {
-                        let jsonData = Utility.Json.getJsonKeyCache(layerName, spriteName, monsterInfo.id) as any;
-                        return CalculateSystem.canHeroAttack(this._heroModel, jsonData, !jsonData.firstAttack);
+                        return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
                     } else {
                         return true;
                     }

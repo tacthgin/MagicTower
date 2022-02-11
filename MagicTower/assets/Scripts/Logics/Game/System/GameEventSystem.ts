@@ -6,6 +6,7 @@ import { SystemBase } from "../../../../GameFramework/Scripts/Application/Comman
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
@@ -200,7 +201,10 @@ export class GameEventSystem extends SystemBase {
     }
 
     clearNpcEvent() {
-        this.levelData.getLayerElement();
+        let npc = this.levelData.getLayerElement<Npc>("npc", this.eventInfo.clearNpcEvent);
+        if (npc) {
+            npc.clearEvent();
+        }
         //this.gameMap.getElement(this.eventInfo.clearNpcEvent, "npc").clearEvent();
         this.execute();
     }

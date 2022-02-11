@@ -3,6 +3,7 @@ import { LoadBase } from "../../../../GameFramework/Scripts/Application/Model/Lo
 import { MapModel } from "../MapModel";
 import { MapAddElementEventArgs } from "../MapModelEventArgs";
 import { Door } from "./Elements/Door";
+import { Element } from "./Elements/Element";
 import { EventInfo } from "./Elements/EventInfo";
 import { Npc } from "./Elements/Npc";
 import { Stair, StairType } from "./Elements/Stair";
@@ -130,7 +131,7 @@ export class LevelData extends LoadBase {
         return this.layerInfo[layerName] || null;
     }
 
-    getLayerElement(layerName: string, index: number | string) {
+    getLayerElement<T extends Element>(layerName: string, index: number | string): T | null {
         let layerInfo = this.getLayerInfo(layerName);
         return layerInfo ? layerInfo[index] : null;
     }

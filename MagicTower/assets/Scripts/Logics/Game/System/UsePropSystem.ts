@@ -223,7 +223,7 @@ export class UsePropSystem extends SystemBase {
         let isRemove = false;
         HERO_FACE_DIRECTION.forEach((diff) => {
             let index = heroIndex + diff;
-            let element: Monster = this.levelData.getLayerElement("monster", index);
+            let element = this.levelData.getLayerElement<Monster>("monster", index);
             if (element && !element.boss) {
                 GameApp.CommandManager.createCommand(DisappearCommand).execute("monster", index);
                 isRemove = true;
@@ -239,7 +239,7 @@ export class UsePropSystem extends SystemBase {
     private removeYellowDoors(): boolean {
         let isRemove = false;
         this.gameMap.forEachLayer("door", (gid, index) => {
-            let door: Door = this.levelData.getLayerElement("door", index);
+            let door = this.levelData.getLayerElement<Door>("door", index);
             if (door && Door.isYellow(door.id)) {
                 GameApp.CommandManager.createCommand(DisappearCommand).execute("door", index);
                 isRemove = true;
