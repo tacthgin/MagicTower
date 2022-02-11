@@ -136,6 +136,19 @@ export class LevelData extends LoadBase {
         return layerInfo ? layerInfo[index] : null;
     }
 
+    getLayerElementWithoutName(index: number | string) {
+        for (let layerName in this.layerInfo) {
+            if (this.layerInfo[layerName][index]) {
+                return {
+                    layerName: layerName,
+                    element: this.layerInfo[layerName][index] as Element,
+                };
+            }
+        }
+
+        return null;
+    }
+
     deleteLayerElement(layerName: string, index: number) {
         let layerInfo = this.getLayerInfo(layerName);
         if (layerInfo && layerInfo[index]) {

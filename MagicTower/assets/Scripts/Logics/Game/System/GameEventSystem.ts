@@ -79,7 +79,8 @@ export class GameEventSystem extends SystemBase {
                     GameApp.CommandManager.createCommand(CollisionCommand).execute(this.gameMap.getTile(this.eventInfo.do));
                     break;
                 case "show":
-                    //this.gameMap.getElement(this.eventInfo.show).add();
+                    let elementInfo = this.levelData.getLayerElementWithoutName(this.eventInfo.show)
+                    
                     this.execute();
                 case "appear":
                     this.appear();
