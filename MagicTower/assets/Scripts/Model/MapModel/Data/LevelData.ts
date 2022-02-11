@@ -73,6 +73,7 @@ export class LevelData extends LoadBase {
             door: Door.parse,
             stair: Stair.parse,
             event: EventInfo.parse,
+            npc: Npc.parse,
         };
         for (let layerName in properties) {
             let func = parsers[layerName];
