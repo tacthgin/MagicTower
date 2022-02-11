@@ -25,4 +25,5 @@ export enum GameEvent {
     COMMAND_EVENT,
     COMMAND_COLLISION,
     COMMAND_MOVE,
+    COMMAND_SPECIAL_MOVE,
 }

@@ -1,12 +1,12 @@
 import { CommandBase } from "../../../../GameFramework/Scripts/Application/Command/CommandBase";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { MoveEventArgs } from "../../Event/MoveEventArgs";
+import { SpecialMoveEventArgs } from "../../Event/SpecialMoveEventArgs";
 
-@CommandManager.register("MoveCommand")
-export class MoveCommand extends CommandBase {
-    execute(layerName: string, src: number, dst: number, speed: number, delay: number): void {
-        GameApp.EventManager.fireNow(this, MoveEventArgs.create(layerName, src, dst, speed, delay));
+@CommandManager.register("SpecialMoveCommand")
+export class SpecialMoveCommand extends CommandBase {
+    execute(specialMoveInfo: any): void {
+        GameApp.EventManager.fireNow(this, SpecialMoveEventArgs.create(specialMoveInfo));
         GameApp.CommandManager.destroyCommand(this);
     }
 

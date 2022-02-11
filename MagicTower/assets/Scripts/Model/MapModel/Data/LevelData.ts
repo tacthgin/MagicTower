@@ -4,12 +4,14 @@ import { MapModel } from "../MapModel";
 import { MapAddElementEventArgs } from "../MapModelEventArgs";
 import { Door } from "./Elements/Door";
 import { EventInfo } from "./Elements/EventInfo";
+import { Npc } from "./Elements/Npc";
 import { Stair, StairType } from "./Elements/Stair";
 
 const CLASS_MAP: any = {
     door: Door,
     stair: Stair,
     event: EventInfo,
+    npc: Npc,
 };
 
 export class LevelData extends LoadBase {
