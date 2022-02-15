@@ -138,7 +138,7 @@ export class CommandManager implements ICommandManager {
     }
 
     destroyCommand<T extends CommandBase>(command: T): void {
-        this._systemPool.upspawn(command);
+        this._commandPool.upspawn(command);
     }
 
     createSystem<T extends SystemBase>(systemConstructor: Constructor<T>): T {
