@@ -4,6 +4,7 @@ import { IVec2, Node, tween, v3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
@@ -62,6 +63,7 @@ export class GameEventSystem extends SystemBase {
     execute() {
         if (this.step < this.eventInfo.step.length) {
             let stepName = this.eventInfo.step[this.step++];
+            GameFrameworkLog.log(stepName);
             switch (stepName) {
                 case "chat":
                     this.chat();
@@ -79,8 +81,8 @@ export class GameEventSystem extends SystemBase {
                     GameApp.CommandManager.createCommand(CollisionCommand).execute(this.gameMap.getTile(this.eventInfo.do));
                     break;
                 case "show":
-                    let elementInfo = this.levelData.getLayerElementWithoutName(this.eventInfo.show)
-                    
+                    let elementInfo = this.levelData.getLayerElementWithoutName(this.eventInfo.show);
+
                     this.execute();
                 case "appear":
                     this.appear();

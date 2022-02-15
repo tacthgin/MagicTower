@@ -251,10 +251,10 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         let uiFromInstanceObject: UIFormInstanceObject | null = this._instancePool.spawn(uiFormAssetName);
 
         if (!uiFromInstanceObject) {
-            let asset = this._resourceManger.internalResourceLoader.getAsset(uiFormAssetName);
+            let asset = this._resourceManger.getAsset(uiFormAssetName);
             if (!asset) {
                 this._uiFormBeingLoaded.set(serialId, uiFormAssetName);
-                asset = await this._resourceManger.internalResourceLoader.loadAsset(uiFormAssetName);
+                asset = await this._resourceManger.loadAsset(uiFormAssetName);
                 if (!asset) {
                     throw new GameFrameworkError(`${uiFormAssetName} asset is invalid`);
                 }

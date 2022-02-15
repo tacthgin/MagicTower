@@ -1,6 +1,7 @@
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
 import { GameFrameworkLog } from "../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
 import { StairType } from "./Data/Elements/Stair";
 import { LevelData } from "./Data/LevelData";
 import { LevelTempData } from "./Data/LevelTempData";
@@ -10,20 +11,17 @@ import { MapSwitchLevelEventArgs } from "./MapModelEventArgs";
 export class MapModel extends ModelBase {
     private readonly MIN_LEVEL: number = 0;
     private readonly MAX_LEVEL: number = 50;
+    private currentLevel: number = 1;
+    private maps: { [key: number | string]: LevelData } = {};
 
-    protected data: any = {
-        currentLevel: 1,
-        maps: {},
-    };
-
-    private levelTempDatas: { [key: number]: LevelTempData } = {};
+    private levelTempDatas: { [key: number | string]: LevelTempData } = {};
 
     set level(value) {
-        this.data.currentLevel = value;
+        this.currentLevel = value;
     }
 
     get level() {
-        return this.data.currentLevel;
+        return this.currentLevel;
     }
 
     canSwitchLevel(diff: number, useFeather: boolean = false): boolean {
@@ -34,27 +32,27 @@ export class MapModel extends ModelBase {
 
     canReachLevel(diff: number): boolean {
         let level = this.level + diff;
-        return !!this.data.maps[level];
+        return !!this.maps[level];
     }
 
     setLevelDiff(diff: number): void {
-        let newLevel = this.data.currentLevel + diff;
+        let newLevel = this.currentLevel + diff;
         if (newLevel > this.MAX_LEVEL || newLevel < this.MIN_LEVEL) {
             GameFrameworkLog.error(`level${newLevel}不合法`);
             return;
         }
-        let currentLevel = this.data.currentLevel;
-        this.data.currentLevel = newLevel;
+        let currentLevel = this.currentLevel;
+        this.currentLevel = newLevel;
         //如果是上去的，英雄站到下楼梯的旁边
         this.fireNow(MapSwitchLevelEventArgs.create(currentLevel, diff > 0 ? StairType.Down : StairType.UP));
     }
 
     getCurrentLevelData(): LevelData {
-        return this.data.maps[this.data.currentLevel];
+        return this.maps[this.currentLevel];
     }
 
     getLevelData(level: number): LevelData {
-        return this.data.maps[level] || null;
+        return this.maps[level] || null;
     }
 
     getLevelTempData(level: number): LevelTempData {
@@ -71,17 +69,31 @@ export class MapModel extends ModelBase {
     createLevelData(level: number, properties: any, data: any = null) {
         let levelData = new LevelData(level);
         levelData.loadProperties(properties, data);
-        this.data.maps[level] = levelData;
+        this.maps[level] = levelData;
         this.levelTempDatas[level] = new LevelTempData(level, levelData, data);
         return levelData;
     }
 
     load(info: any = null) {
         if (info) {
-            this.data.currentLevel = info.currentLevel;
+            this.currentLevel = info.currentLevel;
             for (let level in info.maps) {
-                this.data.maps[level] = new LevelData(parseInt(level));
-                this.data.maps[level].load(info.maps[level]);
+                this.maps[level] = new LevelData(parseInt(level));
+                this.maps[level].load(info.maps[level]);
+            }
+        }
+
+        this.useTestLoad();
+    }
+
+    private useTestLoad() {
+        let useTestload = Utility.Json.getJsonElement("global", "useTestLoad");
+        if (useTestload) {
+            let testLoadData: any = Utility.Json.getJsonElement("global", "testLoad");
+            if (testLoadData) {
+                this.loadData(testLoadData);
+            } else {
+                GameFrameworkLog.error("hero model test laod data is null");
             }
         }
     }

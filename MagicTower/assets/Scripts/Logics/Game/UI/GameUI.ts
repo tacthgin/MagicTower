@@ -11,6 +11,7 @@ import { PropType } from "../../../Model/HeroModel/Prop";
 import { MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
+import { MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { ElementFactory } from "../Map/ElementFactory";
@@ -122,7 +123,9 @@ export class GameUI extends Component {
         this.refreshEquip(event.propTypeOrId, event.propValue);
     }
 
-    private onRefreshLevel(sender: object, event: HeroPropEventArgs) {}
+    private onRefreshLevel(sender: object, event: MapSwitchLevelEventArgs) {
+        this.refreshLevel(this.mapModel.level);
+    }
 
     private onRefreshArchive(sender: object, event: GameEventArgs) {
         this.loadArchive();

@@ -13,11 +13,11 @@
         "defence": 10
     },
     "testLoad": {
-        "currentLevel": 1,
+        "currentLevel": 3,
         "maps": {},
         "position": {
-            "x": 7,
-            "y": 0
+            "x": 4,
+            "y": 9
         },
         "gold": 10000000,
         "attack": 100,

@@ -20,6 +20,7 @@ export enum GameEvent {
     USE_PROP,
     /** 怪物死亡 */
     MONSTER_DIE,
+    //事件系统命令
     COMMAND_DISAPPEAR,
     COMMAND_APPEAR,
     COMMAND_EVENT,

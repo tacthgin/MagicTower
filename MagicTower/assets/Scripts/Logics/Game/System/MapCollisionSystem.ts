@@ -9,6 +9,7 @@ import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropType } from "../../../Model/HeroModel/Prop";
 import { Element } from "../../../Model/MapModel/Data/Elements/Element";
+import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
 import { Monster, MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Npc, NpcInfo } from "../../../Model/MapModel/Data/Elements/Npc";
 import { StairType } from "../../../Model/MapModel/Data/Elements/Stair";
@@ -123,9 +124,6 @@ export class MapCollisionSystem extends SystemBase {
                 break;
             case "building":
                 this.gotoShop();
-                break;
-            case "event":
-                this.eventCollision(tile);
                 break;
             case "floor":
                 return this.floorCollision(tile);
@@ -343,34 +341,6 @@ export class MapCollisionSystem extends SystemBase {
         //}
     }
 
-    private parseDoor(layerName: string, info: any) {
-        //info.tile.forEach((elementInfo) => {
-        //this.addElement(elementInfo[0], layerName, "Door", elementInfo[1]).node.zIndex = 2;
-        //});
-        //if (info.passive) {
-        //info.passive.forEach((index) => {
-        //this.getElement(index, layerName).passive = true;
-        //});
-        //}
-        //if (info.appear) {
-        //info.appear.forEach((index) => {
-        //this.getElement(index, layerName).appear = true;
-        //});
-        //}
-        //if (info.hide) {
-        //this.getElement(info.hide, layerName).hide = true;
-        //}
-        //if (info.monsterCondition) {
-        //for (let doorIndex in info.monsterCondition) {
-        //this.getElement(doorIndex, layerName).condition = info.monsterCondition[doorIndex];
-        //this.doorInfo.monsterCondition = {};
-        //this.doorInfo.monsterCondition[info.monsterCondition[doorIndex]] = doorIndex;
-        //}
-        //}
-        //this.doorInfo.monsterDoor = Util.clone(info.monster);
-        //this.doorInfo.appearEventDoor = Util.clone(info.appearEvent);
-        //this.doorInfo.disappearEventDoor = Util.clone(info.disappearEvent);
-    }
     private parseMonster(layerName: string, info: any) {
         //if (!info) return;
         //if (info.tile) {
@@ -586,6 +556,11 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private floorCollision(tile: IVec2) {
+        let eventInfo = this.levelData.getLayerElement<EventInfo>("event", this.gameMap.getTileIndex(tile));
+        if (eventInfo) {
+            return this.eventCollision(tile);
+        }
+
         if (!this.doorSystem.invisibleDoorCollision(tile)) {
             return false;
         }

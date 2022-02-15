@@ -184,7 +184,9 @@
     "__prefab": {
       "__id__": 11
     },
-    "animation": null,
+    "animation": {
+      "__id__": 8
+    },
     "_id": ""
   },
   {

@@ -150,9 +150,9 @@
     "_horizontalAlign": 1,
     "_verticalAlign": 2,
     "_actualFontSize": 18,
-    "_fontSize": 18,
+    "_fontSize": 16,
     "_fontFamily": "Regular",
-    "_lineHeight": 18,
+    "_lineHeight": 16,
     "_overflow": 0,
     "_enableWrapText": true,
     "_font": {
