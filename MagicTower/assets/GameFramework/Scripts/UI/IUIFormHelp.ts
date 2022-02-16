@@ -18,7 +18,7 @@ export interface IUIFormHelp {
      * @param userData 用户数据
      * @returns 界面
      */
-    createUIForm(uiFormInstance: object, uiGroup: IUIGroup, userData?: Object): IUIForm;
+    createUIForm(uiFormInstance: object, uiGroup: IUIGroup, userData?: Object): IUIForm | null;
 
     /**
      * 释放界面

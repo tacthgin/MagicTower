@@ -20,6 +20,7 @@ import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
 import { CNodeHelp } from "./NodePool/CNodeHelp";
 import { SoundController } from "./Sound/SoundController";
+import { CUIFormHelp } from "./UI/CUIFormHelp";
 
 const { ccclass, executionOrder } = _decorator;
 
@@ -143,6 +144,8 @@ export class GameApp extends Component {
         this.initializeCommand();
         //初始化model
         this.initializeModel();
+        //提高层级到最高
+        this.node.setSiblingIndex(this.node.parent!.children.length - 1);
     }
 
     private initalizeFramework() {
@@ -154,6 +157,7 @@ export class GameApp extends Component {
         let uiManager = GameApp.UIManager;
         uiManager.setResourceManager(resourceManager);
         uiManager.setObjectPoolManager(objectPoolManager);
+        uiManager.setUIFormHelp(this.getComponent(CUIFormHelp)!);
         //初始化节点对象池
         let nodePoolManager = GameApp.NodePoolManager;
         nodePoolManager.setResourceManager(resourceManager);

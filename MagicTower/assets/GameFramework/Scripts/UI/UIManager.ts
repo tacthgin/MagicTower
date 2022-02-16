@@ -327,10 +327,14 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
 
     private internalOpenUIForm(serialId: number, uiFormAssetName: string, uiGroup: UIGroup, uiFormInstance: object, pauseCoveredUIForm: boolean, isNewInstance: boolean, userData?: Object) {
         let uiForm = this._uiFormHelp!.createUIForm(uiFormInstance, uiGroup, userData);
-        uiForm.onInit(serialId, uiFormAssetName, uiGroup, pauseCoveredUIForm, isNewInstance, userData);
-        uiGroup.addUIForm(uiForm);
-        uiForm.onOpen(userData);
-        uiGroup.refresh();
-        this._eventPool.fireNow(this, UIEventArgs.create(UIEvent.UI_FORM_OPEN_EVENT));
+        if (uiForm) {
+            uiForm.onInit(serialId, uiFormAssetName, uiGroup, pauseCoveredUIForm, isNewInstance, userData);
+            uiGroup.addUIForm(uiForm);
+            uiForm.onOpen(userData);
+            uiGroup.refresh();
+            this._eventPool.fireNow(this, UIEventArgs.create(UIEvent.UI_FORM_OPEN_EVENT));
+        } else {
+            throw new GameFrameworkError("create ui form failed");
+        }
     }
 }
