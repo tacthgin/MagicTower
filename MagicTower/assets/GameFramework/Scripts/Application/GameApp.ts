@@ -157,7 +157,15 @@ export class GameApp extends Component {
         let uiManager = GameApp.UIManager;
         uiManager.setResourceManager(resourceManager);
         uiManager.setObjectPoolManager(objectPoolManager);
-        uiManager.setUIFormHelp(this.getComponent(CUIFormHelp)!);
+        let uiFormHelp = this.getComponent(CUIFormHelp);
+        if (uiFormHelp) {
+            uiManager.setUIFormHelp(uiFormHelp);
+            //创建弹窗和toast的ui组
+            uiManager.addUIGroup(CUIFormHelp.DIALOG_LAYER_GROUP, 0, uiFormHelp.getDialogUIGroupHelp());
+            uiManager.addUIGroup(CUIFormHelp.TOAST_LAYER_GROUP, 1, uiFormHelp.getToastUIGroupHelp());
+        } else {
+            throw new GameFrameworkError("you must set ui form help first");
+        }
         //初始化节点对象池
         let nodePoolManager = GameApp.NodePoolManager;
         nodePoolManager.setResourceManager(resourceManager);

@@ -1,8 +1,11 @@
-import { Component, instantiate, Node, UITransform, v3, _decorator } from "cc";
+import { Component, instantiate, Node, TiledUserNodeData, UITransform, v3, _decorator } from "cc";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { IUIForm } from "../../UI/IUIForm";
 import { IUIFormHelp } from "../../UI/IUIFormHelp";
 import { IUIGroup } from "../../UI/IUIGroup";
+import { IUIGroupHelp } from "../../UI/IUIGroupHelp";
+import { UIFormInstanceObject } from "../../UI/UIFormInstanceObject";
+import { CUIGroupHelp } from "./CUIGroupHelp";
 const { ccclass, property } = _decorator;
 
 @ccclass("CUIFormHelp")
@@ -12,6 +15,16 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
 
     @property(Node)
     private toastLayer: Node = null!;
+
+    /**
+     * 弹窗UI组名
+     */
+    static readonly DIALOG_LAYER_GROUP: string = "DIALOG_LAYER_GROUP";
+
+    /**
+     * 飘字UI组名
+     */
+    static readonly TOAST_LAYER_GROUP: string = "DIALOG_LAYER_GROUP";
 
     onLoad() {
         if (!this.dialogLayer || !this.toastLayer) {
@@ -30,27 +43,18 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
         });
     }
 
-    /**
-     * 弹窗UI组名
-     */
-    static readonly DIALOG_LAYER_GROUP: string = "DIALOG_LAYER_GROUP";
-
-    /**
-     * 飘字UI组名
-     */
-    static readonly TOAST_LAYER_GROUP: string = "DIALOG_LAYER_GROUP";
-
     instantiateUIForm(uiFormAsset: object): object {
         return instantiate(uiFormAsset);
     }
 
     createUIForm(uiFormInstance: object, uiGroup: IUIGroup, userData?: Object): IUIForm | null {
+        let uiFromInstanceObject = uiFormInstance as UIFormInstanceObject;
         switch (uiGroup.name) {
             case CUIFormHelp.DIALOG_LAYER_GROUP:
-                (uiFormInstance as Node).parent = this.dialogLayer;
+                (uiFromInstanceObject.target as Node).parent = this.dialogLayer;
                 return uiFormInstance as IUIForm;
             case CUIFormHelp.TOAST_LAYER_GROUP:
-                (uiFormInstance as Node).parent = this.toastLayer;
+                (uiFromInstanceObject.target as Node).parent = this.toastLayer;
                 return uiFormInstance as IUIForm;
             default:
                 return null;
@@ -58,6 +62,14 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
     }
 
     releaseUIForm(uiFormAsset: object, uiFormInstance: object): void {
-        (uiFormInstance as Node).removeFromParent();
+        ((uiFormInstance as UIFormInstanceObject).target as Node).removeFromParent();
+    }
+
+    getDialogUIGroupHelp(): IUIGroupHelp {
+        return this.dialogLayer.getComponent(CUIGroupHelp)!;
+    }
+
+    getToastUIGroupHelp(): IUIGroupHelp {
+        return this.toastLayer.getComponent(CUIGroupHelp)!;
     }
 }

@@ -52,7 +52,6 @@ export class DialogBase extends DialogUIForm {
             this.touchNode.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
         }
         this.dialogContent = this.dialogContent || this.node;
-        this.addActionComponent();
     }
 
     private onTouchStart(event: EventTouch) {
@@ -78,46 +77,8 @@ export class DialogBase extends DialogUIForm {
         event.propagationStopped = true;
     }
 
-    private getActionComponent() {
-        let actionComponent: any = ActionComponent.getActionComponent(this.actionType);
-        return this.getComponent<ActionComponent>(actionComponent);
-    }
-
-    private addActionComponent() {
-        let actionComponent: any = this.getActionComponent();
-        if (!actionComponent) {
-            actionComponent = ActionComponent.getActionComponent(this.actionType);
-            let component: ActionComponent | null = this.addComponent(actionComponent);
-            if (component) {
-                component.endActionCallback = this.closeCallback.bind(this);
-                component.dialogContentNode = this.dialogContent;
-            }
-        }
-    }
-
-    private closeCallback() {
-        GameManager.UI.closeDialogCallback(this.node.name);
-        this.unscheduleAllCallbacks();
-        if (this.closeWithDestroy) {
-            this.node.destroy();
-        } else {
-            this.node.active = false;
-        }
-    }
-
     /** 关闭弹窗 */
     close(useAction: boolean = true) {
-        let actionComponent = this.getActionComponent();
-        if (useAction) {
-            this.getActionComponent()?.executeEndAction();
-        } else {
-            actionComponent?.resetAction();
-            this.closeCallback();
-        }
-    }
-
-    /** 执行弹窗打开动作 */
-    executeStartAction() {
-        this.getActionComponent()?.executeStartAction();
+        
     }
 }

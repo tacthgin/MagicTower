@@ -245,6 +245,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         let serialId = ++this._serialId;
         let uiFromInstanceObject: UIFormInstanceObject | null = this._instancePool.spawn(uiFormAssetName);
 
+        let isNewInstance = false;
         if (!uiFromInstanceObject) {
             let asset = this._resourceManger.getAsset(uiFormAssetName);
             if (!asset) {
@@ -261,8 +262,9 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
             }
             uiFromInstanceObject = UIFormInstanceObject.create(uiFormAssetName, asset, this._uiFormHelp.instantiateUIForm(asset), this._uiFormHelp);
             this._instancePool.register(uiFromInstanceObject, true);
+            isNewInstance = true;
         }
-        this.internalOpenUIForm(serialId, uiFormAssetName, uiGroup as UIGroup, uiFromInstanceObject, pauseCoveredUIForm, false, userData);
+        this.internalOpenUIForm(serialId, uiFormAssetName, uiGroup as UIGroup, uiFromInstanceObject, pauseCoveredUIForm, isNewInstance, userData);
         return serialId;
     }
 
@@ -294,7 +296,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         let uiForms = this.getAllLoadedUIForms();
         uiForms.forEach((uiform) => {
             if (this.hasUIForm(uiform.serialId)) {
-                this.closeUIForm(uiform);
+                this.closeUIForm(uiform, userData);
             }
         });
     }

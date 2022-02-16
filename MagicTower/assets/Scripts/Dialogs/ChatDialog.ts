@@ -1,31 +1,32 @@
-// import { _decorator, Label } from "cc";
-// import { BaseDialog } from "../../Framework/Base/BaseDialog";
-// const { ccclass, property } = _decorator;
+import { _decorator, Label } from "cc";
+import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
+const { ccclass, property } = _decorator;
 
-// @ccclass("ChatDialog")
-// export class ChatDialog extends BaseDialog {
-//     @property(Label)
-//     content: Label | null = null;
-//     private contentIndex: number = 0;
-//     private talkContent: string | string[] = null!;
-//     private endCallback: Function | null = null;
+@ccclass("ChatDialog")
+export class ChatDialog extends DialogBase {
+    @property(Label)
+    private content: Label = null!;
 
-//     init(content: string | string[], endCallback: Function | null) {
-//         //this.talkContent = content;
-//         //this.endCallback = endCallback;
-//         //if (typeof content == "string") {
-//         //this.content.string = content;
-//         //} else {
-//         //this.content.string = content[this.contentIndex++];
-//         //}
-//     }
+    private contentIndex: number = 0;
+    private talkContent: string | string[] = null!;
+    private endCallback: Function | null = null;
 
-//     close() {
-//         //if (typeof this.talkContent == "string" || this.contentIndex >= this.talkContent.length) {
-//         //this.endCallback && this.endCallback();
-//         //super.close();
-//         //} else {
-//         //this.content.string = this.talkContent[this.contentIndex++];
-//         //}
-//     }
-// }
+    onOpen(userData: { content: string | string[]; endCallback: Function | null }) {
+        this.talkContent = userData.content;
+        this.endCallback = userData.endCallback;
+        if (typeof this.talkContent == "string") {
+            this.content.string = this.talkContent;
+        } else {
+            this.content.string = this.talkContent[this.contentIndex++];
+        }
+    }
+
+    onCloseClick() {
+        if (typeof this.talkContent == "string" || this.contentIndex >= this.talkContent.length) {
+            this.endCallback && this.endCallback();
+            super.close();
+        } else {
+            this.content.string = this.talkContent[this.contentIndex++];
+        }
+    }
+}
