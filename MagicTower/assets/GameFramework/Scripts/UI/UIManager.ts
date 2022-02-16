@@ -29,7 +29,6 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     private _serialId: number = 0;
     private _shutDown: boolean = false;
     private _recyleQueue: Array<IUIForm> = null!;
-    readonly defaultUIGroupName: string = "default_ui_group";
 
     constructor() {
         super();
@@ -221,7 +220,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         return false;
     }
 
-    async openUIForm(uiFormAssetName: string, uiGroupName?: string, pauseCoveredUIForm: boolean = false, userData?: Object): Promise<number> {
+    async openUIForm(uiFormAssetName: string, uiGroupName: string, pauseCoveredUIForm: boolean = false, userData?: Object): Promise<number> {
         if (!this._resourceManger) {
             throw new GameFrameworkError("you must set resouce manager first");
         }
@@ -236,10 +235,6 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
 
         if (!uiFormAssetName) {
             throw new GameFrameworkError("ui form asset name is invalid");
-        }
-
-        if (!uiGroupName) {
-            uiGroupName = this.defaultUIGroupName;
         }
 
         let uiGroup = this.getUIGroup(uiGroupName);
