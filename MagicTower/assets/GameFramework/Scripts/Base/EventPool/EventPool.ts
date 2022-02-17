@@ -1,20 +1,22 @@
 import { GameFrameworkError } from "../GameFrameworkError";
-import { LinkedListNode } from "../GameFrameworkLinkedList";
 import { GameFrameworkMap } from "../GameFrameworkMap";
 import { ReferencePool } from "../ReferencePool/ReferencePool";
 import { BaseEventArgs } from "./BaseEventArgs";
 import { Event } from "./Event";
 import { EventHandle, EventHandleTarget } from "./EventHandle";
+import { EventPoolMode } from "./EventPoolMode";
 
 export class EventPool<T extends BaseEventArgs> {
     private readonly _eventHandles: GameFrameworkMap<number, EventHandleTarget<T>> = null!;
     private readonly _targetHandles: GameFrameworkMap<object, EventHandleTarget<T>> = null!;
     private readonly _events: Array<Event<T>> = null!;
+    private readonly _eventPoolMode: EventPoolMode = EventPoolMode.DEFAULT;
 
-    constructor() {
+    constructor(mode: EventPoolMode = EventPoolMode.DEFAULT) {
         this._eventHandles = new GameFrameworkMap<number, EventHandleTarget<T>>();
         this._targetHandles = new GameFrameworkMap<object, EventHandleTarget<T>>();
         this._events = new Array<Event<T>>();
+        this._eventPoolMode = mode;
     }
 
     update(elapseSeconds: number): void {
@@ -110,7 +112,7 @@ export class EventPool<T extends BaseEventArgs> {
             eventHandleTargetList.forEach((eventTarget: EventHandleTarget<T>) => {
                 eventTarget.handle.call(eventTarget.target, sender, e);
             });
-        } else {
+        } else if (this._eventPoolMode !== EventPoolMode.ALLOW_NO_HANDLER) {
             throw new GameFrameworkError(`event id:${e.id} has not event handle`);
         }
 

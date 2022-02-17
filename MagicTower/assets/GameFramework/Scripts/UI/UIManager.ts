@@ -1,5 +1,6 @@
 import { EventHandle } from "../Base/EventPool/EventHandle";
 import { EventPool } from "../Base/EventPool/EventPool";
+import { EventPoolMode } from "../Base/EventPool/EventPoolMode";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
@@ -35,7 +36,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._uiGroups = new Map<string, UIGroup>();
         this._uiFormBeingLoaded = new Map<number, string>();
         this._uiFormToReleaseOnLoad = new Set<number>();
-        this._eventPool = new EventPool<UIEventArgs>();
+        this._eventPool = new EventPool<UIEventArgs>(EventPoolMode.ALLOW_NO_HANDLER);
         this._recyleQueue = new Array<IUIForm>();
     }
 
