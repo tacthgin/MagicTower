@@ -4,6 +4,10 @@
     {
       "name": "default",
       "value": 1
+    },
+    {
+      "name": "DIALOG_TOAST",
+      "value": 2
     }
   ],
   "general": {

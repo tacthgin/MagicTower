@@ -9,13 +9,6 @@ export class ElementFactory {
     private static animations: { [key: number | string]: AnimationClip } = {};
     private static elementObjectPool: IObjectPool<ElementObject> = null!;
 
-    static async loadAsset() {
-        let resouceLoader = GameApp.ResourceManager;
-        await resouceLoader.loadDir("Prefab/Elements", Prefab);
-        await resouceLoader.loadDir("TiledMap", TiledMapAsset);
-        //await resouceLoader.loadDir("TiledMap/Images", SpriteFrame);
-    }
-
     static initliaze() {
         this.elementObjectPool = GameApp.ObjectPoolManager.createSingleSpawnObjectPool(ElementObject, "element object");
     }

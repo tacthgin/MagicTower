@@ -145,8 +145,6 @@ export class GameApp extends Component {
         this.initializeCommand();
         //初始化model
         this.initializeModel();
-        //提高层级到最高
-        this.node.setSiblingIndex(this.node.parent!.children.length - 1);
     }
 
     private initalizeFramework() {

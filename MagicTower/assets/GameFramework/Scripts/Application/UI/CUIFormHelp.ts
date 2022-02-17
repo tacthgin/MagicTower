@@ -56,6 +56,7 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
         let layer = this.layers[index];
         if (layer) {
             let node = uiFormInstance as Node;
+            node.parent = layer;
             let component = node.getComponent(node.name);
             return component ? (component as unknown as IUIForm) : null;
         }

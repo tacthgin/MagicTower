@@ -10,6 +10,7 @@ Enum(DialogAction);
 @ccclass("DialogBase")
 export class DialogBase extends DialogUIForm {
     @property({
+        type: UITransform,
         tooltip: "背景区域，用于做点击关闭，及事件屏蔽",
     })
     private touchNode: UITransform = null!;
