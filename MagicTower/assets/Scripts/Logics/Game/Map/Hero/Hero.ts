@@ -177,7 +177,7 @@ export class Hero extends Component {
     magicLight(monsterIndexs: number[]) {
         let heroIndex = this._map.getTileIndex(this._heroTile);
         monsterIndexs.forEach(async (index) => {
-            let lightning = (await GameApp.NodePoolManager.createNodeWithPath(Lightning, "Prefabs/Element/Lightning")) as Node;
+            let lightning = (await GameApp.NodePoolManager.createNodeWithPath(Lightning, "Prefab/Element/Lightning")) as Node;
             lightning.parent = this.node;
             lightning.getComponent(Lightning)?.init(index - heroIndex);
         });

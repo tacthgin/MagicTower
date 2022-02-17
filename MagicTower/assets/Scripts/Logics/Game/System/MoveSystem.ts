@@ -65,6 +65,7 @@ export class MoveSystem extends SystemBase {
         if (this._canHeroMoving) {
             let localPos = (this._gameMap as any).node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(position.x, position.y));
             let endTile = this._gameMap.toTile(v2(localPos?.x, localPos?.y));
+            if (this._hero.heroTile.equals(v2(endTile.x, endTile.y))) return;
             this.setAstarMoveType(AstarMoveType.HERO);
             let path = this.getPath(this._hero.heroTile, endTile);
             if (path.length > 0) {
@@ -263,6 +264,6 @@ export class MoveSystem extends SystemBase {
     }
 
     private async createElement() {
-        return (await GameApp.NodePoolManager.createNodeWithPath(ElementNode, `Prefabs/Elements/ElementNode`)) as Node;
+        return (await GameApp.NodePoolManager.createNodeWithPath(ElementNode, `Prefab/Elements/ElementNode`)) as Node;
     }
 }

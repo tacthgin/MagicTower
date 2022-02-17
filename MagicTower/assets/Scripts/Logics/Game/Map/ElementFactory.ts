@@ -11,7 +11,7 @@ export class ElementFactory {
 
     static async loadAsset() {
         let resouceLoader = GameApp.ResourceManager;
-        await resouceLoader.loadDir("Prefabs/Elements", Prefab);
+        await resouceLoader.loadDir("Prefab/Elements", Prefab);
         await resouceLoader.loadDir("TiledMap", TiledMapAsset);
         //await resouceLoader.loadDir("TiledMap/Images", SpriteFrame);
     }
@@ -25,7 +25,7 @@ export class ElementFactory {
     }
 
     static getHeroSpriteFrame(name: string): SpriteFrame | null {
-        return GameApp.ResourceManager.getAsset(`Sprites/${name}`, SpriteFrame);
+        return GameApp.ResourceManager.getAsset(`Sprite/${name}`, SpriteFrame);
     }
 
     static getElementAnimationClip(name: string) {

@@ -109,7 +109,7 @@ export class DoorSystem extends SystemBase {
     private async createDoorAnimation(id: number | string, tile: IVec2, reverse: boolean, callback: Function | null = null) {
         let name = reverse ? "DoorAnimationReverseNode" : "DoorAnimationNode";
         let constructor = reverse ? DoorAnimationReverseNode : DoorAnimationNode;
-        let node = (await GameApp.NodePoolManager.createNodeWithPath(constructor, `Prefabs/Elements/${name}`)) as Node;
+        let node = (await GameApp.NodePoolManager.createNodeWithPath(constructor, `Prefab/Elements/${name}`)) as Node;
         if (node) {
             let position = this.gameMap.getPositionAt(tile);
             if (position) {

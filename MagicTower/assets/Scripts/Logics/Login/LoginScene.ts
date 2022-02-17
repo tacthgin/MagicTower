@@ -32,7 +32,7 @@ export class LoginScene extends Component {
                 assetType: AudioClip,
             },
             {
-                path: "Sprites",
+                path: "Sprite",
                 assetType: SpriteFrame,
             },
         ];
