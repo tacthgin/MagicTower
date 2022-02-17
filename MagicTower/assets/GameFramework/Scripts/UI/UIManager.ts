@@ -79,7 +79,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         while (this._recyleQueue.length > 0) {
             let uiForm = this._recyleQueue.pop()!;
             uiForm.onRecyle();
-            this._instancePool.upspawn(uiForm.handle as UIFormInstanceObject);
+            this._instancePool.upspawn(uiForm.handle);
         }
 
         for (let pair of this._uiGroups) {
@@ -264,7 +264,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
             this._instancePool.register(uiFromInstanceObject, true);
             isNewInstance = true;
         }
-        this.internalOpenUIForm(serialId, uiFormAssetName, uiGroup as UIGroup, uiFromInstanceObject, pauseCoveredUIForm, isNewInstance, userData);
+        this.internalOpenUIForm(serialId, uiFormAssetName, uiGroup as UIGroup, uiFromInstanceObject.target, pauseCoveredUIForm, isNewInstance, userData);
         return serialId;
     }
 

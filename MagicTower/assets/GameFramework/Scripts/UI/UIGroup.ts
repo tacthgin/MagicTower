@@ -17,6 +17,7 @@ export class UIGroup implements IUIGroup {
         this._name = name;
         this._depth = depth;
         this._uiGroupHelp = uiGroupHelp;
+        this._uiFormInfos = new GameFrameworkLinkedList<UIFormInfo>();
     }
 
     get name(): string {

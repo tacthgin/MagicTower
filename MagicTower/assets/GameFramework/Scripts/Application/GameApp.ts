@@ -21,6 +21,7 @@ import { ModelContainer } from "./Model/ModelContainer";
 import { CNodeHelp } from "./NodePool/CNodeHelp";
 import { SoundController } from "./Sound/SoundController";
 import { CUIFormHelp } from "./UI/CUIFormHelp";
+import { UIConstant } from "./UI/UIConstant";
 
 const { ccclass, executionOrder } = _decorator;
 
@@ -161,8 +162,8 @@ export class GameApp extends Component {
         if (uiFormHelp) {
             uiManager.setUIFormHelp(uiFormHelp);
             //创建弹窗和toast的ui组
-            uiManager.addUIGroup(CUIFormHelp.DIALOG_LAYER_GROUP, 0, uiFormHelp.getDialogUIGroupHelp());
-            uiManager.addUIGroup(CUIFormHelp.TOAST_LAYER_GROUP, 1, uiFormHelp.getToastUIGroupHelp());
+            uiManager.addUIGroup(UIConstant.DIALOG_LAYER_GROUP, 0, uiFormHelp.getDialogUIGroupHelp());
+            uiManager.addUIGroup(UIConstant.TOAST_LAYER_GROUP, 1, uiFormHelp.getToastUIGroupHelp());
         } else {
             throw new GameFrameworkError("you must set ui form help first");
         }

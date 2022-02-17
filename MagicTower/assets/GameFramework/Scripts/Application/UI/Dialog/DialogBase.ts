@@ -1,4 +1,5 @@
 import { Enum, EventTouch, Node, screen, UITransform, _decorator } from "cc";
+import { GameApp } from "../../GameApp";
 import { DialogAction } from "./DialogAction";
 import { DialogUIForm } from "./DialogUIForm";
 
@@ -79,6 +80,6 @@ export class DialogBase extends DialogUIForm {
 
     /** 关闭弹窗 */
     close(useAction: boolean = true) {
-        
+        GameApp.UIManager.closeUIForm(this);
     }
 }

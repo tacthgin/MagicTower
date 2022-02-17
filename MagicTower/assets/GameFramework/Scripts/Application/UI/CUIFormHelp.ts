@@ -6,6 +6,7 @@ import { IUIGroup } from "../../UI/IUIGroup";
 import { IUIGroupHelp } from "../../UI/IUIGroupHelp";
 import { UIFormInstanceObject } from "../../UI/UIFormInstanceObject";
 import { CUIGroupHelp } from "./CUIGroupHelp";
+import { UIConstant } from "./UIConstant";
 const { ccclass, property } = _decorator;
 
 @ccclass("CUIFormHelp")
@@ -16,15 +17,7 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
     @property(Node)
     private toastLayer: Node = null!;
 
-    /**
-     * 弹窗UI组名
-     */
-    static readonly DIALOG_LAYER_GROUP: string = "DIALOG_LAYER_GROUP";
-
-    /**
-     * 飘字UI组名
-     */
-    static readonly TOAST_LAYER_GROUP: string = "DIALOG_LAYER_GROUP";
+    private layers: Node[] = null!;
 
     onLoad() {
         if (!this.dialogLayer || !this.toastLayer) {
@@ -32,8 +25,8 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
         }
 
         //初始化弹窗层和toast层的大小和位置
-        let layers = [this.dialogLayer, this.toastLayer];
-        layers.forEach((layer) => {
+        this.layers = [this.dialogLayer, this.toastLayer];
+        this.layers.forEach((layer) => {
             layer.position = v3(screen.width * 0.5, screen.height * 0.5);
             let uiTransform = layer.getComponent(UITransform);
             if (uiTransform) {
@@ -48,17 +41,26 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
     }
 
     createUIForm(uiFormInstance: object, uiGroup: IUIGroup, userData?: Object): IUIForm | null {
-        let uiFromInstanceObject = uiFormInstance as UIFormInstanceObject;
+        let index = -1;
         switch (uiGroup.name) {
-            case CUIFormHelp.DIALOG_LAYER_GROUP:
-                (uiFromInstanceObject.target as Node).parent = this.dialogLayer;
-                return uiFormInstance as IUIForm;
-            case CUIFormHelp.TOAST_LAYER_GROUP:
-                (uiFromInstanceObject.target as Node).parent = this.toastLayer;
-                return uiFormInstance as IUIForm;
+            case UIConstant.DIALOG_LAYER_GROUP:
+                index = 0;
+                break;
+            case UIConstant.TOAST_LAYER_GROUP:
+                index = 1;
+                break;
             default:
-                return null;
+                break;
         }
+
+        let layer = this.layers[index];
+        if (layer) {
+            let node = uiFormInstance as Node;
+            let component = node.getComponent(node.name);
+            return component ? (component as unknown as IUIForm) : null;
+        }
+
+        return null;
     }
 
     releaseUIForm(uiFormAsset: object, uiFormInstance: object): void {

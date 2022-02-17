@@ -13,7 +13,7 @@ export interface IUIFormHelp {
 
     /**
      * 创建界面
-     * @param uiFormInstance 界面示例
+     * @param uiFormInstance 界面实例
      * @param uiGroup 界面所属的界面组
      * @param userData 用户数据
      * @returns 界面

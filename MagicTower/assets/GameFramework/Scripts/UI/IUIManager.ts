@@ -145,9 +145,11 @@ export interface IUIManager {
      * 打开界面
      * @param uiFormAssetName 界面资源名称
      * @param uiGroupName 界面所属的界面组名称
+     * @param pauseCoveredUIForm 是否暂停被覆盖的界面
+     * @param userData 用户数据
      * @returns 界面序列编号
      */
-    openUIForm(uiFormAssetName: string, uiGroupName: string): Promise<number>;
+    openUIForm(uiFormAssetName: string, uiGroupName: string, pauseCoveredUIForm?: boolean, userData?: Object): Promise<number>;
 
     /**
      * 关闭界面
