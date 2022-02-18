@@ -1,8 +1,6 @@
 import { AudioClip, Component, director, JsonAsset, Label, Prefab, SpriteFrame, TiledMapAsset, _decorator } from "cc";
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
-import { UIConstant } from "../../../GameFramework/Scripts/Application/UI/UIConstant";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
-import { ElementFactory } from "../Game/Map/ElementFactory";
 
 const { ccclass, property } = _decorator;
 
@@ -10,6 +8,8 @@ const { ccclass, property } = _decorator;
 export class LoginScene extends Component {
     @property(Label)
     private progressLabel: Label = null!;
+
+    private progress: number = 0;
 
     onLoad() {}
 
@@ -48,16 +48,16 @@ export class LoginScene extends Component {
             let info = resouceInfos[i];
             let step = (i + 1) / resouceInfos.length;
             await GameApp.ResourceManager.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number) => {
-                this.progressLabel.string = `${((finished / total) * step * 100).toFixed(2)}%`;
+                let progress = finished / total;
+                if (progress > this.progress) {
+                    this.progress = progress * step;
+                    this.progressLabel.string = `${(this.progress * 100).toFixed(2)}%`;
+                }
             });
         }
     }
 
-    gotoGameScene() {
-        //director.loadScene("GameScene");
-        GameApp.UIManager.openUIForm("Prefab/Dialogs/ChatDialog", UIConstant.DIALOG_LAYER_GROUP, false, {
-            content: "hhahahaha",
-            endCallback: () => {},
-        });
+    async gotoGameScene() {
+        director.loadScene("GameScene");
     }
 }
