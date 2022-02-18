@@ -232,7 +232,13 @@ export class GameFrameworkLinkedList<T> {
                     this._first = node.next;
                 }
             }
+
             this.releaseNode(node);
+
+            if (this._size == 0) {
+                this._first = this._last = null;
+            }
+
             return true;
         }
         return false;
