@@ -1,42 +1,45 @@
-// import { RichText, tween, UITransform, Vec3, _decorator } from "cc";
-// import { BasePoolNode } from "../Base/BasePoolNode";
+import { RichText, tween, UITransform, v3, Vec3, _decorator } from "cc";
+import { GameApp } from "../../GameApp";
+import { ToastUIForm } from "./ToastUIForm";
 
-// const { ccclass, property } = _decorator;
+const { ccclass, property } = _decorator;
 
-// const SHORTEST_LENGTH: number = 120;
+const SHORTEST_LENGTH: number = 120;
 
-// export enum ToastType {
-//     NORAML,
-//     RICH,
-// }
+export enum ToastType {
+    NORAML,
+    RICH,
+}
 
-// @ccclass("ColorToast")
-// export class ColorToast extends BasePoolNode {
-//     @property(RichText)
-//     toastLabel: RichText = null!;
+@ccclass("ColorToast")
+export class ColorToast extends ToastUIForm {
+    @property(RichText)
+    toastLabel: RichText = null!;
 
-//     init(content: string, toastType: ToastType) {
-//         if (toastType == ToastType.NORAML) {
-//             content = `<color=#ffffff>${content}</color>`;
-//         }
-//         this.toastLabel.string = content;
-//         let transform = this.node.getComponent(UITransform)!;
-//         let labelTransform = this.toastLabel.node.getComponent(UITransform)!;
-//         if (labelTransform.width > SHORTEST_LENGTH) {
-//             transform.width = labelTransform.width + 50;
-//         } else {
-//             transform.width = 120;
-//         }
-//         this.runToastAction();
-//     }
+    onOpen(userData: { content: string; toastType?: ToastType }) {
+        userData.toastType = userData.toastType || ToastType.NORAML;
+        if (userData.toastType == ToastType.NORAML) {
+            userData.content = `<color=#ffffff>${userData.content}</color>`;
+        }
+        this.toastLabel.string = userData.content;
+        let transform = this.node.getComponent(UITransform)!;
+        let labelTransform = this.toastLabel.node.getComponent(UITransform)!;
+        if (labelTransform.width > SHORTEST_LENGTH) {
+            transform.width = labelTransform.width + 50;
+        } else {
+            transform.width = SHORTEST_LENGTH;
+        }
+        this.runToastAction();
+    }
 
-//     runToastAction() {
-//         tween(this.node)
-//             .by(0.5, { position: new Vec3(0, 60, 0) })
-//             .delay(1)
-//             .call(() => {
-//                 this.remove();
-//             })
-//             .start();
-//     }
-// }
+    runToastAction() {
+        tween(this.node)
+            .set({ position: v3(0, screen.height * 0.3) })
+            .by(0.5, { position: new Vec3(0, 60, 0) })
+            .delay(1)
+            .call(() => {
+                GameApp.UIManager.closeUIForm(this);
+            })
+            .start();
+    }
+}

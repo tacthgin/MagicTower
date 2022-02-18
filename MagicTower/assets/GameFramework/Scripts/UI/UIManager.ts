@@ -221,7 +221,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         return false;
     }
 
-    async openUIForm(uiFormAssetName: string, uiGroupName: string, pauseCoveredUIForm: boolean = false, userData?: Object): Promise<number> {
+    async openUIForm(uiFormAssetName: string, uiGroupName: string, userData?: Object, pauseCoveredUIForm: boolean = false): Promise<number> {
         if (!this._resourceManger) {
             throw new GameFrameworkError("you must set resouce manager first");
         }

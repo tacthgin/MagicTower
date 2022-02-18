@@ -111,7 +111,7 @@ export class GameEventSystem extends SystemBase {
     }
 
     private chat() {
-        GameApp.UIManager.openUIForm("Prefab/Dialogs/ChatDialog", UIConstant.DIALOG_LAYER_GROUP, false, {
+        GameApp.UIManager.openUIForm("Prefab/Dialogs/ChatDialog", UIConstant.DIALOG_LAYER_GROUP, {
             content: this.eventInfo.chat[this.chatStep++],
             endCallback: () => {
                 this.execute();

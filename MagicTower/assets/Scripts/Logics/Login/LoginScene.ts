@@ -1,5 +1,6 @@
 import { AudioClip, Component, director, JsonAsset, Label, Prefab, SpriteFrame, TiledMapAsset, _decorator } from "cc";
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
+import { UIConstant } from "../../../GameFramework/Scripts/Application/UI/UIConstant";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
 
 const { ccclass, property } = _decorator;
@@ -58,6 +59,7 @@ export class LoginScene extends Component {
     }
 
     async gotoGameScene() {
-        director.loadScene("GameScene");
+        //director.loadScene("GameScene");
+        GameApp.UIManager.openUIForm("Prefab/Base/ColorToast", UIConstant.TOAST_LAYER_GROUP, { content: "hahahaha" });
     }
 }

@@ -7,5 +7,5 @@ export enum UIConstant {
     /**
      * 飘字UI组名
      */
-    TOAST_LAYER_GROUP = "DIALOG_LAYER_GROUP",
+    TOAST_LAYER_GROUP = "TOAST_LAYER_GROUP",
 }

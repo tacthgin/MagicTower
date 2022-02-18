@@ -2,7 +2,7 @@ import { Component } from "cc";
 import { IUIForm } from "../../../UI/IUIForm";
 import { IUIGroup } from "../../../UI/IUIGroup";
 
-export class DialogUIForm extends Component implements IUIForm {
+export class ToastUIForm extends Component implements IUIForm {
     private _serialId: number = -1;
     private _uiFormAssetName: string = "";
     private _uiGroup: IUIGroup = null!;
