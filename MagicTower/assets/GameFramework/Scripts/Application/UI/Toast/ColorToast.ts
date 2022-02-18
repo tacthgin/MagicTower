@@ -1,4 +1,4 @@
-import { RichText, tween, UITransform, v3, Vec3, _decorator } from "cc";
+import { RichText, screen, tween, UITransform, v3, Vec3, _decorator } from "cc";
 import { GameApp } from "../../GameApp";
 import { ToastUIForm } from "./ToastUIForm";
 
@@ -29,12 +29,13 @@ export class ColorToast extends ToastUIForm {
         } else {
             transform.width = SHORTEST_LENGTH;
         }
+
         this.runToastAction();
     }
 
     runToastAction() {
         tween(this.node)
-            .set({ position: v3(0, screen.height * 0.3) })
+            .set({ position: v3(0, screen.windowSize.height * 0.25) })
             .by(0.5, { position: new Vec3(0, 60, 0) })
             .delay(1)
             .call(() => {
