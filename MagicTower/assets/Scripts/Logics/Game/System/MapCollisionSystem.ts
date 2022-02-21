@@ -2,6 +2,7 @@ import { v2, Vec2, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
@@ -257,7 +258,7 @@ export class MapCollisionSystem extends SystemBase {
 
     private fightMonster(monsterJson: MonsterInfo, tile: IVec2) {
         if (!CalculateSystem.canHeroAttack(this.heroModel, monsterJson, !monsterJson.firstAttack)) {
-            //GameManager.UI.showToast(`你打不过${monsterJson.name}`);
+            UIFactory.showToast(`你打不过${monsterJson.name}`);
             return true;
         }
 

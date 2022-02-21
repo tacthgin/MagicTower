@@ -1,5 +1,3 @@
-/**处理地图上的事件 */
-
 import { IVec2, Node, tween, v3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
@@ -21,6 +19,7 @@ import { SpecialMoveCommand } from "../Command/SpecialMoveCommand";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 
+/** 事件系统 */
 @CommandManager.register("GameEventSystem")
 export class GameEventSystem extends SystemBase {
     private eventInfo: any = null;

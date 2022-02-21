@@ -1,6 +1,7 @@
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
@@ -65,7 +66,7 @@ export class NpcInteractiveSystem extends SystemBase {
         //商人交易
         if (npcPropInfo.propGold) {
             if (this.heroModel.getAttr(HeroAttr.GOLD) + npcPropInfo.propGold < 0) {
-                //GameManager.getInstance().showToast("你的钱不够");
+                UIFactory.showToast("你的钱不够");
                 return;
             }
             this.heroModel.setAttrDiff(HeroAttr.HP, npcPropInfo.hp || 0);
@@ -84,7 +85,7 @@ export class NpcInteractiveSystem extends SystemBase {
                 this.heroModel.setAttrDiff(HeroAttr.GOLD, npcPropInfo.propGold || 0);
                 this.npc.consumeProp();
             } else {
-                //GameManager.getInstance().showToast("物品数量不够");
+                UIFactory.showToast("物品数量不够");
             }
         } else if (npcPropInfo.prop) {
             for (let i = 0; i < npcPropInfo.prop.length; i += 2) {
