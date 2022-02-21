@@ -59,7 +59,6 @@ export class LoginScene extends Component {
     }
 
     async gotoGameScene() {
-        //director.loadScene("GameScene");
-        GameApp.UIManager.openUIForm("Prefab/Base/ColorToast", UIConstant.TOAST_LAYER_GROUP, { content: "hahahaha" });
+        director.loadScene("GameScene");
     }
 }

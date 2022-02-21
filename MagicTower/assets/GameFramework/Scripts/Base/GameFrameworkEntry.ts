@@ -3,6 +3,9 @@ import { GameFrameworkError } from "./GameFrameworkError";
 import { GameFrameworkLinkedList, LinkedListNode } from "./GameFrameworkLinkedList";
 import { GameFrameworkModule } from "./GameFrameworkModule";
 
+/**
+ * 游戏框架入口
+ */
 export class GameFrameworkEntry {
     private static s_gameFrameworkModules: GameFrameworkLinkedList<GameFrameworkModule> = new GameFrameworkLinkedList<GameFrameworkModule>();
     private static s_gameFrameworkModulesConstrustor: Map<string, Constructor> = new Map<string, Constructor>();

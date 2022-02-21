@@ -72,7 +72,7 @@ export class Random {
      * @returns 随机到的元素
      */
     randomArray<T>(array: T[]): T | null {
-        if (!array || array.length == 0) {
+        if (array.length == 0) {
             return null;
         }
         return array[this.randomInt(0, array.length - 1)];
@@ -85,9 +85,7 @@ export class Random {
      * @returns 随机到的元素数组
      */
     randomArrayDifferences<T>(array: T[], count: number): T[] {
-        if (!array) {
-            return [];
-        } else if (array.length <= count) {
+        if (array.length <= count) {
             return array;
         }
 
@@ -117,7 +115,6 @@ export class Random {
      * @returns 随机到的索引值，没有符合的索引返回-1
      */
     randomFromArray(array: number[]): number {
-        array = array || [];
         let pro = Math.random();
         for (let i = 0; i < array.length; ++i) {
             if (pro <= array[i]) {

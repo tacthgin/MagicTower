@@ -1,4 +1,3 @@
-import { GameFrameworkLog } from "../../Base/Log/GameFrameworkLog";
 import { IRerference } from "../../Base/ReferencePool/IRerference";
 import { ReferencePool } from "../../Base/ReferencePool/ReferencePool";
 

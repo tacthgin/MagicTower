@@ -43,7 +43,9 @@ export class LinkedListNode<T> {
     }
 }
 
-/** 双链表 */
+/**
+ * 双链表
+ */
 export class GameFrameworkLinkedList<T> {
     private _first: LinkedListNode<T> | null = null;
     private _last: LinkedListNode<T> | null = null;
