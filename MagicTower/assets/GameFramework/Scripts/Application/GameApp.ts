@@ -20,8 +20,9 @@ import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
 import { CNodeHelp } from "./NodePool/CNodeHelp";
 import { SoundController } from "./Sound/SoundController";
-import { CUIFormHelp } from "./UI/CUIFormHelp";
+import { CUIFormHelp } from "./UI/Helper/CUIFormHelp";
 import { UIConstant } from "./UI/UIConstant";
+import { UIFactory } from "./UI/UIFactory";
 
 const { ccclass, executionOrder } = _decorator;
 
@@ -165,6 +166,8 @@ export class GameApp extends Component {
         } else {
             throw new GameFrameworkError("you must set ui form help first");
         }
+        UIFactory.setUIManager(uiManager);
+        UIFactory.setToastAssetPath("Prefab/Base/ColorToast");
         //初始化节点对象池
         let nodePoolManager = GameApp.NodePoolManager;
         nodePoolManager.setResourceManager(resourceManager);

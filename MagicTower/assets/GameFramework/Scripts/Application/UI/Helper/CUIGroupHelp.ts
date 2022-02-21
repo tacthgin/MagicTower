@@ -1,5 +1,6 @@
 import { Component, _decorator } from "cc";
-import { IUIGroupHelp } from "../../UI/IUIGroupHelp";
+import { IUIGroupHelp } from "../../../UI/IUIGroupHelp";
+
 const { ccclass, property } = _decorator;
 
 @ccclass("CUIGroupHelp")

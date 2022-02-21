@@ -1,12 +1,13 @@
-import { Component, instantiate, Node, TiledUserNodeData, UITransform, v3, _decorator } from "cc";
-import { GameFrameworkError } from "../../Base/GameFrameworkError";
-import { IUIForm } from "../../UI/IUIForm";
-import { IUIFormHelp } from "../../UI/IUIFormHelp";
-import { IUIGroup } from "../../UI/IUIGroup";
-import { IUIGroupHelp } from "../../UI/IUIGroupHelp";
-import { UIFormInstanceObject } from "../../UI/UIFormInstanceObject";
+import { Component, instantiate, Node, UITransform, v3, _decorator } from "cc";
+import { GameFrameworkError } from "../../../Base/GameFrameworkError";
+import { IUIForm } from "../../../UI/IUIForm";
+import { IUIFormHelp } from "../../../UI/IUIFormHelp";
+import { IUIGroup } from "../../../UI/IUIGroup";
+import { IUIGroupHelp } from "../../../UI/IUIGroupHelp";
+import { UIFormInstanceObject } from "../../../UI/UIFormInstanceObject";
+import { UIConstant } from "../UIConstant";
 import { CUIGroupHelp } from "./CUIGroupHelp";
-import { UIConstant } from "./UIConstant";
+
 const { ccclass, property } = _decorator;
 
 @ccclass("CUIFormHelp")
