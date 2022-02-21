@@ -33,10 +33,11 @@ export class GameEventSystem extends SystemBase {
     private hero: Hero = null!;
     private levelData: LevelData = null!;
 
-    initliaze(gameMap: IGameMap, eventId: number | string, levelData: LevelData) {
+    initliaze(gameMap: IGameMap, hero: Hero, eventId: number | string, levelData: LevelData) {
         this.eventInfo = Utility.Json.getJsonElement("event", eventId);
         this.globalConfig = Utility.Json.getJson("global");
         this.gameMap = gameMap;
+        this.hero = hero;
         this.levelData = levelData;
         // if (this.eventInfo.monsterDoor) {
         // this.gameMap.monsterDoor = this.eventInfo.monsterDoor;

@@ -162,6 +162,22 @@ export class GameMap extends TiledMap implements IGameMap {
         }
     }
 
+    /**
+     * 打开地图动画定时器
+     */
+    openTileAnimationTimer() {
+        if (this.canOpenTileAnimation() && !director.getScheduler().isScheduled(this.tilesAnimationTimer, this)) {
+            this.schedule(this.tilesAnimationTimer, MAP_ANIMATION_INTERVAL);
+        }
+    }
+
+    /**
+     * 停止地图动画定时器
+     */
+    stopTileAnimationTimer() {
+        this.unschedule(this.tilesAnimationTimer);
+    }
+
     loadLevelData(levelData: LevelData) {
         for (let layerName in levelData.appearTile) {
             let appearInfo = levelData.appearTile[layerName];

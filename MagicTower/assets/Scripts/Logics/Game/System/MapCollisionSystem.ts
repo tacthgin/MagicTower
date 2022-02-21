@@ -323,7 +323,7 @@ export class MapCollisionSystem extends SystemBase {
         if (id) {
             let eventInfo = Utility.Json.getJsonElement("event", id) as any;
             if (!eventInfo.save || eventInfo.save == this.levelData.level) {
-                this.gameEventSystem.initliaze(this.gameMap, id, this.levelData);
+                this.gameEventSystem.initliaze(this.gameMap, this.hero, id, this.levelData);
                 this.gameEventSystem.execute();
                 return false;
             } else {

@@ -1,8 +1,11 @@
+import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
 import { IVec2 } from "../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
+import { CommonEventArgs } from "../../Logics/Event/CommonEventArgs";
+import { GameEvent } from "../../Logics/Event/GameEvent";
 import { HeroAttr } from "./HeroAttr";
 import { HeroEvent } from "./HeroEvent";
 import { HeroAttrEventArgs, HeroPropEventArgs } from "./HeroModelEventArgs";
@@ -79,6 +82,7 @@ export class HeroModel extends ModelBase {
             this.heroAttr[HeroAttr.HP] = info.hp;
             this.swardId = 0;
             this.shieldId = 0;
+            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.REFRESH_ARCHIVE));
             this.save();
             return true;
         } else {

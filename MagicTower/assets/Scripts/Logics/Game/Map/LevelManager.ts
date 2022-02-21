@@ -121,15 +121,22 @@ export class LevelManager extends Component {
     }
 
     private onSceneAppear(sender: object, eventArgs: SceneAppearEventArgs) {
-        this.maps[this.mapModel.level].node.active = false;
+        let gameMap = this.maps[this.mapModel.level];
+        gameMap.openTileAnimationTimer();
+        gameMap.node.active = false;
         this.mapModel.level = eventArgs.level;
         let newMap = this.createMap(this.mapModel.level);
         newMap.node.active = true;
         this.showHero(eventArgs.tile);
+        this.node.getComponent(UIOpacity)!.opacity = 255;
     }
 
     private onSceneDisappear(sender: object, eventArgs: CommonEventArgs) {
-        tween(this.node.getComponent(UIOpacity)).to(1, { opacity: 0 }).start();
+        let gameMap = this.getCurrentMap();
+        if (gameMap) {
+            gameMap.stopTileAnimationTimer();
+            tween(this.node.getComponent(UIOpacity)).to(1, { opacity: 0 }).start();
+        }
     }
 
     private showHero(tile: IVec2 | null = null) {

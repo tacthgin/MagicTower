@@ -29,9 +29,9 @@ export class DialogBase extends DialogUIForm {
 
     /** 关闭弹窗是否摧毁 */
     @property({
-        tooltip: "关闭弹窗是否摧毁",
+        tooltip: "关闭弹窗是否摧毁,默认不摧毁",
     })
-    private closeWithDestroy: boolean = true;
+    private closeWithDestroy: boolean = false;
 
     /** 使用弹窗动作 */
     @property({

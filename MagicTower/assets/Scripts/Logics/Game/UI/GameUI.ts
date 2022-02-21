@@ -7,7 +7,7 @@ import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroEvent } from "../../../Model/HeroModel/HeroEvent";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { HeroAttrEventArgs, HeroPropEventArgs } from "../../../Model/HeroModel/HeroModelEventArgs";
-import { PropType } from "../../../Model/HeroModel/Prop";
+import { PropInfo, PropType } from "../../../Model/HeroModel/Prop";
 import { MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
@@ -53,7 +53,7 @@ export class GameUI extends Component {
     private heroModel: HeroModel = null!;
     private mapModel: MapModel = null!;
     private keys: Map<number, Array<Node>> = new Map<number, Array<Node>>();
-    private propButtons: Map<number, PropButton> = new Map<number, PropButton>();
+    private propButtons: Map<number | string, PropButton> = new Map<number, PropButton>();
     private monsterSprite: Node = null!;
 
     onLoad() {
@@ -147,6 +147,8 @@ export class GameUI extends Component {
     }
 
     private refreshProps() {
+        this.removeAllKeys();
+        this.removeAllPropButtons();
         this.heroModel.forEachProps((propId, count) => {
             this.refreshProp(propId, count);
         });
@@ -178,7 +180,7 @@ export class GameUI extends Component {
                 case PropType.FLYING_WAND:
                     //up
                     for (let i = 0; i < STAIR_NAMES.length; i++) {
-                        let button = this.createPropButton(propInfo, 1);
+                        let button = this.createPropButton(propInfo, 1, `${propInfo.id}_${STAIR_NAMES[i]}`);
                         if (button) {
                             let label = button.getChildByName("label")!;
                             label.active = true;
@@ -268,23 +270,40 @@ export class GameUI extends Component {
         }
     }
 
-    private createPropButton(propInfo: any, num: number) {
+    private removeAllKeys() {
+        this.keys.forEach((keys) => {
+            keys.forEach((key) => {
+                GameApp.NodePoolManager.releaseNode("key", key);
+            });
+            keys.length = 0;
+        });
+    }
+
+    private createPropButton(propInfo: PropInfo, num: number, extraId?: string) {
         let propButton = GameApp.NodePoolManager.createNode(PropButton, this.propButtonPrefab) as Node;
         if (propButton) {
             let control = propButton.getComponent(PropButton)!;
             control.init(propInfo);
             control.setNum(num);
             propButton.parent = this.propButtonLayout;
-            this.propButtons.set(propInfo.id, control);
+            this.propButtons.set(extraId || propInfo.id, control);
         }
         return propButton;
     }
 
-    private removePropButton(propInfo: any) {
-        let propButton = this.propButtons.get(propInfo.id);
+    private removePropButton(propInfo: PropInfo, extraId?: string) {
+        let newId = extraId || propInfo.id;
+        let propButton = this.propButtons.get(newId);
         if (propButton) {
-            this.propButtons.delete(propInfo.id);
+            this.propButtons.delete(newId);
             GameApp.NodePoolManager.releaseNode(PropButton, propButton.node);
         }
+    }
+
+    private removeAllPropButtons() {
+        this.propButtons.forEach((propButton) => {
+            GameApp.NodePoolManager.releaseNode(PropButton, propButton.node);
+        });
+        this.propButtons.clear();
     }
 }

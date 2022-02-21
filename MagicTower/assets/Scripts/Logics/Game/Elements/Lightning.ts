@@ -15,7 +15,7 @@ export class Lightning extends Component {
             this.node.position = positions[index];
             this.node.angle = angles[index];
             let uiOpacity = this.node.getComponent(UIOpacity);
-            tween(uiOpacity).to(0.1, { opacity: 0 }).start();
+            tween(uiOpacity).to(0.5, { opacity: 0 }).start();
         } else {
             GameFrameworkLog.error("Lightning direction error");
         }

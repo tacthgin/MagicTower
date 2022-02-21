@@ -4,7 +4,6 @@ import { IUIForm } from "../../../UI/IUIForm";
 import { IUIFormHelp } from "../../../UI/IUIFormHelp";
 import { IUIGroup } from "../../../UI/IUIGroup";
 import { IUIGroupHelp } from "../../../UI/IUIGroupHelp";
-import { UIFormInstanceObject } from "../../../UI/UIFormInstanceObject";
 import { UIConstant } from "../UIConstant";
 import { CUIGroupHelp } from "./CUIGroupHelp";
 
@@ -66,7 +65,7 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
     }
 
     releaseUIForm(uiFormAsset: object, uiFormInstance: object): void {
-        ((uiFormInstance as UIFormInstanceObject).target as Node).removeFromParent();
+        (uiFormInstance as Node).destroy();
     }
 
     getDialogUIGroupHelp(): IUIGroupHelp {

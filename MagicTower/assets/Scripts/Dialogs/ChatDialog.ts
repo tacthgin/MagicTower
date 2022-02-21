@@ -21,7 +21,7 @@ export class ChatDialog extends DialogBase {
         }
     }
 
-    onCloseClick() {
+    close() {
         if (typeof this.talkContent == "string" || this.contentIndex >= this.talkContent.length) {
             this.endCallback && this.endCallback();
             super.close();
