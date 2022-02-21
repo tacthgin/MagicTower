@@ -97,7 +97,7 @@ export class Npc extends Element {
         let npcInfos: any = {};
         for (let key in propertiesInfo) {
             let npc = new Npc();
-            npc.id = propertiesInfo[key];
+            npc.id = parseInt(propertiesInfo[key]);
             npc.index = parseInt(key);
             npcInfos[key] = npc;
         }

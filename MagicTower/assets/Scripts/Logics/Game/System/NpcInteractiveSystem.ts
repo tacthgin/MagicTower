@@ -5,31 +5,34 @@ import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFa
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
-import { MapCollisionSystem } from "./MapCollisionSystem";
+import { CommonEventArgs } from "../../Event/CommonEventArgs";
+import { GameEvent } from "../../Event/GameEvent";
+import { DisappearCommand } from "../Command/DisappearCommand";
 
 @CommandManager.register("NpcInteractiveSystem")
 export class NpcInteractiveSystem extends SystemBase {
     private npc: Npc = null!;
     private heroModel: HeroModel = null!;
-    private mapCollisionSystem: MapCollisionSystem = null!;
 
-    initliaze(npc: Npc, mapCollisionSystem: MapCollisionSystem) {
+    initliaze(npc: Npc) {
         this.npc = npc;
-        this.mapCollisionSystem = mapCollisionSystem;
         this.heroModel = GameApp.getModel(HeroModel);
     }
 
     execute() {
         if (this.npc.canTrade()) {
             //物品交易
-            // this.map.showDialog("RewardDialog", this.npc, (accept: boolean) => {
-            //     if (accept) {
-            //         this.npcTrade();
-            //         this.interactiveComplete();
-            //         this.npc.nextTalk();
-            //     }
-            //     GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-            // });
+            UIFactory.showDialog("Prefab/Dialogs/RewardDialog", {
+                element: this.npc,
+                callback: (accept: boolean) => {
+                    if (accept) {
+                        this.npcTrade();
+                        this.interactiveComplete();
+                        this.npc.nextTalk();
+                    }
+                    GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+                },
+            });
         } else {
             let info = this.npc.talk();
             this.npc.nextTalk();
@@ -38,22 +41,26 @@ export class NpcInteractiveSystem extends SystemBase {
             }
 
             let npcInfo = this.npc.npcInfo;
-            // this.map.showDialog("ChatDialog", info.talk, () => {
-            //     //小偷
-            //     if (npcInfo.type == 1) {
-            //         //如果有事件聊天
-            //         if (npcInfo.eventTalk) {
-            //             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-            //         } else {
-            //             this.npcMove();
-            //         }
-            //     } else {
-            //         this.interactiveComplete();
-            //         GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-            //     }
-            // });
+            UIFactory.showDialog("Prefab/Dialogs/ChatDialog", {
+                content: info.talk,
+                endCallback: () => {
+                    //小偷
+                    if (npcInfo.type == 1) {
+                        //如果有事件聊天
+                        if (npcInfo.eventTalk) {
+                            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+                        } else {
+                            this.npcMove();
+                        }
+                    } else {
+                        this.interactiveComplete();
+                        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+                    }
+                },
+            });
         }
     }
+
     private npcTrade() {
         let npcPropInfo = this.npc.npcInfo.value;
         this.heroModel.setAttrDiff(HeroAttr.GOLD, npcPropInfo.gold || 0);
@@ -94,45 +101,45 @@ export class NpcInteractiveSystem extends SystemBase {
         }
     }
     private npcMove() {
-        // let wallIndex = this.npc.getWallIndex();
-        // let delay = 0;
-        // if (wallIndex) {
-        //     delay = 0.2;
-        //     this.map.removeElement(wallIndex, "door");
-        // }
-        // let moveIndex = this.npc.move();
-        // let npcInfo = this.npc.npcInfo;
-        // if (moveIndex) {
-        //     let path = CommonAstar.getPath(this.map, this.map.indexToTile(this.index), this.map.indexToTile(moveIndex));
-        //     if (path) {
-        //         tween(this.npc.node)
-        //             .delay(delay)
-        //             .call(() => {
-        //                 this.npc.movePath(this.map.changePathCoord(path)).then((resolve) => {
-        //                     if (this.npc.moveEnd()) {
-        //                         this.map.removeElement(this.index, "npc");
-        //                         if (npcInfo.event) {
-        //                             this.map.eventCollision(npcInfo.event);
-        //                         }
-        //                     } else {
-        //                         //转移小偷位置
-        //                         this.map.changeElementInfo(this.index, moveIndex, "npc", this.npc);
-        //                     }
-        //                     GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-        //                 });
-        //             })
-        //             .start();
-        //     }
-        // } else if (npcInfo.event) {
-        //     this.map.eventCollision(npcInfo.event);
-        //     GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-        // }
+        let wallIndex = this.npc.getWallIndex();
+        let delay = 0;
+        if (wallIndex) {
+            delay = 0.2;
+            GameApp.CommandManager.createCommand(DisappearCommand).execute("door", wallIndex);
+        }
+        let moveIndex = this.npc.move();
+        let npcInfo = this.npc.npcInfo;
+        if (moveIndex) {
+            let path = CommonAstar.getPath(this.map, this.map.indexToTile(this.index), this.map.indexToTile(moveIndex));
+            if (path) {
+                tween(this.npc.node)
+                    .delay(delay)
+                    .call(() => {
+                        this.npc.movePath(this.map.changePathCoord(path)).then((resolve) => {
+                            if (this.npc.moveEnd()) {
+                                this.map.removeElement(this.index, "npc");
+                                if (npcInfo.event) {
+                                    this.map.eventCollision(npcInfo.event);
+                                }
+                            } else {
+                                //转移小偷位置
+                                this.map.changeElementInfo(this.index, moveIndex, "npc", this.npc);
+                            }
+                            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+                        });
+                    })
+                    .start();
+            }
+        } else if (npcInfo.event) {
+            this.map.eventCollision(npcInfo.event);
+            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+        }
     }
 
     private interactiveComplete() {
-        // if (this.npc.talkEnd()) {
-        //     this.map.removeElement(this.index, "npc");
-        // }
+        if (this.npc.talkEnd()) {
+            GameApp.CommandManager.createCommand(DisappearCommand).execute("npc", this.npc.index);
+        }
     }
 
     clear(): void {

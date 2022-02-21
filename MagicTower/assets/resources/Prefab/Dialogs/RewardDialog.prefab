@@ -1827,11 +1827,11 @@
       "__id__": 90
     },
     "touchNode": {
-      "__id__": 2
+      "__id__": 5
     },
     "dialogContent": null,
     "clickBgClose": false,
-    "closeWithDestroy": true,
+    "closeWithDestroy": false,
     "actionType": 0,
     "content": {
       "__id__": 10

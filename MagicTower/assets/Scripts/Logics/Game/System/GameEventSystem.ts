@@ -2,7 +2,7 @@ import { IVec2, Node, tween, v3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { UIConstant } from "../../../../GameFramework/Scripts/Application/UI/UIConstant";
+import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
@@ -111,7 +111,7 @@ export class GameEventSystem extends SystemBase {
     }
 
     private chat() {
-        GameApp.UIManager.openUIForm("Prefab/Dialogs/ChatDialog", UIConstant.DIALOG_LAYER_GROUP, {
+        UIFactory.showDialog("Prefab/Dialogs/ChatDialog", {
             content: this.eventInfo.chat[this.chatStep++],
             endCallback: () => {
                 this.execute();

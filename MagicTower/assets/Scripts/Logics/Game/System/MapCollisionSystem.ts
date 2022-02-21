@@ -117,12 +117,7 @@ export class MapCollisionSystem extends SystemBase {
                 }
                 break;
             case "npc":
-                if (jsonData) {
-                    return this.interactiveNpc(jsonData, tile);
-                } else {
-                    GameFrameworkLog.error("npc json is not exist");
-                }
-                break;
+                return this.interactiveNpc(tile);
             case "building":
                 this.gotoShop();
                 break;
@@ -270,13 +265,16 @@ export class MapCollisionSystem extends SystemBase {
         return false;
     }
 
-    private interactiveNpc(npcJson: NpcInfo, tile: IVec2) {
-        let npc = ElementFactory.createElementData(Npc, "npc");
-        npc.id = parseInt(npcJson.id);
-        npc.index = this.gameMap.getTileIndex(tile);
-        this.npcInteractiveSystem.initliaze(npc, this);
-        this.npcInteractiveSystem.execute();
-        return false;
+    private interactiveNpc(tile: IVec2) {
+        let npc = this.levelData.getLayerElement<Npc>("npc", this.gameMap.getTileIndex(tile));
+        if (npc) {
+            this.npcInteractiveSystem.initliaze(npc);
+            this.npcInteractiveSystem.execute();
+            return false;
+        } else {
+            GameFrameworkLog.error(`cant not find npc at x: ${tile.x} y: ${tile.y}`);
+            return true;
+        }
     }
 
     private gotoShop() {
