@@ -29,6 +29,10 @@ export class Npc extends Element {
         }
     }
 
+    get id(): number {
+        return this._id;
+    }
+
     get npcInfo(): NpcInfo {
         return this._npcInfo;
     }

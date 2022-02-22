@@ -27,7 +27,7 @@ export class ElementFactory {
             for (let i = 0; i < 2; i++) {
                 spriteFrames.push(this.getElementSpriteFrame(`${name}_${i}`)!);
             }
-            let clip = AnimationClip.createWithSpriteFrames(spriteFrames, 20);
+            let clip = AnimationClip.createWithSpriteFrames(spriteFrames, 10);
             if (clip) {
                 clip.name = name;
                 clip.wrapMode = AnimationClip.WrapMode.Loop;

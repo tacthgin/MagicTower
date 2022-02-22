@@ -124,7 +124,14 @@ export class GameMap extends TiledMap implements IGameMap {
 
     getTileGIDAt(layerName: string, tile: IVec2) {
         let layer = this.getLayer(layerName);
-        return layer ? layer.getTileGIDAt(tile.x, tile.y) : null;
+        if (layer) {
+            let gid = layer.getTileGIDAt(tile.x, tile.y);
+            if (gid && layerName in this.animationTiles) {
+                gid -= this.animationCount;
+                return gid;
+            }
+        }
+        return null;
     }
 
     getLayersProperties() {

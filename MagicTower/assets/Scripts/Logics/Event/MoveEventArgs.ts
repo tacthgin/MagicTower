@@ -8,6 +8,7 @@ export class MoveEventArgs extends GameEventArgs {
     private _dst: number = 0;
     private _speed: number = 0;
     private _delay: number = 0;
+    private _moveCompleteCallback: Function | null = null;
 
     get id(): number {
         return GameEvent.COMMAND_MOVE;
@@ -33,13 +34,18 @@ export class MoveEventArgs extends GameEventArgs {
         return this._delay;
     }
 
-    static create(layerName: string, src: number, dst: number, speed: number, delay: number): MoveEventArgs {
+    get moveCompleteCallback(): Function | null {
+        return this._moveCompleteCallback;
+    }
+
+    static create(layerName: string, src: number, dst: number, speed: number, delay: number, moveCompleteCallback: Function | null): MoveEventArgs {
         let moveEventArgs = ReferencePool.acquire(MoveEventArgs);
         moveEventArgs._layerName = layerName;
         moveEventArgs._src = src;
         moveEventArgs._dst = dst;
         moveEventArgs._speed = speed;
         moveEventArgs._delay = delay;
+        moveEventArgs._moveCompleteCallback = moveCompleteCallback;
         return moveEventArgs;
     }
 
@@ -49,5 +55,6 @@ export class MoveEventArgs extends GameEventArgs {
         this._dst = 0;
         this._speed = 0;
         this._delay = 0;
+        this._moveCompleteCallback = null;
     }
 }

@@ -1,3 +1,4 @@
+import { Node } from "cc";
 import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { IAstarMap } from "../../../../../GameFramework/Scripts/ToolLibary/Astar/IAstarMap";
 
@@ -7,6 +8,7 @@ export type CheckType = (position: IVec2) => boolean;
  * 地图接口
  */
 export interface IGameMap extends IAstarMap {
+    readonly node: Node;
     /**
      * 设置A*检查代理回调
      * @param callbackfn 回调函数

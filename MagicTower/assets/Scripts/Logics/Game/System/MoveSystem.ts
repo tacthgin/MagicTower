@@ -46,7 +46,7 @@ export class MoveSystem extends SystemBase {
     awake(): void {
         this._heroModel = GameApp.getModel(HeroModel);
         GameApp.EventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
-        GameApp.EventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
+        GameApp.NodePoolManager.createNodePool(ElementNode);
     }
 
     initliaze(gameMap: IGameMap, levelData: LevelData, hero: Hero) {
@@ -111,25 +111,39 @@ export class MoveSystem extends SystemBase {
         }
     }
 
-    async move(layerName: string, src: number, dst: number, speed: number, delay: number) {
+    async move(layerName: string, src: number, dst: number, speed: number, delay: number, callback: Function | null = null) {
         let tile = this._gameMap.getTile(src);
         let gid = this._gameMap.getTileGIDAt(layerName, tile);
         if (gid) {
             let element = await this.createElement();
             if (element) {
+                element.parent = this._gameMap.node;
+                let position = this._gameMap.getPositionAt(this._gameMap.getTile(src))!;
+                element.position = v3(position.x, position.y);
+                //取元素数据
+                let elementData = this._levelData.getLayerElement(layerName, src);
+                if (elementData) {
+                    element.getComponent(ElementNode)?.init(layerName, elementData.id);
+                }
+
                 this._levelData.move(layerName, src, dst, gid);
                 this._gameMap.setTileGIDAt(layerName, tile, 0);
                 this.setAstarMoveType(LAYER_TO_MOVE[layerName]);
                 let path = this.getPath(this._gameMap.getTile(src), this._gameMap.getTile(dst));
-                if (path) {
+                if (path && path.length > 0) {
                     let moveFunc = () => {
-                        element.getComponent(ElementNode)?.movePath(this.changePathCoord(path), speed);
+                        element.getComponent(ElementNode)?.movePath(this.changePathCoord(path), speed, () => {
+                            this._gameMap.setTileGIDAt(layerName, this._gameMap.getTile(dst), gid);
+                            callback && callback();
+                        });
                     };
                     if (delay != 0) {
-                        tween(element).delay(delay).call(moveFunc).start();
+                        tween(element).delay(0.2).call(moveFunc).start();
                     } else {
-                        tween(element).call(moveFunc).start();
+                        moveFunc();
                     }
+                } else {
+                    GameFrameworkLog.error("element move path error");
                 }
             }
         } else {
@@ -139,30 +153,14 @@ export class MoveSystem extends SystemBase {
 
     specialMove(info: any) {
         if (info.type == "spawn") {
-            let moveAction: Tween<unknown> = null!;
-            let fadeAction: Tween<unknown> = null!;
-            for (let actionName in info) {
-                switch (actionName) {
-                    case "move":
-                        {
-                            let tile = this._gameMap.getTile(info[actionName].to);
-                            moveAction = tween().to(info.interval, { position: this._gameMap.getPositionAt(tile) });
-                        }
-                        break;
-                    case "fadeOut":
-                        {
-                            fadeAction = tween().to(info.interval, { opacity: 0 });
-                        }
-                        break;
-                }
-            }
             if (info.move) {
                 info.move.from.forEach(async (index: number) => {
                     this._gameMap.setTileGIDAt("monster", this._gameMap.getTile(index), 0);
                     let element = await this.createElement();
                     if (element) {
-                        tween(element).then(moveAction).start();
-                        tween(element.getComponent(UIOpacity)).then(fadeAction).start();
+                        element.getComponent(ElementNode)?.moveSpwan(info, (tileIndex: number) => {
+                            return this._gameMap.getPositionAt(this._gameMap.getTile(tileIndex));
+                        });
                     }
                 });
             }
@@ -175,6 +173,7 @@ export class MoveSystem extends SystemBase {
         this._gameMap = null!;
         this._levelData = null!;
         GameApp.EventManager.unsubscribeTarget(this);
+        GameApp.NodePoolManager.destroyNodePool(ElementNode);
     }
 
     private onCollisionComplete() {

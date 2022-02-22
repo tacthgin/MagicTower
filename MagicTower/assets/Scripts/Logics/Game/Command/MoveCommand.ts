@@ -5,8 +5,8 @@ import { MoveEventArgs } from "../../Event/MoveEventArgs";
 
 @CommandManager.register("MoveCommand")
 export class MoveCommand extends CommandBase {
-    execute(layerName: string, src: number, dst: number, speed: number, delay: number): void {
-        GameApp.EventManager.fireNow(this, MoveEventArgs.create(layerName, src, dst, speed, delay));
+    execute(layerName: string, src: number, dst: number, speed: number, delay: number, moveCompleteCallback: Function): void {
+        GameApp.EventManager.fireNow(this, MoveEventArgs.create(layerName, src, dst, speed, delay, moveCompleteCallback));
         GameApp.CommandManager.destroyCommand(this);
     }
 

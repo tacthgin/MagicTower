@@ -1,3 +1,4 @@
+import { GameFrameworkLog } from "../../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../../GameFramework/Scripts/Utility/Utility";
 import { Element } from "./Element";
 
@@ -77,6 +78,7 @@ export class Door extends Element {
                     if (doorJson && (doorJson.id <= DoorType.RED || doorJson.id == DoorType.WALL)) {
                         let door = new Door();
                         door.id = parseInt(doorJson.id);
+                        door.index = i;
                         doorInfos[i] = door;
                     }
                 }
@@ -85,13 +87,23 @@ export class Door extends Element {
         for (let key in propertiesInfo) {
             propertiesValue = propertiesInfo[key];
             switch (key) {
-                case "monsterCondtion":
+                case "passive":
                     {
-                        let indexes: string[] = (propertiesValue as string).split(":");
+                        let door = doorInfos[propertiesValue];
+                        if (door) {
+                            door.doorState = DoorState.PASSIVE;
+                        } else {
+                            GameFrameworkLog.error("map door edit error");
+                        }
+                    }
+                    break;
+                case "appear":
+                case "hide":
+                    {
                         let door = new Door();
-                        door.doorState = DoorState.CONDITION;
-                        door.value = parseInt(indexes[1]);
-                        doorInfos[indexes[0]] = door;
+                        door.doorState = key == "appear" ? DoorState.APPEAR : DoorState.HIDE;
+                        let index = parseInt(propertiesValue);
+                        door.gid = tiles![index];
                     }
                     break;
                 case "appearEvent":
@@ -124,19 +136,11 @@ export class Door extends Element {
                     break;
                 default:
                     {
+                        let indexes: string[] = (propertiesValue as string).split(":");
                         let door = new Door();
-                        switch (key) {
-                            case "passive":
-                                door.doorState = DoorState.PASSIVE;
-                                break;
-                            case "appear":
-                            case "hide":
-                                door.doorState = key == "appear" ? DoorState.APPEAR : DoorState.HIDE;
-                                let index = parseInt(propertiesValue);
-                                door.gid = tiles![index];
-                                break;
-                        }
-                        doorInfos[propertiesValue] = door;
+                        door.doorState = DoorState.CONDITION;
+                        door.value = parseInt(indexes[1]);
+                        doorInfos[indexes[0]] = door;
                     }
                     break;
             }

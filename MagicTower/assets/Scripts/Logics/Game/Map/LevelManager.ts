@@ -18,7 +18,7 @@ const { ccclass, type } = _decorator;
 export class LevelManager extends Component {
     /** 地图层 */
     @type(Node)
-    private layer: Node = null!;
+    private mapLayer: Node = null!;
     /** 地图预设 */
     @type(Prefab)
     private mapPrefab: Prefab = null!;
@@ -85,7 +85,7 @@ export class LevelManager extends Component {
         if (!this.maps[level]) {
             let mapNode = instantiate(this.mapPrefab);
             mapNode.position = v3(0, 0, 0);
-            mapNode.parent = this.layer;
+            mapNode.parent = this.mapLayer;
             let gameMap = mapNode.getComponent(GameMap)!;
             gameMap.init(GameApp.ResourceManager.getAsset(`TiledMap/${level}`, TiledMapAsset));
             this.maps[level] = gameMap;
@@ -145,7 +145,7 @@ export class LevelManager extends Component {
             this.hero = heroNode.getComponent(Hero)!;
         }
         let map = this.maps[this.mapModel.level];
-        this.hero.node.parent = map.node;
+        this.hero.node.parent = this.node;
         this.hero.init(map, tile);
         this.collisionSystem.initliaze(map, this.hero);
     }

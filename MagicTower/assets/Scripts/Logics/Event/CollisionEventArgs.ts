@@ -4,23 +4,23 @@ import { GameEventArgs } from "../../../GameFramework/Scripts/Event/GameEventArg
 import { GameEvent } from "./GameEvent";
 
 export class CollisionEventArgs extends GameEventArgs {
-    private _collisionTile: IVec2 = null!;
+    private _collisionTileOrIndex: number | IVec2 = null!;
 
     get id(): number {
         return GameEvent.COMMAND_COLLISION;
     }
 
-    get collisionTile(): IVec2 {
-        return this._collisionTile;
+    get collisionTileOrIndex(): IVec2 | number {
+        return this._collisionTileOrIndex;
     }
 
-    static create(collisionTile: IVec2): CollisionEventArgs {
+    static create(collisionTile: IVec2 | number): CollisionEventArgs {
         let collisionEventArgs = ReferencePool.acquire(CollisionEventArgs);
-        collisionEventArgs._collisionTile = collisionTile;
+        collisionEventArgs._collisionTileOrIndex = collisionTile;
         return collisionEventArgs;
     }
 
     clear(): void {
-        this._collisionTile = null!;
+        this._collisionTileOrIndex = null!;
     }
 }

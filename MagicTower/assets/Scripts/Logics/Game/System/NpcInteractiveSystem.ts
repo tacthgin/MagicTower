@@ -2,21 +2,29 @@ import { CommandManager } from "../../../../GameFramework/Scripts/Application/Co
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
+import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
+import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
+import { CollisionCommand } from "../Command/CollisionCommand";
 import { DisappearCommand } from "../Command/DisappearCommand";
+import { EventCollisionCommand } from "../Command/EventCollisionCommand";
+import { MoveCommand } from "../Command/MoveCommand";
 
 @CommandManager.register("NpcInteractiveSystem")
 export class NpcInteractiveSystem extends SystemBase {
     private npc: Npc = null!;
     private heroModel: HeroModel = null!;
+    private levelData: LevelData = null!;
 
-    initliaze(npc: Npc) {
+    initliaze(npc: Npc, levelData: LevelData) {
         this.npc = npc;
         this.heroModel = GameApp.getModel(HeroModel);
+        this.levelData = levelData;
     }
 
     execute() {
@@ -105,33 +113,26 @@ export class NpcInteractiveSystem extends SystemBase {
         let delay = 0;
         if (wallIndex) {
             delay = 0.2;
-            GameApp.CommandManager.createCommand(DisappearCommand).execute("door", wallIndex);
+            let door = this.levelData.getLayerElement<Door>("door", wallIndex);
+            if (door) {
+                door.doorState = DoorState.NONE;
+                GameApp.CommandManager.createCommand(CollisionCommand).execute(wallIndex);
+            }
         }
+
         let moveIndex = this.npc.move();
         let npcInfo = this.npc.npcInfo;
         if (moveIndex) {
-            let path = CommonAstar.getPath(this.map, this.map.indexToTile(this.index), this.map.indexToTile(moveIndex));
-            if (path) {
-                tween(this.npc.node)
-                    .delay(delay)
-                    .call(() => {
-                        this.npc.movePath(this.map.changePathCoord(path)).then((resolve) => {
-                            if (this.npc.moveEnd()) {
-                                this.map.removeElement(this.index, "npc");
-                                if (npcInfo.event) {
-                                    this.map.eventCollision(npcInfo.event);
-                                }
-                            } else {
-                                //转移小偷位置
-                                this.map.changeElementInfo(this.index, moveIndex, "npc", this.npc);
-                            }
-                            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-                        });
-                    })
-                    .start();
-            }
+            let npcSpeed = Utility.Json.getJsonElement("global", "npcSpeed") as number;
+            GameApp.CommandManager.createCommand(MoveCommand).execute("npc", this.npc.index, moveIndex, npcSpeed, delay, () => {
+                this.npc.index = moveIndex!;
+                if (this.npc.moveEnd() && npcInfo.event) {
+                    GameApp.CommandManager.createCommand(EventCollisionCommand).execute(npcInfo.event);
+                }
+                GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+            });
         } else if (npcInfo.event) {
-            this.map.eventCollision(npcInfo.event);
+            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(npcInfo.event);
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         }
     }
@@ -145,6 +146,6 @@ export class NpcInteractiveSystem extends SystemBase {
     clear(): void {
         this.npc = null!;
         this.heroModel = null!;
-        this.mapCollisionSystem = null!;
+        this.levelData = null!;
     }
 }

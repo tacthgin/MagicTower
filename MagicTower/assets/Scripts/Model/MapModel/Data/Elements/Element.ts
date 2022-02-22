@@ -11,7 +11,7 @@ export class Element extends LoadBase implements IRerference {
     }
 
     /** tile唯一id */
-    get gid() {
+    get gid(): number {
         return this._gid;
     }
 
@@ -20,7 +20,7 @@ export class Element extends LoadBase implements IRerference {
     }
 
     /** 唯一id */
-    get id() {
+    get id(): number {
         return this._id;
     }
 
@@ -29,7 +29,7 @@ export class Element extends LoadBase implements IRerference {
     }
 
     /** tile index */
-    get index() {
+    get index(): number {
         return this._index;
     }
 

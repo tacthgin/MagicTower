@@ -6,8 +6,8 @@ import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
 
 @CommandManager.register("CollisionCommand")
 export class CollisionCommand extends CommandBase {
-    execute(tile: IVec2): void {
-        GameApp.EventManager.fireNow(this, CollisionEventArgs.create(tile));
+    execute(tileOrIndex: IVec2 | number): void {
+        GameApp.EventManager.fireNow(this, CollisionEventArgs.create(tileOrIndex));
         GameApp.CommandManager.destroyCommand(this);
     }
 

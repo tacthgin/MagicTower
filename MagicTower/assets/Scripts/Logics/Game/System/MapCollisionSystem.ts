@@ -1,4 +1,4 @@
-import { v2, Vec2, Vec3 } from "cc";
+import { TERRAIN_BLOCK_VERTEX_COMPLEXITY, v2, Vec2 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -12,16 +12,19 @@ import { PropType } from "../../../Model/HeroModel/Prop";
 import { Element } from "../../../Model/MapModel/Data/Elements/Element";
 import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
 import { Monster, MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
-import { Npc, NpcInfo } from "../../../Model/MapModel/Data/Elements/Npc";
+import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
 import { StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { ShopModel } from "../../../Model/ShopModel/ShopModel";
+import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventArgs";
 import { EventCollisionEventArgs } from "../../Event/EventCollisionEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
+import { MoveEventArgs } from "../../Event/MoveEventArgs";
+import { SpecialMoveEventArgs } from "../../Event/SpecialMoveEventArgs";
 import { ElementFactory } from "../Map/ElementFactory";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
@@ -56,7 +59,6 @@ export class MapCollisionSystem extends SystemBase {
     private usePropSystem: UsePropSystem = null!;
     private doorSystem: DoorSystem = null!;
     private levelEvent: any = {};
-    private dialogPos: Vec3 = null!;
 
     awake(): void {
         this.monsterFightSystem = GameApp.CommandManager.createSystem(MonsterFightSystem);
@@ -135,6 +137,9 @@ export class MapCollisionSystem extends SystemBase {
         eventManager.subscribe(GameEvent.COMMAND_APPEAR, this.onCommandAppear, this);
         eventManager.subscribe(GameEvent.COMMAND_DISAPPEAR, this.onCommandDisappear, this);
         eventManager.subscribe(GameEvent.COMMAND_EVENT, this.onCommandEvent, this);
+        eventManager.subscribe(GameEvent.COMMAND_MOVE, this.onCommandMove, this);
+        eventManager.subscribe(GameEvent.COMMAND_SPECIAL_MOVE, this.onCommandSpecialMove, this);
+        eventManager.subscribe(GameEvent.COMMAND_COLLISION, this.onCommandCollision, this);
     }
 
     private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
@@ -181,6 +186,24 @@ export class MapCollisionSystem extends SystemBase {
 
     private onCommandEvent(sender: object, eventArgs: EventCollisionEventArgs) {
         this.eventCollision(eventArgs.eventIdOrTile);
+    }
+
+    private onCommandMove(sender: object, eventArgs: MoveEventArgs) {
+        this.moveSystem.move(eventArgs.layerName, eventArgs.src, eventArgs.dst, eventArgs.speed, eventArgs.delay);
+    }
+
+    private onCommandSpecialMove(sender: object, eventArgs: SpecialMoveEventArgs) {
+        this.moveSystem.specialMove(eventArgs.specialMoveInfo);
+    }
+
+    private onCommandCollision(sender: object, eventArgs: CollisionEventArgs) {
+        let tile: IVec2 | null = null;
+        if (typeof eventArgs.collisionTileOrIndex == "number") {
+            tile = this.gameMap.getTile(eventArgs.collisionTileOrIndex);
+        } else {
+            tile = eventArgs.collisionTileOrIndex;
+        }
+        this.collision(tile);
     }
 
     private getTileOrIndex(tileOrIndex: IVec2 | number) {
@@ -268,7 +291,7 @@ export class MapCollisionSystem extends SystemBase {
     private interactiveNpc(tile: IVec2) {
         let npc = this.levelData.getLayerElement<Npc>("npc", this.gameMap.getTileIndex(tile));
         if (npc) {
-            this.npcInteractiveSystem.initliaze(npc);
+            this.npcInteractiveSystem.initliaze(npc, this.levelData);
             this.npcInteractiveSystem.execute();
             return false;
         } else {
