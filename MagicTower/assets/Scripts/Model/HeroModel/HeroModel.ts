@@ -26,6 +26,7 @@ export class HeroModel extends ModelBase {
     private shieldId: number = 0;
     private props: { [key: number | string]: number } = {};
     private animation: string[] = null!;
+    private heroSpeed: number = 0;
 
     constructor() {
         super();
@@ -168,11 +169,7 @@ export class HeroModel extends ModelBase {
     }
 
     getHeroSpeed() {
-        let heroSpeed = Utility.Json.getJsonElement("global", "heroSpeed");
-        if (heroSpeed) {
-            return heroSpeed as number;
-        }
-        return 0;
+        return this.heroSpeed;
     }
 
     magicDamage(damage: number) {
@@ -188,7 +185,7 @@ export class HeroModel extends ModelBase {
         if (useTestload) {
             let testLoadData: any = Utility.Json.getJsonElement("global", "testLoad");
             if (testLoadData) {
-                this.loadData(testLoadData);
+                this.loadData(testLoadData.hero);
             } else {
                 GameFrameworkLog.error("hero model test laod data is null");
             }

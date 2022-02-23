@@ -6,15 +6,20 @@ export enum DoorType {
     YELLOW = 1001,
     BLUE,
     RED,
-    WALL = 1006,
+    PRISON,
+    MONSTER,
+    WALL,
 }
 
 export enum DoorState {
     NONE,
+    /** 被动门，一般是被动的墙门 */
     PASSIVE,
+    /** 出现的门 */
     APPEAR,
     HIDE,
-    CONDITION,
+    /** 怪物守卫的门 */
+    MONSTER,
     APPEAR_EVENT,
     DISAPPEAR_EVENT,
 }
@@ -66,6 +71,7 @@ export class Door extends Element {
         let propertiesValue: string = null!;
         let condition: number[] = [];
         if (tiles && parseGidFn) {
+            let needCreateDoorType = [DoorType.WALL, DoorType];
             for (let i = 0; i < tiles.length; i++) {
                 if (tiles[i] == 0) {
                     continue;
@@ -75,7 +81,7 @@ export class Door extends Element {
                 if (name) {
                     name = name.split("_")[0];
                     let doorJson = Utility.Json.getJsonKeyCache("door", "spriteId", name) as any;
-                    if (doorJson && (doorJson.id <= DoorType.RED || doorJson.id == DoorType.WALL)) {
+                    if (doorJson) {
                         let door = new Door();
                         door.id = parseInt(doorJson.id);
                         door.index = i;
@@ -104,6 +110,7 @@ export class Door extends Element {
                         door.doorState = key == "appear" ? DoorState.APPEAR : DoorState.HIDE;
                         let index = parseInt(propertiesValue);
                         door.gid = tiles![index];
+                        door.index = index;
                     }
                     break;
                 case "appearEvent":
@@ -131,20 +138,36 @@ export class Door extends Element {
                         door.doorState = DoorState.DISAPPEAR_EVENT;
                         door.condition = condition;
                         door.value = parseInt(infos[1]);
+                        door.index = parseInt(key);
                         doorInfos["event"] = door;
                     }
                     break;
+                case "monsterCondition":
+                    break;
                 default:
                     {
-                        let indexes: string[] = (propertiesValue as string).split(":");
-                        let door = new Door();
-                        door.doorState = DoorState.CONDITION;
-                        door.value = parseInt(indexes[1]);
-                        doorInfos[indexes[0]] = door;
+                        //怪物门 监狱门
+                        let monsterDoors: Map<Array<number>, Array<Door>> = doorInfos["monster"];
+                        if (!monsterDoors) {
+                            monsterDoors = doorInfos["monster"] = new Map<Array<number>, Array<Door>>();
+                        }
+                        let monsterIndexs: number[] = (propertiesValue as string).split(",").map((value) => {
+                            return parseInt(value);
+                        });
+
+                        let doorIndexes = key.split(",");
+                        let doors: Door[] = [];
+                        doorIndexes.forEach((value) => {
+                            doors.push(doorInfos[value]);
+                        });
+
+                        monsterDoors.set(monsterIndexs, doors);
                     }
                     break;
             }
         }
         return doorInfos;
     }
+
+    static createMosnterDoor() {}
 }

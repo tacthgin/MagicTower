@@ -1,4 +1,4 @@
-import { TERRAIN_BLOCK_VERTEX_COMPLEXITY, v2, Vec2 } from "cc";
+import { v2, Vec2 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -9,7 +9,6 @@ import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropType } from "../../../Model/HeroModel/Prop";
-import { Element } from "../../../Model/MapModel/Data/Elements/Element";
 import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
 import { Monster, MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
@@ -189,7 +188,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private onCommandMove(sender: object, eventArgs: MoveEventArgs) {
-        this.moveSystem.move(eventArgs.layerName, eventArgs.src, eventArgs.dst, eventArgs.speed, eventArgs.delay);
+        this.moveSystem.move(eventArgs.layerName, eventArgs.src, eventArgs.dst, eventArgs.speed, eventArgs.delay, eventArgs.moveCompleteCallback);
     }
 
     private onCommandSpecialMove(sender: object, eventArgs: SpecialMoveEventArgs) {
@@ -327,29 +326,21 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     eventCollision(eventID: number | string | IVec2) {
-        let id: number | string | null = null;
+        let eventIdOrEventInfo: number | string | EventInfo | null = null;
         if (typeof eventID == "number" || typeof eventID == "string") {
-            id = eventID;
+            eventIdOrEventInfo = eventID;
         } else {
             let index = this.gameMap.getTileIndex(eventID);
             let eventInfo = this.levelData.getLayerInfo("event");
             if (eventInfo) {
-                let event: Element = eventInfo[index];
-                if (event) {
-                    id = event.id;
-                }
+                eventIdOrEventInfo = eventInfo[index];
             }
         }
 
-        if (id) {
-            let eventInfo = Utility.Json.getJsonElement("event", id) as any;
-            if (!eventInfo.save || eventInfo.save == this.levelData.level) {
-                this.gameEventSystem.initliaze(this.gameMap, this.hero, id, this.levelData);
-                this.gameEventSystem.execute();
-                return false;
-            } else {
-                this.levelEvent[eventInfo.save] = id;
-            }
+        if (eventIdOrEventInfo) {
+            this.gameEventSystem.initliaze(this.gameMap, this.hero, eventIdOrEventInfo, this.levelData);
+            this.gameEventSystem.execute();
+            return false;
         }
         return true;
     }
@@ -624,10 +615,6 @@ export class MapCollisionSystem extends SystemBase {
         //}
         //}
         return true;
-    }
-
-    clearGameEventSystem() {
-        //this.gameEventSystem = null;
     }
 
     private elementActionComplete() {

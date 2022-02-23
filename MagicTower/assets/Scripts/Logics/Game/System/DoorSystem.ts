@@ -10,6 +10,7 @@ import { Door, DoorState, DoorType } from "../../../Model/MapModel/Data/Elements
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
+import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
 import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
 import { DoorAnimationReverseNode } from "../Elements/DoorAnimaitonReverseNode";
@@ -98,12 +99,11 @@ export class DoorSystem extends SystemBase {
         GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
     }
 
-    private openDoor(id: number | string, tile: IVec2, layerName: string) {
-        this.createDoorAnimation(id, tile, false, () => {
+    private async openDoor(id: number | string, tile: IVec2, layerName: string) {
+        await this.createDoorAnimation(id, tile, false, () => {
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         });
-        this.levelData.deleteLayerElement(layerName, this.gameMap.getTileIndex(tile));
-        this.gameMap.setTileGIDAt(layerName, tile, 0);
+        GameApp.CommandManager.createCommand(DisappearCommand).execute(layerName, tile);
     }
 
     private async createDoorAnimation(id: number | string, tile: IVec2, reverse: boolean, callback: Function | null = null) {

@@ -16,6 +16,7 @@ export class EventInfo extends Element {
         for (let index in propertiesInfo) {
             let element = new EventInfo();
             element.id = parseInt(propertiesInfo[index]);
+            element.index = parseInt(index);
             eventInfo[index] = element;
         }
         return eventInfo;

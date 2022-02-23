@@ -15,7 +15,15 @@ const CLASS_MAP: any = {
     npc: Npc,
 };
 
+const DISAPPEAR_LAYER_FILTER: Readonly<string[]> = ["event"];
+
 export class LevelData extends LoadBase {
+    private static readonly _levelParsers: { [key: string]: Function } = {
+        door: Door.parse,
+        stair: Stair.parse,
+        event: EventInfo.parse,
+        npc: Npc.parse,
+    };
     //层
     private _level: number = 0;
     /** 出现的tile */
@@ -42,10 +50,6 @@ export class LevelData extends LoadBase {
         this._level = level;
     }
 
-    saveMapData() {
-        GameApp.getModel(MapModel).save();
-    }
-
     private emitEvent(layerName: string, index: number, info: any = null) {
         GameApp.getModel(MapModel).fireNow(MapAddElementEventArgs.create(this._level, layerName, index, info));
     }
@@ -70,14 +74,8 @@ export class LevelData extends LoadBase {
     loadProperties(properties: any, data: { tiles: { [key: string]: number[] }; parseGid: Function } | null = null) {
         let propertiesInfo = null;
 
-        let parsers: { [key: string]: Function } = {
-            door: Door.parse,
-            stair: Stair.parse,
-            event: EventInfo.parse,
-            npc: Npc.parse,
-        };
         for (let layerName in properties) {
-            let func = parsers[layerName];
+            let func = LevelData._levelParsers[layerName];
             if (func) {
                 propertiesInfo = properties[layerName];
                 let tilesData = data ? data.tiles[layerName] : null;
@@ -90,20 +88,23 @@ export class LevelData extends LoadBase {
         }
     }
 
-    setAppear(layerName: string, index: number, gid: number) {
-        if (!this._appearTile[layerName]) {
-            this._appearTile[layerName] = {};
+    setAppear(layerName: string, index: number, gid: number = 0) {
+        if (gid != 0) {
+            if (!this._appearTile[layerName]) {
+                this._appearTile[layerName] = {};
+            }
+            this._appearTile[layerName][index] = gid;
         }
-        this._appearTile[layerName][index] = gid;
-        this.saveMapData();
     }
 
     setDisappear(layerName: string, index: number) {
-        if (!this._disappearTile[layerName]) {
-            this._disappearTile[layerName] = [];
+        if (!DISAPPEAR_LAYER_FILTER.indexOf(layerName)) {
+            if (!this._disappearTile[layerName]) {
+                this._disappearTile[layerName] = [];
+            }
+            this._disappearTile[layerName].push(index);
         }
-        this._disappearTile[layerName].push(index);
-        this.saveMapData();
+        this.deleteLayerElement(layerName, index);
     }
 
     move(layerName: string, src: number, dst: number, gid: number) {
@@ -115,7 +116,8 @@ export class LevelData extends LoadBase {
             delete tiles[src];
         }
         tiles[dst] = gid;
-        this.saveMapData();
+
+        this.moveLayerElement(layerName, src, dst);
     }
 
     canHeroMove(index: number) {
@@ -149,11 +151,22 @@ export class LevelData extends LoadBase {
         return null;
     }
 
-    deleteLayerElement(layerName: string, index: number) {
+    private moveLayerElement(layerName: string, src: number, dst: number) {
+        let layerInfo = this.getLayerInfo(layerName);
+        if (layerInfo) {
+            let element = layerInfo[src];
+            if (element) {
+                delete layerInfo[src];
+                element.index = dst;
+                layerInfo[dst] = element;
+            }
+        }
+    }
+
+    private deleteLayerElement(layerName: string, index: number) {
         let layerInfo = this.getLayerInfo(layerName);
         if (layerInfo && layerInfo[index]) {
             delete layerInfo[index];
-            this.setDisappear(layerName, index);
         }
     }
 

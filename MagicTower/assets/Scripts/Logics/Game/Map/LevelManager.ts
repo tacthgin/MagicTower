@@ -19,6 +19,9 @@ export class LevelManager extends Component {
     /** 地图层 */
     @type(Node)
     private mapLayer: Node = null!;
+    /** 英雄层 */
+    @type(Node)
+    private heroLayer: Node = null!;
     /** 地图预设 */
     @type(Prefab)
     private mapPrefab: Prefab = null!;
@@ -121,21 +124,18 @@ export class LevelManager extends Component {
     }
 
     private onSceneAppear(sender: object, eventArgs: SceneAppearEventArgs) {
-        let gameMap = this.maps[this.mapModel.level];
-        gameMap.openTileAnimationTimer();
-        gameMap.node.active = false;
         this.mapModel.level = eventArgs.level;
         let newMap = this.createMap(this.mapModel.level);
         newMap.node.active = true;
+        this.heroLayer.getComponent(UIOpacity)!.opacity = 255;
         this.showHero(eventArgs.tile);
-        this.node.getComponent(UIOpacity)!.opacity = 255;
     }
 
     private onSceneDisappear(sender: object, eventArgs: CommonEventArgs) {
         let gameMap = this.getCurrentMap();
         if (gameMap) {
-            gameMap.stopTileAnimationTimer();
-            tween(this.node.getComponent(UIOpacity)).to(1, { opacity: 0 }).start();
+            gameMap.node.active = false;
+            tween(this.heroLayer.getComponent(UIOpacity)).to(1, { opacity: 0 }).start();
         }
     }
 
@@ -145,7 +145,7 @@ export class LevelManager extends Component {
             this.hero = heroNode.getComponent(Hero)!;
         }
         let map = this.maps[this.mapModel.level];
-        this.hero.node.parent = this.node;
+        this.hero.node.parent = this.heroLayer;
         this.hero.init(map, tile);
         this.collisionSystem.initliaze(map, this.hero);
     }

@@ -106,7 +106,7 @@ export class MoveSystem extends SystemBase {
 
                 GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
             } else {
-                UIFactory.showToast("勇士找不到路");
+                UIFactory.showToast("勇士迷路了");
             }
         }
     }

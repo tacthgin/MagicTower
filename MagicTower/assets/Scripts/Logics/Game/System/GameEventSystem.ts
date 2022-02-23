@@ -6,6 +6,7 @@ import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFa
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
@@ -22,7 +23,8 @@ import { Hero } from "../Map/Hero/Hero";
 /** 事件系统 */
 @CommandManager.register("GameEventSystem")
 export class GameEventSystem extends SystemBase {
-    private eventInfo: any = null;
+    private eventInfo: EventInfo = null!;
+    private eventJson: any = null;
     private chatStep: number = 0;
     private appearStep: number = 0;
     private disappearStep: number = 0;
@@ -32,24 +34,36 @@ export class GameEventSystem extends SystemBase {
     private gameMap: IGameMap = null!;
     private hero: Hero = null!;
     private levelData: LevelData = null!;
+    private eventCompleteFlag: boolean = false;
 
-    initliaze(gameMap: IGameMap, hero: Hero, eventId: number | string, levelData: LevelData) {
-        this.eventInfo = Utility.Json.getJsonElement("event", eventId);
+    initliaze(gameMap: IGameMap, hero: Hero, eventIdOrEventInfo: number | string | EventInfo, levelData: LevelData) {
+        this.clear();
+        if (typeof eventIdOrEventInfo == "object") {
+            this.eventJson = Utility.Json.getJsonElement("event", eventIdOrEventInfo.id);
+            this.eventInfo = eventIdOrEventInfo;
+        } else {
+            this.eventJson = Utility.Json.getJsonElement("event", eventIdOrEventInfo);
+        }
         this.globalConfig = Utility.Json.getJson("global");
         this.gameMap = gameMap;
         this.hero = hero;
         this.levelData = levelData;
-        // if (this.eventInfo.monsterDoor) {
-        // this.gameMap.monsterDoor = this.eventInfo.monsterDoor;
+        // if (this.eventJson.monsterDoor) {
+        // this.gameMap.monsterDoor = this.eventJson.monsterDoor;
         // }
     }
 
+    getEventCompleteFlag() {
+        return this.eventCompleteFlag;
+    }
+
     executeComplete() {
-        return this.step >= this.eventInfo.step.length;
+        return this.step >= this.eventJson.step.length;
     }
 
     clear(): void {
-        this.eventInfo = null;
+        this.eventInfo = null!;
+        this.eventJson = null;
         this.chatStep = 0;
         this.appearStep = 0;
         this.disappearStep = 0;
@@ -59,11 +73,12 @@ export class GameEventSystem extends SystemBase {
         this.gameMap = null!;
         this.hero = null!;
         this.levelData = null!;
+        this.eventCompleteFlag = false;
     }
 
     execute() {
-        if (this.step < this.eventInfo.step.length) {
-            let stepName = this.eventInfo.step[this.step++];
+        if (this.step < this.eventJson.step.length) {
+            let stepName = this.eventJson.step[this.step++];
             GameFrameworkLog.log(stepName);
             switch (stepName) {
                 case "chat":
@@ -79,17 +94,19 @@ export class GameEventSystem extends SystemBase {
                     this.disappear();
                     break;
                 case "do":
-                    GameApp.CommandManager.createCommand(CollisionCommand).execute(this.gameMap.getTile(this.eventInfo.do));
+                    GameApp.CommandManager.createCommand(CollisionCommand).execute(this.gameMap.getTile(this.eventJson.do));
                     break;
                 case "show":
-                    let elementInfo = this.levelData.getLayerElementWithoutName(this.eventInfo.show);
-
+                    let elementInfo = this.levelData.getLayerElementWithoutName(this.eventJson.show);
+                    if (elementInfo) {
+                        GameApp.CommandManager.createCommand(AppearCommand).execute(elementInfo.layerName, elementInfo.element.index, elementInfo.element.id);
+                    }
                     this.execute();
                 case "appear":
                     this.appear();
                     break;
                 case "beAttack":
-                    this.beAttack(this.eventInfo.beAttack);
+                    this.beAttack(this.eventJson.beAttack);
                     break;
                 case "sceneDisappear":
                     this.sceneDisappear();
@@ -101,18 +118,21 @@ export class GameEventSystem extends SystemBase {
                     this.clearNpcEvent();
                     break;
                 case "weak":
-                    //this.gameMap.getElement(this.eventInfo.weak[0], "monster").weak(this.eventInfo.weak[1]);
+                    //this.gameMap.getElement(this.eventJson.weak[0], "monster").weak(this.eventJson.weak[1]);
                     break;
             }
-        } else {
-            //this.gameMap.clearGameEventSystem();
+        } else if (!this.eventCompleteFlag) {
+            this.eventCompleteFlag = true;
+            if (this.eventInfo) {
+                this.levelData.setDisappear("event", this.eventInfo.index);
+            }
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         }
     }
 
     private chat() {
         UIFactory.showDialog("Prefab/Dialogs/ChatDialog", {
-            content: this.eventInfo.chat[this.chatStep++],
+            content: this.eventJson.chat[this.chatStep++],
             endCallback: () => {
                 this.execute();
             },
@@ -120,7 +140,7 @@ export class GameEventSystem extends SystemBase {
     }
 
     private move() {
-        let moveData = this.eventInfo.move[this.moveStep++];
+        let moveData = this.eventJson.move[this.moveStep++];
         let movePath = moveData.path;
         for (let layer in movePath) {
             //moveinfo 格式[0, 38, 5]第一个延时，第二个当前坐标，第三个终点坐标
@@ -133,13 +153,13 @@ export class GameEventSystem extends SystemBase {
     }
 
     private specialMove() {
-        let info = this.eventInfo.specialMove;
+        let info = this.eventJson.specialMove;
         GameApp.CommandManager.createCommand(SpecialMoveCommand).execute(info);
         this.scheduleOnce(this.execute, info.interval);
     }
 
     private appear() {
-        let appearInfo = this.eventInfo.appear[this.appearStep++];
+        let appearInfo = this.eventJson.appear[this.appearStep++];
         if (appearInfo.delay) {
             for (let layer in appearInfo.layer) {
                 let layerInfo = appearInfo.layer[layer];
@@ -162,7 +182,7 @@ export class GameEventSystem extends SystemBase {
     }
 
     private disappear() {
-        let info = this.eventInfo.disappear[this.disappearStep++];
+        let info = this.eventJson.disappear[this.disappearStep++];
         for (let layer in info) {
             info[layer].forEach((index: number) => {
                 GameApp.CommandManager.createCommand(DisappearCommand).execute(layer, index);
@@ -185,7 +205,7 @@ export class GameEventSystem extends SystemBase {
     }
 
     private sceneAppear() {
-        let info = this.eventInfo.sceneAppear;
+        let info = this.eventJson.sceneAppear;
         GameApp.getModel(HeroModel).weak();
         GameApp.EventManager.fireNow(this, SceneAppearEventArgs.create(info[0], this.gameMap.getTile(info[1])));
         this.execute();
@@ -205,12 +225,11 @@ export class GameEventSystem extends SystemBase {
         tween(icon).delay(this.globalConfig.fadeInterval).removeSelf().start();
     }
 
-    clearNpcEvent() {
-        let npc = this.levelData.getLayerElement<Npc>("npc", this.eventInfo.clearNpcEvent);
+    private clearNpcEvent() {
+        let npc = this.levelData.getLayerElement<Npc>("npc", this.eventJson.clearNpcEvent);
         if (npc) {
             npc.clearEvent();
         }
-        //this.gameMap.getElement(this.eventInfo.clearNpcEvent, "npc").clearEvent();
         this.execute();
     }
 }

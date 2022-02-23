@@ -91,7 +91,7 @@ export class MapModel extends ModelBase {
         if (useTestload) {
             let testLoadData: any = Utility.Json.getJsonElement("global", "testLoad");
             if (testLoadData) {
-                this.loadData(testLoadData);
+                this.loadData(testLoadData.map);
             } else {
                 GameFrameworkLog.error("hero model test laod data is null");
             }

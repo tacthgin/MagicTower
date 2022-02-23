@@ -125,9 +125,12 @@ export class NpcInteractiveSystem extends SystemBase {
         if (moveIndex) {
             let npcSpeed = Utility.Json.getJsonElement("global", "npcSpeed") as number;
             GameApp.CommandManager.createCommand(MoveCommand).execute("npc", this.npc.index, moveIndex, npcSpeed, delay, () => {
-                this.npc.index = moveIndex!;
-                if (this.npc.moveEnd() && npcInfo.event) {
-                    GameApp.CommandManager.createCommand(EventCollisionCommand).execute(npcInfo.event);
+                if (this.npc.moveEnd()) {
+                    GameApp.CommandManager.createCommand(DisappearCommand).execute("npc", moveIndex!);
+                    if (npcInfo.event) {
+                        GameApp.CommandManager.createCommand(EventCollisionCommand).execute(npcInfo.event);
+                        return;
+                    }
                 }
                 GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
             });
