@@ -2,6 +2,7 @@ import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, tween, UIOp
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { Stair } from "../../../Model/MapModel/Data/Elements/Stair";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
@@ -120,7 +121,7 @@ export class LevelManager extends Component {
         let newMap = this.createMap(this.mapModel.level);
         newMap.node.active = true;
         let levelData = this.mapModel.getCurrentLevelData();
-        this.showHero(newMap.getTile(levelData.getStair(eventArgs.stairType)!.standLocation));
+        this.showHero(newMap.getTile(levelData.getLayerElement<Stair>("stair", eventArgs.stairType)!.standLocation));
     }
 
     private onSceneAppear(sender: object, eventArgs: SceneAppearEventArgs) {

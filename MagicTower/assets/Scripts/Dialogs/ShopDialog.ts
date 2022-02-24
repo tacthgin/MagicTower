@@ -1,45 +1,41 @@
-// import { Label, _decorator } from "cc";
-// import { BaseDialog } from "../../Framework/Base/BaseDialog";
-// import { GameManager } from "../../Framework/Managers/GameManager";
-// import { HeroAttr, HeroModel } from "../Data/CustomData/HeroModel";
-// import { ShopData } from "../Data/CustomData/ShopData";
+import { Label, _decorator } from "cc";
+import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
+import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
+import { UIFactory } from "../../GameFramework/Scripts/Application/UI/UIFactory";
+import { HeroModel } from "../Model/HeroModel/HeroModel";
+import { ShopModel } from "../Model/ShopModel/ShopModel";
 
-// const { ccclass, property } = _decorator;
+const { ccclass, property } = _decorator;
 
-// @ccclass("ShopDialog")
-// export class ShopDialog extends BaseDialog {
-//     @property(Label)
-//     content: Label = null!;
+@ccclass("ShopDialog")
+export class ShopDialog extends DialogBase {
+    @property(Label)
+    private content: Label = null!;
+    @property(Label)
+    private attr: Label[] = [];
 
-//     @property(Label)
-//     attr: Label[] = [];
+    onOpen() {
+        let shopModel = GameApp.getModel(ShopModel);
+        this.content.string = `你若给我 ${shopModel.needGold} 个金币，\n我就替你提升以下一种能力。`;
+        this.attr[0].string = `生命力 + ${shopModel.hp}`;
+        this.attr[1].string = `攻击力 + ${shopModel.attack}`;
+        this.attr[2].string = `防御力 + ${shopModel.defence}`;
+    }
 
-//     private callback: ((attr: string) => void) | null = null;
+    onBtnClick(event: any, customEventData: string) {
+        if (customEventData != "no") {
+            this.buy(customEventData);
+        }
+        this.close();
+    }
 
-//     private isGoldEnough: boolean = true;
-
-//     init(callback: (attr: string) => void) {
-//         let shopData = GameManager.DATA.getData(ShopData)!;
-//         this.content.string = `你若给我 ${shopData.needGold} 个金币，\n我就替你提升以下一种能力。`;
-//         this.attr[0].string = `生命力 + ${shopData.hp}`;
-//         this.attr[1].string = `攻击力 + ${shopData.attack}`;
-//         this.attr[2].string = `防御力 + ${shopData.defence}`;
-//         this.callback = callback;
-//         let heroGold = GameManager.DATA.getData(HeroModel)!.getAttr(HeroAttr.GOLD);
-//         this.isGoldEnough = shopData.needGold <= heroGold;
-//     }
-
-//     onBtnClick(event: any, customEventData: string) {
-//         if (customEventData != "no") {
-//             if (this.isGoldEnough) {
-//                 this.callback && this.callback(customEventData);
-//             } else {
-//                 GameManager.UI.showToast("穷鬼还想买东西");
-//                 return;
-//             }
-//         } else {
-//             this.callback && this.callback(customEventData);
-//         }
-//         this.close();
-//     }
-// }
+    private buy(buyType: string) {
+        if (buyType != "no") {
+            let shopModel = GameApp.getModel(ShopModel);
+            let result = GameApp.getModel(HeroModel).buy(buyType, (shopModel as any)[buyType], shopModel.buy());
+            if (!result) {
+                UIFactory.showToast("穷鬼还想买东西");
+            }
+        }
+    }
+}

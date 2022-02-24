@@ -180,6 +180,34 @@ export class HeroModel extends ModelBase {
         }
     }
 
+    buy(shopType: string, value: number, gold: number): boolean {
+        if (gold > this.heroAttr[HeroAttr.GOLD]) {
+            return false;
+        }
+        let attrName = null;
+        switch (shopType) {
+            case "hp":
+                attrName = HeroAttr.HP;
+                break;
+            case "attack":
+                attrName = HeroAttr.ATTACK;
+                break;
+            case "defence":
+                attrName = HeroAttr.DEFENCE;
+                break;
+            default:
+                GameFrameworkLog.error("shop type is invalid");
+                break;
+        }
+
+        if (attrName) {
+            this.setAttrDiff(attrName, value);
+            this.setAttrDiff(HeroAttr.GOLD, -gold);
+        }
+
+        return true;
+    }
+
     private useTestLoad() {
         let useTestload = Utility.Json.getJsonElement("global", "useTestLoad");
         if (useTestload) {

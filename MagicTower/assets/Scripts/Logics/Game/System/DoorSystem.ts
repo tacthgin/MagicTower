@@ -57,9 +57,9 @@ export class DoorSystem extends SystemBase {
             if (keyID && heroModel.getPropNum(keyID) > 0) {
                 heroModel.addProp(keyID, 1, -1);
                 this.openDoor(doorInfo.id, tile, layerName);
-                let eventInfo = this.levelData.getLayerInfo(layerName)["event"];
-                if (eventInfo && eventInfo.doorState == DoorState.DISAPPEAR_EVENT) {
-                    this.disappearEventCollision(eventInfo, tileIndex);
+                let door = this.levelData.getDoorInfo(DoorState.DISAPPEAR_EVENT);
+                if (door) {
+                    this.disappearEventCollision(door, tileIndex);
                 }
             }
         }
@@ -68,29 +68,26 @@ export class DoorSystem extends SystemBase {
     }
 
     invisibleDoorCollision(tile: IVec2) {
-        let layerName = "door";
-        let doorLayerInfo = this.levelData.getLayerInfo(layerName);
-        if (!doorLayerInfo) {
-            return true;
-        }
-        let tileIndex = this.gameMap.getTileIndex(tile);
-
-        let eventInfo: Door = doorLayerInfo["event"];
-        if (eventInfo && eventInfo.doorState == DoorState.APPEAR_EVENT) {
-            this.appearEventCollision(eventInfo, tile);
-        } else {
-            let doorInfo = this.levelData.getLayerElement<Door>(layerName, tileIndex);
-            if (doorInfo && doorInfo.doorState == DoorState.APPEAR) {
-                this.createDoorAnimation(doorInfo.id, tile, true, () => {
-                    this.gameMap.setTileGIDAt(layerName, tile, doorInfo!.gid);
-                    GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-                });
+        if (this.levelData.hasDoorInfo()) {
+            let door = this.levelData.getDoorInfo(DoorState.APPEAR_EVENT);
+            if (door) {
+                this.appearEventCollision(door, tile);
             } else {
-                return true;
+                let tileIndex = this.gameMap.getTileIndex(tile);
+                let doorInfo = this.levelData.getLayerElement<Door>("door", tileIndex);
+                if (doorInfo && doorInfo.doorState == DoorState.APPEAR) {
+                    this.createDoorAnimation(doorInfo.id, tile, true, () => {
+                        this.gameMap.setTileGIDAt("door", tile, doorInfo!.gid);
+                        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+                    });
+                } else {
+                    return true;
+                }
             }
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     clear(): void {
@@ -120,19 +117,19 @@ export class DoorSystem extends SystemBase {
         }
     }
 
-    private disappearEventCollision(eventInfo: any, tileIndex: number) {
-        let existCondition = eventInfo.condition[0];
+    private disappearEventCollision(door: Door, tileIndex: number) {
+        let existCondition = door.condition[0];
         if (existCondition) {
             let index = existCondition.indexOf(tileIndex);
             if (index != -1) {
-                eventInfo.condition[0] = null;
+                door.condition[0] = null;
             } else {
-                let disappearCondition: number[] = eventInfo.condition[1];
+                let disappearCondition: number[] = door.condition[1];
                 index = disappearCondition.indexOf(tileIndex);
                 if (index != -1) {
                     disappearCondition.splice(index, 1);
                     if (disappearCondition.length == 0) {
-                        GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventInfo.value);
+                        GameApp.CommandManager.createCommand(EventCollisionCommand).execute(door.value);
                     }
                 }
             }
@@ -141,22 +138,21 @@ export class DoorSystem extends SystemBase {
 
     /**
      * 墙门出现事件
-     * @param eventInfo 事件数据
+     * @param door 事件数据
      * @param tile 事件发生的地块位置
      */
-    private appearEventCollision(eventInfo: any, tile: IVec2) {
+    private appearEventCollision(door: Door, tile: IVec2) {
         this.createDoorAnimation(DoorType.WALL, tile, false, () => {
             this.gameMap.setTileGIDAt("door", tile, this.gameMap.getGidByName(`door${DoorType.WALL}`));
         });
 
-        let condition: number[] = eventInfo.condition;
+        let condition: number[] = door.condition;
         let index = condition.indexOf(this.gameMap.getTileIndex(tile));
         if (index != -1) {
             condition.splice(index, 1);
         }
-        this.levelData.saveMapData();
         if (condition.length == 0) {
-            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventInfo.value);
+            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(door.value);
         }
     }
 }

@@ -2,7 +2,7 @@ import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { LoadBase } from "../../../../GameFramework/Scripts/Application/Model/LoadBase";
 import { MapModel } from "../MapModel";
 import { MapAddElementEventArgs } from "../MapModelEventArgs";
-import { Door } from "./Elements/Door";
+import { Door, DoorState } from "./Elements/Door";
 import { Element } from "./Elements/Element";
 import { EventInfo } from "./Elements/EventInfo";
 import { Npc } from "./Elements/Npc";
@@ -31,7 +31,7 @@ export class LevelData extends LoadBase {
     /** 消失的tile */
     private _disappearTile: any = {};
     /** 层元素信息 */
-    private layerInfo: any = {};
+    private _layerInfo: any = {};
 
     public get level() {
         return this._level;
@@ -56,8 +56,8 @@ export class LevelData extends LoadBase {
 
     load(info: any) {
         this.loadData(info);
-        for (let layerName in this.layerInfo) {
-            let layerInfo = this.layerInfo[layerName];
+        for (let layerName in this._layerInfo) {
+            let layerInfo = this._layerInfo[layerName];
             for (let key in layerInfo) {
                 let constructor = CLASS_MAP[key];
                 if (constructor) {
@@ -82,7 +82,7 @@ export class LevelData extends LoadBase {
                 let praseGidFn = data ? data.parseGid : null;
                 let result = func.call(this, propertiesInfo, tilesData, praseGidFn);
                 if (result) {
-                    this.layerInfo[layerName] = result;
+                    this._layerInfo[layerName] = result;
                 }
             }
         }
@@ -98,7 +98,7 @@ export class LevelData extends LoadBase {
     }
 
     setDisappear(layerName: string, index: number) {
-        if (!DISAPPEAR_LAYER_FILTER.indexOf(layerName)) {
+        if (DISAPPEAR_LAYER_FILTER.indexOf(layerName) != -1) {
             if (!this._disappearTile[layerName]) {
                 this._disappearTile[layerName] = [];
             }
@@ -125,25 +125,17 @@ export class LevelData extends LoadBase {
         return true;
     }
 
-    getStair(type: StairType): Stair | null {
-        return this.layerInfo["stair"][type] || null;
-    }
-
-    getLayerInfo(layerName: string) {
-        return this.layerInfo[layerName] || null;
-    }
-
     getLayerElement<T extends Element>(layerName: string, index: number | string): T | null {
         let layerInfo = this.getLayerInfo(layerName);
         return layerInfo ? layerInfo[index] : null;
     }
 
     getLayerElementWithoutName(index: number | string) {
-        for (let layerName in this.layerInfo) {
-            if (this.layerInfo[layerName][index]) {
+        for (let layerName in this._layerInfo) {
+            if (this._layerInfo[layerName][index]) {
                 return {
                     layerName: layerName,
-                    element: this.layerInfo[layerName][index] as Element,
+                    element: this._layerInfo[layerName][index] as Element,
                 };
             }
         }
@@ -151,6 +143,99 @@ export class LevelData extends LoadBase {
         return null;
     }
 
+    hasDoorInfo(): boolean {
+        return this.getLayerInfo("door") != null;
+    }
+
+    getDoorInfo(doorState: DoorState, index: number = -1): Door | null {
+        switch (doorState) {
+            case DoorState.NONE:
+            case DoorState.PASSIVE:
+                if (index !== -1) {
+                    return this.getLayerElement("door", index);
+                }
+                break;
+            case DoorState.APPEAR_EVENT:
+            case DoorState.DISAPPEAR_EVENT: {
+                let layerInfo = this.getLayerInfo("door");
+                if (layerInfo) {
+                    let doorInfo = layerInfo["event"];
+                    if (doorInfo && doorInfo.doorState == doorState) {
+                        return doorInfo;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 通过消灭的怪物位置，来获取怪物守卫的门
+     * @param destoryMonsterIndex
+     */
+    getMonsterDoor(destoryMonsterIndex: number): Array<Door> | null {
+        let layerInfo = this.getLayerInfo("door");
+        if (layerInfo) {
+            let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monster"];
+            if (monsterDoors) {
+                let index = 0;
+                for (let pair of monsterDoors) {
+                    index = pair[0].indexOf(destoryMonsterIndex);
+                    if (index != -1) {
+                        pair[0].splice(index, 1);
+                        if (pair[0].length == 0) {
+                            monsterDoors.delete(pair[0]);
+                            return pair[1];
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 添加怪物门结构
+     * @param monsterDoorInfo 怪物们的数据
+     * @param getDoorIdFn 根据index获取门的id
+     */
+    addMonsterDoor(monsterDoorInfo: { [doorIndexes: string]: number[] }, getDoorIdFn: (index: number) => number): void {
+        let layerInfo = this.getLayerInfo("door");
+        if (!layerInfo) {
+            layerInfo["door"] = {};
+        }
+
+        let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monster"];
+        if (!monsterDoors) {
+            monsterDoors = new Map<Array<number>, Array<Door>>();
+        }
+
+        for (let doorIndexes in monsterDoorInfo) {
+            let doors: Array<Door> = new Array<Door>();
+            doorIndexes.split(",").forEach((index) => {
+                let newIndex = parseInt(index);
+                let door = new Door();
+                door.id = getDoorIdFn(newIndex);
+                door.index = newIndex;
+                doors.push(door);
+            });
+            monsterDoors.set(monsterDoorInfo[doorIndexes], doors);
+        }
+    }
+
+    private getLayerInfo(layerName: string) {
+        return this._layerInfo[layerName] || null;
+    }
+
+    /**
+     * 移动元素数据
+     * @param layerName 层名
+     * @param src 原始位置索引
+     * @param dst 目标位置索引
+     */
     private moveLayerElement(layerName: string, src: number, dst: number) {
         let layerInfo = this.getLayerInfo(layerName);
         if (layerInfo) {

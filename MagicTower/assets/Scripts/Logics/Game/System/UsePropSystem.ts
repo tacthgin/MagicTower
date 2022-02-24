@@ -2,6 +2,7 @@ import { v2 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
@@ -54,10 +55,10 @@ export class UsePropSystem extends SystemBase {
     useProp(propInfo: PropInfo, extraInfo: string) {
         switch (propInfo.type) {
             case PropType.MONSTER_HAND_BOOK:
-                //currentMap.showDialog("MonsterHandBook", currentMap.getMonsters());
+                UIFactory.showDialog("Prefab/Dialogs/MonsterHandBook");
                 break;
             case PropType.RECORD_BOOK:
-                //currentMap.showDialog("RecordBook");
+                UIFactory.showDialog("Prefab/Dialogs/RecordBook");
                 break;
             case PropType.FLYING_WAND:
                 {
@@ -66,14 +67,14 @@ export class UsePropSystem extends SystemBase {
                             return;
                         }
                         let stairType = extraInfo == "up" ? StairType.UP : StairType.Down;
-                        let stair = this.levelData.getStair(stairType);
+                        let stair = this.levelData.getLayerElement<Stair>("stair", stairType);
                         if (stair) {
                             this.mapModel.setLevelDiff(stair.levelDiff);
                         } else {
                             GameFrameworkLog.error("传送法杖找不到楼梯");
                         }
                     } else {
-                        //GameManager.UI.showToast("在楼梯旁边才可以使用");
+                        UIFactory.showToast("在楼梯旁边才可以使用");
                     }
                 }
                 break;
@@ -140,26 +141,27 @@ export class UsePropSystem extends SystemBase {
 
     /** 勇士在楼梯旁边 */
     private isHeroNextToStair(): boolean {
-        let stairs: Stair[] = this.levelData.getLayerInfo("stair");
-        if (stairs) {
-            for (let i = 0; i < stairs.length; i++) {
-                let diff = Math.abs(stairs[i].index - this.gameMap.getTileIndex(this.heroModel.getPosition()));
+        let stairTypes = [StairType.UP, StairType.Down];
+        for (let i = 0; i < stairTypes.length; i++) {
+            let stair = this.levelData.getLayerElement<Stair>("stair", stairTypes[i]);
+            if (stair) {
+                let diff = Math.abs(stair.index - this.gameMap.getTileIndex(this.heroModel.getPosition()));
                 if (INDEX_DIFFS.indexOf(diff) != -1) {
                     return true;
                 }
             }
         }
+
         return false;
     }
 
     private switchLevelTip(diff: number, useFeather: boolean = false) {
         let tip = diff == -1 ? "你已经到最下面一层了" : "你已经到最上面一层了";
         if (!this.mapModel.canSwitchLevel(diff, useFeather)) {
-            //GameManager.UI.showToast(tip);
-            GameFrameworkLog.log(tip);
+            UIFactory.showToast(tip);
             return true;
         } else if (!this.mapModel.canReachLevel(diff)) {
-            GameFrameworkLog.log("你还未到达过该层");
+            UIFactory.showToast("你还未到达过该层");
             return true;
         }
         return false;

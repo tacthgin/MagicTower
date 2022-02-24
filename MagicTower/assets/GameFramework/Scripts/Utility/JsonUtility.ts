@@ -42,7 +42,7 @@ export class JsonUtility {
 
     /**
      * 从本地文件夹动态获取json
-     * @param path json路径，不需要根json文件夹
+     * @param path json路径
      * @param clone 是否克隆json
      * @returns json对象
      */
@@ -57,7 +57,7 @@ export class JsonUtility {
 
     /**
      * 从本地文件夹动态获取json元素
-     * @param path json路径，不需要根json文件夹
+     * @param path json路径
      * @param elementName json元素名字
      * @param clone 是否克隆json元素
      * @returns json元素
@@ -77,7 +77,7 @@ export class JsonUtility {
 
     /**
      * 根据json元素名字的值索引json元素
-     * @param path json路径，不需要根json文件夹
+     * @param path json路径
      * @param key json元素名字
      * @param value json元素的值
      * @returns json元素

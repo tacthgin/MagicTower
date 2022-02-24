@@ -71,7 +71,6 @@ export class Door extends Element {
         let propertiesValue: string = null!;
         let condition: number[] = [];
         if (tiles && parseGidFn) {
-            let needCreateDoorType = [DoorType.WALL, DoorType];
             for (let i = 0; i < tiles.length; i++) {
                 if (tiles[i] == 0) {
                     continue;
@@ -151,7 +150,7 @@ export class Door extends Element {
                         if (!monsterDoors) {
                             monsterDoors = doorInfos["monster"] = new Map<Array<number>, Array<Door>>();
                         }
-                        let monsterIndexs: number[] = (propertiesValue as string).split(",").map((value) => {
+                        let monsterIndexes: number[] = (propertiesValue as string).split(",").map((value) => {
                             return parseInt(value);
                         });
 
@@ -161,13 +160,11 @@ export class Door extends Element {
                             doors.push(doorInfos[value]);
                         });
 
-                        monsterDoors.set(monsterIndexs, doors);
+                        monsterDoors.set(monsterIndexes, doors);
                     }
                     break;
             }
         }
         return doorInfos;
     }
-
-    static createMosnterDoor() {}
 }

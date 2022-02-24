@@ -12,7 +12,7 @@ import { PropType } from "../../../Model/HeroModel/Prop";
 import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
 import { Monster, MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
-import { StairType } from "../../../Model/MapModel/Data/Elements/Stair";
+import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { ShopModel } from "../../../Model/ShopModel/ShopModel";
@@ -264,7 +264,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private goStair(spriteName: string) {
-        let stair = this.levelData.getStair(spriteName == "stair_down" ? StairType.Down : StairType.UP);
+        let stair = this.levelData.getLayerElement<Stair>("stair", spriteName == "stair_down" ? StairType.Down : StairType.UP);
         if (stair) {
             this.mapModel.setLevelDiff(stair.levelDiff);
             return true;
@@ -302,27 +302,7 @@ export class MapCollisionSystem extends SystemBase {
     private gotoShop() {
         let shopModel = GameApp.getModel(ShopModel);
         shopModel.level = this.levelData.level;
-        // GameManager.UI.showDialog("ShopDialog", shopModel, this.heroModel.getAttr(HeroAttr.GOLD), (attr: string) => {
-        //     switch (attr) {
-        //         case "hp":
-        //             this.heroModel.setAttrDiff(HeroAttr.HP, shopModel.hp);
-        //             break;
-        //         case "attack":
-        //             this.heroModel.setAttrDiff(HeroAttr.ATTACK, shopModel.attack);
-        //             break;
-        //         case "defence":
-        //             this.heroModel.setAttrDiff(HeroAttr.DEFENCE, shopModel.defence);
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        //     if (attr != "no") {
-        //         this.heroModel.setAttrDiff(HeroAttr.GOLD, shopModel.buy());
-        //     }
-        //     this.elementActionComplete();
-        // }).then((control: any) => {
-        //     //control.node.position = this._dialogPos;
-        // });
+        UIFactory.showDialog("Prefab/Dialogs/ShopDialog");
     }
 
     eventCollision(eventID: number | string | IVec2) {
@@ -331,9 +311,9 @@ export class MapCollisionSystem extends SystemBase {
             eventIdOrEventInfo = eventID;
         } else {
             let index = this.gameMap.getTileIndex(eventID);
-            let eventInfo = this.levelData.getLayerInfo("event");
+            let eventInfo = this.levelData.getLayerElement<EventInfo>("event", index);
             if (eventInfo) {
-                eventIdOrEventInfo = eventInfo[index];
+                eventIdOrEventInfo = eventInfo;
             }
         }
 
