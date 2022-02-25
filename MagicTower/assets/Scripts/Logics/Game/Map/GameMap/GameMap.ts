@@ -100,7 +100,7 @@ export class GameMap extends TiledMap implements IGameMap {
             };
         }
 
-        return {};
+        return null;
     }
 
     setTileGIDAt(layerName: string, tile: IVec2, gid: number | null) {

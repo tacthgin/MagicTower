@@ -54,14 +54,15 @@ export interface IGameMap extends IAstarMap {
      * 得到当前地图块的层名以及资源名字
      * @param tile tile坐标
      * @param layerName 层名
+     * @returns 当前地图块的层名，贴图资源名称
      */
     getTileInfo(
         tile: IVec2,
         layerName?: string
     ): {
-        layerName?: string;
-        spriteName?: string;
-    };
+        layerName: string;
+        spriteName: string;
+    } | null;
 
     /**
      * 设置地图块的gid
@@ -87,9 +88,9 @@ export interface IGameMap extends IAstarMap {
     getGidByName(name: string): number | null;
 
     /**
-     * 根据地图块的gid获取资源名字
+     * 根据地图块的gid获取贴图资源名字
      * @param gid 地图块gid
-     * @returns 资源名字
+     * @returns 贴图资源名字
      */
     getNameByGid(gid: number): string | null;
 
