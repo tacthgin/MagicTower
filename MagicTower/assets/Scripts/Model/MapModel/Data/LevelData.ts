@@ -5,6 +5,7 @@ import { MapAddElementEventArgs } from "../MapModelEventArgs";
 import { Door, DoorState } from "./Elements/Door";
 import { Element } from "./Elements/Element";
 import { EventInfo } from "./Elements/EventInfo";
+import { Monster } from "./Elements/Monster";
 import { Npc } from "./Elements/Npc";
 import { Stair, StairType } from "./Elements/Stair";
 
@@ -13,6 +14,7 @@ const CLASS_MAP: any = {
     stair: Stair,
     event: EventInfo,
     npc: Npc,
+    monster: Monster,
 };
 
 const DISAPPEAR_LAYER_FILTER: Readonly<string[]> = ["event"];
@@ -23,6 +25,7 @@ export class LevelData extends LoadBase {
         stair: Stair.parse,
         event: EventInfo.parse,
         npc: Npc.parse,
+        monster: Monster.parse,
     };
     //层
     private _level: number = 0;

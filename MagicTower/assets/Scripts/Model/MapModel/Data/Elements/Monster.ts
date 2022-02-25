@@ -19,10 +19,12 @@ export interface MonsterInfo {
     boss: boolean;
     spriteId: number;
     firstAttack: boolean;
+    extraDamage: number | null;
 }
 
 export class Monster extends Element {
     private _monsterInfo: MonsterInfo = null!;
+    private _monsterMove: boolean = false;
 
     set id(value: number) {
         this._id = value;
@@ -36,8 +38,20 @@ export class Monster extends Element {
         return this._monsterInfo;
     }
 
+    set firstAttack(value: boolean) {
+        this._monsterInfo.firstAttack = value;
+    }
+
     get firstAttack(): boolean {
         return this._monsterInfo.firstAttack;
+    }
+
+    set monsterMove(value: boolean) {
+        this._monsterMove = value;
+    }
+
+    get monsterMove(): boolean {
+        return this._monsterMove;
     }
 
     get boss(): boolean {
@@ -60,5 +74,70 @@ export class Monster extends Element {
 
     clear(): void {
         this._monsterInfo = null!;
+    }
+
+    static parse(propertiesInfo: any, tiles: number[] | null = null, parseGidFn: Function | null = null): any {
+        let monsterInfos: any = {};
+
+        if (tiles && parseGidFn) {
+            for (let i = 0; i < tiles.length; i++) {
+                if (tiles[i] == 0) {
+                    continue;
+                }
+                let name = parseGidFn(tiles[i]);
+                if (name) {
+                    name = name.split("_")[0];
+                    let monsterJson = Utility.Json.getJsonKeyCache("monster", "spriteId", name) as any;
+                    if (monsterJson) {
+                        let monster = new Monster();
+                        monster.id = parseInt(monsterJson.id);
+                        monster.index = i;
+                        monsterInfos[i] = monster;
+                    }
+                }
+            }
+        }
+        let propertiesValue: string = null!;
+        for (let key in propertiesInfo) {
+            propertiesValue = propertiesInfo[key];
+            switch (key) {
+                case "monsterEvent":
+                    {
+                        let infos = propertiesValue.split(":");
+                        let monsterEvents = new Map<Array<number>, number>();
+                        monsterEvents.set(
+                            infos[1].split(",").map((value) => {
+                                return parseInt(value);
+                            }),
+                            parseInt(infos[0])
+                        );
+                        monsterInfos["event"] = monsterEvents;
+                    }
+                    break;
+                case "firstAttack":
+                    {
+                        let monsterIndexes = propertiesValue.split(",");
+                        monsterIndexes.forEach((index) => {
+                            let monster: Monster = monsterInfos[index];
+                            if (monster) {
+                                monster.firstAttack = true;
+                            }
+                        });
+                    }
+                    break;
+                case "monsterMove":
+                    {
+                        let monsterIndexes = propertiesValue.split(",");
+                        monsterIndexes.forEach((index) => {
+                            let monster: Monster = monsterInfos[index];
+                            if (monster) {
+                                monster.monsterMove = true;
+                            }
+                        });
+                    }
+                    break;
+            }
+        }
+        return monsterInfos;
     }
 }

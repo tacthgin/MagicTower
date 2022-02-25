@@ -63,6 +63,16 @@ export class HeroModel extends ModelBase {
         return this.heroAttr[attr];
     }
 
+    /**
+     * 从怪物那赚取金币
+     * @param gold 怪物金币
+     */
+    earnGold(gold: number): void {
+        //幸运金币,获取金币翻倍
+        let ratio = this.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
+        this.setAttrDiff(HeroAttr.GOLD, gold * ratio);
+    }
+
     setPosition(tile: IVec2, heroDireciton: number | null = null) {
         this.position = tile;
         if (heroDireciton != null) {

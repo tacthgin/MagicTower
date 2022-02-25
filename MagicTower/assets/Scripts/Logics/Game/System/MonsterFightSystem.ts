@@ -4,6 +4,7 @@ import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { PropType } from "../../../Model/HeroModel/Prop";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
@@ -50,6 +51,7 @@ export class MonsterFightSystem extends SystemBase {
                     this.hero.showAttack(false);
                     //怪物死了
                     if (this.monster.monsterInfo.hp == 0) {
+                        this.monsterDie(this.monster);
                         GameApp.EventManager.fireNow(this, MonsterDieEventArgs.create(this.monster, magic));
                     } else {
                         heroModel.setAttrDiff(HeroAttr.HP, -damageInfo.heroDamage);
@@ -68,5 +70,10 @@ export class MonsterFightSystem extends SystemBase {
         super.clear();
         this.hero = null!;
         this.monster = null!;
+    }
+
+    private monsterDie(monster: Monster) {
+        let heroModel = GameApp.getModel(HeroModel);
+        heroModel.earnGold(monster.monsterInfo.gold);
     }
 }

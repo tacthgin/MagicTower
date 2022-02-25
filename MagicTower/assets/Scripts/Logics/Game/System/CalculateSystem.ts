@@ -1,6 +1,7 @@
 import { math } from "cc";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 
 export class CalculateSystem {
     /**
@@ -9,7 +10,7 @@ export class CalculateSystem {
      * @param monsterInfo 怪物数据
      * @param heroFirstAttack 勇士先攻击
      */
-    static canHeroAttack(heroModel: HeroModel, monsterInfo: any, heroFirstAttack: boolean = true) {
+    static canHeroAttack(heroModel: HeroModel, monsterInfo: MonsterInfo, heroFirstAttack: boolean = true) {
         let heroAttackCount = this.getHeroAttackCount(heroModel, monsterInfo);
         if (heroAttackCount == 0) {
             return false;
@@ -29,7 +30,7 @@ export class CalculateSystem {
      * @param heroModel 勇士数据
      * @param monsterInfo 怪物数据
      */
-    static getMonsterAttackCount(heroModel: HeroModel, monsterInfo: any) {
+    static getMonsterAttackCount(heroModel: HeroModel, monsterInfo: MonsterInfo) {
         //如果怪物攻击力小于勇士防御，攻击次数无意义
         if (monsterInfo.attack <= heroModel.getAttr(HeroAttr.DEFENCE)) {
             return 0;
@@ -42,7 +43,7 @@ export class CalculateSystem {
      * @param heroModel 勇士数据
      * @param monsterInfo 怪物数据
      */
-    static getHeroAttackCount(heroModel: HeroModel, monsterInfo: any) {
+    static getHeroAttackCount(heroModel: HeroModel, monsterInfo: MonsterInfo) {
         let attack = this.getHeroAttack(heroModel, monsterInfo);
         //如果勇士攻击力小于怪物防御，攻击次数无意义
         if (attack <= monsterInfo.defence) {
@@ -51,7 +52,7 @@ export class CalculateSystem {
         return Math.ceil(monsterInfo.hp / (attack - monsterInfo.defence));
     }
 
-    static getHeroAttack(heroModel: HeroModel, monsterInfo: any) {
+    static getHeroAttack(heroModel: HeroModel, monsterInfo: MonsterInfo) {
         return monsterInfo.extraDamage && heroModel.getPropNum(monsterInfo.extraDamage) ? heroModel.getAttr(HeroAttr.ATTACK) * 2 : heroModel.getAttr(HeroAttr.ATTACK);
     }
 
@@ -60,7 +61,7 @@ export class CalculateSystem {
      * @param heroModel 勇士数据
      * @param monsterInfo 怪物数据
      */
-    static perAttackDamage(heroModel: HeroModel, monsterInfo: any) {
+    static perAttackDamage(heroModel: HeroModel, monsterInfo: MonsterInfo) {
         let attack = this.getHeroAttack(heroModel, monsterInfo);
         return {
             heroDamage: math.clamp(monsterInfo.attack - heroModel.getAttr(HeroAttr.DEFENCE), 0, Number.MAX_VALUE),
@@ -73,7 +74,7 @@ export class CalculateSystem {
      * @param heroModel
      * @param monsterInfo
      */
-    static totalHeroDamage(heroModel: HeroModel, monsterInfo: any) {
+    static totalHeroDamage(heroModel: HeroModel, monsterInfo: MonsterInfo) {
         let damage = CalculateSystem.perAttackDamage(heroModel, monsterInfo);
         return CalculateSystem.getMonsterAttackCount(heroModel, monsterInfo) * damage.heroDamage;
     }

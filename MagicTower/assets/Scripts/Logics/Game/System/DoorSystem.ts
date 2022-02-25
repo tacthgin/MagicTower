@@ -37,16 +37,9 @@ export class DoorSystem extends SystemBase {
      * @param layerName 层名
      * @returns 是否该格子可走
      */
-    doorCollision(tile: IVec2, layerName: string) {
-        let tileIndex = this.gameMap.getTileIndex(tile);
-
-        let doorInfo = this.levelData.getLayerElement<Door>(layerName, tileIndex);
-        if (!doorInfo) {
-            return true;
-        }
-
+    doorCollision(layerName: string, doorInfo: Door) {
         if (doorInfo.canWallOpen()) {
-            this.openDoor(doorInfo.id, tile, layerName);
+            this.openDoor(doorInfo.id, doorInfo.index, layerName);
         } else if (doorInfo.isKeyDoor()) {
             let doorJson = Utility.Json.getJsonKeyCache("prop", "value", doorInfo.id) as any;
             if (!doorJson) {
@@ -56,10 +49,10 @@ export class DoorSystem extends SystemBase {
             let heroModel = GameApp.getModel(HeroModel);
             if (keyID && heroModel.getPropNum(keyID) > 0) {
                 heroModel.addProp(keyID, 1, -1);
-                this.openDoor(doorInfo.id, tile, layerName);
+                this.openDoor(doorInfo.id, doorInfo.index, layerName);
                 let door = this.levelData.getDoorInfo(DoorState.DISAPPEAR_EVENT);
                 if (door) {
-                    this.disappearEventCollision(door, tileIndex);
+                    this.disappearEventCollision(door, doorInfo.index);
                 }
             }
         }
@@ -96,7 +89,8 @@ export class DoorSystem extends SystemBase {
         GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
     }
 
-    private async openDoor(id: number | string, tile: IVec2, layerName: string) {
+    private async openDoor(id: number | string, index: number, layerName: string) {
+        let tile = this.gameMap.getTile(index);
         await this.createDoorAnimation(id, tile, false, () => {
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         });

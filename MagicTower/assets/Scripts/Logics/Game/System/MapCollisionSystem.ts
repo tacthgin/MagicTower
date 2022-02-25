@@ -9,6 +9,7 @@ import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropType } from "../../../Model/HeroModel/Prop";
+import { Door } from "../../../Model/MapModel/Data/Elements/Door";
 import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
 import { Monster, MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
@@ -24,7 +25,6 @@ import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { MoveEventArgs } from "../../Event/MoveEventArgs";
 import { SpecialMoveEventArgs } from "../../Event/SpecialMoveEventArgs";
-import { ElementFactory } from "../Map/ElementFactory";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
@@ -71,7 +71,6 @@ export class MapCollisionSystem extends SystemBase {
         this.mapModel = GameApp.getModel(MapModel);
 
         this.registerEvent();
-        ElementFactory.initliaze();
     }
 
     initliaze(gameMap: IGameMap, hero: Hero) {
@@ -93,6 +92,16 @@ export class MapCollisionSystem extends SystemBase {
      * @returns true表示交互结束，false表示交互正在进行
      */
     collision(tile: IVec2) {
+        let layerInfo = this.levelData.getLayerElementWithoutName(this.gameMap.getTileIndex(tile));
+        if (layerInfo) {
+            switch (layerInfo.layerName) {
+                case "door":
+                    //这里只处理可见的门逻辑
+                    return this.doorSystem.doorCollision(layerInfo.layerName, layerInfo.element as Door);
+                case "monster":
+                    return this.fightMonster(tile);
+            }
+        }
         let { layerName, spriteName } = this.gameMap.getTileInfo(tile);
         if (!layerName) return true;
         let jsonData = this.getJsonData(layerName, spriteName) as any;
@@ -106,17 +115,11 @@ export class MapCollisionSystem extends SystemBase {
                 }
                 break;
             case "door":
-                //这里只处理可见的门逻辑
-                return this.doorSystem.doorCollision(tile, layerName);
+
             case "stair":
                 return this.goStair(spriteName!);
             case "monster":
-                if (jsonData) {
-                    return this.fightMonster(jsonData, tile);
-                } else {
-                    GameFrameworkLog.error("monster json is not exist");
-                }
-                break;
+
             case "npc":
                 return this.interactiveNpc(tile);
             case "building":
@@ -146,7 +149,6 @@ export class MapCollisionSystem extends SystemBase {
         let ratio = this.heroModel.getPropNum(PropType.LUCKY_GOLD) ? 2 : 1;
         this.heroModel.setAttrDiff(HeroAttr.GOLD, eventArgs.monster.monsterInfo.gold * ratio);
         this.disappear("monster", eventArgs.monster.index);
-        ElementFactory.releaseElementData(eventArgs.monster);
         this.elementActionComplete();
         //this.removeMonsterDoor();
         //this.monsterEventTrigger(index);
@@ -273,13 +275,13 @@ export class MapCollisionSystem extends SystemBase {
         return false;
     }
 
-    private fightMonster(monsterJson: MonsterInfo, tile: IVec2) {
+    private fightMonster(tile: IVec2) {
+        GameFrameworkLog.error("monster json is not exist");
         if (!CalculateSystem.canHeroAttack(this.heroModel, monsterJson, !monsterJson.firstAttack)) {
             UIFactory.showToast(`你打不过${monsterJson.name}`);
             return true;
         }
 
-        let monster = ElementFactory.createElementData(Monster, "monster");
         monster.id = parseInt(monsterJson.id);
         monster.index = this.gameMap.getTileIndex(tile);
         this.monsterFightSystem.initliaze(this.hero, monster);
@@ -624,6 +626,5 @@ export class MapCollisionSystem extends SystemBase {
         GameApp.CommandManager.destroySystem(this.gameEventSystem);
         GameApp.CommandManager.destroySystem(this.moveSystem);
         GameApp.CommandManager.destroySystem(this.doorSystem);
-        ElementFactory.clear();
     }
 }
