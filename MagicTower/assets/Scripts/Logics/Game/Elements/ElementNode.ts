@@ -12,7 +12,7 @@ export class ElementNode extends Component {
     private animation: Animation = null!;
 
     init(layerName: string, id: number | string) {
-        let json = Utility.Json.getJsonElement(layerName, id) as any;
+        let json = Utility.Json.getJsonElement<any>(layerName, id);
         if (json) {
             let name = json.spriteId;
             this.getComponent(Sprite)!.spriteFrame = ElementFactory.getElementSpriteFrame(`${name}_0`);

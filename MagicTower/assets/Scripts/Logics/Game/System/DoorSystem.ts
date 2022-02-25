@@ -9,6 +9,7 @@ import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Door, DoorState, DoorType } from "../../../Model/MapModel/Data/Elements/Door";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
+import { DoorOpenEventArgs } from "../../Event/DoorOpenEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
@@ -24,6 +25,13 @@ export class DoorSystem extends SystemBase {
     awake(): void {
         GameApp.NodePoolManager.createNodePool(DoorAnimationNode);
         GameApp.NodePoolManager.createNodePool(DoorAnimationReverseNode);
+        GameApp.EventManager.subscribe(GameEvent.OPEN_DOOR, this.onOpenDoor, this);
+    }
+
+    clear(): void {
+        super.clear();
+        GameApp.NodePoolManager.destroyNodePool(DoorAnimationNode);
+        GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
     }
 
     initliaze(gameMap: IGameMap, levelData: LevelData) {
@@ -41,11 +49,11 @@ export class DoorSystem extends SystemBase {
         if (doorInfo.canWallOpen()) {
             this.openDoor(doorInfo.id, doorInfo.index, layerName);
         } else if (doorInfo.isKeyDoor()) {
-            let doorJson = Utility.Json.getJsonKeyCache("prop", "value", doorInfo.id) as any;
-            if (!doorJson) {
-                throw new GameFrameworkError("door json is invaild");
+            let propJson = Utility.Json.getJsonKeyCache("prop", "value", doorInfo.id) as any;
+            if (!propJson) {
+                throw new GameFrameworkError("prop json is invaild");
             }
-            let keyID = doorJson.id;
+            let keyID = propJson.id;
             let heroModel = GameApp.getModel(HeroModel);
             if (keyID && heroModel.getPropNum(keyID) > 0) {
                 heroModel.addProp(keyID, 1, -1);
@@ -83,10 +91,11 @@ export class DoorSystem extends SystemBase {
         return true;
     }
 
-    clear(): void {
-        super.clear();
-        GameApp.NodePoolManager.destroyNodePool(DoorAnimationNode);
-        GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
+    private onOpenDoor(sender: object, eventArgs: DoorOpenEventArgs) {
+        let doors = eventArgs.doors;
+        doors.forEach((door) => {
+            this.openDoor(door.id, door.index, "door");
+        });
     }
 
     private async openDoor(id: number | string, index: number, layerName: string) {

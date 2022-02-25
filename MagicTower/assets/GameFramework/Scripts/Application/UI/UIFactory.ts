@@ -26,7 +26,7 @@ export class UIFactory {
      * @param pauseCoveredUIForm 是否暂停被覆盖的界面
      * @returns 界面序列编号
      */
-    static async showDialog(path: string, userData?: object, pauseCoveredUIForm?: boolean, position: Vec3 = Vec3.ZERO): Promise<number> {
+    static async showDialog(path: string, userData?: Object, pauseCoveredUIForm?: boolean, position: Vec3 = Vec3.ZERO): Promise<number> {
         let dialogId = await this._uiManager.openUIForm(path, UIConstant.DIALOG_LAYER_GROUP, userData, pauseCoveredUIForm);
         let uiForm = this._uiManager.getUIForm(dialogId);
         if (uiForm) {

@@ -2,9 +2,10 @@ import { LoadBase } from "../../../../../GameFramework/Scripts/Application/Model
 import { IRerference } from "../../../../../GameFramework/Scripts/Base/ReferencePool/IRerference";
 
 export class Element extends LoadBase implements IRerference {
-    protected _gid: number = 0;
+    private _gid: number = 0;
     protected _id: number = 0;
-    protected _index: number = -1;
+    private _index: number = -1;
+    private _hide: boolean = false;
 
     set gid(value: number) {
         this._gid = value;
@@ -31,6 +32,15 @@ export class Element extends LoadBase implements IRerference {
     /** tile index */
     get index(): number {
         return this._index;
+    }
+
+    set hide(value: boolean) {
+        this._hide = value;
+    }
+
+    /** is hide */
+    get hide(): boolean {
+        return this._hide;
     }
 
     clear(): void {

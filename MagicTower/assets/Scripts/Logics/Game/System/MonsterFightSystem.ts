@@ -1,13 +1,16 @@
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
-import { PropType } from "../../../Model/HeroModel/Prop";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
-import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
+import { LevelData } from "../../../Model/MapModel/Data/LevelData";
+import { DoorOpenEventArgs } from "../../Event/DoorOpenEventArgs";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
+import { DisappearCommand } from "../Command/DisappearCommand";
+import { EventCollisionCommand } from "../Command/EventCollisionCommand";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 
@@ -17,10 +20,12 @@ const ATTACK_INTERVAL = 0.1;
 export class MonsterFightSystem extends SystemBase {
     private hero: Hero = null!;
     private monster: Monster = null!;
+    private levelData: LevelData = null!;
 
-    initliaze(hero: Hero, monster: Monster) {
+    initliaze(hero: Hero, monster: Monster, levelData: LevelData) {
         this.hero = hero;
         this.monster = monster;
+        this.levelData = levelData;
     }
 
     /**
@@ -34,25 +39,29 @@ export class MonsterFightSystem extends SystemBase {
 
         let heroModel = GameApp.getModel(HeroModel);
         let monsterInfo = this.monster.monsterInfo;
+        if (!CalculateSystem.canHeroAttack(heroModel, monsterInfo, !monsterInfo.firstAttack)) {
+            UIFactory.showToast(`你打不过${monsterInfo.name}`);
+            return true;
+        }
+
         let count = CalculateSystem.getHeroAttackCount(heroModel, monsterInfo);
         let damageInfo = CalculateSystem.perAttackDamage(heroModel, monsterInfo);
         //谁先攻击 0英雄先攻击
         let heroFirst = !monsterInfo.firstAttack;
         let attackCount = heroFirst ? count * 2 : count * 2 + 1;
         //先贴图怪物信息
-        GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(this.monster.monsterInfo));
+        GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(monsterInfo));
         this.schedule(
             () => {
                 if (heroFirst) {
                     this.hero.showAttack(true);
                     this.monster.hurt(damageInfo.monsterDamage);
-                    GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(this.monster.monsterInfo));
+                    GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(monsterInfo));
                 } else {
                     this.hero.showAttack(false);
                     //怪物死了
-                    if (this.monster.monsterInfo.hp == 0) {
+                    if (monsterInfo.hp == 0) {
                         this.monsterDie(this.monster);
-                        GameApp.EventManager.fireNow(this, MonsterDieEventArgs.create(this.monster, magic));
                     } else {
                         heroModel.setAttrDiff(HeroAttr.HP, -damageInfo.heroDamage);
                     }
@@ -70,10 +79,25 @@ export class MonsterFightSystem extends SystemBase {
         super.clear();
         this.hero = null!;
         this.monster = null!;
+        this.levelData = null!;
     }
 
     private monsterDie(monster: Monster) {
         let heroModel = GameApp.getModel(HeroModel);
         heroModel.earnGold(monster.monsterInfo.gold);
+
+        GameApp.CommandManager.createCommand(DisappearCommand).execute("monster", monster.index);
+
+        let doors = this.levelData.removeMonsterDoor(monster.index);
+        if (doors) {
+            GameApp.EventManager.fireNow(this, DoorOpenEventArgs.create(doors));
+        }
+
+        let eventId = this.levelData.removeMonsterEvent(monster.index);
+        if (eventId) {
+            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
+        }
+
+        // GameApp.EventManager.fireNow(this, MonsterDieEventArgs.create(this.monster, magic));
     }
 }

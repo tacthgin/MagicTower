@@ -10,15 +10,4 @@ export class EventInfo extends Element {
     get mosnters() {
         return this._monsters;
     }
-
-    static parse(propertiesInfo: any) {
-        let eventInfo: { [key: string]: EventInfo } = {};
-        for (let index in propertiesInfo) {
-            let element = new EventInfo();
-            element.id = parseInt(propertiesInfo[index]);
-            element.index = parseInt(index);
-            eventInfo[index] = element;
-        }
-        return eventInfo;
-    }
 }

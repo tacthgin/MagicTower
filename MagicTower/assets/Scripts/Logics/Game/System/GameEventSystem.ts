@@ -44,13 +44,13 @@ export class GameEventSystem extends SystemBase {
         } else {
             this.eventJson = Utility.Json.getJsonElement("event", eventIdOrEventInfo);
         }
+        if (this.eventJson.monsterDoor) {
+            levelData.addMonsterDoor(this.eventJson.monsterDoor);
+        }
         this.globalConfig = Utility.Json.getJson("global");
         this.gameMap = gameMap;
         this.hero = hero;
         this.levelData = levelData;
-        // if (this.eventJson.monsterDoor) {
-        // this.gameMap.monsterDoor = this.eventJson.monsterDoor;
-        // }
     }
 
     getEventCompleteFlag() {

@@ -121,7 +121,7 @@ export class LevelManager extends Component {
         let newMap = this.createMap(this.mapModel.level);
         newMap.node.active = true;
         let levelData = this.mapModel.getCurrentLevelData();
-        this.showHero(newMap.getTile(levelData.getLayerElement<Stair>("stair", eventArgs.stairType)!.standLocation));
+        this.showHero(newMap.getTile(levelData.getStair(eventArgs.stairType)!.standLocation));
     }
 
     private onSceneAppear(sender: object, eventArgs: SceneAppearEventArgs) {

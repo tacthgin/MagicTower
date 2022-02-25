@@ -27,4 +27,6 @@ export enum GameEvent {
     COMMAND_COLLISION,
     COMMAND_MOVE,
     COMMAND_SPECIAL_MOVE,
+    /** 开门 */
+    OPEN_DOOR,
 }

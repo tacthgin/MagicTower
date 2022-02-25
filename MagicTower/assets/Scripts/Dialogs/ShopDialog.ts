@@ -14,8 +14,9 @@ export class ShopDialog extends DialogBase {
     @property(Label)
     private attr: Label[] = [];
 
-    onOpen() {
+    onOpen(level: number) {
         let shopModel = GameApp.getModel(ShopModel);
+        shopModel.level = level;
         this.content.string = `你若给我 ${shopModel.needGold} 个金币，\n我就替你提升以下一种能力。`;
         this.attr[0].string = `生命力 + ${shopModel.hp}`;
         this.attr[1].string = `攻击力 + ${shopModel.attack}`;

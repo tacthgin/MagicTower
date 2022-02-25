@@ -96,15 +96,4 @@ export class Npc extends Element {
     clearEvent() {
         this._npcInfo.eventTalk = null;
     }
-
-    static parse(propertiesInfo: any, tiles: number[] | null = null, parseGidFn: Function | null = null): any {
-        let npcInfos: any = {};
-        for (let key in propertiesInfo) {
-            let npc = new Npc();
-            npc.id = parseInt(propertiesInfo[key]);
-            npc.index = parseInt(key);
-            npcInfos[key] = npc;
-        }
-        return npcInfos;
-    }
 }

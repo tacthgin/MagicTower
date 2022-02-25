@@ -1,9 +1,10 @@
-import { v2 } from "cc";
+import { IVec2, v2 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropInfo, PropType } from "../../../Model/HeroModel/Prop";
@@ -52,6 +53,19 @@ export class UsePropSystem extends SystemBase {
         GameApp.EventManager.unsubscribeTarget(this);
     }
 
+    eatProp(layerName: string, tile: IVec2, spriteFrameName: string) {
+        GameApp.SoundManager.playSound("Sound/eat");
+        let name = spriteFrameName.split("_")[0];
+        let propJson = Utility.Json.getJsonKeyCache(layerName, "spriteId", name) as any;
+        if (propJson) {
+            this.heroModel.addProp(propJson.id, this.levelData.level);
+            GameApp.CommandManager.createCommand(DisappearCommand).execute(layerName, tile);
+        } else {
+            GameFrameworkLog.error(`prop ${spriteFrameName} not exist`);
+        }
+        return true;
+    }
+
     useProp(propInfo: PropInfo, extraInfo: string) {
         switch (propInfo.type) {
             case PropType.MONSTER_HAND_BOOK:
@@ -67,7 +81,7 @@ export class UsePropSystem extends SystemBase {
                             return;
                         }
                         let stairType = extraInfo == "up" ? StairType.UP : StairType.Down;
-                        let stair = this.levelData.getLayerElement<Stair>("stair", stairType);
+                        let stair = this.levelData.getStair(stairType);
                         if (stair) {
                             this.mapModel.setLevelDiff(stair.levelDiff);
                         } else {
@@ -143,7 +157,7 @@ export class UsePropSystem extends SystemBase {
     private isHeroNextToStair(): boolean {
         let stairTypes = [StairType.UP, StairType.Down];
         for (let i = 0; i < stairTypes.length; i++) {
-            let stair = this.levelData.getLayerElement<Stair>("stair", stairTypes[i]);
+            let stair = this.levelData.getStair(stairTypes[i]);
             if (stair) {
                 let diff = Math.abs(stair.index - this.gameMap.getTileIndex(this.heroModel.getPosition()));
                 if (INDEX_DIFFS.indexOf(diff) != -1) {
@@ -242,7 +256,7 @@ export class UsePropSystem extends SystemBase {
         let isRemove = false;
         this.gameMap.forEachLayer("door", (gid, index) => {
             let door = this.levelData.getLayerElement<Door>("door", index);
-            if (door && Door.isYellow(door.id)) {
+            if (door && door.isYellow()) {
                 GameApp.CommandManager.createCommand(DisappearCommand).execute("door", index);
                 isRemove = true;
             }

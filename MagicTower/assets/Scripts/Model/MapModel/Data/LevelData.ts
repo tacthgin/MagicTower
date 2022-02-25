@@ -2,11 +2,12 @@ import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { LoadBase } from "../../../../GameFramework/Scripts/Application/Model/LoadBase";
 import { MapModel } from "../MapModel";
 import { MapAddElementEventArgs } from "../MapModelEventArgs";
-import { Door, DoorState } from "./Elements/Door";
+import { Door, DoorState, DoorType } from "./Elements/Door";
 import { Element } from "./Elements/Element";
 import { EventInfo } from "./Elements/EventInfo";
 import { Monster } from "./Elements/Monster";
 import { Npc } from "./Elements/Npc";
+import { ParserFactory } from "./Elements/ParserFactory";
 import { Stair, StairType } from "./Elements/Stair";
 
 const CLASS_MAP: any = {
@@ -20,13 +21,6 @@ const CLASS_MAP: any = {
 const DISAPPEAR_LAYER_FILTER: Readonly<string[]> = ["event"];
 
 export class LevelData extends LoadBase {
-    private static readonly _levelParsers: { [key: string]: Function } = {
-        door: Door.parse,
-        stair: Stair.parse,
-        event: EventInfo.parse,
-        npc: Npc.parse,
-        monster: Monster.parse,
-    };
     //层
     private _level: number = 0;
     /** 出现的tile */
@@ -34,7 +28,7 @@ export class LevelData extends LoadBase {
     /** 消失的tile */
     private _disappearTile: any = {};
     /** 层元素信息 */
-    private _layerInfo: any = {};
+    private _layerInfo: { [layerName: string]: any } = {};
 
     public get level() {
         return this._level;
@@ -74,19 +68,14 @@ export class LevelData extends LoadBase {
         return this;
     }
 
-    loadProperties(properties: any, data: { tiles: { [key: string]: number[] }; parseGid: Function } | null = null) {
+    loadProperties(properties: any, data: { tiles: { [key: string]: number[] }; parseGid: Function }) {
         let propertiesInfo = null;
 
         for (let layerName in properties) {
-            let func = LevelData._levelParsers[layerName];
-            if (func) {
-                propertiesInfo = properties[layerName];
-                let tilesData = data ? data.tiles[layerName] : null;
-                let praseGidFn = data ? data.parseGid : null;
-                let result = func.call(this, propertiesInfo, tilesData, praseGidFn);
-                if (result) {
-                    this._layerInfo[layerName] = result;
-                }
+            propertiesInfo = properties[layerName];
+            let result = ParserFactory.parse(layerName, propertiesInfo, data.tiles[layerName], data.parseGid);
+            if (result) {
+                this._layerInfo = result;
             }
         }
     }
@@ -130,7 +119,7 @@ export class LevelData extends LoadBase {
 
     getLayerElement<T extends Element>(layerName: string, index: number | string): T | null {
         let layerInfo = this.getLayerInfo(layerName);
-        return layerInfo ? layerInfo[index] : null;
+        return layerInfo ? layerInfo.elements[index] : null;
     }
 
     getLayerElementWithoutName(index: number | string) {
@@ -140,6 +129,20 @@ export class LevelData extends LoadBase {
                     layerName: layerName,
                     element: this._layerInfo[layerName][index] as Element,
                 };
+            }
+        }
+
+        return null;
+    }
+
+    getStair(stairType: StairType): Stair | null {
+        let layerInfo = this.getLayerInfo("stair");
+        if (layerInfo) {
+            let elements = layerInfo.elements;
+            for (let index in elements) {
+                if (elements[index].id == stairType) {
+                    return elements[index] || null;
+                }
             }
         }
 
@@ -175,9 +178,9 @@ export class LevelData extends LoadBase {
 
     /**
      * 通过消灭的怪物位置，来获取怪物守卫的门
-     * @param destoryMonsterIndex
+     * @param destoryMonsterIndex 消灭的怪物位置索引
      */
-    getMonsterDoor(destoryMonsterIndex: number): Array<Door> | null {
+    removeMonsterDoor(destoryMonsterIndex: number): Array<Door> | null {
         let layerInfo = this.getLayerInfo("door");
         if (layerInfo) {
             let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monster"];
@@ -203,9 +206,8 @@ export class LevelData extends LoadBase {
     /**
      * 添加怪物门结构
      * @param monsterDoorInfo 怪物们的数据
-     * @param getDoorIdFn 根据index获取门的id
      */
-    addMonsterDoor(monsterDoorInfo: { [doorIndexes: string]: number[] }, getDoorIdFn: (index: number) => number): void {
+    addMonsterDoor(monsterDoorInfo: { [doorIndexes: string]: number[] }): void {
         let layerInfo = this.getLayerInfo("door");
         if (!layerInfo) {
             layerInfo["door"] = {};
@@ -221,12 +223,40 @@ export class LevelData extends LoadBase {
             doorIndexes.split(",").forEach((index) => {
                 let newIndex = parseInt(index);
                 let door = new Door();
-                door.id = getDoorIdFn(newIndex);
+                door.id = DoorType.MONSTER;
                 door.index = newIndex;
                 doors.push(door);
             });
             monsterDoors.set(monsterDoorInfo[doorIndexes], doors);
         }
+    }
+
+    /**
+     * 消灭的怪物，来获取消灭怪物的事件
+     * @param destoryMonsterIndex 消灭的怪物位置索引
+     * @returns 事件ID
+     */
+    removeMonsterEvent(destoryMonsterIndex: number): number | null {
+        let layerInfo = this.getLayerInfo("monster");
+        if (layerInfo) {
+            let monsterEvents: Map<Array<number>, number> = layerInfo["monster"];
+            if (monsterEvents) {
+                let index = 0;
+                for (let pair of monsterEvents) {
+                    index = pair[0].indexOf(destoryMonsterIndex);
+                    if (index != -1) {
+                        pair[0].splice(index, 1);
+                        if (pair[0].length == 0) {
+                            monsterEvents.delete(pair[0]);
+                            return pair[1];
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     private getLayerInfo(layerName: string) {
