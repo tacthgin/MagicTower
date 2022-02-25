@@ -46,10 +46,11 @@ export class JsonUtility {
      * @param clone 是否克隆json
      * @returns json对象
      */
-    getJson(path: string, clone: boolean = false): object | null {
+    getJson<T extends object>(path: string, clone: boolean = false): T | null {
         let jsonAsset = this._resourceManger.getAsset(`${this._jsonDirPath}/${path}`, JsonAsset);
         if (jsonAsset) {
-            return clone ? this._systemUtility.clone(jsonAsset.json) || null : jsonAsset.json;
+            let json: any = clone ? this._systemUtility.clone(jsonAsset.json) : jsonAsset.json;
+            return json;
         } else {
             throw new GameFrameworkError(`can't find json ${path}`);
         }
@@ -62,10 +63,10 @@ export class JsonUtility {
      * @param clone 是否克隆json元素
      * @returns json元素
      */
-    getJsonElement(path: string, elementName: number | string, clone: boolean = false): Object | null {
-        let json = this.getJson(path);
+    getJsonElement<T extends Object>(path: string, elementName: number | string, clone: boolean = false): T | null {
+        let json = this.getJson<any>(path);
         if (json) {
-            let member = (json as any)[elementName];
+            let member = json[elementName];
             if (member) {
                 return clone ? this._systemUtility.clone(member) : member;
             }
@@ -82,11 +83,11 @@ export class JsonUtility {
      * @param value json元素的值
      * @returns json元素
      */
-    getJsonKeyCache(path: string, key: string, value: number | string): object | null {
-        let json: any = this.getJson(path);
+    getJsonKeyCache<T extends object>(path: string, key: string, value: number | string): T | null {
+        let json = this.getJson<any>(path);
         if (json) {
             let keyCache = this.internalGetJsonKeyCache(json, path, key);
-            return keyCache.get(value) || null;
+            return (keyCache.get(value) as T) || null;
         } else {
             throw new GameFrameworkError(`can't find json ${path}`);
         }
