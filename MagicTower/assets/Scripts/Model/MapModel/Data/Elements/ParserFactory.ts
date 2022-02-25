@@ -140,6 +140,8 @@ export class ParserFactory {
                             return parseInt(index);
                         });
 
+                        conditions[1] = parseInt(conditions[1]);
+
                         conditions[2] = conditions[2].map((index: string) => {
                             return parseInt(index);
                         });
