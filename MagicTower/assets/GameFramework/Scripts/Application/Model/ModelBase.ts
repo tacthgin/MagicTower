@@ -35,7 +35,7 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
      * 关闭并清理模型
      */
     shutDown() {
-        super.clear();
+        super.shutDown();
         this._eventPool.shutDown();
     }
 

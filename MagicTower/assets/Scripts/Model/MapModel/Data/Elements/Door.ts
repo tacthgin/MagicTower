@@ -39,6 +39,13 @@ export class Door extends Element {
         return this._doorState;
     }
 
+    /**
+     * 把一些被动的墙，转化为可以开的墙
+     */
+    normal() {
+        this._doorState = DoorState.NORMAL;
+    }
+
     canWallOpen() {
         return this._doorState == DoorState.NORMAL && this._id == DoorType.WALL;
     }

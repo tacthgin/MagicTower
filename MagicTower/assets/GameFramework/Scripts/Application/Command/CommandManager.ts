@@ -168,6 +168,7 @@ export class CommandManager implements ICommandManager {
     }
 
     destroySystem<T extends SystemBase>(system: T): void {
+        system.shutDown();
         this._systemPool.upspawn(system);
         this._updateSystemPool.remove(system);
     }

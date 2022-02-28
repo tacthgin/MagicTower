@@ -21,6 +21,12 @@ export class NpcInteractiveSystem extends SystemBase {
     private heroModel: HeroModel = null!;
     private levelData: LevelData = null!;
 
+    clear(): void {
+        this.npc = null!;
+        this.heroModel = null!;
+        this.levelData = null!;
+    }
+
     initliaze(npc: Npc, levelData: LevelData) {
         this.npc = npc;
         this.heroModel = GameApp.getModel(HeroModel);
@@ -115,7 +121,7 @@ export class NpcInteractiveSystem extends SystemBase {
             delay = 0.2;
             let door = this.levelData.getLayerElement<Door>("door", wallIndex);
             if (door) {
-                door.doorState = DoorState.NONE;
+                door.normal()
                 GameApp.CommandManager.createCommand(CollisionCommand).execute(wallIndex);
             }
         }
@@ -144,11 +150,5 @@ export class NpcInteractiveSystem extends SystemBase {
         if (this.npc.talkEnd()) {
             GameApp.CommandManager.createCommand(DisappearCommand).execute("npc", this.npc.index);
         }
-    }
-
-    clear(): void {
-        this.npc = null!;
-        this.heroModel = null!;
-        this.levelData = null!;
     }
 }

@@ -31,7 +31,6 @@ export class DoorSystem extends SystemBase {
     }
 
     clear(): void {
-        super.clear();
         GameApp.NodePoolManager.destroyNodePool(DoorAnimationNode);
         GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
     }

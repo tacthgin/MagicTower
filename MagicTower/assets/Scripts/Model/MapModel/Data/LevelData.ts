@@ -200,7 +200,7 @@ export class LevelData extends LoadBase {
                             if (monsterIndex == triggerIndex) {
                                 let door = this.getLayerElement<Door>("door", conditions[0]);
                                 if (door) {
-                                    door.doorState = DoorState.NORMAL;
+                                    door.normal();
                                 }
                             }
                         }
@@ -267,6 +267,11 @@ export class LevelData extends LoadBase {
         }
     }
 
+    /**
+     * 获取层数据
+     * @param layerName 层名
+     * @returns 层数据根据parsefactory返回数据为准
+     */
     private getLayerInfo(layerName: string) {
         return this._layerInfo[layerName] || null;
     }

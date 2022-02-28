@@ -1,4 +1,4 @@
-import { Tween, tween, UITransform, v2, v3, Node, UIOpacity } from "cc";
+import { Node, tween, UITransform, v2, v3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -47,6 +47,15 @@ export class MoveSystem extends SystemBase {
         this._heroModel = GameApp.getModel(HeroModel);
         GameApp.EventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
         GameApp.NodePoolManager.createNodePool(ElementNode);
+    }
+
+    clear(): void {
+        this._astarMoveType = AstarMoveType.NONE;
+        this._astar = null;
+        this._gameMap = null!;
+        this._levelData = null!;
+        GameApp.EventManager.unsubscribeTarget(this);
+        GameApp.NodePoolManager.destroyNodePool(ElementNode);
     }
 
     initliaze(gameMap: IGameMap, levelData: LevelData, hero: Hero) {
@@ -167,15 +176,6 @@ export class MoveSystem extends SystemBase {
         }
     }
 
-    clear(): void {
-        this._astarMoveType = AstarMoveType.NONE;
-        this._astar = null;
-        this._gameMap = null!;
-        this._levelData = null!;
-        GameApp.EventManager.unsubscribeTarget(this);
-        GameApp.NodePoolManager.destroyNodePool(ElementNode);
-    }
-
     private onCollisionComplete() {
         this._canHeroMoving = true;
     }
@@ -202,7 +202,12 @@ export class MoveSystem extends SystemBase {
      * @param tile tile坐标
      */
     private canEndTileMove(tile: IVec2) {
-        let { layerName, spriteName } = this._gameMap.getTileInfo(tile);
+        let tileInfo = this._gameMap.getTileInfo(tile);
+        if (!tileInfo) {
+            return true;
+        }
+        let layerName = tileInfo.layerName;
+        let spriteName = tileInfo.spriteName;
         switch (layerName) {
             case "floor":
                 if (this._levelData.level >= 40) {
@@ -233,7 +238,12 @@ export class MoveSystem extends SystemBase {
     }
 
     private check(tile: IVec2): boolean {
-        let { layerName } = this._gameMap!.getTileInfo(tile);
+        let tileInfo = this._gameMap!.getTileInfo(tile);
+        if (!tileInfo) {
+            return true;
+        }
+
+        let layerName = tileInfo.layerName;
 
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:

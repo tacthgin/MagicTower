@@ -75,7 +75,6 @@ export class MonsterFightSystem extends SystemBase {
     }
 
     clear(): void {
-        super.clear();
         this.hero = null!;
         this.monster = null!;
         this.levelData = null!;

@@ -78,7 +78,7 @@ export class ScheduleBase {
         }
     }
 
-    clear() {
+    shutDown() {
         this._scheduleHandles.forEach((scheduleInfo: ScheduleInfo) => {
             ReferencePool.release(scheduleInfo);
         });
