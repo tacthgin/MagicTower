@@ -7,6 +7,7 @@ import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/Gam
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
+import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
@@ -118,7 +119,10 @@ export class GameEventSystem extends SystemBase {
                     this.clearNpcEvent();
                     break;
                 case "weak":
-                    //this.gameMap.getElement(this.eventJson.weak[0], "monster").weak(this.eventJson.weak[1]);
+                    let monster = this.levelData.getLayerElement<Monster>("monster", this.eventJson.weak[0]);
+                    if (monster) {
+                        monster.weak(this.eventJson.weak[1]);
+                    }
                     break;
             }
         } else if (!this.eventCompleteFlag) {

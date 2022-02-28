@@ -267,6 +267,48 @@ export class LevelData extends LoadBase {
         }
     }
 
+    getWizardDamage(index: number) {
+        let layerInfo = this.getLayerInfo("monster");
+        if (layerInfo) {
+            let wizardDamages: Map<number, number[]> = layerInfo.wizardDamages;
+            if (wizardDamages.size > 0) {
+                let wizardIndexes = wizardDamages.get(index);
+                if (wizardIndexes) {
+                    let damage = 0;
+                    wizardIndexes.forEach((wizardIndex) => {
+                        let monster: Monster = layerInfo.elements[wizardIndex];
+                        if (monster && monster.monsterInfo.magicAttack) {
+                            damage += monster.monsterInfo.magicAttack;
+                        }
+                    });
+                    return { damage: damage, indexes: wizardIndexes };
+                }
+            }
+        }
+        return null;
+    }
+
+    removeWizard(index: number) {}
+
+    getMagicGuardDamage(index: number) {
+        let layerInfo = this.getLayerInfo("monster");
+        if (layerInfo) {
+            let magicGuardDamges: Map<number, number[]> = layerInfo.magicGuardDamges;
+            if (magicGuardDamges.size > 0) {
+                let magicGuardIndexes = magicGuardDamges.get(index);
+                if (magicGuardIndexes) {
+                    let damage = 0;
+                    let monster: Monster = layerInfo.elements[magicGuardIndexes[0]];
+                    if (monster && monster.monsterInfo.magicAttack) {
+                        damage += monster.monsterInfo.magicAttack;
+                    }
+                    return { damage: damage, indexes: magicGuardIndexes };
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * 获取层数据
      * @param layerName 层名

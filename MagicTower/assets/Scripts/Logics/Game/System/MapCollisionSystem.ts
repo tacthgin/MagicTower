@@ -259,100 +259,6 @@ export class MapCollisionSystem extends SystemBase {
         //}
     }
 
-    private parseDamage(info: any) {
-        //魔法警卫
-        //this.monsterInfo.magicHurt.magic = {};
-        //for (let index in info) {
-        //this.monsterInfo.magicHurt.magic[index] = info[index];
-        //}
-    }
-    /**
-     * 获取巫师周围伤害地块index
-     * @param index
-     */
-    private getMagicHurtIndexs(index: number) {
-        //let indexs = [];
-        //for (let diff in DIRECTION_INDEX_DIFFS) {
-        //let coord = this.indexToTile(index).add(DIRECTION_INDEX_DIFFS[diff]);
-        //if (this.inBoundary(coord)) {
-        //let { tileType } = this.getTileLayer(coord);
-        //if (tileType == "floor" || tileType == "door") {
-        //indexs.push(index + parseInt(diff));
-        //}
-        //}
-        //}
-        //return indexs;
-    }
-    private parseMagicHurt() {
-        //解析巫师的伤害tile
-        //let layer = this.layers["monster"];
-        //let targetIndexs = Object.keys(layer).filter((index: string) => {
-        //let magicAttack = layer[index].monsterInfo.magicAttack;
-        //if (magicAttack) {
-        //return magicAttack >= 1;
-        //}
-        //return false;
-        //});
-        //let wizard = {};
-        //if (targetIndexs.length > 0) {
-        //targetIndexs.forEach((index) => {
-        //let indexs = this.getMagicHurtIndexs(parseInt(index));
-        //indexs.forEach((hurtIndex) => {
-        //if (!wizard[hurtIndex]) {
-        //wizard[hurtIndex] = [];
-        //}
-        //wizard[hurtIndex].push(parseInt(index));
-        //});
-        //});
-        //}
-        //this.monsterInfo.magicHurt.wizard = wizard;
-    }
-
-    private removeMagicHurt(index: number, monster: Monster) {
-        //let magicHurt = monster.monsterInfo.magicAttack;
-        //if (magicHurt) {
-        //if (magicHurt < 1) {
-        //for (let tileIndex in this.monsterInfo.magicHurt.magic) {
-        //if (this.monsterInfo.magicHurt.magic[tileIndex].indexOf(index) != -1) {
-        //delete this.monsterInfo.magicHurt.magic[tileIndex];
-        //}
-        //}
-        //} else {
-        //this.parseMagicHurt();
-        //}
-        //}
-    }
-
-    haveMagicHurt(index: number) {
-        //let magic = false;
-        //if (!this.heroModel.equipedDivineShield()) {
-        //if (this.monsterInfo.magicHurt.wizard) {
-        //magic = this.monsterInfo.magicHurt.wizard[index] != undefined;
-        //}
-        //if (!magic && this.monsterInfo.magicHurt.magic) {
-        //magic = this.monsterInfo.magicHurt.magic[index] != undefined;
-        //}
-        //}
-        //return magic;
-    }
-
-    /** 获取巫师的魔法伤害 */
-    getWizardMagicDamage(index: number) {
-        let totalDamage = 0;
-        // if (!this.heroModel.equipedDivineShield()) {
-        //     // if (this.monsterInfo.magicHurt.wizard) {
-        //     //     let hurtInfo = this.monsterInfo.magicHurt.wizard[index];
-        //     //     if (hurtInfo) {
-        //     //         hurtInfo.forEach((monsterIndex) => {
-        //     //             let element = this.getElement(monsterIndex, "monster");
-        //     //             totalDamage += element.monsterInfo.magicAttack;
-        //     //         });
-        //     //     }
-        //     // }
-        // }
-        return totalDamage;
-    }
-
     private floorCollision(tile: IVec2) {
         //if (!this.heroModel.equipedDivineShield()) {
         //if (this.monsterInfo.magicHurt.magic) {
@@ -391,25 +297,5 @@ export class MapCollisionSystem extends SystemBase {
         //}
         //}
         return true;
-    }
-
-    private elementActionComplete() {
-        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-    }
-
-    getMonsters() {
-        //let layer = this.layers["monster"];
-        //let monsters = {};
-        //for (let index in layer) {
-        //let monster = layer[index];
-        //monsters[monster.monsterInfo.id] = monster;
-        //}
-        //return Object.keys(monsters)
-        //.map((id) => {
-        //return monsters[id];
-        //})
-        //.sort((l, r) => {
-        //return parseInt(l.id) - parseInt(r.id);
-        //});
     }
 }
