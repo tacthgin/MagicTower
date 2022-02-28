@@ -2,9 +2,12 @@ import { GameFrameworkError } from "../../../../../GameFramework/Scripts/Base/Ga
 import { Utility } from "../../../../../GameFramework/Scripts/Utility/Utility";
 import { Door, DoorState } from "./Door";
 import { EventInfo } from "./EventInfo";
-import { Monster } from "./Monster";
+import { Monster, MonsterInfo } from "./Monster";
 import { Npc } from "./Npc";
 import { Stair, StairType } from "./Stair";
+
+/** 4个地块偏移值 */
+const DIRECTION_INDEX_DIFFS: Readonly<Array<number>> = [-1, 1, -11, 11];
 
 export class ParserFactory {
     private static parserMap: { [layerName: string]: Function } = {
@@ -150,8 +153,12 @@ export class ParserFactory {
                     }
                     break;
                 case "monsterCondition":
-                    let conditions: any = propertiesValue.split(":");
-                    event[DoorState.MONSTER_EVENT] = conditions;
+                    {
+                        let conditions: any = propertiesValue.split(":");
+                        conditions[0] = parseInt(conditions[0]);
+                        conditions[1] = parseInt(conditions[1]);
+                        event[DoorState.MONSTER_EVENT] = conditions;
+                    }
                     break;
                 default:
                     {
@@ -178,6 +185,8 @@ export class ParserFactory {
     private static parseMonster(propertiesInfo: any, tiles: number[], parseGidFn: Function) {
         let monsters: { [index: number | string]: Monster } = {};
 
+        let wizardDamages: Map<number, number[]> = new Map<number, number[]>();
+        let magicGuards: any = {};
         for (let i = 0; i < tiles.length; i++) {
             if (tiles[i] == 0) {
                 continue;
@@ -185,14 +194,46 @@ export class ParserFactory {
             let name = parseGidFn(tiles[i]);
             if (name) {
                 name = name.split("_")[0];
-                let monsterJson = Utility.Json.getJsonKeyCache<any>("monster", "spriteId", name);
+                let monsterJson = Utility.Json.getJsonKeyCache<MonsterInfo>("monster", "spriteId", name);
                 if (monsterJson) {
                     let monster = new Monster();
                     monster.gid = tiles[i];
                     monster.id = parseInt(monsterJson.id);
                     monster.index = i;
                     monsters[i] = monster;
+                    if (monster.isWizard()) {
+                        //采集巫师伤害
+                        DIRECTION_INDEX_DIFFS.forEach((diff) => {
+                            let damageIndex = diff + i;
+                            let monsterindexes = wizardDamages.get(damageIndex);
+                            if (!monsterindexes) {
+                                monsterindexes = [];
+                                wizardDamages.set(damageIndex, monsterindexes);
+                            }
+                            monsterindexes.push(monster.index);
+                        });
+                    } else if (monster.isMagicGuard()) {
+                        magicGuards[monster.index] = Monster;
+                    }
                 }
+            }
+        }
+
+        let magicGuardDamges: Map<number, number[]> = new Map<number, number[]>();
+        //采集魔法警卫伤害
+        for (let index in magicGuards) {
+            let hasDamage = false;
+            DIRECTION_INDEX_DIFFS.forEach((diff) => {
+                let currentIndex = parseInt(index);
+                let monsterIndex = currentIndex + diff * 2;
+                if (magicGuards[monsterIndex]) {
+                    magicGuardDamges.set(currentIndex + diff, [currentIndex, monsterIndex]);
+                    hasDamage = true;
+                }
+            });
+
+            if (hasDamage) {
+                delete magicGuards[index];
             }
         }
 
@@ -238,7 +279,7 @@ export class ParserFactory {
                     break;
             }
         }
-        return { elements: monsters, event: event };
+        return { elements: monsters, event: event, wizardDamages: wizardDamages, magicGuardDamges: magicGuardDamges };
     }
 
     private static parseNpc(propertiesInfo: any, tiles: number[], parseGidFn: Function): any {

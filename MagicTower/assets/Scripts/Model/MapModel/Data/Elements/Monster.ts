@@ -20,6 +20,7 @@ export interface MonsterInfo {
     spriteId: number;
     firstAttack: boolean;
     extraDamage: number | null;
+    eventId: number | null;
 }
 
 export class Monster extends Element {
@@ -55,7 +56,7 @@ export class Monster extends Element {
     }
 
     get boss(): boolean {
-        return this._monsterInfo!.boss;
+        return this._monsterInfo.boss;
     }
 
     hurt(damage: number) {
@@ -74,5 +75,13 @@ export class Monster extends Element {
 
     clear(): void {
         this._monsterInfo = null!;
+    }
+
+    isWizard(): boolean {
+        return this._id == MonsterType.JUNIOR_WIZARD || this._id == MonsterType.SENIOR_WIZARD;
+    }
+
+    isMagicGuard(): boolean {
+        return this._id == MonsterType.MAGIC_GUARD;
     }
 }

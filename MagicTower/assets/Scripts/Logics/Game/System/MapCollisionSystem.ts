@@ -1,5 +1,3 @@
-import { v2, Vec2 } from "cc";
-import { startup } from "../../../../../@types/editor/i18n/languages/en";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -30,14 +28,6 @@ import { MonsterFightSystem } from "./MonsterFightSystem";
 import { MoveSystem } from "./MoveSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
 import { UsePropSystem } from "./UsePropSystem";
-
-/** 地块4个方向 */
-const DIRECTION_INDEX_DIFFS: Readonly<{ [key: string]: Vec2 }> = {
-    "-1": v2(1, 0),
-    "1": v2(-1, 0),
-    "-11": v2(0, -1),
-    "11": v2(0, 1),
-};
 
 @CommandManager.register("MapCollisionSystem")
 export class MapCollisionSystem extends SystemBase {
@@ -101,14 +91,14 @@ export class MapCollisionSystem extends SystemBase {
                 case "door": {
                     let door = layerInfo.element as Door;
                     if (!door.hide) {
-                        return this.doorSystem.doorCollision(layerInfo.layerName, door);
+                        return this.doorSystem.doorCollision(door);
                     } else {
                         return true;
                     }
                 }
                 case "monster":
                     this.monsterFightSystem.initliaze(this.hero, layerInfo.element as Monster, this.levelData);
-                    return this.monsterFightSystem.execute(/*this.haveMagicHurt(index)*/ false);
+                    return this.monsterFightSystem.execute();
                 case "stair":
                     {
                         let stair = layerInfo.element as Stair;
@@ -158,25 +148,12 @@ export class MapCollisionSystem extends SystemBase {
 
     private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
         this.elementActionComplete();
-        //this.removeMonsterDoor();
-        //this.monsterEventTrigger(index);
         //this.removeMagicHurt(index, monster);
         // if (monster.monsterInfo.big) {
         //     this.monsterInfo.bigMonster = null;
         // }
-        // if (this.doorInfo.monsterCondition) {
-        //     let doorIndex = this.doorInfo.monsterCondition[index];
-        //     if (doorIndex) {
-        //         let door = this.getElement(doorIndex, "door");
-        //         if (door) {
-        //             door.condition = null;
-        //         }
-        //     }
-        //     delete this.doorInfo.monsterCondition[index];
-        // }
-        // if (monster.monsterInfo.eventID) {
-        //     this.eventCollision(monster.monsterInfo.eventID);
-        // } else if (this.gameEventSystem && !this.gameEventSystem.executeComplete()) {
+
+        //if (this.gameEventSystem && !this.gameEventSystem.executeComplete()) {
         //     this.gameEventSystem.execute();
         // } else if (magic) {
         //     this.floorCollision(index);
@@ -346,24 +323,6 @@ export class MapCollisionSystem extends SystemBase {
         //}
     }
 
-    private disappearDoorEventTrigger(index: number) {
-        //for (let eventID in this.doorInfo.disappearEventDoor) {
-        //let info = this.doorInfo.disappearEventDoor[eventID];
-        //if (info.condition.indexOf(index) != -1) {
-        //delete this.doorInfo.disappearEventDoor[eventID];
-        //} else {
-        //let disappearIndex = info.tile.indexOf(index);
-        //if (disappearIndex != -1) {
-        //info.tile.splice(disappearIndex, 1);
-        //if (info.tile.length == 0) {
-        //delete this.doorInfo.disappearEventDoor[eventID];
-        //this.eventCollision(eventID);
-        //}
-        //}
-        //}
-        //}
-    }
-
     haveMagicHurt(index: number) {
         //let magic = false;
         //if (!this.heroModel.equipedDivineShield()) {
@@ -395,10 +354,6 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private floorCollision(tile: IVec2) {
-        if (!this.doorSystem.invisibleDoorCollision(tile)) {
-            return false;
-        }
-
         //if (!this.heroModel.equipedDivineShield()) {
         //if (this.monsterInfo.magicHurt.magic) {
         //如果通过魔法守卫中间

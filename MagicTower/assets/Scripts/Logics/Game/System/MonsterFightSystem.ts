@@ -5,9 +5,12 @@ import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFa
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
+import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { DoorOpenEventArgs } from "../../Event/DoorOpenEventArgs";
+import { GameEvent } from "../../Event/GameEvent";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
@@ -28,11 +31,7 @@ export class MonsterFightSystem extends SystemBase {
         this.levelData = levelData;
     }
 
-    /**
-     * 执行事件
-     * @param magic 是否后续还有魔法伤害
-     */
-    execute(magic: boolean) {
+    execute() {
         if (!this.hero || !this.monster) {
             throw new GameFrameworkError("you must initliaze monster fight system");
         }
@@ -88,16 +87,17 @@ export class MonsterFightSystem extends SystemBase {
 
         GameApp.CommandManager.createCommand(DisappearCommand).execute("monster", monster.index);
 
-        let doors = this.levelData.removeMonsterDoor(monster.index);
+        let doors = this.levelData.triggerMonsterDoor(monster.index);
         if (doors) {
             GameApp.EventManager.fireNow(this, DoorOpenEventArgs.create(doors));
         }
 
-        let eventId = this.levelData.removeMonsterEvent(monster.index);
-        if (eventId) {
-            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
-        }
+        this.levelData.triggerDoorEvent(DoorState.MONSTER_EVENT, monster.index);
 
-        // GameApp.EventManager.fireNow(this, MonsterDieEventArgs.create(this.monster, magic));
+        if (monster.monsterInfo.eventId) {
+            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(monster.monsterInfo.eventId);
+        } else {
+            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+        }
     }
 }

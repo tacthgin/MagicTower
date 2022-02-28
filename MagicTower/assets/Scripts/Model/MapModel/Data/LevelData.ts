@@ -153,39 +153,23 @@ export class LevelData extends LoadBase {
         return this.getLayerInfo("door") != null;
     }
 
-    getDoorInfo(doorState: DoorState, index: number = -1): Door | null {
-        switch (doorState) {
-            case DoorState.NONE:
-            case DoorState.PASSIVE:
-                if (index !== -1) {
-                    return this.getLayerElement("door", index);
-                }
-                break;
-            case DoorState.APPEAR_EVENT:
-            case DoorState.DISAPPEAR_EVENT: {
-                let layerInfo = this.getLayerInfo("door");
-                if (layerInfo) {
-                    let doorInfo = layerInfo["event"];
-                    if (doorInfo && doorInfo.doorState == doorState) {
-                        return doorInfo;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    triggerDoorEvent(removeDoorIndex: number) {
+    /**
+     * 触发门事件
+     * @param doorState 门事件的状态类型
+     * @param triggerIndex 触发事件的地块索引
+     * @returns 事件id
+     */
+    triggerDoorEvent(doorState: DoorState, triggerIndex: number): number | null {
         let layerInfo = this.getLayerInfo("door");
         if (layerInfo && layerInfo.event) {
-            for (let type in layerInfo.event) {
-                switch (parseInt(type)) {
+            let eventInfo = layerInfo.event[doorState];
+            if (eventInfo) {
+                switch (doorState) {
                     case DoorState.APPEAR_EVENT:
                         {
-                            let map: Map<Array<number>, number> = layerInfo.event[type];
+                            let map: Map<Array<number>, number> = eventInfo;
                             for (let pair of map) {
-                                let index = pair[0].indexOf(removeDoorIndex);
+                                let index = pair[0].indexOf(triggerIndex);
                                 if (index != -1) {
                                     pair[0].splice(index, 1);
                                     if (pair[0].length == 0) {
@@ -194,21 +178,45 @@ export class LevelData extends LoadBase {
                                 }
                             }
                         }
-                        
                         break;
                     case DoorState.DISAPPEAR_EVENT:
-                        let conditions = 
+                        let conditions = eventInfo;
+                        if (conditions[0].indexOf(triggerIndex) != -1) {
+                            delete layerInfo.event[doorState];
+                        } else {
+                            let index = conditions[2].indexOf(triggerIndex);
+                            if (index != -1) {
+                                conditions[2].splice(index, 1);
+                                if (conditions[2].length == 0) {
+                                    return conditions[1];
+                                }
+                            }
+                        }
+                        break;
+                    case DoorState.MONSTER_EVENT:
+                        {
+                            let conditions = eventInfo;
+                            let monsterIndex = conditions[1];
+                            if (monsterIndex == triggerIndex) {
+                                let door = this.getLayerElement<Door>("door", conditions[0]);
+                                if (door) {
+                                    door.doorState = DoorState.NORMAL;
+                                }
+                            }
+                        }
                         break;
                 }
             }
         }
+
+        return null;
     }
 
     /**
      * 通过消灭的怪物位置，来获取怪物守卫的门
      * @param destoryMonsterIndex 消灭的怪物位置索引
      */
-    removeMonsterDoor(destoryMonsterIndex: number): Array<Door> | null {
+    triggerMonsterDoor(destoryMonsterIndex: number): Array<Door> | null {
         let layerInfo = this.getLayerInfo("door");
         if (layerInfo) {
             let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monster"];
@@ -243,7 +251,7 @@ export class LevelData extends LoadBase {
 
         let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monster"];
         if (!monsterDoors) {
-            monsterDoors = new Map<Array<number>, Array<Door>>();
+            layerInfo["monster"] = monsterDoors = new Map<Array<number>, Array<Door>>();
         }
 
         for (let doorIndexes in monsterDoorInfo) {
@@ -257,34 +265,6 @@ export class LevelData extends LoadBase {
             });
             monsterDoors.set(monsterDoorInfo[doorIndexes], doors);
         }
-    }
-
-    /**
-     * 消灭的怪物，来获取消灭怪物的事件
-     * @param destoryMonsterIndex 消灭的怪物位置索引
-     * @returns 事件ID
-     */
-    removeMonsterEvent(destoryMonsterIndex: number): number | null {
-        let layerInfo = this.getLayerInfo("monster");
-        if (layerInfo) {
-            let monsterEvents: Map<Array<number>, number> = layerInfo["monster"];
-            if (monsterEvents) {
-                let index = 0;
-                for (let pair of monsterEvents) {
-                    index = pair[0].indexOf(destoryMonsterIndex);
-                    if (index != -1) {
-                        pair[0].splice(index, 1);
-                        if (pair[0].length == 0) {
-                            monsterEvents.delete(pair[0]);
-                            return pair[1];
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 
     private getLayerInfo(layerName: string) {
