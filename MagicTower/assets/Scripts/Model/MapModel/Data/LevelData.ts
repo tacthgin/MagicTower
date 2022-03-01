@@ -7,7 +7,7 @@ import { Element } from "./Elements/Element";
 import { EventInfo } from "./Elements/EventInfo";
 import { Monster } from "./Elements/Monster";
 import { Npc } from "./Elements/Npc";
-import { ParserFactory } from "./Elements/ParserFactory";
+import { DIRECTION_INDEX_DIFFS, ParserFactory } from "./Elements/ParserFactory";
 import { Stair, StairType } from "./Elements/Stair";
 
 const CLASS_MAP: any = {
@@ -19,6 +19,8 @@ const CLASS_MAP: any = {
 };
 
 const DISAPPEAR_LAYER_FILTER: Readonly<string[]> = ["event"];
+
+export const MAGIC_DAMAGE_LEVEL: number = 40;
 
 export class LevelData extends LoadBase {
     //层
@@ -110,11 +112,6 @@ export class LevelData extends LoadBase {
         tiles[dst] = gid;
 
         this.moveLayerElement(layerName, src, dst);
-    }
-
-    canHeroMove(index: number) {
-        //if ((this.monsterInfo.bigMonster && this.monsterInfo.bigMonster.indexOf(index) != -1) || this.hero.HeroModel.Hp <= this.getWizardMagicDamage(index)) return false;
-        return true;
     }
 
     getLayerElement<T extends Element>(layerName: string, index: number | string): T | null {
@@ -288,8 +285,6 @@ export class LevelData extends LoadBase {
         return null;
     }
 
-    removeWizard(index: number) {}
-
     getMagicGuardDamage(index: number) {
         let layerInfo = this.getLayerInfo("monster");
         if (layerInfo) {
@@ -307,6 +302,19 @@ export class LevelData extends LoadBase {
             }
         }
         return null;
+    }
+
+    /**
+     * 是否在大怪物的范围
+     * @param index 需要行走地块的索引
+     * @returns 是否在大怪物的范围
+     */
+    inBigMonster(index: number): boolean {
+        let layerInfo = this.getLayerInfo("monster");
+        if (layerInfo && layerInfo.bigMonster) {
+            return layerInfo.bigMonster[index];
+        }
+        return false;
     }
 
     /**
@@ -339,11 +347,39 @@ export class LevelData extends LoadBase {
     private deleteLayerElement(layerName: string, index: number) {
         let layerInfo = this.getLayerInfo(layerName);
         if (layerInfo && layerInfo[index]) {
+            if (layerName == "monster") {
+                this.removeWizardOrMagicGuards(layerInfo[index]);
+            }
             delete layerInfo[index];
         }
     }
 
-    getWizardMagicDamage(index: number): number {
-        return 0;
+    private removeWizardOrMagicGuards(monster: Monster) {
+        let layerInfo = this.getLayerInfo("monster");
+        if (monster.isWizard()) {
+            let damages = layerInfo.wizardDamages;
+            DIRECTION_INDEX_DIFFS.forEach((offset) => {
+                let damageIndex = offset + monster.index;
+                let monsterIndexes = damages.get(damageIndex);
+                if (monsterIndexes) {
+                    let monsterIndex = monsterIndexes.indexOf(monster.index);
+                    if (monsterIndex != -1) {
+                        monsterIndexes.splice(monsterIndex, 1);
+                        if (monsterIndexes.length == 0) {
+                            damages.delete(damageIndex);
+                        }
+                    }
+                }
+            });
+        } else if (monster.isMagicGuard()) {
+            let damages = layerInfo.magicGuardDamges;
+            DIRECTION_INDEX_DIFFS.forEach((offset) => {
+                let damageIndex = offset + monster.index;
+                let monsterIndexes = damages.get(damageIndex);
+                if (monsterIndexes && monsterIndexes.indexOf(monster.index) != -1) {
+                    damages.delete(damageIndex);
+                }
+            });
+        }
     }
 }

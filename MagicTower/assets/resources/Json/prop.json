@@ -7,8 +7,7 @@
     "value": 1001,
     "desc": "打开黄色的门。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "2": {
     "id": "2",
@@ -18,8 +17,7 @@
     "value": 1002,
     "desc": "打开蓝色的门。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "3": {
     "id": "3",
@@ -29,8 +27,7 @@
     "value": 1003,
     "desc": "打开红色的门。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "4": {
     "id": "4",
@@ -40,8 +37,7 @@
     "value": 50,
     "desc": "恢复50*level血量。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "5": {
     "id": "5",
@@ -51,8 +47,7 @@
     "value": 200,
     "desc": "恢复200*level血量。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "6": {
     "id": "6",
@@ -62,8 +57,7 @@
     "value": 1,
     "desc": "提升1*level攻击力。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "7": {
     "id": "7",
@@ -73,8 +67,7 @@
     "value": 1,
     "desc": "提升1*level防御力。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "8": {
     "id": "8",
@@ -84,8 +77,7 @@
     "value": 10,
     "desc": "攻击+10。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "9": {
     "id": "9",
@@ -95,8 +87,7 @@
     "value": 20,
     "desc": "攻击+20。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "10": {
     "id": "10",
@@ -106,8 +97,7 @@
     "value": 40,
     "desc": "攻击+40。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "11": {
     "id": "11",
@@ -117,8 +107,7 @@
     "value": 50,
     "desc": "攻击+50。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "12": {
     "id": "12",
@@ -128,8 +117,7 @@
     "value": 100,
     "desc": "攻击+100。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "13": {
     "id": "13",
@@ -139,8 +127,7 @@
     "value": 10,
     "desc": "防御+10。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "14": {
     "id": "14",
@@ -150,8 +137,7 @@
     "value": 20,
     "desc": "防御+20。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "15": {
     "id": "15",
@@ -161,8 +147,7 @@
     "value": 40,
     "desc": "防御+40。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "16": {
     "id": "16",
@@ -172,8 +157,7 @@
     "value": 50,
     "desc": "防御+50。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "17": {
     "id": "17",
@@ -183,8 +167,7 @@
     "value": 100,
     "desc": "防御+100。",
     "other": null,
-    "consumption": true,
-    "permanent": false
+    "consumption": true
   },
   "18": {
     "id": "18",
@@ -194,8 +177,7 @@
     "value": 0,
     "desc": "查看怪物能力、伤害，无限使用。",
     "other": null,
-    "consumption": false,
-    "permanent": true
+    "consumption": false
   },
   "19": {
     "id": "19",
@@ -205,8 +187,7 @@
     "value": 0,
     "desc": "记录对话，无限使用。",
     "other": null,
-    "consumption": false,
-    "permanent": true
+    "consumption": false
   },
   "20": {
     "id": "20",
@@ -216,8 +197,7 @@
     "value": 0,
     "desc": "在楼梯旁边才有效，可以在已经去过的楼层间进行楼层跳跃，不能去44楼。无限使用。",
     "other": null,
-    "consumption": false,
-    "permanent": true
+    "consumption": false
   },
   "21": {
     "id": "21",
@@ -227,8 +207,7 @@
     "value": 0,
     "desc": "消除周围墙壁，一次性使用。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "22": {
     "id": "22",
@@ -238,8 +217,7 @@
     "value": 0,
     "desc": "摧毁一层楼所有墙，一次性使用。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "23": {
     "id": "23",
@@ -249,8 +227,7 @@
     "value": 0,
     "desc": "将熔岩冻为平地，无限使用。",
     "other": null,
-    "consumption": false,
-    "permanent": true
+    "consumption": false
   },
   "24": {
     "id": "24",
@@ -260,8 +237,7 @@
     "value": 0,
     "desc": "炸毁周围敌人，对头目无效。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "25": {
     "id": "25",
@@ -271,8 +247,7 @@
     "value": 0,
     "desc": "打开一层楼全部黄门。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "26": {
     "id": "26",
@@ -282,8 +257,7 @@
     "value": 0,
     "desc": "按攻击力、防御力增加生命值，一次性使用。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "27": {
     "id": "27",
@@ -293,8 +267,7 @@
     "value": 2,
     "desc": "打败敌人获得双倍金钱。",
     "other": null,
-    "consumption": false,
-    "permanent": true
+    "consumption": false
   },
   "28": {
     "id": "28",
@@ -304,8 +277,7 @@
     "value": 2,
     "desc": "和兽人、兽人武士、吸血鬼战斗攻击力倍增。",
     "other": null,
-    "consumption": false,
-    "permanent": true
+    "consumption": false
   },
   "29": {
     "id": "29",
@@ -315,8 +287,7 @@
     "value": 2,
     "desc": "和魔龙战斗攻击力倍增。",
     "other": null,
-    "consumption": false,
-    "permanent": true
+    "consumption": false
   },
   "30": {
     "id": "30",
@@ -326,8 +297,7 @@
     "value": 1,
     "desc": "去上一层楼。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "31": {
     "id": "31",
@@ -337,8 +307,7 @@
     "value": -1,
     "desc": "去下一层楼。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   },
   "32": {
     "id": "32",
@@ -348,7 +317,6 @@
     "value": 0,
     "desc": "飞到该层楼中心对称的位置，此位置必须是空地。限3次使用。",
     "other": null,
-    "consumption": false,
-    "permanent": false
+    "consumption": false
   }
 }

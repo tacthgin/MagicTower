@@ -37,7 +37,6 @@
         103
       ]
     },
-    "weak": null,
     "sceneDisappear": true,
     "sceneAppear": [
       2,
@@ -121,7 +120,6 @@
       ]
     },
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -236,7 +234,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -264,7 +261,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -354,7 +350,6 @@
     "do": 104,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -416,7 +411,6 @@
       ]
     },
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -483,7 +477,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -559,7 +552,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -576,7 +568,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -613,7 +604,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -653,7 +643,6 @@
     "do": 104,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -725,7 +714,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -785,7 +773,6 @@
       ]
     },
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -827,7 +814,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -881,7 +867,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -905,7 +890,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -949,7 +933,6 @@
     "do": 71,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -1176,7 +1159,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -1294,7 +1276,6 @@
       },
       {
         "monster": [
-          82,
           71,
           81,
           83,
@@ -1312,11 +1293,10 @@
     "beAttack": {
       "monster": 82
     },
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
-      "disappear",
+      "disapear",
       "chat",
       "move",
       "appear",
@@ -1326,7 +1306,7 @@
       "appear",
       "chat",
       "beAttack",
-      "disappear",
+      "disapear",
       "chat",
       "disappear"
     ],
@@ -1392,17 +1372,10 @@
     "save": null,
     "clearNpcEvent": null,
     "show": null,
-    "disappear": [
-      {
-        "event": [
-          60
-        ]
-      }
-    ],
+    "disappear": null,
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -1421,7 +1394,7 @@
             ]
           ]
         },
-        "interval": 0,
+        "interval": null,
         "delay": null
       },
       {
@@ -1478,16 +1451,9 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": [
-      27,
-      0.1
-    ],
     "sceneDisappear": null,
     "sceneAppear": null,
-    "step": [
-      "chat",
-      "weak"
-    ]
+    "step": null
   },
   "22": {
     "id": "22",
@@ -1497,24 +1463,13 @@
     "save": null,
     "clearNpcEvent": null,
     "show": null,
-    "disappear": [
-      {
-        "monster": [
-          15,
-          17,
-          37,
-          39
-        ]
-      }
-    ],
+    "disappear": null,
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
-      "disappear",
       "appear",
       "chat"
     ],
@@ -1591,7 +1546,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -1609,7 +1563,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -1670,7 +1623,6 @@
     "do": null,
     "monsterDoor": null,
     "beAttack": null,
-    "weak": null,
     "sceneDisappear": null,
     "sceneAppear": null,
     "step": [
@@ -1689,59 +1641,6 @@
           ]
         },
         "interval": 0.5,
-        "delay": null
-      }
-    ]
-  },
-  "26": {
-    "id": "26",
-    "chat": null,
-    "save": null,
-    "clearNpcEvent": null,
-    "show": null,
-    "disappear": [
-      {
-        "wall": [
-          70,
-          72
-        ]
-      }
-    ],
-    "do": null,
-    "monsterDoor": null,
-    "beAttack": null,
-    "weak": null,
-    "sceneDisappear": null,
-    "sceneAppear": null,
-    "step": [
-      "disappear",
-      "appear"
-    ],
-    "appear": [
-      {
-        "layer": {
-          "prop": [
-            [
-              49,
-              31
-            ]
-          ],
-          "wall": [
-            [
-              59,
-              "door1006_0"
-            ],
-            [
-              60,
-              "door1006_0"
-            ],
-            [
-              61,
-              "door1006_0"
-            ]
-          ]
-        },
-        "interval": 0,
         "delay": null
       }
     ]

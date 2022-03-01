@@ -147,12 +147,10 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
-        this.elementActionComplete();
         //this.removeMagicHurt(index, monster);
         // if (monster.monsterInfo.big) {
         //     this.monsterInfo.bigMonster = null;
         // }
-
         //if (this.gameEventSystem && !this.gameEventSystem.executeComplete()) {
         //     this.gameEventSystem.execute();
         // } else if (magic) {

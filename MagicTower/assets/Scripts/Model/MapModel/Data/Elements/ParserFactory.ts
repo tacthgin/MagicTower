@@ -7,7 +7,7 @@ import { Npc } from "./Npc";
 import { Stair, StairType } from "./Stair";
 
 /** 4个地块偏移值 */
-const DIRECTION_INDEX_DIFFS: Readonly<Array<number>> = [-1, 1, -11, 11];
+export const DIRECTION_INDEX_DIFFS: Readonly<Array<number>> = [-1, 1, -11, 11];
 
 export class ParserFactory {
     private static parserMap: { [layerName: string]: Function } = {
@@ -187,6 +187,7 @@ export class ParserFactory {
 
         let wizardDamages: Map<number, number[]> = new Map<number, number[]>();
         let magicGuards: any = {};
+        let bigMonster: { [index: number | string]: boolean } | null = null;
         for (let i = 0; i < tiles.length; i++) {
             if (tiles[i] == 0) {
                 continue;
@@ -201,6 +202,7 @@ export class ParserFactory {
                     monster.id = parseInt(monsterJson.id);
                     monster.index = i;
                     monsters[i] = monster;
+
                     if (monster.isWizard()) {
                         //采集巫师伤害
                         DIRECTION_INDEX_DIFFS.forEach((diff) => {
@@ -214,6 +216,12 @@ export class ParserFactory {
                         });
                     } else if (monster.isMagicGuard()) {
                         magicGuards[monster.index] = Monster;
+                    } else if (monster.monsterInfo.big) {
+                        bigMonster = {};
+                        let monsterIndex = i + 1;
+                        monster.monsterInfo.big.forEach((offset) => {
+                            bigMonster![monsterIndex + offset] = true;
+                        });
                     }
                 }
             }
@@ -279,7 +287,7 @@ export class ParserFactory {
                     break;
             }
         }
-        return { elements: monsters, event: event, wizardDamages: wizardDamages, magicGuardDamges: magicGuardDamges };
+        return { elements: monsters, event: event, wizardDamages: wizardDamages, magicGuardDamges: magicGuardDamges, bigMonster: bigMonster };
     }
 
     private static parseNpc(propertiesInfo: any, tiles: number[], parseGidFn: Function): any {

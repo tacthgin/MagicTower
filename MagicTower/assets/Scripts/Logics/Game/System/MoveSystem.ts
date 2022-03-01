@@ -11,8 +11,8 @@ import { IAstar } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAsta
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
-import { MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
-import { LevelData } from "../../../Model/MapModel/Data/LevelData";
+import { Monster, MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
+import { LevelData, MAGIC_DAMAGE_LEVEL } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { ElementNode } from "../Elements/ElementNode";
@@ -31,6 +31,8 @@ const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
     monster: AstarMoveType.MONSTER,
 };
 
+const CAN_MOVE_TILES: Readonly<string[]> = ["prop", "stair"];
+
 @CommandManager.register("MoveSystem")
 export class MoveSystem extends SystemBase {
     private _astarMoveType: AstarMoveType = AstarMoveType.NONE;
@@ -41,7 +43,6 @@ export class MoveSystem extends SystemBase {
     private _heroModel: HeroModel = null!;
     private _hero: Hero = null!;
     private _canHeroMoving: boolean = true;
-    private static canEndMoveTiles: Readonly<string[]> = ["prop", "stair"];
 
     awake(): void {
         this._heroModel = GameApp.getModel(HeroModel);
@@ -80,7 +81,7 @@ export class MoveSystem extends SystemBase {
             let path = this.getPath(this._hero.heroTile, endTile);
             if (path.length > 0) {
                 this._canHeroMoving = false;
-                let canEndMove = this.canEndTileMove(endTile);
+                let canEndMove = this.canMoveTile(endTile);
                 if (!canEndMove) {
                     path.pop();
                 }
@@ -201,40 +202,55 @@ export class MoveSystem extends SystemBase {
      * 是否终点tile可以移动
      * @param tile tile坐标
      */
-    private canEndTileMove(tile: IVec2) {
+    private canMoveTile(tile: IVec2) {
         let tileInfo = this._gameMap.getTileInfo(tile);
         if (!tileInfo) {
             return true;
         }
         let layerName = tileInfo.layerName;
-        let spriteName = tileInfo.spriteName;
+        let index = this._gameMap.getTileIndex(tile);
         switch (layerName) {
             case "floor":
-                if (this._levelData.level >= 40) {
-                    return this._heroModel.getAttr(HeroAttr.HP) > this.getWizardMagicDamage(this._gameMap.getTileIndex(tile));
-                }
-                return true;
-            case "monster":
-                if (spriteName) {
-                    let name = spriteName.split("_")[0];
-                    let monsterInfo = Utility.Json.getJsonKeyCache(layerName, "spriteId", name) as MonsterInfo;
-                    if (monsterInfo) {
-                        return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
+                return this.canHeroMove(index);
+            case "monster": {
+                let monster = this._levelData.getLayerElement<Monster>(layerName, index);
+                if (monster) {
+                    let monsterInfo = monster.monsterInfo;
+                    if (monsterInfo.big) {
+                        //如果是大个怪物，那么碰到的是左下角怪物身体，不能走
+                        return false;
                     } else {
-                        return true;
+                        return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
                     }
                 } else {
                     throw new GameFrameworkError("move to monster invailid");
                 }
+            }
         }
-        return MoveSystem.canEndMoveTiles.includes(layerName!);
+        return CAN_MOVE_TILES.includes(layerName);
     }
 
-    private getWizardMagicDamage(index: number): number {
-        if (this._heroModel.equipedDivineShield()) {
-            return 0;
+    private canPassWizard(index: number): boolean {
+        if (this._levelData.level >= MAGIC_DAMAGE_LEVEL && !this._heroModel.equipedDivineShield()) {
+            let wizardDamage = this._levelData.getWizardDamage(index);
+            if (wizardDamage) {
+                return this._heroModel.getAttr(HeroAttr.HP) > wizardDamage.damage;
+            }
         }
-        return this._levelData.getWizardMagicDamage(index);
+
+        return true;
+    }
+
+    private canHeroMove(index: number): boolean {
+        if (!this.canPassWizard(index)) {
+            return false;
+        }
+
+        if (this._levelData.inBigMonster(index)) {
+            return false;
+        }
+
+        return true;
     }
 
     private check(tile: IVec2): boolean {
@@ -248,11 +264,11 @@ export class MoveSystem extends SystemBase {
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
-                    if (!this._levelData?.canHeroMove(this._gameMap!.getTileIndex(tile))) return false;
+                    if (!this.canHeroMove(this._gameMap!.getTileIndex(tile))) return false;
 
                     if (tile.x != this._endTile.x || tile.y != this._endTile.y) {
                         //中途过程遇到事件也可以走
-                        return layerName == "floor" || layerName == "event" || layerName == "prop";
+                        return layerName == "floor" || layerName == "prop";
                     }
                 }
                 break;

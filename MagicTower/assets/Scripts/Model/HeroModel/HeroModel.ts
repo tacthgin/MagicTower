@@ -18,7 +18,7 @@ type TalkInfo = {
 
 @ModelContainer.registerModel("HeroModel")
 export class HeroModel extends ModelBase {
-    private heroAttr: HeroAttr[] = null!;
+    private heroAttr: number[] = null!;
     private position: IVec2 = null!;
     private direction: number = 0;
     private records: TalkInfo[] = null!;

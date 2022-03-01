@@ -22,6 +22,7 @@ export interface MonsterInfo {
     extraDamage: number | null;
     eventId: number | null;
     magicAttack: number | null;
+    big: number[] | null;
 }
 
 export class Monster extends Element {
