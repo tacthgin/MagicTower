@@ -68,6 +68,8 @@ export class DoorSystem extends SystemBase {
                         GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
                     }
                 });
+            } else {
+                return true;
             }
         } else if (doorInfo.canWallOpen()) {
             //可以开的墙门

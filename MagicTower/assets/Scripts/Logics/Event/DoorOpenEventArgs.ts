@@ -5,10 +5,9 @@ import { GameEvent } from "./GameEvent";
 
 export class DoorOpenEventArgs extends GameEventArgs {
     private _doors: Door[] = null!;
-    private _extraInfo: string = null!;
 
     get id(): number {
-        return GameEvent.USE_PROP;
+        return GameEvent.OPEN_DOOR;
     }
 
     get doors(): Door[] {

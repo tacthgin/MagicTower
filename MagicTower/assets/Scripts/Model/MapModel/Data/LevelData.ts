@@ -216,7 +216,7 @@ export class LevelData extends LoadBase {
     triggerMonsterDoor(destoryMonsterIndex: number): Array<Door> | null {
         let layerInfo = this.getLayerInfo("door");
         if (layerInfo) {
-            let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monster"];
+            let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monsterDoors"];
             if (monsterDoors) {
                 let index = 0;
                 for (let pair of monsterDoors) {
@@ -359,13 +359,18 @@ export class LevelData extends LoadBase {
         }
     }
 
+    /**
+     * 删除层元素
+     * @param layerName 层名
+     * @param index 元素地块索引
+     */
     private deleteLayerElement(layerName: string, index: number) {
         let layerInfo = this.getLayerInfo(layerName);
         if (layerInfo) {
             let element = layerInfo.elements[index];
             if (element) {
                 if (layerName == "monster") {
-                    this.removeWizardOrMagicGuards(layerInfo[index]);
+                    this.removeWizardOrMagicGuards(element);
                 }
                 delete layerInfo.elements[index];
             } else if (layerName == "monster" && layerInfo.bigMonster) {

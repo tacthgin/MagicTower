@@ -255,16 +255,24 @@ export class MoveSystem extends SystemBase {
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
-                    let index = this._gameMap.getTileIndex(tile);
                     if (layerName == "floor") {
-                        return this.canHeroMove(index);
-                    } else if (tile.x != this._endTile.x || tile.y != this._endTile.y) {
+                        let notEnd = tile.x != this._endTile.x || tile.y != this._endTile.y;
+                        let index = this._gameMap.getTileIndex(tile);
+                        if (notEnd) {
+                            let monster = this._levelData.getLayerElement<Monster>("monster", index);
+                            if (monster) {
+                                return false;
+                            }
+                        } else {
+                            return this.canHeroMove(index);
+                        }
+                    } else {
                         return CAN_MOVE_TILES.includes(layerName);
                     }
                 }
                 break;
             case AstarMoveType.MONSTER: {
-                return layerName == "floor" || layerName == "monster" || layerName == "event" || layerName == "stair";
+                return layerName == "floor" || layerName == "monster" || layerName == "stair";
             }
             default:
                 break;
