@@ -8,10 +8,9 @@ import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { AstarFactory } from "../../../../GameFramework/Scripts/ToolLibary/Astar/AstarFactory";
 import { IAstar } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAstar";
-import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
-import { Monster, MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
+import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData, MAGIC_DAMAGE_LEVEL } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
@@ -203,31 +202,23 @@ export class MoveSystem extends SystemBase {
      * @param tile tile坐标
      */
     private canMoveTile(tile: IVec2) {
-        let tileInfo = this._gameMap.getTileInfo(tile);
-        if (!tileInfo) {
-            return true;
-        }
-        let layerName = tileInfo.layerName;
         let index = this._gameMap.getTileIndex(tile);
-        switch (layerName) {
-            case "floor":
+        let monster = this._levelData.getLayerElement<Monster>("monster", index);
+        if (monster) {
+            let monsterInfo = monster.monsterInfo;
+            return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
+        } else {
+            let tileInfo = this._gameMap.getTileInfo(tile);
+            if (!tileInfo) {
+                return true;
+            }
+
+            if (tileInfo.layerName == "floor") {
                 return this.canHeroMove(index);
-            case "monster": {
-                let monster = this._levelData.getLayerElement<Monster>(layerName, index);
-                if (monster) {
-                    let monsterInfo = monster.monsterInfo;
-                    if (monsterInfo.big) {
-                        //如果是大个怪物，那么碰到的是左下角怪物身体，不能走
-                        return false;
-                    } else {
-                        return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
-                    }
-                } else {
-                    throw new GameFrameworkError("move to monster invailid");
-                }
+            } else {
+                return CAN_MOVE_TILES.includes(tileInfo.layerName);
             }
         }
-        return CAN_MOVE_TILES.includes(layerName);
     }
 
     private canPassWizard(index: number): boolean {
@@ -264,11 +255,11 @@ export class MoveSystem extends SystemBase {
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
-                    if (!this.canHeroMove(this._gameMap!.getTileIndex(tile))) return false;
-
-                    if (tile.x != this._endTile.x || tile.y != this._endTile.y) {
-                        //中途过程遇到事件也可以走
-                        return layerName == "floor" || layerName == "prop";
+                    let index = this._gameMap.getTileIndex(tile);
+                    if (layerName == "floor") {
+                        return this.canHeroMove(index);
+                    } else if (tile.x != this._endTile.x || tile.y != this._endTile.y) {
+                        return CAN_MOVE_TILES.includes(layerName);
                     }
                 }
                 break;

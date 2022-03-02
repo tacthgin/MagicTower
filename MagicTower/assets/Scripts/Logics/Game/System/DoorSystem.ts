@@ -33,6 +33,9 @@ export class DoorSystem extends SystemBase {
     clear(): void {
         GameApp.NodePoolManager.destroyNodePool(DoorAnimationNode);
         GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
+        GameApp.EventManager.unsubscribeTarget(this);
+        this.gameMap = null!;
+        this.levelData = null!;
     }
 
     initliaze(gameMap: IGameMap, levelData: LevelData) {

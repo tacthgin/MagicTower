@@ -31,6 +31,8 @@ export class LevelData extends LoadBase {
     private _disappearTile: any = {};
     /** 层元素信息 */
     private _layerInfo: { [layerName: string]: any } = {};
+    /** 正在执行的事件队列 */
+    private _eventQueue: number[] = [];
 
     public get level() {
         return this._level;
@@ -49,24 +51,20 @@ export class LevelData extends LoadBase {
         this._level = level;
     }
 
-    private emitEvent(layerName: string, index: number, info: any = null) {
-        GameApp.getModel(MapModel).fireNow(MapAddElementEventArgs.create(this._level, layerName, index, info));
-    }
-
     load(info: any) {
         this.loadData(info);
-        for (let layerName in this._layerInfo) {
-            let layerInfo = this._layerInfo[layerName];
-            for (let key in layerInfo) {
-                let constructor = CLASS_MAP[key];
-                if (constructor) {
-                    for (let key in layerInfo) {
-                        let element = new constructor();
-                        layerInfo[key] = element.load(layerInfo[key]);
-                    }
-                }
-            }
-        }
+        // for (let layerName in this._layerInfo) {
+        //     let layerInfo = this._layerInfo[layerName];
+        //     for (let key in layerInfo) {
+        //         let constructor = CLASS_MAP[key];
+        //         if (constructor) {
+        //             for (let key in layerInfo) {
+        //                 let element = new constructor();
+        //                 layerInfo[key] = element.load(layerInfo[key]);
+        //             }
+        //         }
+        //     }
+        // }
         return this;
     }
 
@@ -77,7 +75,7 @@ export class LevelData extends LoadBase {
             propertiesInfo = properties[layerName];
             let result = ParserFactory.parse(layerName, propertiesInfo, data.tiles[layerName], data.parseGid);
             if (result) {
-                this._layerInfo = result;
+                this._layerInfo[layerName] = result;
             }
         }
     }
@@ -115,16 +113,18 @@ export class LevelData extends LoadBase {
     }
 
     getLayerElement<T extends Element>(layerName: string, index: number | string): T | null {
-        let layerInfo = this.getLayerInfo(layerName);
-        return layerInfo ? layerInfo.elements[index] : null;
+        let elements = this.getLayerElements(layerName);
+        return elements ? elements[index] : null;
     }
 
     getLayerElementWithoutName(index: number | string) {
+        let element = null;
         for (let layerName in this._layerInfo) {
-            if (this._layerInfo[layerName][index]) {
+            element = this.getLayerElement(layerName, index);
+            if (element) {
                 return {
                     layerName: layerName,
-                    element: this._layerInfo[layerName][index] as Element,
+                    element: element as Element,
                 };
             }
         }
@@ -327,6 +327,18 @@ export class LevelData extends LoadBase {
     }
 
     /**
+     * 获取层元素数据
+     * @param layerName
+     * @returns
+     */
+    private getLayerElements(layerName: string) {
+        let layerInfo = this._layerInfo[layerName];
+        if (layerInfo) {
+            return layerInfo.elements;
+        }
+    }
+
+    /**
      * 移动元素数据
      * @param layerName 层名
      * @param src 原始位置索引
@@ -335,22 +347,30 @@ export class LevelData extends LoadBase {
     private moveLayerElement(layerName: string, src: number, dst: number) {
         let layerInfo = this.getLayerInfo(layerName);
         if (layerInfo) {
-            let element = layerInfo[src];
+            let element = layerInfo.elements[src];
             if (element) {
-                delete layerInfo[src];
+                if (layerName == "monster") {
+                    this.moveWizard(element, dst);
+                }
+                delete layerInfo.elements[src];
                 element.index = dst;
-                layerInfo[dst] = element;
+                layerInfo.elements[dst] = element;
             }
         }
     }
 
     private deleteLayerElement(layerName: string, index: number) {
         let layerInfo = this.getLayerInfo(layerName);
-        if (layerInfo && layerInfo[index]) {
-            if (layerName == "monster") {
-                this.removeWizardOrMagicGuards(layerInfo[index]);
+        if (layerInfo) {
+            let element = layerInfo.elements[index];
+            if (element) {
+                if (layerName == "monster") {
+                    this.removeWizardOrMagicGuards(layerInfo[index]);
+                }
+                delete layerInfo.elements[index];
+            } else if (layerName == "monster" && layerInfo.bigMonster) {
+                this.removeBigMonster(index);
             }
-            delete layerInfo[index];
         }
     }
 
@@ -379,6 +399,31 @@ export class LevelData extends LoadBase {
                 if (monsterIndexes && monsterIndexes.indexOf(monster.index) != -1) {
                     damages.delete(damageIndex);
                 }
+            });
+        }
+    }
+
+    private removeBigMonster(monsterIndex: number) {
+        let layerInfo = this.getLayerInfo("monster");
+        let monster = layerInfo.elements[monsterIndex + 1];
+        if (monster) {
+            delete layerInfo.elements[monsterIndex + 1];
+            layerInfo.bigMonster = null;
+        }
+    }
+
+    private moveWizard(monster: Monster, newIndex: number) {
+        if (monster.isWizard()) {
+            this.removeWizardOrMagicGuards(monster);
+            let wizardDamages = this.getLayerInfo("monster").wizardDamages;
+            DIRECTION_INDEX_DIFFS.forEach((diff) => {
+                let damageIndex = diff + newIndex;
+                let monsterindexes = wizardDamages.get(damageIndex);
+                if (!monsterindexes) {
+                    monsterindexes = [];
+                    wizardDamages.set(damageIndex, monsterindexes);
+                }
+                monsterindexes.push(monster.index);
             });
         }
     }

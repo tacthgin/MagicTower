@@ -8,6 +8,7 @@ import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
+import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { DoorOpenEventArgs } from "../../Event/DoorOpenEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
@@ -92,6 +93,10 @@ export class MonsterFightSystem extends SystemBase {
         }
 
         this.levelData.triggerDoorEvent(DoorState.MONSTER_EVENT, monster.index);
+
+        if (monster.isMagicGuard()) {
+            GameApp.EventManager.fireNow(this, CollisionEventArgs.create(monster.index));
+        }
 
         if (monster.monsterInfo.eventId) {
             GameApp.CommandManager.createCommand(EventCollisionCommand).execute(monster.monsterInfo.eventId);

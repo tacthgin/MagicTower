@@ -18,8 +18,6 @@ export enum GameEvent {
     MOVE_PATH,
     /** 使用道具 */
     USE_PROP,
-    /** 怪物死亡 */
-    MONSTER_DIE,
     //事件系统命令
     COMMAND_DISAPPEAR,
     COMMAND_APPEAR,

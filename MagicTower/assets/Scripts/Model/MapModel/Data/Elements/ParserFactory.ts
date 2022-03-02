@@ -218,7 +218,10 @@ export class ParserFactory {
                         magicGuards[monster.index] = Monster;
                     } else if (monster.monsterInfo.big) {
                         bigMonster = {};
+                        //如果是大怪物，把数据转移到大怪物头部
                         let monsterIndex = i + 1;
+                        delete monsters[i];
+                        monsters[monsterIndex] = monster;
                         monster.monsterInfo.big.forEach((offset) => {
                             bigMonster![monsterIndex + offset] = true;
                         });
