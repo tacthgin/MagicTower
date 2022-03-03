@@ -113,6 +113,7 @@ export class GameMap extends TiledMap implements IGameMap {
                         gid += this.animationCount;
                     }
                 }
+                GameFrameworkLog.log(layerName, tile.x, tile.y, gid);
                 layer.setTileGIDAt(gid, tile.x, tile.y);
                 layer.markForUpdateRenderData(true);
                 this.updateAnimationTiles(layerName, tile, gid);

@@ -121,7 +121,7 @@ export class NpcInteractiveSystem extends SystemBase {
             delay = 0.2;
             let door = this.levelData.getLayerElement<Door>("door", wallIndex);
             if (door) {
-                door.normal()
+                door.normal();
                 GameApp.CommandManager.createCommand(CollisionCommand).execute(wallIndex);
             }
         }

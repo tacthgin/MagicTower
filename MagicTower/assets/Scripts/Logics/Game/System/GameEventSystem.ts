@@ -1,4 +1,4 @@
-import { IVec2, Node, tween, v3 } from "cc";
+import { IVec2, Node, tween, v2, v3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -149,11 +149,18 @@ export class GameEventSystem extends SystemBase {
         for (let layer in movePath) {
             //moveinfo 格式[0, 38, 5]第一个延时，第二个当前坐标，第三个终点坐标
             let move = movePath[layer];
-            move.forEach((moveInfo: number[]) => {
-                GameApp.CommandManager.createCommand(MoveCommand).execute(layer, moveInfo[1], moveInfo[2], moveData.speed, moveInfo[0]);
-            });
+            // move.forEach((moveInfo: number[]) => {
+            //     GameApp.CommandManager.createCommand(MoveCommand).execute(layer, moveInfo[1], moveInfo[2], moveData.speed, moveInfo[0]);
+            // });
         }
-        this.scheduleOnce(this.execute, moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
+        for (let i = 0; i <= 10; i++) {
+            for (let j = 0; j <= 10; j++) {
+                this.gameMap.setTileGIDAt("monster", v2(i, j), 9);
+            }
+        }
+        this, this.gameMap.setTileGIDAt("door", v2(0, 1), 66);
+
+        //this.scheduleOnce(this.execute, moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
     }
 
     private specialMove() {

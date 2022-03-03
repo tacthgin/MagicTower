@@ -76,6 +76,11 @@ export class LevelData extends LoadBase {
             let result = ParserFactory.parse(layerName, propertiesInfo, data.tiles[layerName], data.parseGid);
             if (result) {
                 this._layerInfo[layerName] = result;
+                if (result.hide) {
+                    for (let index in result.hide) {
+                        this.setDisappear(layerName, parseInt(index), false);
+                    }
+                }
             }
         }
     }
@@ -89,14 +94,17 @@ export class LevelData extends LoadBase {
         }
     }
 
-    setDisappear(layerName: string, index: number) {
-        if (DISAPPEAR_LAYER_FILTER.indexOf(layerName) != -1) {
+    setDisappear(layerName: string, index: number, deleteElement: boolean = true) {
+        if (DISAPPEAR_LAYER_FILTER.indexOf(layerName) == -1) {
             if (!this._disappearTile[layerName]) {
                 this._disappearTile[layerName] = [];
             }
             this._disappearTile[layerName].push(index);
         }
-        this.deleteLayerElement(layerName, index);
+
+        if (deleteElement) {
+            this.deleteLayerElement(layerName, index);
+        }
     }
 
     move(layerName: string, src: number, dst: number, gid: number) {

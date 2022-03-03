@@ -109,7 +109,7 @@ export class ParserFactory {
             switch (key) {
                 case "passive":
                     {
-                        doors[propertiesValue] = this.packageDoor(doors[propertiesValue], DoorState.PASSIVE);
+                        doors[propertiesValue] = ParserFactory.packageDoor(doors[propertiesValue], DoorState.PASSIVE);
                     }
                     break;
                 case "appear":
@@ -124,14 +124,14 @@ export class ParserFactory {
                             let map = new Map<Array<number>, number>();
                             let indexes: number[] = [];
                             for (let index in doors) {
-                                doors[index] = this.packageDoor(doors[index], DoorState.APPEAR);
+                                doors[index] = ParserFactory.packageDoor(doors[index], DoorState.APPEAR);
                                 indexes.push(parseInt(index));
                             }
                             map.set(indexes, parseInt(propertiesValue));
                             event[DoorState.APPEAR_EVENT] = map;
                         } else {
                             let door = doors[propertiesValue];
-                            doors[propertiesValue] = this.packageDoor(door, key == "appear" ? DoorState.APPEAR : DoorState.HIDE);
+                            doors[propertiesValue] = ParserFactory.packageDoor(door, key == "appear" ? DoorState.APPEAR : DoorState.HIDE);
                             hideInfo[door.index] = door.gid;
                         }
                     }
@@ -312,6 +312,6 @@ export class ParserFactory {
             element.index = parseInt(index);
             eventInfo[index] = element;
         }
-        return eventInfo;
+        return { elements: eventInfo };
     }
 }

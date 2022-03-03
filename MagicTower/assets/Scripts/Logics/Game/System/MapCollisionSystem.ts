@@ -128,6 +128,8 @@ export class MapCollisionSystem extends SystemBase {
                     this.npcInteractiveSystem.initliaze(layerInfo.element as Npc, this.levelData);
                     this.npcInteractiveSystem.execute();
                     return false;
+                case "event":
+                    return this.eventCollision(tile);
                 default:
                     GameFrameworkLog.error(`${layerInfo.layerName} does not handle function`);
                     break;

@@ -255,8 +255,8 @@ export class MoveSystem extends SystemBase {
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
+                    let notEnd = tile.x != this._endTile.x || tile.y != this._endTile.y;
                     if (layerName == "floor") {
-                        let notEnd = tile.x != this._endTile.x || tile.y != this._endTile.y;
                         let index = this._gameMap.getTileIndex(tile);
                         if (notEnd) {
                             let monster = this._levelData.getLayerElement<Monster>("monster", index);
@@ -266,7 +266,7 @@ export class MoveSystem extends SystemBase {
                         } else {
                             return this.canHeroMove(index);
                         }
-                    } else {
+                    } else if (notEnd) {
                         return CAN_MOVE_TILES.includes(layerName);
                     }
                 }

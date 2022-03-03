@@ -37,6 +37,10 @@ export class Monster extends Element {
         }
     }
 
+    get id(): number {
+        return this._id;
+    }
+
     get monsterInfo() {
         return this._monsterInfo;
     }
