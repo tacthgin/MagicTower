@@ -1,4 +1,4 @@
-import { instantiate, isValid, Node } from "cc";
+import { instantiate, Node } from "cc";
 import { INodeHelp } from "../../NodePool/INodeHelp";
 
 export class CNodeHelp implements INodeHelp {

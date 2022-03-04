@@ -5,7 +5,7 @@ export abstract class SystemBase extends ScheduleBase implements IRerference {
     /**
      * 系统被分配的时候调用
      */
-    awake() {}
+    awake(): void {}
 
     clear(): void {}
 }

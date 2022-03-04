@@ -62,7 +62,7 @@ export class GameApp extends Component {
     }
 
     /**
-     * 对象池管理器
+     * 节点对象池管理器
      */
     static get NodePoolManager(): INodePoolManager {
         return GameFrameworkEntry.getModule<INodePoolManager>("NodePoolManager");
