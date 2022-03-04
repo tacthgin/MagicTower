@@ -135,6 +135,15 @@ export class GameMap extends TiledMap implements IGameMap {
         return null;
     }
 
+    getTileTiled(layerName: string, tile: IVec2, forceCreate?: boolean) {
+        let layer = this.getLayer(layerName);
+        if (layer) {
+            return layer.getTiledTileAt(tile.x, tile.y, forceCreate);
+        }
+
+        return null;
+    }
+
     getLayersProperties() {
         let layers = this.getLayers();
         let layersProperties = {} as { [key: string]: any };

@@ -1,4 +1,4 @@
-import { Node } from "cc";
+import { Node, TiledTile } from "cc";
 import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { IAstarMap } from "../../../../../GameFramework/Scripts/ToolLibary/Astar/IAstarMap";
 
@@ -79,6 +79,8 @@ export interface IGameMap extends IAstarMap {
      * @returns 地图块gid
      */
     getTileGIDAt(layerName: string, tile: IVec2): number | null;
+
+    getTileTiled(layerName: string, tile: IVec2, forceCreate?: boolean): TiledTile | null;
 
     /**
      * 根据地图块资源名字获取gid
