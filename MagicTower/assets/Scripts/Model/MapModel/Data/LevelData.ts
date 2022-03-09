@@ -1,7 +1,4 @@
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { LoadBase } from "../../../../GameFramework/Scripts/Application/Model/LoadBase";
-import { MapModel } from "../MapModel";
-import { MapAddElementEventArgs } from "../MapModelEventArgs";
 import { Door, DoorState, DoorType } from "./Elements/Door";
 import { Element } from "./Elements/Element";
 import { EventInfo } from "./Elements/EventInfo";
@@ -140,6 +137,23 @@ export class LevelData extends LoadBase {
         return null;
     }
 
+    /**
+     * 删除掉隐藏的tile
+     * @param layerName 层名
+     * @param index 索引位置
+     * @returns tile的gid
+     */
+    deleteHide(layerName: string, index: number): number | null {
+        let disappear = this._disappearTile[layerName];
+        if (disappear && index in disappear) {
+            let gid = disappear[index];
+            delete disappear[index];
+            return gid;
+        }
+
+        return null;
+    }
+
     getStair(stairType: StairType): Stair | null {
         let layerInfo = this.getLayerInfo("stair");
         if (layerInfo) {
@@ -254,21 +268,26 @@ export class LevelData extends LoadBase {
             layerInfo["door"] = {};
         }
 
-        let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monster"];
+        let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monsterDoors"];
         if (!monsterDoors) {
-            layerInfo["monster"] = monsterDoors = new Map<Array<number>, Array<Door>>();
+            layerInfo["monsterDoors"] = monsterDoors = new Map<Array<number>, Array<Door>>();
         }
 
-        for (let doorIndexes in monsterDoorInfo) {
+        for (let monsterIndexesString in monsterDoorInfo) {
             let doors: Array<Door> = new Array<Door>();
-            doorIndexes.split(",").forEach((index) => {
-                let newIndex = parseInt(index);
+            let monsterIndexes = monsterIndexesString.split(",").map((value) => {
+                return parseInt(value);
+            });
+
+            let doorIndexes = monsterDoorInfo[monsterIndexesString];
+            doorIndexes.forEach((index) => {
                 let door = new Door();
                 door.id = DoorType.MONSTER;
-                door.index = newIndex;
+                door.index = index;
                 doors.push(door);
+                layerInfo.elements[index] = door;
             });
-            monsterDoors.set(monsterDoorInfo[doorIndexes], doors);
+            monsterDoors.set(monsterIndexes, doors);
         }
     }
 

@@ -7,12 +7,10 @@ import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropInfo } from "../../../Model/HeroModel/Prop";
-import { Door, DoorState, DoorType } from "../../../Model/MapModel/Data/Elements/Door";
+import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
-import { DoorOpenEventArgs } from "../../Event/DoorOpenEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
-import { AppearCommand } from "../Command/AppearCommand";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
 import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
@@ -27,13 +25,11 @@ export class DoorSystem extends SystemBase {
     awake(): void {
         GameApp.NodePoolManager.createNodePool(DoorAnimationNode);
         GameApp.NodePoolManager.createNodePool(DoorAnimationReverseNode);
-        GameApp.EventManager.subscribe(GameEvent.OPEN_DOOR, this.onOpenDoor, this);
     }
 
     clear(): void {
         GameApp.NodePoolManager.destroyNodePool(DoorAnimationNode);
         GameApp.NodePoolManager.destroyNodePool(DoorAnimationReverseNode);
-        GameApp.EventManager.unsubscribeTarget(this);
         this.gameMap = null!;
         this.levelData = null!;
     }
@@ -68,12 +64,12 @@ export class DoorSystem extends SystemBase {
                         GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
                     }
                 });
-            } else {
-                return true;
+                // return false;
             }
         } else if (doorInfo.canWallOpen()) {
             //可以开的墙门
             this.openDoor(doorInfo);
+            //return false;
         } else if (doorInfo.doorState == DoorState.APPEAR) {
             //隐藏的墙门
             this.closeDoor(doorInfo, () => {
@@ -84,19 +80,13 @@ export class DoorSystem extends SystemBase {
                     GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
                 }
             });
+            //return false;
         }
 
-        return false;
+        return true;
     }
 
-    private onOpenDoor(sender: object, eventArgs: DoorOpenEventArgs) {
-        let doors = eventArgs.doors;
-        doors.forEach((door) => {
-            this.openDoor(door);
-        });
-    }
-
-    private async openDoor(door: Door, callback: Function | null = null) {
+    async openDoor(door: Door, callback: Function | null = null) {
         let tile = this.gameMap.getTile(door.index);
         await this.createDoorAnimation(door.id, tile, false, () => {
             if (callback) {
@@ -108,10 +98,9 @@ export class DoorSystem extends SystemBase {
         GameApp.CommandManager.createCommand(DisappearCommand).execute("door", tile);
     }
 
-    private async closeDoor(door: Door, callback: Function | null = null) {
+    async closeDoor(door: Door, callback: Function | null = null) {
         let tile = this.gameMap.getTile(door.index);
         await this.createDoorAnimation(door.id, tile, true, () => {
-            GameApp.CommandManager.createCommand(AppearCommand).execute("door", tile, door.id);
             if (callback) {
                 callback();
             } else {
@@ -122,14 +111,14 @@ export class DoorSystem extends SystemBase {
 
     private async createDoorAnimation(id: number | string, tile: IVec2, reverse: boolean, callback: Function | null = null) {
         let name = reverse ? "DoorAnimationReverseNode" : "DoorAnimationNode";
-        let constructor = reverse ? DoorAnimationReverseNode : DoorAnimationNode;
+        let constructor: any = reverse ? DoorAnimationReverseNode : DoorAnimationNode;
         let node = (await GameApp.NodePoolManager.createNodeWithPath(constructor, `Prefab/Elements/${name}`)) as Node;
         if (node) {
             let position = this.gameMap.getPositionAt(tile);
             if (position) {
                 node.position = v3(position.x, position.y);
                 node.parent = this.gameMap.node;
-                node.getComponent(constructor)?.init(`door${id}`, callback);
+                node.getComponent<any>(constructor).init(`door${id}`, callback);
             }
         }
     }

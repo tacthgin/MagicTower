@@ -16,6 +16,7 @@ export class ParserFactory {
         monster: this.parseMonster,
         npc: this.parseNpc,
         event: this.parseEvent,
+        prop: this.parseProp,
     };
 
     static parse(layerName: string, propertiesInfo: any, tiles: number[], parseGidFn: Function) {
@@ -179,7 +180,7 @@ export class ParserFactory {
                     break;
             }
         }
-        return { elements: doors, event: event, monsterDoors: monsterDoors };
+        return { elements: doors, event: event, monsterDoors: monsterDoors, hide: hideInfo };
     }
 
     private static parseMonster(propertiesInfo: any, tiles: number[], parseGidFn: Function) {
@@ -248,6 +249,7 @@ export class ParserFactory {
             }
         }
 
+        let hideInfo: { [index: number | string]: number } | null = null;
         let propertiesValue: string = null!;
         let event: any = {};
         for (let key in propertiesInfo) {
@@ -288,9 +290,16 @@ export class ParserFactory {
                         });
                     }
                     break;
+                case "hide":
+                    let hideIndex = parseInt(propertiesValue);
+                    let monster: Monster = monsters[hideIndex];
+                    monster.hide = true;
+                    hideInfo = {};
+                    hideInfo[hideIndex] = monster.gid;
+                    break;
             }
         }
-        return { elements: monsters, event: event, wizardDamages: wizardDamages, magicGuardDamges: magicGuardDamges, bigMonster: bigMonster };
+        return { elements: monsters, event: event, wizardDamages: wizardDamages, magicGuardDamges: magicGuardDamges, bigMonster: bigMonster, hide: hideInfo };
     }
 
     private static parseNpc(propertiesInfo: any, tiles: number[], parseGidFn: Function): any {
@@ -313,5 +322,21 @@ export class ParserFactory {
             eventInfo[index] = element;
         }
         return { elements: eventInfo };
+    }
+
+    private static parseProp(propertiesInfo: any, tiles: number[], parseGidFn: Function) {
+        let hideInfo: any = null;
+        for (let key in propertiesInfo) {
+            let propertiesValue = propertiesInfo[key];
+            switch (key) {
+                case "hide":
+                    let hideIndex = parseInt(propertiesValue);
+                    hideInfo = {};
+                    hideInfo[hideIndex] = 0;
+                    break;
+            }
+        }
+
+        return { hide: hideInfo };
     }
 }

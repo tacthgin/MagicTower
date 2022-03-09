@@ -1,4 +1,4 @@
-import { Node, tween, UITransform, v2, v3 } from "cc";
+import { Node, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -14,7 +14,6 @@ import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData, MAGIC_DAMAGE_LEVEL } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
-import { ElementNode } from "../Elements/ElementNode";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
@@ -46,7 +45,6 @@ export class MoveSystem extends SystemBase {
     awake(): void {
         this._heroModel = GameApp.getModel(HeroModel);
         GameApp.EventManager.subscribe(GameEvent.COLLISION_COMPLETE, this.onCollisionComplete, this);
-        GameApp.NodePoolManager.createNodePool(ElementNode);
     }
 
     clear(): void {
@@ -55,7 +53,6 @@ export class MoveSystem extends SystemBase {
         this._gameMap = null!;
         this._levelData = null!;
         GameApp.EventManager.unsubscribeTarget(this);
-        GameApp.NodePoolManager.destroyNodePool(ElementNode);
     }
 
     initliaze(gameMap: IGameMap, levelData: LevelData, hero: Hero) {
@@ -122,37 +119,24 @@ export class MoveSystem extends SystemBase {
 
     async move(layerName: string, src: number, dst: number, speed: number, delay: number, callback: Function | null = null) {
         let tile = this._gameMap.getTile(src);
+        let newTile = this._gameMap.getTile(dst);
         let gid = this._gameMap.getTileGIDAt(layerName, tile);
         if (gid) {
-            let element = await this.createElement();
-            if (element) {
-                element.parent = this._gameMap.node;
-                let position = this._gameMap.getPositionAt(this._gameMap.getTile(src))!;
-                element.position = v3(position.x, position.y);
-                //取元素数据
-                let elementData = this._levelData.getLayerElement(layerName, src);
-                if (elementData) {
-                    element.getComponent(ElementNode)?.init(layerName, elementData.id);
-                }
-
-                this._levelData.move(layerName, src, dst, gid);
-                this._gameMap.setTileGIDAt(layerName, tile, 0);
+            let tileTiled = this._gameMap.getTiledTileAt(layerName, tile, true);
+            if (tileTiled) {
                 this.setAstarMoveType(LAYER_TO_MOVE[layerName]);
-                let path = this.getPath(this._gameMap.getTile(src), this._gameMap.getTile(dst));
-                if (path && path.length > 0) {
-                    let moveFunc = () => {
-                        element.getComponent(ElementNode)?.movePath(this.changePathCoord(path), speed, () => {
-                            this._gameMap.setTileGIDAt(layerName, this._gameMap.getTile(dst), gid);
-                            callback && callback();
-                        });
-                    };
-                    if (delay != 0) {
-                        tween(element).delay(0.2).call(moveFunc).start();
-                    } else {
-                        moveFunc();
-                    }
+                let path = this.getPath(tile, newTile);
+                if (path.length > 0) {
+                    let action = this.getMoveAction(this.changePathCoord(path), speed, () => {
+                        this._gameMap.setTileGIDAt(layerName, tile, 0);
+                        this._gameMap.setTiledTileAt(layerName, tile, null);
+                        this._gameMap.setTileGIDAt(layerName, newTile, gid);
+                        this._levelData.move(layerName, src, dst, gid!);
+                        callback && callback();
+                    });
+                    tween(tileTiled.node).delay(delay).then(action).start();
                 } else {
-                    GameFrameworkLog.error("element move path error");
+                    GameFrameworkLog.error(`${tile} to ${newTile} element move path error`);
                 }
             }
         } else {
@@ -164,11 +148,11 @@ export class MoveSystem extends SystemBase {
         if (info.type == "spawn") {
             if (info.move) {
                 info.move.from.forEach(async (index: number) => {
-                    this._gameMap.setTileGIDAt("monster", this._gameMap.getTile(index), 0);
-                    let element = await this.createElement();
-                    if (element) {
-                        element.getComponent(ElementNode)?.moveSpwan(info, (tileIndex: number) => {
-                            return this._gameMap.getPositionAt(this._gameMap.getTile(tileIndex));
+                    let tile = this._gameMap.getTile(index);
+                    let tileTiled = this._gameMap.getTiledTileAt("monster", tile);
+                    if (tileTiled) {
+                        this.excuteMoveSpawnAction(tileTiled.node, info, index, () => {
+                            this._gameMap.setTileGIDAt("monster", tile, 0);
                         });
                     }
                 });
@@ -195,6 +179,48 @@ export class MoveSystem extends SystemBase {
 
         this._endTile = endTile;
         return this._astar.makePath(beginTile, endTile);
+    }
+
+    private getMoveAction(path: Vec3[], speed: number, callback: Function | null) {
+        let moveActions: Tween<Node>[] = [];
+        for (let i = 0; i < path.length; i++) {
+            moveActions.push(tween().to(speed, { position: path[i] }));
+        }
+        moveActions.push(
+            tween().call(() => {
+                callback && callback();
+            })
+        );
+
+        return tween().sequence(...moveActions);
+    }
+
+    private excuteMoveSpawnAction(node: Node, info: any, tileIndex: number, callback: Function) {
+        let moveAction: Tween<unknown> = null!;
+        let fadeAction: Tween<unknown> = null!;
+        for (let actionName in info) {
+            switch (actionName) {
+                case "move":
+                    {
+                        moveAction = tween().to(info.interval, { position: this._gameMap.getPositionAt(this._gameMap.getTile(tileIndex)) });
+                    }
+                    break;
+                case "fadeOut":
+                    {
+                        fadeAction = tween().to(info.interval, { opacity: 0 });
+                    }
+                    break;
+            }
+        }
+        tween(node).then(moveAction).start();
+        let uiOpacity: UIOpacity = node.getComponent(UIOpacity)!;
+        tween(uiOpacity)
+            .then(fadeAction)
+            .set({
+                opacity: 255,
+            })
+            .call(callback)
+            .start();
     }
 
     /**
@@ -272,6 +298,10 @@ export class MoveSystem extends SystemBase {
                 }
                 break;
             case AstarMoveType.MONSTER: {
+                let heroTile = this._hero.heroTile;
+                if (tile.x == heroTile.x && tile.y == heroTile.y) {
+                    return false;
+                }
                 return layerName == "floor" || layerName == "monster" || layerName == "stair";
             }
             default:
@@ -281,14 +311,16 @@ export class MoveSystem extends SystemBase {
         return true;
     }
 
-    private changePathCoord(path: IVec2[]) {
+    private changePathCoord(path: IVec2[]): Vec3[] {
+        let newPath: Vec3[] = [];
+        let position = null;
+        //tiletiled 运行动作坐标调整
+        let width = (this._gameMap.width - 1) * 32 * 0.5;
+        let height = (this._gameMap.height - 1) * 32 * 0.5;
         for (let i = 0; i < path.length; i++) {
-            path[i] = this._gameMap.getPositionAt(path[i])!;
+            position = this._gameMap.getPositionAt(path[i])!;
+            newPath.push(v3(position.x + width, position.y + height));
         }
-        return path;
-    }
-
-    private async createElement() {
-        return (await GameApp.NodePoolManager.createNodeWithPath(ElementNode, `Prefab/Elements/ElementNode`)) as Node;
+        return newPath;
     }
 }

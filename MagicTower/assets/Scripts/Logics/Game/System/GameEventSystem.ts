@@ -149,12 +149,13 @@ export class GameEventSystem extends SystemBase {
         for (let layer in movePath) {
             //moveinfo 格式[0, 38, 5]第一个延时，第二个当前坐标，第三个终点坐标
             let move = movePath[layer];
-            move.forEach((moveInfo: number[]) => {
+            for (let i = 0; i < move.length; i++) {
+                let moveInfo = move[i];
                 GameApp.CommandManager.createCommand(MoveCommand).execute(layer, moveInfo[1], moveInfo[2], moveData.speed, moveInfo[0]);
-            });
+            }
         }
 
-        //this.scheduleOnce(this.execute, moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
+        this.scheduleOnce(this.execute, moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
     }
 
     private specialMove() {

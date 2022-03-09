@@ -80,7 +80,23 @@ export interface IGameMap extends IAstarMap {
      */
     getTileGIDAt(layerName: string, tile: IVec2): number | null;
 
-    getTileTiled(layerName: string, tile: IVec2, forceCreate?: boolean): TiledTile | null;
+    /**
+     * 根据指定坐标获取tiledTile
+     * @param layerName 层名
+     * @param tile tile坐标
+     * @param forceCreate 如果当前无tiledTile，强制创建tiledTile
+     * @returns 指定坐标的tiledTile
+     */
+    getTiledTileAt(layerName: string, tile: IVec2, forceCreate?: boolean): TiledTile | null;
+
+    /**
+     * 设置当前位置的tiledTile
+     * @param layerName 层名
+     * @param tile tile坐标
+     * @param tiledTile 要设置的tiledTile
+     * @returns 指定坐标的tiledTile
+     */
+    setTiledTileAt(layerName: string, tile: IVec2, tiledTile: TiledTile | null): TiledTile | null;
 
     /**
      * 根据地图块资源名字获取gid

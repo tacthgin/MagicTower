@@ -1,4 +1,4 @@
-import { director, js, math, size, TiledLayer, TiledMap, TiledMapAsset, v2, Vec2, _decorator } from "cc";
+import { director, js, math, size, TiledLayer, TiledMap, TiledMapAsset, TiledTile, v2, Vec2, _decorator } from "cc";
 import { GameFrameworkError } from "../../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
@@ -113,7 +113,6 @@ export class GameMap extends TiledMap implements IGameMap {
                         gid += this.animationCount;
                     }
                 }
-                GameFrameworkLog.log(layerName, tile.x, tile.y, gid);
                 layer.setTileGIDAt(gid, tile.x, tile.y);
                 layer.markForUpdateRenderData(true);
                 this.updateAnimationTiles(layerName, tile, gid);
@@ -135,10 +134,19 @@ export class GameMap extends TiledMap implements IGameMap {
         return null;
     }
 
-    getTileTiled(layerName: string, tile: IVec2, forceCreate?: boolean) {
+    getTiledTileAt(layerName: string, tile: IVec2, forceCreate?: boolean) {
         let layer = this.getLayer(layerName);
         if (layer) {
             return layer.getTiledTileAt(tile.x, tile.y, forceCreate);
+        }
+
+        return null;
+    }
+
+    setTiledTileAt(layerName: string, tile: IVec2, tiledTile: TiledTile | null) {
+        let layer = this.getLayer(layerName);
+        if (layer) {
+            return layer.setTiledTileAt(tile.x, tile.y, tiledTile);
         }
 
         return null;

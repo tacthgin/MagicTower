@@ -96,7 +96,7 @@ export class LevelManager extends Component {
 
             let levelData = this.mapModel.getLevelData(level);
             if (!levelData) {
-                let selectLayers = ["door", "stair", "monster", "npc"];
+                let selectLayers = ["door", "stair", "monster", "npc", "prop"];
                 let selectTiles: { [key: string]: number[] | null } = {};
                 selectLayers.forEach((layerName) => {
                     selectTiles[layerName] = gameMap.getLayersTiles(layerName);

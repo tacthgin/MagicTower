@@ -209,19 +209,56 @@ export class MapCollisionSystem extends SystemBase {
         return { tile: tile, index: index };
     }
 
+    private getGidBySpriteId(layerName: string, spriteId: string): number | null {
+        let name = spriteId;
+        switch (layerName) {
+            case "npc":
+            case "monster":
+            case "door":
+                name = `${spriteId}_0`;
+                break;
+        }
+
+        return this.gameMap.getGidByName(name);
+    }
+
     private appear(layerName: string, tileOrIndex: IVec2 | number, id: number, record: boolean = true) {
-        let json = Utility.Json.getJsonElement(layerName, id) as any;
-        if (json) {
-            let { index, tile } = this.getTileOrIndex(tileOrIndex);
-            let gid = this.gameMap.getGidByName(`${json.spriteId}_0`);
-            if (gid) {
-                this.gameMap.setTileGIDAt(layerName, tile, gid);
-                record && this.levelData.setAppear(layerName, index, gid);
-            } else {
-                GameFrameworkLog.error("appear gid 找不到");
-            }
-        } else {
-            GameFrameworkLog.error("appear error id:", id);
+        let { index, tile } = this.getTileOrIndex(tileOrIndex);
+
+        switch (layerName) {
+            case "event":
+                record && this.levelData.setAppear(layerName, index);
+                break;
+            case "stair":
+                let gid = this.levelData.deleteHide(layerName, index);
+                if (gid != null) {
+                    this.gameMap.setTileGIDAt(layerName, tile, gid);
+                }
+                break;
+            default:
+                let json = Utility.Json.getJsonElement<any>(layerName, id);
+                if (json) {
+                    let gid = this.getGidBySpriteId(layerName, json.spriteId);
+                    if (gid) {
+                        if (layerName == "door") {
+                            let door = this.levelData.getLayerElement<Door>("door", index);
+                            if (door) {
+                                this.doorSystem.closeDoor(door, () => {
+                                    this.gameMap.setTileGIDAt(layerName, tile, gid);
+                                    record && this.levelData.setAppear(layerName, index, gid!);
+                                });
+                            }
+                        } else {
+                            this.gameMap.setTileGIDAt(layerName, tile, gid);
+                            record && this.levelData.setAppear(layerName, index, gid);
+                        }
+                    } else {
+                        GameFrameworkLog.error("appear gid 找不到");
+                    }
+                } else {
+                    GameFrameworkLog.error("appear error id:", id);
+                }
+                break;
         }
     }
 
@@ -230,6 +267,13 @@ export class MapCollisionSystem extends SystemBase {
         if (tile) {
             this.gameMap.setTileGIDAt(layerName, tile, 0);
         }
+        if (layerName == "door") {
+            let door = this.levelData.getLayerElement<Door>("door", index);
+            if (door) {
+                this.doorSystem.openDoor(door);
+            }
+        }
+
         record && this.levelData.setDisappear(layerName, index);
     }
 

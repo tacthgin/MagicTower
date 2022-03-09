@@ -10,7 +10,6 @@ import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
-import { DoorOpenEventArgs } from "../../Event/DoorOpenEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { DisappearCommand } from "../Command/DisappearCommand";
@@ -89,7 +88,9 @@ export class MonsterFightSystem extends SystemBase {
 
         let doors = this.levelData.triggerMonsterDoor(monster.index);
         if (doors) {
-            GameApp.EventManager.fireNow(this, DoorOpenEventArgs.create(doors));
+            doors.forEach((door) => {
+                GameApp.CommandManager.createCommand(DisappearCommand).execute("door", door.index);
+            });
         }
 
         this.levelData.triggerDoorEvent(DoorState.MONSTER_EVENT, monster.index);

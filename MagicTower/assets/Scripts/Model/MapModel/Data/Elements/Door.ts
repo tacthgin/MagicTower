@@ -4,8 +4,8 @@ export enum DoorType {
     YELLOW = 1001,
     BLUE,
     RED,
-    PRISON,
     MONSTER,
+    PRISON,
     WALL,
 }
 

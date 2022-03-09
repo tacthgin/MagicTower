@@ -112,10 +112,7 @@
       "b": 255,
       "a": 255
     },
-    "_spriteFrame": {
-      "__uuid__": "56d69082-0e5d-4e2b-9e44-4bc37828f657@f9941",
-      "__expectedType__": "cc.SpriteFrame"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_fillType": 0,
     "_sizeMode": 0,
@@ -149,27 +146,27 @@
     "playOnLoad": false,
     "_clips": [
       {
-        "__uuid__": "d71b935b-d2b6-4c4a-acf0-783978a74020",
+        "__uuid__": "c90e4696-c447-4c44-b303-379dc359bba8",
         "__expectedType__": "cc.AnimationClip"
       },
       {
-        "__uuid__": "d90aa723-c1b7-498a-b714-ebcbd6bad9fa",
+        "__uuid__": "24888a6c-8351-478c-b5f0-6b342942e73a",
         "__expectedType__": "cc.AnimationClip"
       },
       {
-        "__uuid__": "3fdd749b-d62f-47e0-a359-b3e21c6b41f0",
+        "__uuid__": "f8709c5c-dbca-428f-a1ea-80e8aefec355",
         "__expectedType__": "cc.AnimationClip"
       },
       {
-        "__uuid__": "79336866-1c88-4a8c-95a2-f175ac258fe5",
+        "__uuid__": "5ebdd5fd-44b2-494f-98aa-dd54c3689747",
         "__expectedType__": "cc.AnimationClip"
       },
       {
-        "__uuid__": "6af60412-12f1-44de-86be-a2459b1f6247",
+        "__uuid__": "3ccbce6b-a666-4d7b-9dd7-d1b0bb20372d",
         "__expectedType__": "cc.AnimationClip"
       },
       {
-        "__uuid__": "c0373d0c-53ab-41b8-b767-6ece6e8b5b3d",
+        "__uuid__": "8d5399dc-d67a-4224-a327-42e750db319e",
         "__expectedType__": "cc.AnimationClip"
       }
     ],
@@ -195,7 +192,7 @@
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "f22uGqnZlD9qZqu5TLHuHM"
+    "fileId": "darTtA1txLTp3GZ63p6Jvq"
   },
   {
     "__type__": "cc.PrefabInfo",
