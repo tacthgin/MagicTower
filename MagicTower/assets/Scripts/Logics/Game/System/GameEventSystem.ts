@@ -103,6 +103,7 @@ export class GameEventSystem extends SystemBase {
                         GameApp.CommandManager.createCommand(AppearCommand).execute(elementInfo.layerName, elementInfo.element.index, elementInfo.element.id);
                     }
                     this.execute();
+                    break;
                 case "appear":
                     this.appear();
                     break;
@@ -151,7 +152,7 @@ export class GameEventSystem extends SystemBase {
             let move = movePath[layer];
             for (let i = 0; i < move.length; i++) {
                 let moveInfo = move[i];
-                GameApp.CommandManager.createCommand(MoveCommand).execute(layer, moveInfo[1], moveInfo[2], moveData.speed, moveInfo[0]);
+                GameApp.CommandManager.createCommand(MoveCommand).execute(layer, moveInfo[1], moveInfo[2], this.globalConfig.npcSpeed, moveInfo[0]);
             }
         }
 

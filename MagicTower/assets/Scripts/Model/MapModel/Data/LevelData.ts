@@ -1,3 +1,4 @@
+import { js } from "cc";
 import { LoadBase } from "../../../../GameFramework/Scripts/Application/Model/LoadBase";
 import { Door, DoorState, DoorType } from "./Elements/Door";
 import { Element } from "./Elements/Element";
@@ -82,12 +83,16 @@ export class LevelData extends LoadBase {
         }
     }
 
-    setAppear(layerName: string, index: number, gid: number = 0) {
+    setAppear(layerName: string, index: number, gid: number = 0, id: number = 0) {
         if (gid != 0) {
             if (!this._appearTile[layerName]) {
                 this._appearTile[layerName] = {};
             }
             this._appearTile[layerName][index] = gid;
+        }
+
+        if (id) {
+            this.addLayerElement(layerName, index, gid, id);
         }
     }
 
@@ -145,10 +150,22 @@ export class LevelData extends LoadBase {
      */
     deleteHide(layerName: string, index: number): number | null {
         let disappear = this._disappearTile[layerName];
-        if (disappear && index in disappear) {
-            let gid = disappear[index];
-            delete disappear[index];
-            return gid;
+        if (disappear) {
+            let disappearIndex = disappear.indexOf(index);
+            if (disappearIndex != -1) {
+                disappear.splice(disappearIndex, 1);
+                let layerInfo = this.getLayerInfo(layerName);
+                if (layerInfo && layerInfo.hide) {
+                    let gid = layerInfo.hide[index];
+                    let element = layerInfo.elements[index];
+                    element.hide = false;
+                    delete layerInfo.hide[index];
+                    if (js.isEmptyObject(layerInfo.hide)) {
+                        layerInfo.hide = null;
+                    }
+                    return gid;
+                }
+            }
         }
 
         return null;
@@ -384,6 +401,25 @@ export class LevelData extends LoadBase {
                 layerInfo.elements[dst] = element;
             }
         }
+    }
+
+    private addLayerElement(layerName: string, index: number, gid: number, id: number) {
+        let constructor = CLASS_MAP[layerName];
+        if (!constructor) {
+            return;
+        }
+
+        let layerInfo = this.getLayerInfo(layerName);
+        if (!layerInfo) {
+            layerInfo = this._layerInfo[layerName] = {};
+            layerInfo.elements = {};
+        }
+
+        let element = new constructor();
+        element.id = id;
+        element.gid = gid;
+        element.index = index;
+        layerInfo.elements[index] = element;
     }
 
     /**

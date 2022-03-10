@@ -304,13 +304,24 @@ export class ParserFactory {
 
     private static parseNpc(propertiesInfo: any, tiles: number[], parseGidFn: Function): any {
         let npcInfos: { [index: number | string]: Npc } = {};
+        let hideInfo: any = null;
         for (let key in propertiesInfo) {
-            let npc = new Npc();
-            npc.id = parseInt(propertiesInfo[key]);
-            npc.index = parseInt(key);
-            npcInfos[key] = npc;
+            let propertiesValue = propertiesInfo[key];
+            switch (key) {
+                case "hide":
+                    let hideIndex = parseInt(propertiesValue);
+                    hideInfo = {};
+                    hideInfo[hideIndex] = 0;
+                    break;
+                default:
+                    let npc = new Npc();
+                    npc.id = parseInt(propertiesInfo[key]);
+                    npc.index = parseInt(key);
+                    npcInfos[key] = npc;
+                    break;
+            }
         }
-        return { elements: npcInfos };
+        return { elements: npcInfos, hide: hideInfo };
     }
 
     private static parseEvent(propertiesInfo: any, tiles: number[], parseGidFn: Function) {
@@ -337,6 +348,6 @@ export class ParserFactory {
             }
         }
 
-        return { hide: hideInfo };
+        return { elements: {}, hide: hideInfo };
     }
 }

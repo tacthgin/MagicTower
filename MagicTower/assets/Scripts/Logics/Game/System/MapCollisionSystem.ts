@@ -227,7 +227,7 @@ export class MapCollisionSystem extends SystemBase {
 
         switch (layerName) {
             case "event":
-                record && this.levelData.setAppear(layerName, index);
+                record && this.levelData.setAppear(layerName, index, 0, id);
                 break;
             case "stair":
                 let gid = this.levelData.deleteHide(layerName, index);
@@ -250,7 +250,7 @@ export class MapCollisionSystem extends SystemBase {
                             }
                         } else {
                             this.gameMap.setTileGIDAt(layerName, tile, gid);
-                            record && this.levelData.setAppear(layerName, index, gid);
+                            record && this.levelData.setAppear(layerName, index, gid, id);
                         }
                     } else {
                         GameFrameworkLog.error("appear gid 找不到");
