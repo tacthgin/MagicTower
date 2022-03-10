@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="1">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="1">
  <tileset firstgid="1" source="element.tsx"/>
  <layer id="8" name="floor" width="11" height="11">
   <data encoding="csv">
@@ -33,10 +33,10 @@
  </layer>
  <layer id="3" name="door" width="11" height="11">
   <properties>
-   <property name="hide" value="0"/>
+   <property name="hide" value="10"/>
   </properties>
   <data encoding="csv">
-79,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,79,
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,
@@ -70,10 +70,10 @@
  </layer>
  <layer id="4" name="prop" width="11" height="11">
   <properties>
-   <property name="hide" value="0"/>
+   <property name="hide" value="10"/>
   </properties>
   <data encoding="csv">
-112,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,112,
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,
@@ -88,10 +88,10 @@
  </layer>
  <layer id="5" name="monster" width="11" height="11">
   <properties>
-   <property name="hide" value="0"/>
+   <property name="hide" value="10"/>
   </properties>
   <data encoding="csv">
-16,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,16,
 0,0,0,0,0,0,0,0,0,0,0,
 9,9,9,0,0,0,0,0,9,9,9,
 0,9,0,0,0,15,0,0,0,9,0,
@@ -111,6 +111,24 @@
   </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="11" name="npc" width="11" height="11">
+  <properties>
+   <property name="hide" value="10"/>
+  </properties>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,93,
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,
