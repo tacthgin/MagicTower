@@ -21,12 +21,13 @@
             ],
             "props": {
                 "1": 5,
+                "2": 3,
                 "3": 1,
                 "20": 1
             }
         },
         "map": {
-            "currentLevel": 10,
+            "currentLevel": 4,
             "maps": {}
         }
     },

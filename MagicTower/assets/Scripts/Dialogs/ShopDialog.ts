@@ -2,6 +2,8 @@ import { Label, _decorator } from "cc";
 import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
 import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
 import { UIFactory } from "../../GameFramework/Scripts/Application/UI/UIFactory";
+import { CommonEventArgs } from "../Logics/Event/CommonEventArgs";
+import { GameEvent } from "../Logics/Event/GameEvent";
 import { HeroModel } from "../Model/HeroModel/HeroModel";
 import { ShopModel } from "../Model/ShopModel/ShopModel";
 
@@ -28,6 +30,7 @@ export class ShopDialog extends DialogBase {
             this.buy(customEventData);
         }
         this.close();
+        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
     }
 
     private buy(buyType: string) {

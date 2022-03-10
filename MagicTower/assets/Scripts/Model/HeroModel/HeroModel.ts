@@ -210,7 +210,7 @@ export class HeroModel extends ModelBase {
                 break;
         }
 
-        if (attrName) {
+        if (attrName != null) {
             this.setAttrDiff(attrName, value);
             this.setAttrDiff(HeroAttr.GOLD, -gold);
         }

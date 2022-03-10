@@ -107,7 +107,7 @@ export class LevelManager extends Component {
                 });
             }
             gameMap.loadLevelData(levelData);
-            gameMap.openTileAnimation(["obstacle", "monster", "npc", "lava"]);
+            gameMap.openTileAnimation(["building", "monster", "npc", "lava"]);
         }
         return this.maps[level];
     }
