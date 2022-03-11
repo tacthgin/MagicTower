@@ -119,13 +119,14 @@ export class MapCollisionSystem extends SystemBase {
                         if (layerName != "floor") {
                             element = this.levelData.getLayerElement(layerName, index);
                         } else {
+                            //如果是地板的话
                             let layerInfo = this.levelData.getLayerElementWithoutName(index);
                             if (layerInfo) {
                                 layerName = layerInfo.layerName;
                                 element = layerInfo.element;
                             } else {
-                                GameFrameworkLog.error("tile not exist any element");
-                                return true;
+                                //剩下的是地板
+                                return this.damageSystem.damageCollision(index);
                             }
                         }
 
@@ -157,8 +158,7 @@ export class MapCollisionSystem extends SystemBase {
                                 case "event":
                                     return this.eventCollision(tile);
                                 default:
-                                    //剩下的是地板
-                                    return this.damageSystem.damageCollision(index);
+                                    break;
                             }
                         }
                     }

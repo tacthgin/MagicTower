@@ -127,6 +127,7 @@ export class ParserFactory {
                             for (let index in doors) {
                                 doors[index] = ParserFactory.packageDoor(doors[index], DoorState.APPEAR);
                                 indexes.push(parseInt(index));
+                                hideInfo[index] = doors[index].gid;
                             }
                             map.set(indexes, parseInt(propertiesValue));
                             event[DoorState.APPEAR_EVENT] = map;
@@ -164,7 +165,10 @@ export class ParserFactory {
                 default:
                     {
                         //怪物门 监狱门
-                        monsterDoors = new Map<Array<number>, Array<Door>>();
+                        if (!monsterDoors) {
+                            monsterDoors = new Map<Array<number>, Array<Door>>();
+                        }
+
                         let monsterIndexes: number[] = (propertiesValue as string).split(",").map((value) => {
                             return parseInt(value);
                         });

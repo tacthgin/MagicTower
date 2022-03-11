@@ -435,7 +435,7 @@
                         ]
                     ]
                 },
-                "interval": "0..5",
+                "interval": 0.5,
                 "delay": null
             },
             {

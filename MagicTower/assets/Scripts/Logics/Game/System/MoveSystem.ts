@@ -1,4 +1,4 @@
-import { Node, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
+import { math, Node, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -10,10 +10,12 @@ import { AstarFactory } from "../../../../GameFramework/Scripts/ToolLibary/Astar
 import { IAstar } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAstar";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
+import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData, MAGIC_DAMAGE_LEVEL } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
+import { DisappearCommand } from "../Command/DisappearCommand";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
@@ -41,6 +43,7 @@ export class MoveSystem extends SystemBase {
     private _heroModel: HeroModel = null!;
     private _hero: Hero = null!;
     private _canHeroMoving: boolean = true;
+    private _coordOffset: IVec2 = null!;
 
     awake(): void {
         this._heroModel = GameApp.getModel(HeroModel);
@@ -52,6 +55,12 @@ export class MoveSystem extends SystemBase {
         this._astar = null;
         this._gameMap = null!;
         this._levelData = null!;
+        this._endTile = null!;
+        this._heroModel = null!;
+        this._hero = null!;
+        this._canHeroMoving = true;
+        this._coordOffset = null!;
+
         GameApp.EventManager.unsubscribeTarget(this);
     }
 
@@ -60,6 +69,7 @@ export class MoveSystem extends SystemBase {
         this._gameMap.setCheckDelegate(this.check.bind(this));
         this._levelData = levelData;
         this._hero = hero;
+        this._coordOffset = { x: (this._gameMap.width - 1) * 32 * 0.5, y: (this._gameMap.height - 1) * 32 * 0.5 };
 
         if (!this._astar) {
             this._astar = AstarFactory.createCrossAstar(this._gameMap);
@@ -70,49 +80,37 @@ export class MoveSystem extends SystemBase {
 
     moveHero(position: IVec2, collisionFunc: (tile: IVec2) => boolean) {
         if (this._canHeroMoving) {
-            let localPos = (this._gameMap as any).node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(position.x, position.y));
-            let endTile = this._gameMap.toTile(v2(localPos?.x, localPos?.y));
+            let localPos = this._gameMap.node.getComponent(UITransform)?.convertToNodeSpaceAR(v3(position.x, position.y));
+            if (!localPos) {
+                return;
+            }
+            let endTile = this._gameMap.toTile(v2(localPos.x, localPos.y));
             if (this._hero.heroTile.equals(v2(endTile.x, endTile.y))) return;
+
             this.setAstarMoveType(AstarMoveType.HERO);
             let path = this.getPath(this._hero.heroTile, endTile);
-            if (path.length > 0) {
-                this._canHeroMoving = false;
-                let canEndMove = this.canMoveTile(endTile);
-                if (!canEndMove) {
-                    path.pop();
-                }
 
-                let moveComplete = () => {
-                    if (!canEndMove) {
+            if (path.length == 0) {
+                if (this.isNearBy(this._hero.heroTile, endTile)) {
+                    this._canHeroMoving = collisionFunc(endTile);
+                    this._hero.toward(endTile);
+                    this._hero.stand();
+                    GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
+                } else {
+                    UIFactory.showToast("勇士迷路了");
+                }
+            } else {
+                this._hero.movePath(path, (tile: IVec2, end: boolean) => {
+                    let canMove = collisionFunc(tile);
+                    if (end || !canMove) {
                         this._hero.toward(endTile);
-                    } else {
-                        this._hero.toward();
-                    }
-                    let tile = canEndMove ? endTile : path[path.length - 1];
-                    if (tile) {
+                        this._hero.stand();
                         this._heroModel.setPosition(tile, this._hero.heroDirection);
                     }
-                    this._canHeroMoving = collisionFunc(endTile);
-                    this._hero.stand();
-                };
 
-                if (path.length > 0) {
-                    this._hero.movePath(path, (tile: IVec2, end: boolean) => {
-                        if (end) {
-                            moveComplete();
-                        } else if (!collisionFunc(tile)) {
-                            this._hero.stand();
-                            return true;
-                        }
-                        return false;
-                    });
-                } else {
-                    moveComplete();
-                }
-
+                    return canMove;
+                });
                 GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
-            } else {
-                UIFactory.showToast("勇士迷路了");
             }
         }
     }
@@ -149,10 +147,11 @@ export class MoveSystem extends SystemBase {
             if (info.move) {
                 info.move.from.forEach(async (index: number) => {
                     let tile = this._gameMap.getTile(index);
-                    let tileTiled = this._gameMap.getTiledTileAt("monster", tile);
+                    let tileTiled = this._gameMap.getTiledTileAt("monster", tile, true);
                     if (tileTiled) {
-                        this.excuteMoveSpawnAction(tileTiled.node, info, index, () => {
-                            this._gameMap.setTileGIDAt("monster", tile, 0);
+                        this.excuteMoveSpawnAction(tileTiled.node, info, info.move.to, () => {
+                            GameApp.CommandManager.createCommand(DisappearCommand).execute("monster", tile);
+                            this._gameMap.setTiledTileAt("monster", tile, null);
                         });
                     }
                 });
@@ -196,31 +195,25 @@ export class MoveSystem extends SystemBase {
     }
 
     private excuteMoveSpawnAction(node: Node, info: any, tileIndex: number, callback: Function) {
-        let moveAction: Tween<unknown> = null!;
-        let fadeAction: Tween<unknown> = null!;
         for (let actionName in info) {
             switch (actionName) {
                 case "move":
                     {
-                        moveAction = tween().to(info.interval, { position: this._gameMap.getPositionAt(this._gameMap.getTile(tileIndex)) });
+                        let position = this.changeTileTiledCoord(this._gameMap.getPositionAt(this._gameMap.getTile(tileIndex))!);
+                        tween(node).to(info.interval, { position: position }).start();
                     }
                     break;
                 case "fadeOut":
                     {
-                        fadeAction = tween().to(info.interval, { opacity: 0 });
+                        let uiOpacity: UIOpacity | null = node.getComponent(UIOpacity);
+                        if (!uiOpacity) {
+                            uiOpacity = node.addComponent(UIOpacity);
+                        }
+                        tween(uiOpacity).to(info.interval, { opacity: 0 }).call(callback).start();
                     }
                     break;
             }
         }
-        tween(node).then(moveAction).start();
-        let uiOpacity: UIOpacity = node.getComponent(UIOpacity)!;
-        tween(uiOpacity)
-            .then(fadeAction)
-            .set({
-                opacity: 255,
-            })
-            .call(callback)
-            .start();
     }
 
     /**
@@ -267,6 +260,11 @@ export class MoveSystem extends SystemBase {
             return false;
         }
 
+        let door = this._levelData.getLayerElement<Door>("door", index);
+        if (door && door.doorState == DoorState.APPEAR) {
+            return false;
+        }
+
         return true;
     }
 
@@ -281,20 +279,8 @@ export class MoveSystem extends SystemBase {
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
-                    let notEnd = tile.x != this._endTile.x || tile.y != this._endTile.y;
-                    if (layerName == "floor") {
-                        let index = this._gameMap.getTileIndex(tile);
-                        if (notEnd) {
-                            let monster = this._levelData.getLayerElement<Monster>("monster", index);
-                            if (monster) {
-                                return false;
-                            }
-                        } else {
-                            return this.canHeroMove(index);
-                        }
-                    } else if (notEnd) {
-                        return layerName == "prop";
-                    }
+                    let result = this.canMoveTile(tile);
+                    return result;
                 }
                 break;
             case AstarMoveType.MONSTER: {
@@ -314,13 +300,22 @@ export class MoveSystem extends SystemBase {
     private changePathCoord(path: IVec2[]): Vec3[] {
         let newPath: Vec3[] = [];
         let position = null;
-        //tiletiled 运行动作坐标调整
-        let width = (this._gameMap.width - 1) * 32 * 0.5;
-        let height = (this._gameMap.height - 1) * 32 * 0.5;
+
         for (let i = 0; i < path.length; i++) {
             position = this._gameMap.getPositionAt(path[i])!;
-            newPath.push(v3(position.x + width, position.y + height));
+            newPath.push(this.changeTileTiledCoord(position));
         }
         return newPath;
+    }
+
+    private changeTileTiledCoord(coord: IVec2) {
+        //tiletiled 运行动作坐标调整
+        return v3(coord.x + this._coordOffset.x, coord.y + this._coordOffset.y);
+    }
+
+    private isNearBy(srcTile: IVec2, dstTile: IVec2) {
+        let x = Math.abs(dstTile.x - srcTile.x);
+        let y = Math.abs(dstTile.y - srcTile.y);
+        return x + y == 1;
     }
 }

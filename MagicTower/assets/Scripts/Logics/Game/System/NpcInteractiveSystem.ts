@@ -116,21 +116,23 @@ export class NpcInteractiveSystem extends SystemBase {
     }
     private npcMove() {
         let wallIndex = this.npc.getWallIndex();
-        let delay = 0;
         if (wallIndex) {
-            delay = 0.2;
             let door = this.levelData.getLayerElement<Door>("door", wallIndex);
             if (door) {
-                door.normal();
-                GameApp.CommandManager.createCommand(CollisionCommand).execute(wallIndex);
+                GameApp.CommandManager.createCommand(DisappearCommand).execute("door", wallIndex, this.npcMoveDetail.bind(this));
+                return;
             }
         }
 
+        this.npcMoveDetail();
+    }
+
+    private npcMoveDetail() {
         let moveIndex = this.npc.move();
         let npcInfo = this.npc.npcInfo;
         if (moveIndex) {
             let npcSpeed = Utility.Json.getJsonElement("global", "npcSpeed") as number;
-            GameApp.CommandManager.createCommand(MoveCommand).execute("npc", this.npc.index, moveIndex, npcSpeed, delay, () => {
+            GameApp.CommandManager.createCommand(MoveCommand).execute("npc", this.npc.index, moveIndex, npcSpeed, 0, () => {
                 if (this.npc.moveEnd()) {
                     GameApp.CommandManager.createCommand(DisappearCommand).execute("npc", moveIndex!);
                     if (npcInfo.event) {
