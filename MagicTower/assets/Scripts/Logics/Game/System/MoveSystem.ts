@@ -293,7 +293,7 @@ export class MoveSystem extends SystemBase {
                             return this.canHeroMove(index);
                         }
                     } else if (notEnd) {
-                        return CAN_MOVE_TILES.includes(layerName);
+                        return layerName == "prop";
                     }
                 }
                 break;

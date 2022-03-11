@@ -11,6 +11,7 @@ import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
+import { AppearCommand } from "../Command/AppearCommand";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
 import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
@@ -56,7 +57,7 @@ export class DoorSystem extends SystemBase {
             let heroModel = GameApp.getModel(HeroModel);
             if (keyID && heroModel.getPropNum(keyID) > 0) {
                 heroModel.addProp(keyID, 1, -1);
-                this.openDoor(doorInfo, () => {
+                GameApp.CommandManager.createCommand(DisappearCommand).execute("door", doorInfo.index, () => {
                     let eventId = this.levelData.triggerDoorEvent(DoorState.DISAPPEAR_EVENT, doorInfo.index);
                     if (eventId) {
                         GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
@@ -64,15 +65,12 @@ export class DoorSystem extends SystemBase {
                         GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
                     }
                 });
-                // return false;
             }
         } else if (doorInfo.canWallOpen()) {
-            //可以开的墙门
-            this.openDoor(doorInfo);
-            //return false;
+            GameApp.CommandManager.createCommand(DisappearCommand).execute("door", doorInfo.index);
         } else if (doorInfo.doorState == DoorState.APPEAR) {
             //隐藏的墙门
-            this.closeDoor(doorInfo, () => {
+            GameApp.CommandManager.createCommand(AppearCommand).execute("door", doorInfo.index, doorInfo.id, () => {
                 let eventId = this.levelData.triggerDoorEvent(DoorState.APPEAR_EVENT, doorInfo.index);
                 if (eventId) {
                     GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
@@ -80,7 +78,6 @@ export class DoorSystem extends SystemBase {
                     GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
                 }
             });
-            //return false;
         }
 
         return true;
@@ -95,7 +92,6 @@ export class DoorSystem extends SystemBase {
                 GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
             }
         });
-        GameApp.CommandManager.createCommand(DisappearCommand).execute("door", tile);
     }
 
     async closeDoor(door: Door, callback: Function | null = null) {

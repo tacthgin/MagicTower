@@ -6,6 +6,7 @@ import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { Door } from "../../../Model/MapModel/Data/Elements/Door";
+import { Element } from "../../../Model/MapModel/Data/Elements/Element";
 import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
@@ -102,53 +103,66 @@ export class MapCollisionSystem extends SystemBase {
      */
     collision(tile: IVec2) {
         let index = this.gameMap.getTileIndex(tile);
-        let layerInfo = this.levelData.getLayerElementWithoutName(index);
-        if (layerInfo) {
-            switch (layerInfo.layerName) {
-                case "door": {
-                    let door = layerInfo.element as Door;
-                    if (!door.hide) {
-                        return this.doorSystem.doorCollision(door);
-                    } else {
-                        return true;
-                    }
-                }
-                case "monster":
-                    this.monsterFightSystem.initliaze(this.hero, layerInfo.element as Monster, this.levelData);
-                    return this.monsterFightSystem.execute();
-                case "stair":
+        let tileInfo = this.gameMap.getTileInfo(tile);
+
+        if (tileInfo) {
+            let layerName = tileInfo.layerName;
+            switch (layerName) {
+                case "prop":
+                    return this.usePropSystem.eatProp(layerName, tile, tileInfo.spriteName);
+                case "building":
+                    UIFactory.showDialog("Prefab/Dialogs/ShopDialog", this.levelData.level);
+                    return false;
+                default:
                     {
-                        let stair = layerInfo.element as Stair;
-                        if (!stair.hide) {
-                            this.mapModel.setLevelDiff(stair.levelDiff);
+                        let element: Element | null = null;
+                        if (layerName != "floor") {
+                            element = this.levelData.getLayerElement(layerName, index);
+                        } else {
+                            let layerInfo = this.levelData.getLayerElementWithoutName(index);
+                            if (layerInfo) {
+                                layerName = layerInfo.layerName;
+                                element = layerInfo.element;
+                            } else {
+                                GameFrameworkLog.error("tile not exist any element");
+                                return true;
+                            }
+                        }
+
+                        if (element) {
+                            switch (layerName) {
+                                case "door": {
+                                    let door = element as Door;
+                                    if (!door.hide) {
+                                        return this.doorSystem.doorCollision(door);
+                                    } else {
+                                        return true;
+                                    }
+                                }
+                                case "monster":
+                                    this.monsterFightSystem.initliaze(this.hero, element as Monster, this.levelData);
+                                    return this.monsterFightSystem.execute();
+                                case "stair":
+                                    {
+                                        let stair = element as Stair;
+                                        if (!stair.hide) {
+                                            this.mapModel.setLevelDiff(stair.levelDiff);
+                                        }
+                                    }
+                                    return true;
+                                case "npc":
+                                    this.npcInteractiveSystem.initliaze(element as Npc, this.levelData);
+                                    this.npcInteractiveSystem.execute();
+                                    return false;
+                                case "event":
+                                    return this.eventCollision(tile);
+                                default:
+                                    //剩下的是地板
+                                    return this.damageSystem.damageCollision(index);
+                            }
                         }
                     }
-                    return true;
-                case "npc":
-                    this.npcInteractiveSystem.initliaze(layerInfo.element as Npc, this.levelData);
-                    this.npcInteractiveSystem.execute();
-                    return false;
-                case "event":
-                    return this.eventCollision(tile);
-                default:
-                    GameFrameworkLog.error(`${layerInfo.layerName} does not handle function`);
                     break;
-            }
-        } else {
-            let tileInfo = this.gameMap.getTileInfo(tile);
-            if (tileInfo) {
-                switch (tileInfo.layerName) {
-                    case "prop":
-                        return this.usePropSystem.eatProp(tileInfo.layerName, tile, tileInfo.spriteName);
-                    case "building":
-                        UIFactory.showDialog("Prefab/Dialogs/ShopDialog", this.levelData.level);
-                        return false;
-                    case "floor":
-                        return this.damageSystem.damageCollision(index);
-                    default:
-                        GameFrameworkLog.error(`${tileInfo.layerName} does not handle function`);
-                        break;
-                }
             }
         }
 
@@ -166,11 +180,11 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private onCommandAppear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
-        this.appear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.elementId, eventArgs.record);
+        this.appear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.elementId, eventArgs.callback);
     }
 
     private onCommandDisappear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
-        this.disappear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.record);
+        this.disappear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.callback);
     }
 
     private onCommandEvent(sender: object, eventArgs: EventCollisionEventArgs) {
@@ -222,12 +236,12 @@ export class MapCollisionSystem extends SystemBase {
         return this.gameMap.getGidByName(name);
     }
 
-    private appear(layerName: string, tileOrIndex: IVec2 | number, id: number, record: boolean = true) {
+    private appear(layerName: string, tileOrIndex: IVec2 | number, id: number, callback: Function | null) {
         let { index, tile } = this.getTileOrIndex(tileOrIndex);
 
         switch (layerName) {
             case "event":
-                record && this.levelData.setAppear(layerName, index, 0, id);
+                this.levelData.setAppear(layerName, index, 0, id);
                 break;
             case "stair":
                 let gid = this.levelData.deleteHide(layerName, index);
@@ -245,12 +259,13 @@ export class MapCollisionSystem extends SystemBase {
                             if (door) {
                                 this.doorSystem.closeDoor(door, () => {
                                     this.gameMap.setTileGIDAt(layerName, tile, gid);
-                                    record && this.levelData.setAppear(layerName, index, gid!);
+                                    this.levelData.setAppear(layerName, index, gid!);
+                                    callback && callback();
                                 });
                             }
                         } else {
                             this.gameMap.setTileGIDAt(layerName, tile, gid);
-                            record && this.levelData.setAppear(layerName, index, gid, id);
+                            this.levelData.setAppear(layerName, index, gid, id);
                         }
                     } else {
                         GameFrameworkLog.error("appear gid 找不到");
@@ -262,19 +277,22 @@ export class MapCollisionSystem extends SystemBase {
         }
     }
 
-    private disappear(layerName: string, tileOrIndex: IVec2 | number, record: boolean = true) {
+    private disappear(layerName: string, tileOrIndex: IVec2 | number, callback: Function | null) {
         let { index, tile } = this.getTileOrIndex(tileOrIndex);
-        if (tile) {
-            this.gameMap.setTileGIDAt(layerName, tile, 0);
-        }
+
         if (layerName == "door") {
             let door = this.levelData.getLayerElement<Door>("door", index);
             if (door) {
-                this.doorSystem.openDoor(door);
+                this.doorSystem.openDoor(door, callback);
             }
+            this.scheduleOnce(() => {
+                this.gameMap.setTileGIDAt(layerName, tile, 0);
+            }, 0);
+        } else {
+            this.gameMap.setTileGIDAt(layerName, tile, 0);
         }
 
-        record && this.levelData.setDisappear(layerName, index);
+        this.levelData.setDisappear(layerName, index);
     }
 
     private eventCollision(eventID: number | string | IVec2) {

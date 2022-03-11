@@ -8,7 +8,7 @@ export class DisappearOrAppearEventArgs extends GameEventArgs {
     private _layerName: string = "";
     private _tileOrIndex: IVec2 | number = null!;
     private _elementId: number = 0;
-    private _record: boolean = true;
+    private _callback: Function | null = null;
 
     get id(): number {
         return this._eventId;
@@ -26,17 +26,17 @@ export class DisappearOrAppearEventArgs extends GameEventArgs {
         return this._elementId;
     }
 
-    get record(): boolean {
-        return this._record;
+    get callback(): Function | null {
+        return this._callback;
     }
 
-    static create(eventId: GameEvent, layerName: string, tileOrIndex: IVec2 | number, elementId: number = 0, record: boolean = true): DisappearOrAppearEventArgs {
+    static create(eventId: GameEvent, layerName: string, tileOrIndex: IVec2 | number, elementId: number = 0, callback: Function | null = null): DisappearOrAppearEventArgs {
         let disappearOrAppearEventArgs = ReferencePool.acquire(DisappearOrAppearEventArgs);
         disappearOrAppearEventArgs._eventId = eventId;
         disappearOrAppearEventArgs._layerName = layerName;
         disappearOrAppearEventArgs._tileOrIndex = tileOrIndex;
         disappearOrAppearEventArgs._elementId = elementId;
-        disappearOrAppearEventArgs._record = record;
+        disappearOrAppearEventArgs._callback = callback;
         return disappearOrAppearEventArgs;
     }
 
@@ -45,6 +45,6 @@ export class DisappearOrAppearEventArgs extends GameEventArgs {
         this._layerName = "";
         this._tileOrIndex = null!;
         this._elementId = 0;
-        this._record = true;
+        this._callback = null;
     }
 }

@@ -7,8 +7,8 @@ import { GameEvent } from "../../Event/GameEvent";
 
 @CommandManager.register("DisappearCommand")
 export class DisappearCommand extends CommandBase {
-    execute(layerName: string, tileOrIndex: IVec2 | number, record: boolean = true): void {
-        GameApp.EventManager.fireNow(this, DisappearOrAppearEventArgs.create(GameEvent.COMMAND_DISAPPEAR, layerName, tileOrIndex, 0, record));
+    execute(layerName: string, tileOrIndex: IVec2 | number, callback: Function | null = null): void {
+        GameApp.EventManager.fireNow(this, DisappearOrAppearEventArgs.create(GameEvent.COMMAND_DISAPPEAR, layerName, tileOrIndex, 0, callback));
         GameApp.CommandManager.destroyCommand(this);
     }
 
