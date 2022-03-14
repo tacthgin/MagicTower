@@ -37,11 +37,12 @@ export class UsePropSystem extends SystemBase {
         GameApp.EventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
     }
 
-    initliaze(gameMap: IGameMap) {
+    initliaze(gameMap: IGameMap, hero: Hero) {
         this.heroModel = GameApp.getModel(HeroModel);
         this.mapModel = GameApp.getModel(MapModel);
         this.levelData = this.mapModel.getCurrentLevelData();
         this.gameMap = gameMap;
+        this.hero = hero;
     }
 
     clear(): void {
@@ -143,6 +144,8 @@ export class UsePropSystem extends SystemBase {
                 {
                     if (this.centrosymmetricFly()) {
                         this.consumptionProp(propInfo);
+                    } else {
+                        UIFactory.showToast("飞行的地方有障碍物");
                     }
                 }
                 break;
@@ -187,7 +190,7 @@ export class UsePropSystem extends SystemBase {
      */
     private consumptionProp(propInfo: PropInfo) {
         if (!propInfo.permanent) {
-            this.heroModel.addProp(parseInt(propInfo.id), -1);
+            this.heroModel.addProp(parseInt(propInfo.id), 0, -1);
         }
     }
 
@@ -271,7 +274,8 @@ export class UsePropSystem extends SystemBase {
     private centrosymmetricFly(): boolean {
         let tile = this.heroModel.getPosition();
         let newTile = v2(this.gameMap.width - tile.x - 1, this.gameMap.height - tile.y - 1);
-        if (this.gameMap.getTileInfo(newTile) == null) {
+        let tileInfo = this.gameMap.getTileInfo(newTile);
+        if (tileInfo?.layerName == "floor") {
             this.hero.location(newTile);
             return true;
         }

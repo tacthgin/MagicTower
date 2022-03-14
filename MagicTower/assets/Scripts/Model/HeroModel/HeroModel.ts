@@ -9,7 +9,7 @@ import { GameEvent } from "../../Logics/Event/GameEvent";
 import { HeroAttr } from "./HeroAttr";
 import { HeroEvent } from "./HeroEvent";
 import { HeroAttrEventArgs, HeroPropEventArgs } from "./HeroModelEventArgs";
-import { PropId, PropType } from "./Prop";
+import { PropId, PropInfo, PropType } from "./Prop";
 
 type TalkInfo = {
     npcID: number;
@@ -103,7 +103,7 @@ export class HeroModel extends ModelBase {
     }
 
     addProp(id: number, mapLevel: number, count: number = 1): boolean {
-        let prop = Utility.Json.getJsonElement("prop", id) as any;
+        let prop = Utility.Json.getJsonElement<PropInfo>("prop", id);
         if (!prop) {
             GameFrameworkLog.error(`can't find prop id:${id}`);
             return false;
@@ -122,6 +122,9 @@ export class HeroModel extends ModelBase {
                 break;
             default:
                 if (!prop.consumption) {
+                    if (count > 0) {
+                        count *= prop.initNum;
+                    }
                     this.props[id] = this.getPropNum(id) + count;
                     this.save();
                     this.fireNow(HeroPropEventArgs.create(HeroEvent.REFRESH_PROP, id, count));

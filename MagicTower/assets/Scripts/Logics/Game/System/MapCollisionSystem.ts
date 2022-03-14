@@ -89,7 +89,7 @@ export class MapCollisionSystem extends SystemBase {
         this.levelData = this.mapModel.getCurrentLevelData();
         this.moveSystem.initliaze(this.gameMap, this.levelData, hero);
         this.doorSystem.initliaze(this.gameMap, this.levelData);
-        this.usePropSystem.initliaze(this.gameMap);
+        this.usePropSystem.initliaze(this.gameMap, this.hero);
         this.damageSystem.initliaze(this.gameMap, this.hero, this.levelData);
 
         this.triggerLevelEvent();

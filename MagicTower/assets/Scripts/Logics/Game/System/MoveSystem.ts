@@ -353,6 +353,5 @@ export class MoveSystem extends SystemBase {
 
     private setCanHeroMoving(canMove: boolean) {
         this._canHeroMoving = canMove;
-        GameFrameworkLog.trace(this._canHeroMoving);
     }
 }

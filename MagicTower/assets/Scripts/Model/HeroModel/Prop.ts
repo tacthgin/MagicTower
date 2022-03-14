@@ -42,4 +42,5 @@ export interface PropInfo {
     desc: string;
     consumption: boolean;
     permanent: boolean;
+    initNum: number;
 }
