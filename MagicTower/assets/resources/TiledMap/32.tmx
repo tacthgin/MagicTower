@@ -83,8 +83,11 @@
 </data>
  </layer>
  <layer id="5" name="monster" width="11" height="11">
+  <properties>
+   <property name="hide" value="10"/>
+  </properties>
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,1,
 0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,
 37,0,39,0,0,0,0,35,0,0,0,

@@ -156,16 +156,17 @@ export class GameEventSystem extends SystemBase {
     private move() {
         let moveData = this.eventJson.move[this.moveStep++];
         let movePath = moveData.path;
+        let speed = this.globalConfig.npcSpeed * moveData.speed;
         for (let layer in movePath) {
             //moveinfo 格式[0, 38, 5]第一个延时，第二个当前坐标，第三个终点坐标
             let move = movePath[layer];
             for (let i = 0; i < move.length; i++) {
                 let moveInfo = move[i];
-                GameApp.CommandManager.createCommand(MoveCommand).execute(layer, moveInfo[1], moveInfo[2], this.globalConfig.npcSpeed, moveInfo[0]);
+                GameApp.CommandManager.createCommand(MoveCommand).execute(layer, moveInfo[1], moveInfo[2], speed, moveInfo[0]);
             }
         }
 
-        this.scheduleOnce(this.execute, moveData.interval * moveData.speed * this.globalConfig.npcSpeed + 0.05);
+        this.scheduleOnce(this.execute, moveData.interval * speed + 0.05);
     }
 
     private specialMove() {

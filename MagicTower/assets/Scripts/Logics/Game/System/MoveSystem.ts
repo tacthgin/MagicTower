@@ -1,4 +1,4 @@
-import { Node, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
+import { Node, TiledUserNodeData, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -247,6 +247,10 @@ export class MoveSystem extends SystemBase {
         let index = this._gameMap.getTileIndex(tile);
         let monster = this._levelData.getLayerElement<Monster>("monster", index);
         if (monster) {
+            if (!isEnd) {
+                //如果行走中绕过怪物
+                return false;
+            }
             let monsterInfo = monster.monsterInfo;
             return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
         } else {
@@ -303,7 +307,7 @@ export class MoveSystem extends SystemBase {
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
-                    if (this._endTile.x == tile.x && this._endTile.y == tile.y) {
+                    if (this.equal(tile, this._endTile)) {
                         //寻路的时候，默认终点可以走
                         return true;
                     }
@@ -312,10 +316,11 @@ export class MoveSystem extends SystemBase {
                 }
                 break;
             case AstarMoveType.MONSTER: {
-                let heroTile = this._hero.heroTile;
-                if (tile.x == heroTile.x && tile.y == heroTile.y) {
+                if (!this.equal(tile, this._endTile) && this.equal(tile, this._hero.heroTile)) {
+                    //不是终点，不能走英雄的格子
                     return false;
                 }
+
                 return layerName == "floor" || layerName == "monster" || layerName == "stair";
             }
             default:
@@ -341,9 +346,7 @@ export class MoveSystem extends SystemBase {
         return v3(coord.x + this._coordOffset.x, coord.y + this._coordOffset.y);
     }
 
-    private isNearBy(srcTile: IVec2, dstTile: IVec2) {
-        let x = Math.abs(dstTile.x - srcTile.x);
-        let y = Math.abs(dstTile.y - srcTile.y);
-        return x + y == 1;
+    private equal(left: IVec2, right: IVec2) {
+        return left.x == right.x && left.y == right.y;
     }
 }

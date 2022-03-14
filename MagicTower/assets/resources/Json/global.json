@@ -11,7 +11,7 @@
         "hero": {
             "position": {
                 "x": 5,
-                "y": 0
+                "y": 10
             },
             "heroAttr": [
                 1000,
@@ -28,7 +28,7 @@
             }
         },
         "map": {
-            "currentLevel": 29,
+            "currentLevel": 32,
             "maps": {}
         }
     },
