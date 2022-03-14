@@ -69,4 +69,15 @@ export class GameFrameworkLog {
         }
         this.s_logHelp.log(GameFrameworkLogLevel.ERROR, ...message);
     }
+
+    /**
+     * 打印堆栈日志，用于调试查看堆栈的时候使用
+     * @param message
+     */
+    static trace(...message: any[]): void {
+        if (!this.s_logHelp) {
+            return;
+        }
+        this.s_logHelp.log(GameFrameworkLogLevel.TRACE, ...message);
+    }
 }

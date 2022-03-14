@@ -24,6 +24,14 @@ export class WebLogHelp implements ILogHelp {
             case GameFrameworkLogLevel.ERROR:
                 console.error(...message);
                 break;
+            case GameFrameworkLogLevel.TRACE:
+                console.info(...message);
+                try {
+                    throw new Error();
+                } catch (e: any) {
+                    console.info(e.stack);
+                }
+                break;
         }
     }
 }

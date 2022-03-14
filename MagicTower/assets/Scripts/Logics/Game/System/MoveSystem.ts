@@ -8,6 +8,7 @@ import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { AstarFactory } from "../../../../GameFramework/Scripts/ToolLibary/Astar/AstarFactory";
 import { IAstar } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAstar";
+import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
@@ -102,7 +103,7 @@ export class MoveSystem extends SystemBase {
                 }
 
                 if (path.length == 0) {
-                    this._canHeroMoving = collisionFunc(endTile);
+                    this.setCanHeroMoving(collisionFunc(endTile));
                     this.moveEnd(endTile);
                 } else {
                     this._hero.movePath(
@@ -111,7 +112,7 @@ export class MoveSystem extends SystemBase {
                             let stop = !collisionFunc(tile);
                             if (stop || end) {
                                 //当前格子不能走后结束
-                                this._canHeroMoving = !stop;
+                                this.setCanHeroMoving(!stop);
                                 this.moveEnd(tile);
                             }
 
@@ -120,7 +121,7 @@ export class MoveSystem extends SystemBase {
                         () => {
                             if (isRemoveEnd) {
                                 //如果是终点，并且没停止，碰撞真正的终点
-                                this._canHeroMoving = collisionFunc(endTile);
+                                this.setCanHeroMoving(collisionFunc(endTile));
                                 this.moveEnd(endTile);
                             }
                         }
@@ -183,7 +184,7 @@ export class MoveSystem extends SystemBase {
     }
 
     private onCollisionComplete() {
-        this._canHeroMoving = true;
+        this.setCanHeroMoving(true);
     }
 
     private setAstarMoveType(astarMoveType: AstarMoveType) {
@@ -348,5 +349,10 @@ export class MoveSystem extends SystemBase {
 
     private equal(left: IVec2, right: IVec2) {
         return left.x == right.x && left.y == right.y;
+    }
+
+    private setCanHeroMoving(canMove: boolean) {
+        this._canHeroMoving = canMove;
+        GameFrameworkLog.trace(this._canHeroMoving);
     }
 }

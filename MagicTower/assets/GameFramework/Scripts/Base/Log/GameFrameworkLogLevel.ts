@@ -21,4 +21,9 @@ export enum GameFrameworkLogLevel {
      * 错误
      */
     ERROR,
+
+    /**
+     * 堆栈
+     */
+    TRACE,
 }
