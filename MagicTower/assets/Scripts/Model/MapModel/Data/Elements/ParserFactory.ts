@@ -141,13 +141,13 @@ export class ParserFactory {
                 case "disappearEvent":
                     {
                         let conditions: any = propertiesValue.split(":");
-                        conditions[0] = conditions[0].map((index: string) => {
+                        conditions[0] = conditions[0].split(",").map((index: string) => {
                             return parseInt(index);
                         });
 
                         conditions[1] = parseInt(conditions[1]);
 
-                        conditions[2] = conditions[2].map((index: string) => {
+                        conditions[2] = conditions[2].split(",").map((index: string) => {
                             return parseInt(index);
                         });
 

@@ -263,7 +263,11 @@ export class MapCollisionSystem extends SystemBase {
                                 this.doorSystem.closeDoor(door, () => {
                                     this.gameMap.setTileGIDAt(layerName, tile, gid);
                                     this.levelData.setAppear(layerName, index, gid!);
-                                    callback && callback();
+                                    if (callback) {
+                                        callback();
+                                    } else {
+                                        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+                                    }
                                 });
                             }
                         } else {
