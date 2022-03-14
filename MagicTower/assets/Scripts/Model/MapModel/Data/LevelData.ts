@@ -29,8 +29,6 @@ export class LevelData extends LoadBase {
     private _disappearTile: any = {};
     /** 层元素信息 */
     private _layerInfo: { [layerName: string]: any } = {};
-    /** 正在执行的事件队列 */
-    private _eventQueue: number[] = [];
 
     public get level() {
         return this._level;
@@ -209,7 +207,9 @@ export class LevelData extends LoadBase {
                                 if (index != -1) {
                                     pair[0].splice(index, 1);
                                     if (pair[0].length == 0) {
-                                        return pair[1];
+                                        let eventId = pair[1];
+                                        delete layerInfo.event[doorState];
+                                        return eventId;
                                     }
                                 }
                             }
@@ -308,6 +308,11 @@ export class LevelData extends LoadBase {
         }
     }
 
+    /**
+     * 获取当前地块的巫师伤害
+     * @param index 地块索引
+     * @returns 巫师伤害
+     */
     getWizardDamage(index: number) {
         let layerInfo = this.getLayerInfo("monster");
         if (layerInfo) {
@@ -329,6 +334,11 @@ export class LevelData extends LoadBase {
         return null;
     }
 
+    /**
+     * 获取当前地块的魔法警卫伤害
+     * @param index 地块索引
+     * @returns 魔法警卫伤害
+     */
     getMagicGuardDamage(index: number) {
         let layerInfo = this.getLayerInfo("monster");
         if (layerInfo) {

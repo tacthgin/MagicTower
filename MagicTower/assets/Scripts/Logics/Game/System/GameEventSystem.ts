@@ -10,6 +10,7 @@ import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
+import { MapModel } from "../../../Model/MapModel/MapModel";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
@@ -78,6 +79,12 @@ export class GameEventSystem extends SystemBase {
     }
 
     execute() {
+        if (this.eventJson.save) {
+            if (this.eventJson.save != this.levelData.level) {
+                GameApp.getModel(MapModel).addLevelEvent(this.eventJson.save, parseInt(this.eventJson.id));
+                return true;
+            }
+        }
         if (this.step < this.eventJson.step.length) {
             let stepName = this.eventJson.step[this.step++];
             GameFrameworkLog.log(stepName);
@@ -133,6 +140,8 @@ export class GameEventSystem extends SystemBase {
             }
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         }
+
+        return false;
     }
 
     private chat() {

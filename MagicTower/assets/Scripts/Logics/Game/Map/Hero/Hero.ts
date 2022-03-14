@@ -119,7 +119,7 @@ export class Hero extends Component {
         this.heroNode.getComponent(Sprite)!.spriteFrame = ElementFactory.getHeroSpriteFrame(`${this._heroModel.getAnimation()[this._heroDirection]}_0`);
     }
 
-    movePath(path: IVec2[], moveCallback: (tile: IVec2, end: boolean) => boolean) {
+    movePath(path: IVec2[], moveCallback: (tile: IVec2, end: boolean) => boolean, completeCallback: Function) {
         let moveActions: Tween<Node>[] = [];
         let stop = false;
         let speed = this._heroModel.getHeroSpeed();
@@ -137,15 +137,15 @@ export class Hero extends Component {
                 })
                 .to(speed, { position: v3(position.x, position.y) })
                 .call(() => {
-                    this._heroTile = currentTile;
                     stop = moveCallback(tile, end);
+                    this._heroTile = currentTile;
                 });
         };
         for (let i = 0; i < path.length - 1; i++) {
             moveActions.push(moveAction(path[i]));
         }
         moveActions.push(moveAction(path[path.length - 1], true));
-        moveActions.push(tween().call(this.stand.bind(this)));
+        moveActions.push(tween().call(completeCallback));
         tween(this.node)
             .sequence(...moveActions)
             .start();
@@ -163,6 +163,7 @@ export class Hero extends Component {
         } else {
             this.toward(this._heroModel.getDireciton());
         }
+        this.setDirectionTexture();
         let heroPosition = this._heroModel.getPosition();
         this._heroTile = new Vec2(heroPosition.x, heroPosition.y);
         let position = this._map.getPositionAt(this._heroTile) || Vec2.ZERO;

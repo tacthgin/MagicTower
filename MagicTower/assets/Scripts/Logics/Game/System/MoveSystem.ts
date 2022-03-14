@@ -1,4 +1,4 @@
-import { math, Node, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
+import { Node, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -31,7 +31,8 @@ const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
     monster: AstarMoveType.MONSTER,
 };
 
-const CAN_MOVE_TILES: Readonly<string[]> = ["prop", "stair"];
+const CAN_MOVE_TILES_END: Readonly<string[]> = ["prop", "stair"];
+const CAN_MOVE_TILES: Readonly<string[]> = ["prop"];
 
 @CommandManager.register("MoveSystem")
 export class MoveSystem extends SystemBase {
@@ -91,25 +92,41 @@ export class MoveSystem extends SystemBase {
             let path = this.getPath(this._hero.heroTile, endTile);
 
             if (path.length == 0) {
-                if (this.isNearBy(this._hero.heroTile, endTile)) {
-                    this._canHeroMoving = collisionFunc(endTile);
-                    this._hero.toward(endTile);
-                    this._hero.stand();
-                    GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
-                } else {
-                    UIFactory.showToast("勇士迷路了");
-                }
+                UIFactory.showToast("勇士迷路了");
             } else {
-                this._hero.movePath(path, (tile: IVec2, end: boolean) => {
-                    let canMove = collisionFunc(tile);
-                    if (end || !canMove) {
-                        this._hero.toward(endTile);
-                        this._hero.stand();
-                        this._heroModel.setPosition(tile, this._hero.heroDirection);
-                    }
+                let endTile: IVec2 = path[path.length - 1];
+                let isRemoveEnd = !this.canMoveTile(endTile, true);
+                if (isRemoveEnd) {
+                    //终点是否可走，不能走就去掉终点
+                    path.pop();
+                }
 
-                    return canMove;
-                });
+                if (path.length == 0) {
+                    this._canHeroMoving = collisionFunc(endTile);
+                    this.moveEnd(endTile);
+                } else {
+                    this._hero.movePath(
+                        path,
+                        (tile: IVec2, end: boolean) => {
+                            let stop = !collisionFunc(tile);
+                            if (stop || end) {
+                                //当前格子不能走后结束
+                                this._canHeroMoving = !stop;
+                                this.moveEnd(tile);
+                            }
+
+                            return stop;
+                        },
+                        () => {
+                            if (isRemoveEnd) {
+                                //如果是终点，并且没停止，碰撞真正的终点
+                                this._canHeroMoving = collisionFunc(endTile);
+                                this.moveEnd(endTile);
+                            }
+                        }
+                    );
+                }
+
                 GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MOVE_PATH));
             }
         }
@@ -157,6 +174,12 @@ export class MoveSystem extends SystemBase {
                 });
             }
         }
+    }
+
+    private moveEnd(tile: IVec2) {
+        this._hero.toward(tile);
+        this._hero.stand();
+        this._heroModel.setPosition(tile, this._hero.heroDirection);
     }
 
     private onCollisionComplete() {
@@ -220,7 +243,7 @@ export class MoveSystem extends SystemBase {
      * 是否终点tile可以移动
      * @param tile tile坐标
      */
-    private canMoveTile(tile: IVec2) {
+    private canMoveTile(tile: IVec2, isEnd: boolean) {
         let index = this._gameMap.getTileIndex(tile);
         let monster = this._levelData.getLayerElement<Monster>("monster", index);
         if (monster) {
@@ -235,7 +258,8 @@ export class MoveSystem extends SystemBase {
             if (tileInfo.layerName == "floor") {
                 return this.canHeroMove(index);
             } else {
-                return CAN_MOVE_TILES.includes(tileInfo.layerName);
+                let tiles = isEnd ? CAN_MOVE_TILES_END : CAN_MOVE_TILES;
+                return tiles.includes(tileInfo.layerName);
             }
         }
     }
@@ -279,7 +303,11 @@ export class MoveSystem extends SystemBase {
         switch (this._astarMoveType) {
             case AstarMoveType.HERO:
                 {
-                    let result = this.canMoveTile(tile);
+                    if (this._endTile.x == tile.x && this._endTile.y == tile.y) {
+                        //寻路的时候，默认终点可以走
+                        return true;
+                    }
+                    let result = this.canMoveTile(tile, false);
                     return result;
                 }
                 break;

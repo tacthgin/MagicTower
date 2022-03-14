@@ -122,6 +122,7 @@ export class LevelManager extends Component {
         newMap.node.active = true;
         let levelData = this.mapModel.getCurrentLevelData();
         this.showHero(newMap.getTile(levelData.getStair(eventArgs.stairType)!.standLocation));
+        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
     }
 
     private onSceneAppear(sender: object, eventArgs: SceneAppearEventArgs) {

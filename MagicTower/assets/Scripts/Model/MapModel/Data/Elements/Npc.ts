@@ -27,6 +27,7 @@ export class Npc extends Element {
         if (!this._npcInfo) {
             throw new GameFrameworkError("cant find npc info");
         }
+        this.clearEvent();
     }
 
     get id(): number {

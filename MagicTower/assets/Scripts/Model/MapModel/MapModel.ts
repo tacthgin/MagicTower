@@ -13,6 +13,8 @@ export class MapModel extends ModelBase {
     private readonly MAX_LEVEL: number = 50;
     private currentLevel: number = 1;
     private maps: { [key: number | string]: LevelData } = {};
+    /** 跨层事件缓存 */
+    private _levelEventCache: { [level: number | string]: number } = {};
 
     private levelTempDatas: { [key: number | string]: LevelTempData } = {};
 
@@ -44,7 +46,7 @@ export class MapModel extends ModelBase {
         let currentLevel = this.currentLevel;
         this.currentLevel = newLevel;
         //如果是上去的，英雄站到下楼梯的旁边
-        this.fireNow(MapSwitchLevelEventArgs.create(currentLevel, diff > 0 ? StairType.Down : StairType.UP));
+        this.fire(MapSwitchLevelEventArgs.create(currentLevel, diff > 0 ? StairType.Down : StairType.UP));
     }
 
     getCurrentLevelData(): LevelData {
@@ -84,6 +86,29 @@ export class MapModel extends ModelBase {
         }
 
         this.useTestLoad();
+    }
+
+    /**
+     * 添加跨层事件
+     * @param level 需要发生事件的层
+     * @param eventId 事件id
+     */
+    addLevelEvent(level: number | string, eventId: number) {
+        this._levelEventCache[level] = eventId;
+    }
+
+    /**
+     * 获取并移除跨层事件
+     * @returns 事件id
+     */
+    removeLevelEvent(level: number): number | null {
+        let eventId = this._levelEventCache[level];
+        if (eventId) {
+            delete this._levelEventCache[level];
+            return eventId;
+        } else {
+            return null;
+        }
     }
 
     private useTestLoad() {

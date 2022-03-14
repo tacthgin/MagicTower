@@ -14,6 +14,7 @@ import { Stair } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
+import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventArgs";
 import { EventCollisionEventArgs } from "../../Event/EventCollisionEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
@@ -90,6 +91,8 @@ export class MapCollisionSystem extends SystemBase {
         this.doorSystem.initliaze(this.gameMap, this.levelData);
         this.usePropSystem.initliaze(this.gameMap);
         this.damageSystem.initliaze(this.gameMap, this.hero, this.levelData);
+
+        this.triggerLevelEvent();
     }
 
     moveHero(position: IVec2) {
@@ -150,7 +153,7 @@ export class MapCollisionSystem extends SystemBase {
                                             this.mapModel.setLevelDiff(stair.levelDiff);
                                         }
                                     }
-                                    return true;
+                                    return false;
                                 case "npc":
                                     this.npcInteractiveSystem.initliaze(element as Npc, this.levelData);
                                     this.npcInteractiveSystem.execute();
@@ -309,18 +312,23 @@ export class MapCollisionSystem extends SystemBase {
 
         if (eventIdOrEventInfo) {
             this.gameEventSystem.initliaze(this.gameMap, this.hero, eventIdOrEventInfo, this.levelData);
-            this.gameEventSystem.execute();
-            return false;
+            let canMove = this.gameEventSystem.execute();
+            if (canMove) {
+                GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+            }
+            return canMove;
         }
+
         return true;
     }
 
-    show() {
-        //跨层事件
-        //let eventID = this.eventInfo.get(this.mapData.level);
-        //if (eventID) {
-        //this.excuteEvent(eventID);
-        //this.eventInfo.clear(this.mapData.level);
-        //}
+    /**
+     * 跨层事件
+     */
+    triggerLevelEvent() {
+        let eventId = this.mapModel.removeLevelEvent(this.levelData.level);
+        if (eventId) {
+            this.eventCollision(eventId);
+        }
     }
 }
