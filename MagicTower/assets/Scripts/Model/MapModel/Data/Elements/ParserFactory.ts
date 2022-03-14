@@ -255,7 +255,7 @@ export class ParserFactory {
 
         let hideInfo: { [index: number | string]: number } | null = null;
         let propertiesValue: string = null!;
-        let event: any = {};
+        let event: any = null;
         for (let key in propertiesInfo) {
             propertiesValue = propertiesInfo[key];
             switch (key) {

@@ -248,6 +248,30 @@ export class LevelData extends LoadBase {
         return null;
     }
 
+    triggerMonsterEvent(triggerIndex: number): number | null {
+        let layerInfo = this.getLayerInfo("monster");
+        if (layerInfo && layerInfo.event) {
+            let monsterEventInfo = layerInfo.event as Map<Array<number>, number>;
+            let index = 0;
+            for (let pair of monsterEventInfo) {
+                index = pair[0].indexOf(triggerIndex);
+                if (index != -1) {
+                    pair[0].splice(index, 1);
+                    if (pair[0].length == 0) {
+                        let eventId = pair[1];
+                        monsterEventInfo.delete(pair[0]);
+                        if (monsterEventInfo.size == 0) {
+                            delete layerInfo.event;
+                        }
+                        return eventId;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     /**
      * 通过消灭的怪物位置，来获取怪物守卫的门
      * @param destoryMonsterIndex 消灭的怪物位置索引

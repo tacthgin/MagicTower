@@ -97,10 +97,17 @@ export class MonsterFightSystem extends SystemBase {
 
         if (monster.isMagicGuard()) {
             GameApp.EventManager.fireNow(this, CollisionEventArgs.create(monster.index));
+            return;
         }
 
-        if (monster.monsterInfo.eventId) {
-            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(monster.monsterInfo.eventId);
+        let eventId = this.levelData.triggerMonsterEvent(monster.index);
+
+        if (!eventId) {
+            eventId = monster.monsterInfo.eventId;
+        }
+
+        if (eventId) {
+            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
         } else {
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         }
