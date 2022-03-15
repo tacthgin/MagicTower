@@ -175,8 +175,13 @@ export class Hero extends Component {
         this.heroNode.active = !active;
     }
 
-    magicLight(monsterIndexs: number[]) {
-        let heroIndex = this._map.getTileIndex(this._heroTile);
+    magicLight(monsterIndexs: number[], damageIndex: number | null = null) {
+        let heroIndex = 0;
+        if (damageIndex != null) {
+            heroIndex = damageIndex;
+        } else {
+            heroIndex = this._map.getTileIndex(this._heroTile);
+        }
         monsterIndexs.forEach(async (index) => {
             let lightning = (await GameApp.NodePoolManager.createNodeWithPath(Lightning, "Prefab/Elements/Lightning")) as Node;
             lightning.parent = this.node;
@@ -184,8 +189,8 @@ export class Hero extends Component {
         });
     }
 
-    magicDamage(monsterIndexs: number[]) {
-        this.magicLight(monsterIndexs);
+    magicDamage(monsterIndexs: number[], damageIndex: number) {
+        this.magicLight(monsterIndexs, damageIndex);
         let animationName = this._heroModel.getAnimation()[this._heroModel.getDireciton()];
         this.animation.play(`${animationName}_once`);
         this._currentAnimationName = "";

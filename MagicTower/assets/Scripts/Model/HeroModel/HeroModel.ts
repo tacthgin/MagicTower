@@ -170,7 +170,7 @@ export class HeroModel extends ModelBase {
     }
 
     equipedDivineShield() {
-        return this.props.shieldId == PropId.DIVINE_SHIELD;
+        return this.shieldId == PropId.DIVINE_SHIELD;
     }
 
     getDireciton() {

@@ -210,7 +210,10 @@ export class MapCollisionSystem extends SystemBase {
         } else {
             tile = eventArgs.collisionTileOrIndex;
         }
-        this.collision(tile);
+        let canMove = this.collision(tile);
+        if (canMove) {
+            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+        }
     }
 
     private onMonsterDie(sender: object, eventArgs: CommonEventArgs) {

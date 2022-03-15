@@ -36,7 +36,7 @@ export class GameEventSystem extends SystemBase {
     private gameMap: IGameMap = null!;
     private hero: Hero = null!;
     private levelData: LevelData = null!;
-    private eventCompleteFlag: boolean = false;
+    private eventCompleteFlag: boolean = true;
 
     initliaze(gameMap: IGameMap, hero: Hero, eventIdOrEventInfo: number | string | EventInfo, levelData: LevelData) {
         this.clear();
@@ -53,6 +53,7 @@ export class GameEventSystem extends SystemBase {
         this.gameMap = gameMap;
         this.hero = hero;
         this.levelData = levelData;
+        this.eventCompleteFlag = false;
     }
 
     getEventCompleteFlag() {
@@ -75,7 +76,7 @@ export class GameEventSystem extends SystemBase {
         this.gameMap = null!;
         this.hero = null!;
         this.levelData = null!;
-        this.eventCompleteFlag = false;
+        this.eventCompleteFlag = true;
     }
 
     execute() {

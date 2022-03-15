@@ -1,6 +1,7 @@
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
@@ -44,13 +45,17 @@ export class DamageSystem extends SystemBase {
         let hurtIndexes: number[] | null = null;
         let wizardDamgeInfo = this.levelData.getWizardDamage(index);
         if (wizardDamgeInfo) {
+            if (heroModel.getAttr(HeroAttr.HP) <= wizardDamgeInfo.damage) {
+                UIFactory.showToast("你将会被巫师杀死");
+                return true;
+            }
             heroModel.setAttrDiff(HeroAttr.HP, -wizardDamgeInfo.damage);
             hurtIndexes = wizardDamgeInfo.indexes;
             //巫师行走
             this.monsterMove(index, hurtIndexes);
         }
 
-        let magicGuardDamageInfo = this.levelData.getWizardDamage(index);
+        let magicGuardDamageInfo = this.levelData.getMagicGuardDamage(index);
         if (magicGuardDamageInfo) {
             heroModel.setAttr(HeroAttr.HP, Math.ceil(heroModel.getAttr(HeroAttr.HP) * magicGuardDamageInfo.damage));
             hurtIndexes = magicGuardDamageInfo.indexes;
@@ -58,7 +63,7 @@ export class DamageSystem extends SystemBase {
 
         if (hurtIndexes) {
             //受到魔法伤害
-            this.hero.magicDamage(hurtIndexes);
+            this.hero.magicDamage(hurtIndexes, index);
             this.scheduleOnce(() => {
                 GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
             }, 0.5);
