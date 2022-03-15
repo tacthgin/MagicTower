@@ -19,6 +19,7 @@ import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventAr
 import { EventCollisionEventArgs } from "../../Event/EventCollisionEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MoveEventArgs } from "../../Event/MoveEventArgs";
+import { ShowEventArgs } from "../../Event/ShowEventArgs";
 import { SpecialMoveEventArgs } from "../../Event/SpecialMoveEventArgs";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
@@ -180,6 +181,7 @@ export class MapCollisionSystem extends SystemBase {
         eventManager.subscribe(GameEvent.COMMAND_MOVE, this.onCommandMove, this);
         eventManager.subscribe(GameEvent.COMMAND_SPECIAL_MOVE, this.onCommandSpecialMove, this);
         eventManager.subscribe(GameEvent.COMMAND_COLLISION, this.onCommandCollision, this);
+        eventManager.subscribe(GameEvent.COMMAND_SHOW, this.onCommandShow, this);
         eventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
     }
 
@@ -213,6 +215,22 @@ export class MapCollisionSystem extends SystemBase {
         let canMove = this.collision(tile);
         if (canMove) {
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+        }
+    }
+
+    private onCommandShow(sender: object, eventArgs: ShowEventArgs) {
+        let index: number | null = null;
+        if (typeof eventArgs.tileOrIndex == "number") {
+            index = eventArgs.tileOrIndex;
+        } else {
+            index = this.gameMap.getTileIndex(eventArgs.tileOrIndex);
+        }
+
+        let elementInfo = this.levelData.getLayerElementWithoutName(index);
+        if (elementInfo) {
+            this.appear(elementInfo.layerName, elementInfo.element.index, elementInfo.element.id);
+        } else {
+            GameFrameworkLog.error(`${index} show not exist`);
         }
     }
 
@@ -251,7 +269,7 @@ export class MapCollisionSystem extends SystemBase {
         return this.gameMap.getGidByName(name);
     }
 
-    private appear(layerName: string, tileOrIndex: IVec2 | number, id: number, callback: Function | null) {
+    private appear(layerName: string, tileOrIndex: IVec2 | number, id: number, callback: Function | null = null) {
         let { index, tile } = this.getTileOrIndex(tileOrIndex);
 
         switch (layerName) {

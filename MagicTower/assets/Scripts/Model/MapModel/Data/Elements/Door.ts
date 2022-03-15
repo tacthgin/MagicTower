@@ -26,6 +26,8 @@ export enum DoorState {
     DISAPPEAR_EVENT,
     /** 怪物死后，门可以打开 */
     MONSTER_EVENT,
+    /** 墙门消失后触发事件 */
+    WALL_SHOW_EVENT,
 }
 
 export class Door extends Element {

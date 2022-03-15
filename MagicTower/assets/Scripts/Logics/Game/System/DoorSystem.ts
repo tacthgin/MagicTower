@@ -14,6 +14,7 @@ import { GameEvent } from "../../Event/GameEvent";
 import { AppearCommand } from "../Command/AppearCommand";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
+import { ShowCommand } from "../Command/ShowCommand";
 import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
 import { DoorAnimationReverseNode } from "../Elements/DoorAnimaitonReverseNode";
 import { IGameMap } from "../Map/GameMap/IGameMap";
@@ -67,7 +68,12 @@ export class DoorSystem extends SystemBase {
                 });
             }
         } else if (doorInfo.canWallOpen()) {
-            GameApp.CommandManager.createCommand(DisappearCommand).execute("door", doorInfo.index);
+            GameApp.CommandManager.createCommand(DisappearCommand).execute("door", doorInfo.index, () => {
+                let index = this.levelData.triggerDoorEvent(DoorState.WALL_SHOW_EVENT, doorInfo.index);
+                if (index) {
+                    GameApp.CommandManager.createCommand(ShowCommand).execute(index);
+                }
+            });
         } else if (doorInfo.doorState == DoorState.APPEAR) {
             //隐藏的墙门
             GameApp.CommandManager.createCommand(AppearCommand).execute("door", doorInfo.index, doorInfo.id, () => {

@@ -162,6 +162,9 @@ export class ParserFactory {
                         event[DoorState.MONSTER_EVENT] = conditions;
                     }
                     break;
+                case "wallShow":
+                    event[DoorState.WALL_SHOW_EVENT] = parseInt(propertiesValue);
+                    break;
                 default:
                     {
                         //怪物门 监狱门

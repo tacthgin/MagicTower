@@ -18,6 +18,7 @@ import { AppearCommand } from "../Command/AppearCommand";
 import { CollisionCommand } from "../Command/CollisionCommand";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { MoveCommand } from "../Command/MoveCommand";
+import { ShowCommand } from "../Command/ShowCommand";
 import { SpecialMoveCommand } from "../Command/SpecialMoveCommand";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
@@ -106,10 +107,7 @@ export class GameEventSystem extends SystemBase {
                     GameApp.CommandManager.createCommand(CollisionCommand).execute(this.gameMap.getTile(this.eventJson.do));
                     break;
                 case "show":
-                    let elementInfo = this.levelData.getLayerElementWithoutName(this.eventJson.show);
-                    if (elementInfo) {
-                        GameApp.CommandManager.createCommand(AppearCommand).execute(elementInfo.layerName, elementInfo.element.index, elementInfo.element.id);
-                    }
+                    GameApp.CommandManager.createCommand(ShowCommand).execute(this.eventJson.show);
                     this.execute();
                     break;
                 case "appear":

@@ -241,31 +241,36 @@ export class MoveSystem extends SystemBase {
     }
 
     /**
-     * 是否终点tile可以移动
+     * 路径途中和终点行走判断
      * @param tile tile坐标
+     * @param isEnd 是否路径终点
      */
     private canMoveTile(tile: IVec2, isEnd: boolean) {
         let index = this._gameMap.getTileIndex(tile);
-        let monster = this._levelData.getLayerElement<Monster>("monster", index);
-        if (monster) {
-            if (!isEnd) {
-                //如果行走中绕过怪物
-                return false;
-            }
-            let monsterInfo = monster.monsterInfo;
-            return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
-        } else {
-            let tileInfo = this._gameMap.getTileInfo(tile);
-            if (!tileInfo) {
-                return true;
-            }
+        let tileInfo = this._gameMap.getTileInfo(tile);
+        if (!tileInfo) {
+            return true;
+        }
 
-            if (tileInfo.layerName == "floor") {
+        switch (tileInfo.layerName) {
+            case "monster":
+                if (!isEnd) {
+                    //如果行走中绕过怪物
+                    return false;
+                } else {
+                    let monster = this._levelData.getLayerElement<Monster>("monster", index);
+                    if (monster) {
+                        let monsterInfo = monster.monsterInfo;
+                        return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
+                    } else {
+                        throw new GameFrameworkError("move monster error");
+                    }
+                }
+            case "floor":
                 return this.canHeroMove(index);
-            } else {
+            default:
                 let tiles = isEnd ? CAN_MOVE_TILES_END : CAN_MOVE_TILES;
                 return tiles.includes(tileInfo.layerName);
-            }
         }
     }
 

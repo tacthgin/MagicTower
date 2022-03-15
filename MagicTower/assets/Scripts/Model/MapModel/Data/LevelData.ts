@@ -241,6 +241,8 @@ export class LevelData extends LoadBase {
                             }
                         }
                         break;
+                    case DoorState.WALL_SHOW_EVENT:
+                        return eventInfo;
                 }
             }
         }
@@ -345,13 +347,15 @@ export class LevelData extends LoadBase {
                 let wizardIndexes = wizardDamages.get(index);
                 if (wizardIndexes) {
                     let damage = 0;
+                    let damageIndexes: number[] = [];
                     wizardIndexes.forEach((wizardIndex) => {
                         let monster: Monster = layerInfo.elements[wizardIndex];
-                        if (monster && monster.monsterInfo.magicAttack) {
+                        if (monster && !monster.hide && monster.monsterInfo.magicAttack) {
                             damage += monster.monsterInfo.magicAttack;
+                            damageIndexes.push(wizardIndex);
                         }
                     });
-                    return { damage: damage, indexes: wizardIndexes };
+                    return { damage: damage, indexes: damageIndexes };
                 }
             }
         }
