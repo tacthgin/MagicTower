@@ -85,6 +85,7 @@
  <layer id="5" name="monster" width="11" height="11">
   <properties>
    <property name="hide" value="10"/>
+   <property name="monsterEvent" value="12:104"/>
   </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,1,

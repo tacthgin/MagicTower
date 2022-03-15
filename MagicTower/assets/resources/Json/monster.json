@@ -541,20 +541,5 @@
         "big": null,
         "extraDamage": null,
         "firstAttack": false
-    },
-    "135": {
-        "id": "135",
-        "name": "骑士队长",
-        "hp": 120,
-        "attack": 150,
-        "defence": 50,
-        "gold": 100,
-        "boss": false,
-        "spriteId": "124",
-        "magicAttack": null,
-        "eventId": 12,
-        "big": null,
-        "extraDamage": null,
-        "firstAttack": true
     }
 }

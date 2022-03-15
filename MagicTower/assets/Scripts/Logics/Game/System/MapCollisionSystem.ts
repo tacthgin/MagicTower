@@ -180,6 +180,7 @@ export class MapCollisionSystem extends SystemBase {
         eventManager.subscribe(GameEvent.COMMAND_MOVE, this.onCommandMove, this);
         eventManager.subscribe(GameEvent.COMMAND_SPECIAL_MOVE, this.onCommandSpecialMove, this);
         eventManager.subscribe(GameEvent.COMMAND_COLLISION, this.onCommandCollision, this);
+        eventManager.subscribe(GameEvent.MONSTER_DIE, this.onMonsterDie, this);
     }
 
     private onCommandAppear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
@@ -210,6 +211,14 @@ export class MapCollisionSystem extends SystemBase {
             tile = eventArgs.collisionTileOrIndex;
         }
         this.collision(tile);
+    }
+
+    private onMonsterDie(sender: object, eventArgs: CommonEventArgs) {
+        if (!this.gameEventSystem.getEventCompleteFlag()) {
+            this.gameEventSystem.execute();
+        } else {
+            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+        }
     }
 
     private getTileOrIndex(tileOrIndex: IVec2 | number) {

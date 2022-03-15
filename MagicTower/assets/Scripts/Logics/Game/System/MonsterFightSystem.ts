@@ -109,7 +109,7 @@ export class MonsterFightSystem extends SystemBase {
         if (eventId) {
             GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
         } else {
-            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MONSTER_DIE));
         }
     }
 }
