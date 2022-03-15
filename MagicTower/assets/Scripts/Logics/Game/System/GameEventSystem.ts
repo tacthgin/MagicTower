@@ -39,8 +39,17 @@ export class GameEventSystem extends SystemBase {
     private levelData: LevelData = null!;
     private eventCompleteFlag: boolean = true;
 
+    awake(): void {
+        GameApp.NodePoolManager.createNodePool("attack");
+    }
+
+    clear(): void {
+        this.reset();
+        GameApp.NodePoolManager.destroyNodePool("attack");
+    }
+
     initliaze(gameMap: IGameMap, hero: Hero, eventIdOrEventInfo: number | string | EventInfo, levelData: LevelData) {
-        this.clear();
+        this.reset();
         if (typeof eventIdOrEventInfo == "object") {
             this.eventJson = Utility.Json.getJsonElement("event", eventIdOrEventInfo.id);
             this.eventInfo = eventIdOrEventInfo;
@@ -65,7 +74,7 @@ export class GameEventSystem extends SystemBase {
         return this.step >= this.eventJson.step.length;
     }
 
-    clear(): void {
+    reset(): void {
         this.eventInfo = null!;
         this.eventJson = null;
         this.chatStep = 0;
@@ -217,7 +226,7 @@ export class GameEventSystem extends SystemBase {
             }
         }
 
-        this.scheduleOnce(this.execute, this.globalConfig.fadeInterval + 0.05);
+        this.scheduleOnce(this.execute, this.globalConfig.fadeInterval + 0.1);
     }
 
     private sceneAppear() {
@@ -235,7 +244,7 @@ export class GameEventSystem extends SystemBase {
     }
 
     private async createAttack(position: IVec2) {
-        let icon = (await GameApp.NodePoolManager.createNodeWithPath("attack", "Prefab/Element/Attack")) as Node;
+        let icon = (await GameApp.NodePoolManager.createNodeWithPath("attack", "Prefab/Elements/Attack")) as Node;
         icon.parent = (this.gameMap as any).node;
         icon.position = v3(position.x, position.y);
         tween(icon).delay(this.globalConfig.fadeInterval).removeSelf().start();

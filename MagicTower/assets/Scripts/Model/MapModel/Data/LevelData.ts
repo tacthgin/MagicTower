@@ -522,15 +522,7 @@ export class LevelData extends LoadBase {
         if (monster.isWizard()) {
             this.removeWizardOrMagicGuards(monster);
             let wizardDamages = this.getLayerInfo("monster").wizardDamages;
-            DIRECTION_INDEX_DIFFS.forEach((diff) => {
-                let damageIndex = diff + newIndex;
-                let monsterindexes = wizardDamages.get(damageIndex);
-                if (!monsterindexes) {
-                    monsterindexes = [];
-                    wizardDamages.set(damageIndex, monsterindexes);
-                }
-                monsterindexes.push(monster.index);
-            });
+            ParserFactory.parseWizardDamage(wizardDamages, newIndex);
         }
     }
 }

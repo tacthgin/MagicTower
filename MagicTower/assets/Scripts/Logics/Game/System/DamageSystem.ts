@@ -1,3 +1,4 @@
+import { IVec2 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -78,11 +79,18 @@ export class DamageSystem extends SystemBase {
             let mosnter = this.levelData.getLayerElement<Monster>("monster", monsterIndex);
             if (mosnter && mosnter.monsterMove) {
                 let newIndex = 2 * monsterIndex - heroIndex;
-                let tileInfo = this.gameMap.getTileInfo(this.gameMap.getTile(newIndex));
-                if (tileInfo && tileInfo.layerName == "floor") {
-                    GameApp.CommandManager.createCommand(MoveCommand).execute("monster", monsterIndex, newIndex, 0.2, 0);
+                let tile = this.gameMap.getTile(newIndex);
+                if (this.isTileInvalid(tile)) {
+                    let tileInfo = this.gameMap.getTileInfo(tile);
+                    if (tileInfo && tileInfo.layerName == "floor") {
+                        GameApp.CommandManager.createCommand(MoveCommand).execute("monster", monsterIndex, newIndex, 0.2, 0);
+                    }
                 }
             }
         });
+    }
+
+    private isTileInvalid(tile: IVec2) {
+        return tile.x >= 0 && tile.x < this.gameMap.width && tile.y >= 0 && tile.y < this.gameMap.height;
     }
 }

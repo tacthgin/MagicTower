@@ -106,10 +106,11 @@ export class MoveSystem extends SystemBase {
                     this.setCanHeroMoving(collisionFunc(endTile));
                     this.moveEnd(endTile);
                 } else {
+                    let stop = false;
                     this._hero.movePath(
                         path,
                         (tile: IVec2, end: boolean) => {
-                            let stop = !collisionFunc(tile);
+                            stop = !collisionFunc(tile);
                             if (stop || end) {
                                 //当前格子不能走后结束
                                 this.setCanHeroMoving(!stop);
@@ -119,7 +120,7 @@ export class MoveSystem extends SystemBase {
                             return stop;
                         },
                         () => {
-                            if (isRemoveEnd) {
+                            if (isRemoveEnd && !stop) {
                                 //如果是终点，并且没停止，碰撞真正的终点
                                 this.setCanHeroMoving(collisionFunc(endTile));
                                 this.moveEnd(endTile);

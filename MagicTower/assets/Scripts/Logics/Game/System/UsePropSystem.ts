@@ -177,7 +177,7 @@ export class UsePropSystem extends SystemBase {
         if (!this.mapModel.canSwitchLevel(diff, useFeather)) {
             UIFactory.showToast(tip);
             return true;
-        } else if (!this.mapModel.canReachLevel(diff)) {
+        } else if (!useFeather && !this.mapModel.canReachLevel(diff)) {
             UIFactory.showToast("你还未到达过该层");
             return true;
         }

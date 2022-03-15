@@ -8,6 +8,7 @@ import { Stair, StairType } from "./Stair";
 
 /** 4个地块偏移值 */
 export const DIRECTION_INDEX_DIFFS: Readonly<Array<number>> = [-1, 1, -11, 11];
+const GAME_MAP_WIDTH = 10;
 
 export class ParserFactory {
     private static parserMap: { [layerName: string]: Function } = {
@@ -22,6 +23,22 @@ export class ParserFactory {
     static parse(layerName: string, propertiesInfo: any, tiles: number[], parseGidFn: Function) {
         let func = this.parserMap[layerName];
         return func ? func(propertiesInfo, tiles, parseGidFn) : null;
+    }
+
+    static parseWizardDamage(wizardDamages: Map<number, number[]>, wizardIndex: number) {
+        //采集巫师伤害
+        DIRECTION_INDEX_DIFFS.forEach((diff) => {
+            if (this.filterDamageIndex(wizardIndex, diff)) {
+                return;
+            }
+            let damageIndex = diff + wizardIndex;
+            let monsterindexes = wizardDamages.get(damageIndex);
+            if (!monsterindexes) {
+                monsterindexes = [];
+                wizardDamages.set(damageIndex, monsterindexes);
+            }
+            monsterindexes.push(wizardIndex);
+        });
     }
 
     private static parseStair(propertiesInfo: any, tiles: number[], parseGidFn: Function) {
@@ -190,6 +207,11 @@ export class ParserFactory {
         return { elements: doors, event: event, monsterDoors: monsterDoors, hide: hideInfo };
     }
 
+    private static filterDamageIndex(wizardIndex: number, diff: number) {
+        let y = GAME_MAP_WIDTH + 1;
+        return (wizardIndex % y == 0 && diff == -1) || ((wizardIndex - GAME_MAP_WIDTH) % y == 0 && diff == 1);
+    }
+
     private static parseMonster(propertiesInfo: any, tiles: number[], parseGidFn: Function) {
         let monsters: { [index: number | string]: Monster } = {};
 
@@ -212,16 +234,7 @@ export class ParserFactory {
                     monsters[i] = monster;
 
                     if (monster.isWizard()) {
-                        //采集巫师伤害
-                        DIRECTION_INDEX_DIFFS.forEach((diff) => {
-                            let damageIndex = diff + i;
-                            let monsterindexes = wizardDamages.get(damageIndex);
-                            if (!monsterindexes) {
-                                monsterindexes = [];
-                                wizardDamages.set(damageIndex, monsterindexes);
-                            }
-                            monsterindexes.push(monster.index);
-                        });
+                        ParserFactory.parseWizardDamage(wizardDamages, i);
                     } else if (monster.isMagicGuard()) {
                         magicGuards[monster.index] = Monster;
                     } else if (monster.monsterInfo.big) {

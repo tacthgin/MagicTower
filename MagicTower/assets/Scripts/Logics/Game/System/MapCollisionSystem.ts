@@ -144,9 +144,15 @@ export class MapCollisionSystem extends SystemBase {
                                         return true;
                                     }
                                 }
-                                case "monster":
-                                    this.monsterFightSystem.initliaze(this.hero, element as Monster, this.levelData);
-                                    return this.monsterFightSystem.execute();
+                                case "monster": {
+                                    let monster = element as Monster;
+                                    if (!monster.hide) {
+                                        this.monsterFightSystem.initliaze(this.hero, monster, this.levelData);
+                                        return this.monsterFightSystem.execute();
+                                    } else {
+                                        return true;
+                                    }
+                                }
                                 case "stair":
                                     {
                                         let stair = element as Stair;
