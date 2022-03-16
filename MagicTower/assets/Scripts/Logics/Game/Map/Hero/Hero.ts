@@ -1,7 +1,6 @@
-import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, TweenSystem, v2, v3, Vec2, _decorator } from "cc";
+import { Animation, AnimationClip, Component, Node, Sprite, Tween, tween, v2, v3, Vec2, _decorator } from "cc";
 import { GameApp } from "../../../../../GameFramework/Scripts/Application/GameApp";
 import { IVec2 } from "../../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
-import { GameFrameworkLog } from "../../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { IFsm } from "../../../../../GameFramework/Scripts/Fsm/IFsm";
 import { HeroModel } from "../../../../Model/HeroModel/HeroModel";
 import { Lightning } from "../../Elements/Lightning";

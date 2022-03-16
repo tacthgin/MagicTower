@@ -141,6 +141,10 @@ export class GameEventSystem extends SystemBase {
                     }
                     this.execute();
                     break;
+                case "jump":
+                    GameApp.getModel(MapModel).jumpLevel(this.eventJson.jump[0], { x: this.eventJson.jump[1], y: this.eventJson.jump[2] });
+                    this.execute();
+                    break;
             }
         } else if (!this.eventCompleteFlag) {
             this.eventCompleteFlag = true;
@@ -254,7 +258,7 @@ export class GameEventSystem extends SystemBase {
     private clearNpcEvent() {
         let npc = this.levelData.getLayerElement<Npc>("npc", this.eventJson.clearNpcEvent);
         if (npc) {
-            npc.clearEvent();
+            npc.clearEventTalk();
         }
         this.execute();
     }

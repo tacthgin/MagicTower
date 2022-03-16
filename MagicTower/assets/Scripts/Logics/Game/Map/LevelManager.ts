@@ -5,7 +5,7 @@ import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/Gam
 import { Stair } from "../../../Model/MapModel/Data/Elements/Stair";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
-import { MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
+import { MapJumpLevelEventArgs, MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
@@ -47,6 +47,7 @@ export class LevelManager extends Component {
 
         this.mapModel = GameApp.getModel(MapModel);
         this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onSwitchLevel, this);
+        this.mapModel.subscribe(MapEvent.JUMP_LEVEL, this.onJumpLevel, this);
 
         let eventManager = GameApp.EventManager;
         eventManager.subscribe(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
@@ -122,6 +123,14 @@ export class LevelManager extends Component {
         newMap.node.active = true;
         let levelData = this.mapModel.getCurrentLevelData();
         this.showHero(newMap.getTile(levelData.getStair(eventArgs.stairType)!.standLocation));
+        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+    }
+
+    private onJumpLevel(sender: object, eventArgs: MapJumpLevelEventArgs) {
+        this.maps[eventArgs.level].node.active = false;
+        let newMap = this.createMap(this.mapModel.level);
+        newMap.node.active = true;
+        this.showHero(eventArgs.heroTile);
         GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
     }
 

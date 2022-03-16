@@ -58,17 +58,27 @@ export class NpcInteractiveSystem extends SystemBase {
             UIFactory.showDialog("Prefab/Dialogs/ChatDialog", {
                 content: info.talk,
                 endCallback: () => {
-                    //小偷
-                    if (npcInfo.type == 1) {
-                        //如果有事件聊天
-                        if (npcInfo.eventTalk) {
+                    switch (npcInfo.type) {
+                        case 1:
+                            //小偷
+                            //如果有事件聊天
+                            if (npcInfo.eventTalk) {
+                                GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+                            } else {
+                                this.npcMove();
+                            }
+                            break;
+                        case 5:
+                            //公主
+                            if (npcInfo.event) {
+                                GameApp.CommandManager.createCommand(EventCollisionCommand).execute(npcInfo.event);
+                                this.npc.clearEvent();
+                            }
+                            break;
+                        default:
+                            this.interactiveComplete();
                             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
-                        } else {
-                            this.npcMove();
-                        }
-                    } else {
-                        this.interactiveComplete();
-                        GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
+                            break;
                     }
                 },
             });

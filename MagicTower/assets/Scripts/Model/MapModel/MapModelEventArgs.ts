@@ -1,50 +1,8 @@
+import { IVec2 } from "cc";
 import { ModelEventArgs } from "../../../GameFramework/Scripts/Application/Model/ModelEventArgs";
 import { ReferencePool } from "../../../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
 import { StairType } from "./Data/Elements/Stair";
 import { MapEvent } from "./MapEvent";
-
-export class MapAddElementEventArgs extends ModelEventArgs {
-    private _level: number = 0;
-    private _layerName: string = "";
-    private _index: number = 0;
-    private _info: any = null;
-
-    get id(): number {
-        return MapEvent.ADD_ELEMENT;
-    }
-
-    get level(): number {
-        return this._level;
-    }
-
-    get layerName(): string {
-        return this._layerName;
-    }
-
-    get index(): number {
-        return this._index;
-    }
-
-    get info(): any {
-        return this._info;
-    }
-
-    static create(level: number, layerName: string, index: number, info: any): MapAddElementEventArgs {
-        let addElementEventArgs = ReferencePool.acquire(MapAddElementEventArgs);
-        addElementEventArgs._level = level;
-        addElementEventArgs._layerName = layerName;
-        addElementEventArgs._index = index;
-        addElementEventArgs._info = info;
-        return addElementEventArgs;
-    }
-
-    clear(): void {
-        this._level = 0;
-        this._layerName = "";
-        this._index = 0;
-        this._info = null;
-    }
-}
 
 export class MapSwitchLevelEventArgs extends ModelEventArgs {
     private _level: number = 0;
@@ -72,5 +30,34 @@ export class MapSwitchLevelEventArgs extends ModelEventArgs {
     clear(): void {
         this._level = 0;
         this._stairType = StairType.UP;
+    }
+}
+
+export class MapJumpLevelEventArgs extends ModelEventArgs {
+    private _level: number = 0;
+    private _heroTile: IVec2 = null!;
+
+    get id(): number {
+        return MapEvent.JUMP_LEVEL;
+    }
+
+    get level(): number {
+        return this._level;
+    }
+
+    get heroTile(): IVec2 {
+        return this._heroTile;
+    }
+
+    static create(level: number, heroTile: IVec2): MapJumpLevelEventArgs {
+        let jumpLevelEventArgs = ReferencePool.acquire(MapJumpLevelEventArgs);
+        jumpLevelEventArgs._level = level;
+        jumpLevelEventArgs._heroTile = heroTile;
+        return jumpLevelEventArgs;
+    }
+
+    clear(): void {
+        this._level = 0;
+        this._heroTile = null!;
     }
 }

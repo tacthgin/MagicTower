@@ -1,3 +1,4 @@
+import { IVec2 } from "cc";
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
 import { GameFrameworkLog } from "../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
@@ -5,7 +6,7 @@ import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
 import { StairType } from "./Data/Elements/Stair";
 import { LevelData } from "./Data/LevelData";
 import { LevelTempData } from "./Data/LevelTempData";
-import { MapSwitchLevelEventArgs } from "./MapModelEventArgs";
+import { MapJumpLevelEventArgs, MapSwitchLevelEventArgs } from "./MapModelEventArgs";
 
 @ModelContainer.registerModel("MapModel")
 export class MapModel extends ModelBase {
@@ -47,6 +48,12 @@ export class MapModel extends ModelBase {
         this.currentLevel = newLevel;
         //如果是上去的，英雄站到下楼梯的旁边
         this.fire(MapSwitchLevelEventArgs.create(currentLevel, diff > 0 ? StairType.Down : StairType.UP));
+    }
+
+    jumpLevel(level: number, heroTile: IVec2) {
+        let currentLevel = this.currentLevel;
+        this.currentLevel = level;
+        this.fire(MapJumpLevelEventArgs.create(currentLevel, heroTile));
     }
 
     getCurrentLevelData(): LevelData {

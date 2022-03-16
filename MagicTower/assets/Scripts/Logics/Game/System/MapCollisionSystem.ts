@@ -270,10 +270,15 @@ export class MapCollisionSystem extends SystemBase {
 
     private getGidBySpriteId(layerName: string, spriteId: string): number | null {
         let name = spriteId;
+        if (parseInt(spriteId) == 133) {
+            //懒得做动态了，对真魔王做个硬编码写死
+            spriteId = "132";
+        }
         switch (layerName) {
             case "npc":
             case "monster":
             case "door":
+            case "wall":
                 name = `${spriteId}_0`;
                 break;
         }
@@ -289,9 +294,19 @@ export class MapCollisionSystem extends SystemBase {
                 this.levelData.setAppear(layerName, index, 0, id);
                 break;
             case "stair":
-                let gid = this.levelData.deleteHide(layerName, index);
-                if (gid != null) {
-                    this.gameMap.setTileGIDAt(layerName, tile, gid);
+                {
+                    let gid = this.levelData.deleteHide(layerName, index);
+                    if (gid != null) {
+                        this.gameMap.setTileGIDAt(layerName, tile, gid);
+                    }
+                }
+                break;
+            case "wall":
+                {
+                    let gid = this.getGidBySpriteId(layerName, "door1006");
+                    if (gid) {
+                        this.gameMap.setTileGIDAt(layerName, tile, gid);
+                    }
                 }
                 break;
             default:

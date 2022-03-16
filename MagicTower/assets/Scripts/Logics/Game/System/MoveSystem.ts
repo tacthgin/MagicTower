@@ -104,7 +104,7 @@ export class MoveSystem extends SystemBase {
 
                 if (path.length == 0) {
                     this.setCanHeroMoving(collisionFunc(endTile));
-                    this.moveEnd(endTile);
+                    this.moveEnd(endTile, false);
                 } else {
                     let stop = false;
                     this._hero.movePath(
@@ -114,7 +114,7 @@ export class MoveSystem extends SystemBase {
                             if (stop || end) {
                                 //当前格子不能走后结束
                                 this.setCanHeroMoving(!stop);
-                                this.moveEnd(tile);
+                                this.moveEnd(tile, true);
                             }
 
                             return stop;
@@ -123,7 +123,7 @@ export class MoveSystem extends SystemBase {
                             if (isRemoveEnd && !stop) {
                                 //如果是终点，并且没停止，碰撞真正的终点
                                 this.setCanHeroMoving(collisionFunc(endTile));
-                                this.moveEnd(endTile);
+                                this.moveEnd(endTile, false);
                             }
                         }
                     );
@@ -178,10 +178,12 @@ export class MoveSystem extends SystemBase {
         }
     }
 
-    private moveEnd(tile: IVec2) {
+    private moveEnd(tile: IVec2, recordHeroTile: boolean) {
         this._hero.toward(tile);
         this._hero.stand();
-        this._heroModel.setPosition(tile, this._hero.heroDirection);
+        if (recordHeroTile) {
+            this._heroModel.setPosition(tile, this._hero.heroDirection);
+        }
     }
 
     private onCollisionComplete() {
