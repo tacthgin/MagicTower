@@ -10,8 +10,8 @@
     "testLoad": {
         "hero": {
             "position": {
-                "x": 0,
-                "y": 9
+                "x": 5,
+                "y": 0
             },
             "heroAttr": [
                 10000,
@@ -29,7 +29,7 @@
             "shieldId": 0
         },
         "map": {
-            "currentLevel": 43,
+            "currentLevel": 29,
             "maps": {}
         }
     },

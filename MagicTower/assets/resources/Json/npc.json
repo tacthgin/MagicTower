@@ -1,707 +1,707 @@
 {
-  "1": {
-    "id": "1",
-    "type": 1,
-    "spriteId": "npc1",
-    "value": null,
-    "desc": "小偷",
-    "wall": [
-      67
-    ],
-    "move": [
-      88,
-      110
-    ],
-    "talk": [
-      "你清醒了吗？你到监狱时还处在昏迷中，魔塔警卫把你扔到我这个房间。但你很幸运，我刚完成逃跑的暗道你就醒了，我们一起越狱吧。",
-      "我们终于逃出来了，你的剑和盾被警卫拿走了，你必须先找到武器。我知道铁剑在5楼，铁盾在9楼，你最好先取到它们。我现在有事要做没法帮你，再见。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "2": {
-    "id": "2",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": {
-      "gold": 1000
+    "1": {
+        "id": "1",
+        "type": 1,
+        "spriteId": "npc1",
+        "value": null,
+        "desc": "小偷",
+        "wall": [
+            67
+        ],
+        "move": [
+            88,
+            110
+        ],
+        "talk": [
+            "你清醒了吗？你到监狱时还处在昏迷中，魔塔警卫把你扔到我这个房间。但你很幸运，我刚完成逃跑的暗道你就醒了，我们一起越狱吧。",
+            "我们终于逃出来了，你的剑和盾被警卫拿走了，你必须先找到武器。我知道铁剑在5楼，铁盾在9楼，你最好先取到它们。我现在有事要做没法帮你，再见。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "谢谢你救了我，为了感谢你的帮助请收下这些礼物，（收到1000金币）"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "3": {
-    "id": "3",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "attack": 0.03,
-      "defence": 0.03
+    "2": {
+        "id": "2",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": {
+            "gold": 1000
+        },
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "谢谢你救了我，为了感谢你的帮助请收下这些礼物，（收到1000金币）"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "谢谢你救了我，我能用祝福魔法提升你3%的攻击力和防御力，现在提升吗？"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "4": {
-    "id": "4",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": {
-      "prop": [
-        18,
-        1
-      ]
+    "3": {
+        "id": "3",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "attack": 0.03,
+            "defence": 0.03
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "谢谢你救了我，我能用祝福魔法提升你3%的攻击力和防御力，现在提升吗？"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我可以给你怪物手册，它能预测出当前楼层各类怪物对你的伤害。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "5": {
-    "id": "5",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "有些门不能用钥匙打开，只有当你打败它的守卫后才会自动打开。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "6": {
-    "id": "6",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "你购买了礼物后再与商人对话，他会告诉你一些重要的信息。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "7": {
-    "id": "7",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        2,
-        1
-      ],
-      "propGold": -50
+    "4": {
+        "id": "4",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": {
+            "prop": [
+                18,
+                1
+            ]
+        },
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我可以给你怪物手册，它能预测出当前楼层各类怪物对你的伤害。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我有一把蓝钥匙，你出50个金币就卖给你。",
-      "魔塔一共50层，每10层为一个区域，如果不打败此区域的头目就不能到更高的地方。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "8": {
-    "id": "8",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        1,
-        5
-      ],
-      "propGold": -50
+    "5": {
+        "id": "5",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "有些门不能用钥匙打开，只有当你打败它的守卫后才会自动打开。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我有五把黄钥匙，你出50个金币就卖给你。",
-      "在商店里你最好选择提升防御，只有在攻击力低于敌人的防御力时才提升攻击力"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "9": {
-    "id": "9",
-    "type": 1,
-    "spriteId": "npc1",
-    "value": null,
-    "desc": "小偷",
-    "wall": null,
-    "move": [
-      115
-    ],
-    "talk": [
-      "嘿！我们又见面了！非常感谢你打败了此区域的头目，我正苦恼于如何到更高的楼层，现在我终于可以上去了。我听说银盾在11楼，银剑在17楼，这消息不知道对你是否有用。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "10": {
-    "id": "10",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        1,
-        1
-      ],
-      "propGold": -1000
+    "6": {
+        "id": "6",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "你购买了礼物后再与商人对话，他会告诉你一些重要的信息。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我有许多黄钥匙，1000个金币一把，你要吗？"
-    ],
-    "unlimit": true,
-    "eventTalk": null,
-    "event": null
-  },
-  "11": {
-    "id": "11",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        3,
-        1
-      ],
-      "propGold": -800
+    "7": {
+        "id": "7",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                2,
+                1
+            ],
+            "propGold": -50
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我有一把蓝钥匙，你出50个金币就卖给你。",
+            "魔塔一共50层，每10层为一个区域，如果不打败此区域的头目就不能到更高的地方。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我有一把红钥匙，你出800个金币就卖给你。",
-      "你是否注意到5，9，12，14，16，18层的墙与众不同。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "12": {
-    "id": "12",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        2,
-        1
-      ],
-      "propGold": -200
+    "8": {
+        "id": "8",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                1,
+                5
+            ],
+            "propGold": -50
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我有五把黄钥匙，你出50个金币就卖给你。",
+            "在商店里你最好选择提升防御，只有在攻击力低于敌人的防御力时才提升攻击力"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我有一把蓝钥匙，你出200个金币就卖给你。",
-      "如果你持有十字，面对兽人和吸血鬼时你的攻击力加倍。在没有十字架的情况下你不可能打败吸血鬼。十字架被藏在高于15楼的墙内。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "13": {
-    "id": "13",
-    "type": 1,
-    "spriteId": "npc1",
-    "value": null,
-    "desc": "小偷",
-    "wall": [
-      7
-    ],
-    "move": [
-      5
-    ],
-    "talk": [
-      "啊哈！你还好吗？这大章鱼挡住了我前进的道路，现在暗道终于完工了，你现在最好也躲开它。我要走了，再见。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "14": {
-    "id": "14",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": {
-      "prop": [
-        26,
-        1
-      ]
+    "9": {
+        "id": "9",
+        "type": 1,
+        "spriteId": "npc1",
+        "value": null,
+        "desc": "小偷",
+        "wall": null,
+        "move": [
+            115
+        ],
+        "talk": [
+            "嘿！我们又见面了！非常感谢你打败了此区域的头目，我正苦恼于如何到更高的楼层，现在我终于可以上去了。我听说银盾在11楼，银剑在17楼，这消息不知道对你是否有用。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "很好，你居然找到了我，作为奖励我将给你一瓶圣水。喝了他将按你的攻击和防御力的总和增加你的生命点数，你越晚使用它效果越好。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "15": {
-    "id": "15",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我听说在塔内有2把隐藏的红钥匙。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "16": {
-    "id": "16",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "在这区域不多次提升攻击力，就不能打败石头人。切记前人教训。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "17": {
-    "id": "17",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "大法师住在25楼，他是魔塔的主人。以你现在的状态去攻击他简直就是自杀。你应当在取得更高级别的道具后再去打败他。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "18": {
-    "id": "18",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我没有什么可说的，但有一个确切的消息藏在这个楼层里。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "19": {
-    "id": "19",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "如果你到27楼时状态为：生命1500，攻击80，防御98，拥有1蓝钥匙，5黄钥匙。那么祝贺你，你前期是比较成功的。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "20": {
-    "id": "20",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        1,
-        -1
-      ],
-      "propGold": 100
+    "10": {
+        "id": "10",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                1,
+                1
+            ],
+            "propGold": -1000
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我有许多黄钥匙，1000个金币一把，你要吗？"
+        ],
+        "unlimit": true,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我按100个金币一把的价格回收黄钥匙，你出售吗？"
-    ],
-    "unlimit": true,
-    "eventTalk": null,
-    "event": null
-  },
-  "21": {
-    "id": "21",
-    "type": 1,
-    "spriteId": "npc1",
-    "value": null,
-    "desc": "小偷",
-    "wall": [
-      27
-    ],
-    "move": [
-      115
-    ],
-    "talk": [
-      "哦，我刚完成暗道。你每次都及时赶到，看在朋友的份上，你可以免费使用。好了下次见。"
-    ],
-    "unlimit": false,
-    "eventTalk": "你先到别的地方走走，我还在挖暗道。",
-    "event": 9
-  },
-  "22": {
-    "id": "22",
-    "type": 1,
-    "spriteId": "npc1",
-    "value": null,
-    "desc": "小偷",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "哈哈，我们又见面了！谢谢你救了我，我可以帮你在魔龙前打开一条暗道，我现在就去35楼。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": 10
-  },
-  "23": {
-    "id": "23",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "双手剑士的攻击力太高了，你最好到能对他一击必杀时再与他战斗。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "24": {
-    "id": "24",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        1,
-        4,
-        2,
-        1
-      ],
-      "propGold": -1000
+    "11": {
+        "id": "11",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                3,
+                1
+            ],
+            "propGold": -800
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我有一把红钥匙，你出800个金币就卖给你。",
+            "你是否注意到5，9，12，14，16，18层的墙与众不同。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      [
-        "我有四把黄钥匙和一把蓝钥匙，你出1000个金币就都给你。",
-        " 魔塔有50层高，但你似乎不能直接到50层。",
-        "这魔塔太危险了，我可不想再次被抓，我要离塔回去了，再见。"
-      ]
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "25": {
-    "id": "25",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "别匆忙，放慢速度。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "26": {
-    "id": "26",
-    "type": 1,
-    "spriteId": "npc1",
-    "value": null,
-    "desc": "小偷",
-    "wall": null,
-    "move": [
-      116
-    ],
-    "talk": [
-      [
-        "你好，暗道已挖好，你可用它绕过魔龙。",
-        "我听说起始队长(本区的头目)实力差又爱吹牛，所以被魔法警卫们讨厌。",
-        "这魔塔太危险了，我可不想再次被抓，我要离塔回去了，再见。"
-      ]
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "27": {
-    "id": "27",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "如果你能用好4条密道，你不用与强敌作战就能上楼。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "28": {
-    "id": "28",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "你需要用地震卷轴取出37楼仓库内的所有宝物。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "29": {
-    "id": "29",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        1,
-        3
-      ],
-      "propGold": -200
+    "12": {
+        "id": "12",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                2,
+                1
+            ],
+            "propGold": -200
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我有一把蓝钥匙，你出200个金币就卖给你。",
+            "如果你持有十字，面对兽人和吸血鬼时你的攻击力加倍。在没有十字架的情况下你不可能打败吸血鬼。十字架被藏在高于15楼的墙内。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我有三把黄钥匙，你出200个金币就都给你。",
-      "放圣剑的门坏了，你可以用镐破墙而入。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "30": {
-    "id": "30",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        2,
-        3
-      ],
-      "propGold": -2000
+    "13": {
+        "id": "13",
+        "type": 1,
+        "spriteId": "npc1",
+        "value": null,
+        "desc": "小偷",
+        "wall": [
+            7
+        ],
+        "move": [
+            5
+        ],
+        "talk": [
+            "啊哈！你还好吗？这大章鱼挡住了我前进的道路，现在暗道终于完工了，你现在最好也躲开它。我要走了，再见。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "我有三把蓝钥匙，你出2000个金币就都给你。",
-      "塔内有个幸运金币。拥有它在打败敌人后能获得2倍的金钱。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "31": {
-    "id": "31",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "谜题：在3点，拥有传送功能的密宝就会出现。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "32": {
-    "id": "32",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "巫师会用魔法攻击路过的人，在2个魔法警卫间通过会使你的生命减少一半。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "33": {
-    "id": "33",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "44楼被藏在异空间，你只能用密宝才能到达。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "34": {
-    "id": "34",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "hp": 2000,
-      "propGold": -1000
+    "14": {
+        "id": "14",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": {
+            "prop": [
+                26,
+                1
+            ]
+        },
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "很好，你居然找到了我，作为奖励我将给你一瓶圣水。喝了他将按你的攻击和防御力的总和增加你的生命点数，你越晚使用它效果越好。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "给我1000个金币，我就提升你的生命2000点。",
-      "神圣盾能防御魔法攻击，但它被藏在异空间的楼层内。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "35": {
-    "id": "35",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "41楼事实上是左右对称的。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "36": {
-    "id": "36",
-    "type": 3,
-    "spriteId": "npc3",
-    "value": {
-      "prop": [
-        22,
-        1
-      ],
-      "propGold": -4000
+    "15": {
+        "id": "15",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我听说在塔内有2把隐藏的红钥匙。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
     },
-    "desc": "商人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "给我4000个金币，我就给你地震卷轴，它可以炸毁一层楼所有的墙",
-      "如果要打败魔龙你需要圣剑、圣盾、屠龙匕或更高等级的装备。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "37": {
-    "id": "37",
-    "type": 2,
-    "spriteId": "npc2",
-    "value": null,
-    "desc": "老人",
-    "wall": null,
-    "move": null,
-    "talk": [
-      "像骰子上5的形状是一种封印魔法，你最好记住它在你与49楼假魔王战斗时有用。"
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": null
-  },
-  "38": {
-    "id": "38",
-    "type": 5,
-    "spriteId": "npc5",
-    "value": null,
-    "desc": "公主",
-    "wall": null,
-    "move": null,
-    "talk": [
-      [
-        "时间到了，你已被命运选中。如果你不怕死亡，你最终将通过时空来到我这里。",
-        "哦！什么？这只是个洋娃娃！"
-      ]
-    ],
-    "unlimit": true,
-    "eventTalk": null,
-    "event": null
-  },
-  "39": {
-    "id": "39",
-    "type": 1,
-    "spriteId": "npc1",
-    "value": null,
-    "desc": "小偷",
-    "wall": null,
-    "move": null,
-    "talk": [
-      [
-        "勇者问：“你怎会在这里！你到底是谁？”",
-        "小偷回答：“我在这里只有一个理由，那就是。。。”"
-      ]
-    ],
-    "unlimit": false,
-    "eventTalk": null,
-    "event": 25
-  }
+    "16": {
+        "id": "16",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "在这区域不多次提升攻击力，就不能打败石头人。切记前人教训。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "17": {
+        "id": "17",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "大法师住在25楼，他是魔塔的主人。以你现在的状态去攻击他简直就是自杀。你应当在取得更高级别的道具后再去打败他。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "18": {
+        "id": "18",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我没有什么可说的，但有一个确切的消息藏在这个楼层里。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "19": {
+        "id": "19",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "如果你到27楼时状态为：生命1500，攻击80，防御98，拥有1蓝钥匙，5黄钥匙。那么祝贺你，你前期是比较成功的。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "20": {
+        "id": "20",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                1,
+                -1
+            ],
+            "propGold": 100
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我按100个金币一把的价格回收黄钥匙，你出售吗？"
+        ],
+        "unlimit": true,
+        "eventTalk": null,
+        "event": null
+    },
+    "21": {
+        "id": "21",
+        "type": 1,
+        "spriteId": "npc1",
+        "value": null,
+        "desc": "小偷",
+        "wall": [
+            27
+        ],
+        "move": [
+            115
+        ],
+        "talk": [
+            "哦，我刚完成暗道。你每次都及时赶到，看在朋友的份上，你可以免费使用。好了下次见。"
+        ],
+        "unlimit": false,
+        "eventTalk": "你先到别的地方走走，我还在挖暗道。",
+        "event": 9
+    },
+    "22": {
+        "id": "22",
+        "type": 1,
+        "spriteId": "npc1",
+        "value": null,
+        "desc": "小偷",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "哈哈，我们又见面了！谢谢你救了我，我可以帮你在魔龙前打开一条暗道，我现在就去35楼。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": 10
+    },
+    "23": {
+        "id": "23",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "双手剑士的攻击力太高了，你最好到能对他一击必杀时再与他战斗。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "24": {
+        "id": "24",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                1,
+                4,
+                2,
+                1
+            ],
+            "propGold": -1000
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            [
+                "我有四把黄钥匙和一把蓝钥匙，你出1000个金币就都给你。",
+                " 魔塔有50层高，但你似乎不能直接到50层。",
+                "这魔塔太危险了，我可不想再次被抓，我要离塔回去了，再见。"
+            ]
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "25": {
+        "id": "25",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "别匆忙，放慢速度。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "26": {
+        "id": "26",
+        "type": 1,
+        "spriteId": "npc1",
+        "value": null,
+        "desc": "小偷",
+        "wall": null,
+        "move": [
+            115
+        ],
+        "talk": [
+            [
+                "你好，暗道已挖好，你可用它绕过魔龙。",
+                "我听说起始队长(本区的头目)实力差又爱吹牛，所以被魔法警卫们讨厌。",
+                "这魔塔太危险了，我可不想再次被抓，我要离塔回去了，再见。"
+            ]
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "27": {
+        "id": "27",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "如果你能用好4条密道，你不用与强敌作战就能上楼。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "28": {
+        "id": "28",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "你需要用地震卷轴取出37楼仓库内的所有宝物。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "29": {
+        "id": "29",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                1,
+                3
+            ],
+            "propGold": -200
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我有三把黄钥匙，你出200个金币就都给你。",
+            "放圣剑的门坏了，你可以用镐破墙而入。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "30": {
+        "id": "30",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                2,
+                3
+            ],
+            "propGold": -2000
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "我有三把蓝钥匙，你出2000个金币就都给你。",
+            "塔内有个幸运金币。拥有它在打败敌人后能获得2倍的金钱。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "31": {
+        "id": "31",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "谜题：在3点，拥有传送功能的密宝就会出现。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "32": {
+        "id": "32",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "巫师会用魔法攻击路过的人，在2个魔法警卫间通过会使你的生命减少一半。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "33": {
+        "id": "33",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "44楼被藏在异空间，你只能用密宝才能到达。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "34": {
+        "id": "34",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "hp": 2000,
+            "propGold": -1000
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "给我1000个金币，我就提升你的生命2000点。",
+            "神圣盾能防御魔法攻击，但它被藏在异空间的楼层内。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "35": {
+        "id": "35",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "41楼事实上是左右对称的。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "36": {
+        "id": "36",
+        "type": 3,
+        "spriteId": "npc3",
+        "value": {
+            "prop": [
+                22,
+                1
+            ],
+            "propGold": -4000
+        },
+        "desc": "商人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "给我4000个金币，我就给你地震卷轴，它可以炸毁一层楼所有的墙",
+            "如果要打败魔龙你需要圣剑、圣盾、屠龙匕或更高等级的装备。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "37": {
+        "id": "37",
+        "type": 2,
+        "spriteId": "npc2",
+        "value": null,
+        "desc": "老人",
+        "wall": null,
+        "move": null,
+        "talk": [
+            "像骰子上5的形状是一种封印魔法，你最好记住它在你与49楼假魔王战斗时有用。"
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": null
+    },
+    "38": {
+        "id": "38",
+        "type": 5,
+        "spriteId": "npc5",
+        "value": null,
+        "desc": "公主",
+        "wall": null,
+        "move": null,
+        "talk": [
+            [
+                "时间到了，你已被命运选中。如果你不怕死亡，你最终将通过时空来到我这里。",
+                "哦！什么？这只是个洋娃娃！"
+            ]
+        ],
+        "unlimit": true,
+        "eventTalk": null,
+        "event": null
+    },
+    "39": {
+        "id": "39",
+        "type": 1,
+        "spriteId": "npc1",
+        "value": null,
+        "desc": "小偷",
+        "wall": null,
+        "move": null,
+        "talk": [
+            [
+                "勇者问：“你怎会在这里！你到底是谁？”",
+                "小偷回答：“我在这里只有一个理由，那就是。。。”"
+            ]
+        ],
+        "unlimit": false,
+        "eventTalk": null,
+        "event": 25
+    }
 }

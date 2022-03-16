@@ -136,30 +136,20 @@ export class MapCollisionSystem extends SystemBase {
                         }
 
                         if (element) {
+                            if (element.hide) {
+                                return true;
+                            }
                             switch (layerName) {
                                 case "door": {
-                                    let door = element as Door;
-                                    if (!door.hide) {
-                                        return this.doorSystem.doorCollision(door);
-                                    } else {
-                                        return true;
-                                    }
+                                    return this.doorSystem.doorCollision(element as Door);
                                 }
                                 case "monster": {
-                                    let monster = element as Monster;
-                                    if (!monster.hide) {
-                                        this.monsterFightSystem.initliaze(this.hero, monster, this.levelData);
-                                        return this.monsterFightSystem.execute();
-                                    } else {
-                                        return true;
-                                    }
+                                    this.monsterFightSystem.initliaze(this.hero, element as Monster, this.levelData);
+                                    return this.monsterFightSystem.execute();
                                 }
                                 case "stair":
                                     {
-                                        let stair = element as Stair;
-                                        if (!stair.hide) {
-                                            this.mapModel.setLevelDiff(stair.levelDiff);
-                                        }
+                                        this.mapModel.setLevelDiff((element as Stair).levelDiff);
                                     }
                                     return false;
                                 case "npc":

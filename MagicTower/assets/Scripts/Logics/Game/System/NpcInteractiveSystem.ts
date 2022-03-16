@@ -144,6 +144,7 @@ export class NpcInteractiveSystem extends SystemBase {
             });
         } else if (npcInfo.event) {
             GameApp.CommandManager.createCommand(EventCollisionCommand).execute(npcInfo.event);
+            GameApp.CommandManager.createCommand(DisappearCommand).execute("npc", this.npc.index);
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         }
     }
