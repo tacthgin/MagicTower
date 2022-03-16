@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.5" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="1">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="1">
  <tileset firstgid="1" source="element.tsx"/>
  <layer id="8" name="floor" width="11" height="11">
   <data encoding="csv">
@@ -48,7 +48,7 @@
  </layer>
  <layer id="9" name="stair" width="11" height="11">
   <properties>
-   <property name="location" value="99,11,2,1"/>
+   <property name="location" value="99,11,2,-1"/>
   </properties>
   <data encoding="csv">
 139,0,0,0,0,0,0,0,0,0,0,
