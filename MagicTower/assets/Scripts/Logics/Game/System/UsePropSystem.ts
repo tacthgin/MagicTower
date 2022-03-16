@@ -5,12 +5,13 @@ import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
+import { MonsterHandBookItem } from "../../../Dialogs/MonsterHandBookItem";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropInfo, PropType } from "../../../Model/HeroModel/Prop";
 import { Door } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
-import { Stair, StairType } from "../../../Model/MapModel/Data/Elements/Stair";
+import { StairType } from "../../../Model/MapModel/Data/Elements/Stair";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { GameEvent } from "../../Event/GameEvent";
@@ -35,6 +36,7 @@ export class UsePropSystem extends SystemBase {
 
     awake(): void {
         GameApp.EventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
+        GameApp.NodePoolManager.createNodePool(MonsterHandBookItem);
     }
 
     initliaze(gameMap: IGameMap, hero: Hero) {
@@ -52,6 +54,7 @@ export class UsePropSystem extends SystemBase {
         this.gameMap = null!;
         this.hero = null!;
         GameApp.EventManager.unsubscribeTarget(this);
+        GameApp.NodePoolManager.destroyNodePool(MonsterHandBookItem);
     }
 
     eatProp(layerName: string, tile: IVec2, spriteFrameName: string) {
@@ -70,7 +73,12 @@ export class UsePropSystem extends SystemBase {
     useProp(propInfo: PropInfo, extraInfo: string) {
         switch (propInfo.type) {
             case PropType.MONSTER_HAND_BOOK:
-                UIFactory.showDialog("Prefab/Dialogs/MonsterHandBook");
+                let mosnters = this.levelData.getMonsters();
+                if (mosnters.length > 0) {
+                    UIFactory.showDialog("Prefab/Dialogs/MonsterHandBook", { monsters: mosnters });
+                } else {
+                    UIFactory.showToast("怪物已经全部被消灭了");
+                }
                 break;
             case PropType.RECORD_BOOK:
                 UIFactory.showDialog("Prefab/Dialogs/RecordBook");

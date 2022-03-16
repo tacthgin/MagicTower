@@ -185,6 +185,21 @@ export class LevelData extends LoadBase {
         return null;
     }
 
+    getMonsters(): Monster[] {
+        let layerInfo = this.getLayerInfo("monster");
+        let monsters: Monster[] = [];
+        if (layerInfo && layerInfo.elements) {
+            for (let index in layerInfo.elements) {
+                let monster = layerInfo.elements[index];
+                if (!monster.hide) {
+                    monsters.push(layerInfo.elements[index]);
+                }
+            }
+        }
+
+        return monsters;
+    }
+
     hasDoorInfo(): boolean {
         return this.getLayerInfo("door") != null;
     }

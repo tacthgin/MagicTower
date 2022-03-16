@@ -11,7 +11,7 @@
         "hero": {
             "position": {
                 "x": 5,
-                "y": 5
+                "y": 10
             },
             "heroAttr": [
                 10000,
@@ -24,12 +24,13 @@
                 "2": 3,
                 "3": 4,
                 "20": 1,
-                "23": 1
+                "23": 1,
+                "18": 1
             },
             "shieldId": 0
         },
         "map": {
-            "currentLevel": 50,
+            "currentLevel": 1,
             "maps": {}
         }
     },

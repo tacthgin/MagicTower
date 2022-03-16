@@ -14,6 +14,7 @@
     "__type__": "cc.Node",
     "_name": "MonsterHandBookItem",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": null,
     "_children": [
       {
@@ -1853,6 +1854,10 @@
     },
     "damageLabel": {
       "__id__": 11
+    },
+    "monsterIconPrefab": {
+      "__uuid__": "166abebd-716f-450e-8252-15769b1a8c58",
+      "__expectedType__": "cc.Prefab"
     },
     "_id": ""
   },
