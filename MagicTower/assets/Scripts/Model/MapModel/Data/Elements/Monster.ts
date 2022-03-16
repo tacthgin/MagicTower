@@ -25,6 +25,18 @@ export interface MonsterInfo {
     big: number[] | null;
 }
 
+export enum MonsterEvent {
+    /*
+     * 正常条件，一组怪物消灭完触发事件
+     */
+    NORMAL = 0,
+
+    /**
+     * 双层条件, 一组怪物消灭完，一组怪物全部存活
+     */
+    DOUBLE = 1,
+}
+
 export class Monster extends Element {
     private _monsterInfo: MonsterInfo = null!;
     private _monsterMove: boolean = false;

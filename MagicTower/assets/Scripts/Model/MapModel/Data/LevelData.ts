@@ -3,7 +3,7 @@ import { LoadBase } from "../../../../GameFramework/Scripts/Application/Model/Lo
 import { Door, DoorState, DoorType } from "./Elements/Door";
 import { Element } from "./Elements/Element";
 import { EventInfo } from "./Elements/EventInfo";
-import { Monster } from "./Elements/Monster";
+import { Monster, MonsterEvent } from "./Elements/Monster";
 import { Npc } from "./Elements/Npc";
 import { DIRECTION_INDEX_DIFFS, ParserFactory } from "./Elements/ParserFactory";
 import { Stair, StairType } from "./Elements/Stair";
@@ -29,6 +29,8 @@ export class LevelData extends LoadBase {
     private _disappearTile: any = {};
     /** 层元素信息 */
     private _layerInfo: { [layerName: string]: any } = {};
+
+    private _tempAddMagicGuards: { [index: number | string]: any } | null = null;
 
     public get level() {
         return this._level;
@@ -250,23 +252,60 @@ export class LevelData extends LoadBase {
         return null;
     }
 
+    /**
+     * 消灭怪物触发怪物事件
+     * @param triggerIndex 触发的地块索引
+     * @returns 事件id
+     */
     triggerMonsterEvent(triggerIndex: number): number | null {
         let layerInfo = this.getLayerInfo("monster");
         if (layerInfo && layerInfo.event) {
-            let monsterEventInfo = layerInfo.event as Map<Array<number>, number>;
-            let index = 0;
-            for (let pair of monsterEventInfo) {
-                index = pair[0].indexOf(triggerIndex);
-                if (index != -1) {
-                    pair[0].splice(index, 1);
-                    if (pair[0].length == 0) {
-                        let eventId = pair[1];
-                        monsterEventInfo.delete(pair[0]);
-                        if (monsterEventInfo.size == 0) {
-                            delete layerInfo.event;
+            for (let key in layerInfo.event) {
+                let eventType = parseInt(key);
+                switch (eventType) {
+                    case MonsterEvent.NORMAL:
+                        {
+                            let monsterEventInfo = layerInfo.event[eventType] as Map<Array<number>, number>;
+                            let index = 0;
+                            for (let pair of monsterEventInfo) {
+                                index = pair[0].indexOf(triggerIndex);
+                                if (index != -1) {
+                                    pair[0].splice(index, 1);
+                                    if (pair[0].length == 0) {
+                                        let eventId = pair[1];
+                                        monsterEventInfo.delete(pair[0]);
+                                        if (monsterEventInfo.size == 0) {
+                                            delete layerInfo.event[eventType];
+                                        }
+                                        return eventId;
+                                    }
+                                    break;
+                                }
+                            }
                         }
-                        return eventId;
-                    }
+                        break;
+                    case MonsterEvent.DOUBLE:
+                        {
+                            let monsterEventInfo = layerInfo.event[eventType];
+                            let existConditions = monsterEventInfo[2];
+                            if (existConditions.indexOf(triggerIndex) != -1) {
+                                delete layerInfo.event[eventType];
+                                return null;
+                            } else {
+                                let destroyConditions = monsterEventInfo[1];
+                                let index = destroyConditions.indexOf(triggerIndex);
+                                if (index != -1) {
+                                    destroyConditions.splice(index, 1);
+                                    if (destroyConditions.length == 0) {
+                                        let eventId = monsterEventInfo[0];
+                                        delete layerInfo.event[eventType];
+                                        return eventId;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        break;
                 }
             }
         }
@@ -276,16 +315,16 @@ export class LevelData extends LoadBase {
 
     /**
      * 通过消灭的怪物位置，来获取怪物守卫的门
-     * @param destoryMonsterIndex 消灭的怪物位置索引
+     * @param destroyMonsterIndex 消灭的怪物位置索引
      */
-    triggerMonsterDoor(destoryMonsterIndex: number): Array<Door> | null {
+    triggerMonsterDoor(destroyMonsterIndex: number): Array<Door> | null {
         let layerInfo = this.getLayerInfo("door");
         if (layerInfo) {
             let monsterDoors: Map<Array<number>, Array<Door>> = layerInfo["monsterDoors"];
             if (monsterDoors) {
                 let index = 0;
                 for (let pair of monsterDoors) {
-                    index = pair[0].indexOf(destoryMonsterIndex);
+                    index = pair[0].indexOf(destroyMonsterIndex);
                     if (index != -1) {
                         pair[0].splice(index, 1);
                         if (pair[0].length == 0) {
@@ -458,6 +497,10 @@ export class LevelData extends LoadBase {
         element.gid = gid;
         element.index = index;
         layerInfo.elements[index] = element;
+
+        if (layerName == "monster") {
+            this.addMagicGuards(element);
+        }
     }
 
     /**
@@ -523,6 +566,23 @@ export class LevelData extends LoadBase {
             this.removeWizardOrMagicGuards(monster);
             let wizardDamages = this.getLayerInfo("monster").wizardDamages;
             ParserFactory.parseWizardDamage(wizardDamages, newIndex);
+        }
+    }
+
+    private addMagicGuards(monster: Monster) {
+        if (monster.isMagicGuard()) {
+            let layerInfo = this.getLayerInfo("monster");
+            if (layerInfo) {
+                if (!this._tempAddMagicGuards) {
+                    this._tempAddMagicGuards = {};
+                }
+                let damages = layerInfo.magicGuardDamges;
+                if (!damages) {
+                    damages = layerInfo.magicGuardDamages = new Map<number, number[]>();
+                }
+                ParserFactory.addMagicGuardsDamage(damages, this._tempAddMagicGuards, monster);
+                this._tempAddMagicGuards[monster.index] = monster.index;
+            }
         }
     }
 }

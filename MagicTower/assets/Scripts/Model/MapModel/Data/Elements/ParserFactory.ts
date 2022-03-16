@@ -2,7 +2,7 @@ import { GameFrameworkError } from "../../../../../GameFramework/Scripts/Base/Ga
 import { Utility } from "../../../../../GameFramework/Scripts/Utility/Utility";
 import { Door, DoorState } from "./Door";
 import { EventInfo } from "./EventInfo";
-import { Monster, MonsterInfo } from "./Monster";
+import { Monster, MonsterEvent, MonsterInfo } from "./Monster";
 import { Npc } from "./Npc";
 import { Stair, StairType } from "./Stair";
 
@@ -22,7 +22,7 @@ export class ParserFactory {
 
     static parse(layerName: string, propertiesInfo: any, tiles: number[], parseGidFn: Function) {
         let func = this.parserMap[layerName];
-        return func ? func(propertiesInfo, tiles, parseGidFn) : null;
+        return func ? func.call(ParserFactory, propertiesInfo, tiles, parseGidFn) : null;
     }
 
     static parseWizardDamage(wizardDamages: Map<number, number[]>, wizardIndex: number) {
@@ -38,6 +38,35 @@ export class ParserFactory {
                 wizardDamages.set(damageIndex, monsterindexes);
             }
             monsterindexes.push(wizardIndex);
+        });
+    }
+
+    static parseMagicGuardsDamage(magicGuardsDamages: Map<number, number[]>, magicGuards: { [key: number | string]: any }) {
+        //采集魔法警卫伤害
+        for (let index in magicGuards) {
+            let hasDamage = false;
+            DIRECTION_INDEX_DIFFS.forEach((diff) => {
+                let currentIndex = parseInt(index);
+                let monsterIndex = currentIndex + diff * 2;
+                if (magicGuards[monsterIndex]) {
+                    magicGuardsDamages.set(currentIndex + diff, [currentIndex, monsterIndex]);
+                    hasDamage = true;
+                }
+            });
+
+            if (hasDamage) {
+                delete magicGuards[index];
+            }
+        }
+    }
+
+    static addMagicGuardsDamage(magicGuardsDamages: Map<number, number[]>, magicGuards: { [key: number | string]: any }, newMagicGuard: Monster) {
+        DIRECTION_INDEX_DIFFS.forEach((diff) => {
+            let currentIndex = newMagicGuard.index;
+            let monsterIndex = currentIndex + diff * 2;
+            if (magicGuards[monsterIndex]) {
+                magicGuardsDamages.set(currentIndex + diff, [currentIndex, monsterIndex]);
+            }
         });
     }
 
@@ -127,7 +156,7 @@ export class ParserFactory {
             switch (key) {
                 case "passive":
                     {
-                        doors[propertiesValue] = ParserFactory.packageDoor(doors[propertiesValue], DoorState.PASSIVE);
+                        doors[propertiesValue] = this.packageDoor(doors[propertiesValue], DoorState.PASSIVE);
                     }
                     break;
                 case "appear":
@@ -142,7 +171,7 @@ export class ParserFactory {
                             let map = new Map<Array<number>, number>();
                             let indexes: number[] = [];
                             for (let index in doors) {
-                                doors[index] = ParserFactory.packageDoor(doors[index], DoorState.APPEAR);
+                                doors[index] = this.packageDoor(doors[index], DoorState.APPEAR);
                                 indexes.push(parseInt(index));
                                 hideInfo[index] = doors[index].gid;
                             }
@@ -150,7 +179,7 @@ export class ParserFactory {
                             event[DoorState.APPEAR_EVENT] = map;
                         } else {
                             let door = doors[propertiesValue];
-                            doors[propertiesValue] = ParserFactory.packageDoor(door, key == "appear" ? DoorState.APPEAR : DoorState.HIDE);
+                            doors[propertiesValue] = this.packageDoor(door, key == "appear" ? DoorState.APPEAR : DoorState.HIDE);
                             hideInfo[door.index] = door.gid;
                         }
                     }
@@ -234,7 +263,7 @@ export class ParserFactory {
                     monsters[i] = monster;
 
                     if (monster.isWizard()) {
-                        ParserFactory.parseWizardDamage(wizardDamages, i);
+                        this.parseWizardDamage(wizardDamages, i);
                     } else if (monster.isMagicGuard()) {
                         magicGuards[monster.index] = Monster;
                     } else if (monster.monsterInfo.big) {
@@ -251,23 +280,9 @@ export class ParserFactory {
             }
         }
 
-        let magicGuardDamges: Map<number, number[]> = new Map<number, number[]>();
+        let magicGuardDamages: Map<number, number[]> = new Map<number, number[]>();
         //采集魔法警卫伤害
-        for (let index in magicGuards) {
-            let hasDamage = false;
-            DIRECTION_INDEX_DIFFS.forEach((diff) => {
-                let currentIndex = parseInt(index);
-                let monsterIndex = currentIndex + diff * 2;
-                if (magicGuards[monsterIndex]) {
-                    magicGuardDamges.set(currentIndex + diff, [currentIndex, monsterIndex]);
-                    hasDamage = true;
-                }
-            });
-
-            if (hasDamage) {
-                delete magicGuards[index];
-            }
-        }
+        this.parseMagicGuardsDamage(magicGuardDamages, magicGuards);
 
         let hideInfo: { [index: number | string]: number } | null = null;
         let propertiesValue: string = null!;
@@ -277,6 +292,9 @@ export class ParserFactory {
             switch (key) {
                 case "monsterEvent":
                     {
+                        if (!event) {
+                            event = {};
+                        }
                         let infos = propertiesValue.split(":");
                         let monsterEvents = new Map<Array<number>, number>();
                         monsterEvents.set(
@@ -285,7 +303,25 @@ export class ParserFactory {
                             }),
                             parseInt(infos[0])
                         );
-                        event = monsterEvents;
+
+                        event[MonsterEvent.NORMAL] = monsterEvents;
+                    }
+                    break;
+                case "disappearMonsterEvent":
+                    {
+                        if (!event) {
+                            event = {};
+                        }
+                        let conditions: any = propertiesValue.split(":");
+                        conditions[0] = parseInt(conditions[0]);
+                        conditions[1] = conditions[1].split(",").map((index: string) => {
+                            return parseInt(index);
+                        });
+                        conditions[2] = conditions[2].split(",").map((index: string) => {
+                            return parseInt(index);
+                        });
+
+                        event[MonsterEvent.DOUBLE] = conditions;
                     }
                     break;
                 case "firstAttack":
@@ -319,7 +355,7 @@ export class ParserFactory {
                     break;
             }
         }
-        return { elements: monsters, event: event, wizardDamages: wizardDamages, magicGuardDamges: magicGuardDamges, bigMonster: bigMonster, hide: hideInfo };
+        return { elements: monsters, event: event, wizardDamages: wizardDamages, magicGuardDamges: magicGuardDamages, bigMonster: bigMonster, hide: hideInfo };
     }
 
     private static parseNpc(propertiesInfo: any, tiles: number[], parseGidFn: Function): any {

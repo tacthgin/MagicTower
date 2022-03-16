@@ -18,6 +18,7 @@ import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventArgs";
 import { EventCollisionEventArgs } from "../../Event/EventCollisionEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
+import { MonsterDieEventArgs } from "../../Event/MonsterDIeEventArgs";
 import { MoveEventArgs } from "../../Event/MoveEventArgs";
 import { ShowEventArgs } from "../../Event/ShowEventArgs";
 import { SpecialMoveEventArgs } from "../../Event/SpecialMoveEventArgs";
@@ -240,10 +241,25 @@ export class MapCollisionSystem extends SystemBase {
         }
     }
 
-    private onMonsterDie(sender: object, eventArgs: CommonEventArgs) {
-        if (!this.gameEventSystem.getEventCompleteFlag()) {
+    private onMonsterDie(sender: object, eventArgs: MonsterDieEventArgs) {
+        let collisionComplete = true;
+        if (eventArgs.eventId != null) {
+            //怪物事件
+            this.eventCollision(eventArgs.eventId);
+            collisionComplete = false;
+        } else if (!this.gameEventSystem.getEventCompleteFlag()) {
+            //事件进行中怪物死亡，继续执行事件
             this.gameEventSystem.execute();
-        } else {
+            collisionComplete = false;
+        }
+
+        let magicGuardCollisionComplete = true;
+        if (eventArgs.magicGuardIndex != null) {
+            //收到魔法警卫伤害
+            magicGuardCollisionComplete = this.collision(this.gameMap.getTile(eventArgs.magicGuardIndex));
+        }
+
+        if (collisionComplete || magicGuardCollisionComplete) {
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
         }
     }

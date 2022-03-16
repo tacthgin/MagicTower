@@ -11,6 +11,7 @@ import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
+import { MonsterDieEventArgs } from "../../Event/MonsterDIeEventArgs";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
@@ -95,9 +96,9 @@ export class MonsterFightSystem extends SystemBase {
 
         this.levelData.triggerDoorEvent(DoorState.MONSTER_EVENT, monster.index);
 
+        let magicGuardIndex = null;
         if (monster.isMagicGuard()) {
-            GameApp.EventManager.fireNow(this, CollisionEventArgs.create(monster.index));
-            return;
+            magicGuardIndex = monster.index;
         }
 
         let eventId = this.levelData.triggerMonsterEvent(monster.index);
@@ -106,10 +107,6 @@ export class MonsterFightSystem extends SystemBase {
             eventId = monster.monsterInfo.eventId;
         }
 
-        if (eventId) {
-            GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
-        } else {
-            GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.MONSTER_DIE));
-        }
+        GameApp.EventManager.fireNow(this, MonsterDieEventArgs.create(magicGuardIndex, eventId));
     }
 }

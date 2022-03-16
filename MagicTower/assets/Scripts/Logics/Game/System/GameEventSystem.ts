@@ -139,6 +139,7 @@ export class GameEventSystem extends SystemBase {
                     if (monster) {
                         monster.weak(this.eventJson.weak[1]);
                     }
+                    this.execute();
                     break;
             }
         } else if (!this.eventCompleteFlag) {
