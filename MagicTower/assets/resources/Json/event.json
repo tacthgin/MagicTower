@@ -50,10 +50,10 @@
         "step": [
             "appear",
             "chat",
+            "sound",
             "appear",
             "chat",
             "beAttack",
-            "sound",
             "sceneDisappear",
             "disappear",
             "chat",

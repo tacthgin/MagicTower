@@ -226,7 +226,7 @@ export class GameEventSystem extends SystemBase {
 
     private beAttack(info: any) {
         if (info.hero) {
-            GameApp.SoundManager.playSound("beAttacked");
+            GameApp.SoundManager.playSound("Sound/beAttacked");
             this.hero.magicLight(info.hero);
         } else if (info.monster) {
             let position = this.gameMap.getPositionAt(this.gameMap.getTile(info.monster));
