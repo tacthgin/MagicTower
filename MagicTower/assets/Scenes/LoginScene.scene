@@ -340,7 +340,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 42.27,
+      "width": 42.26,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -379,11 +379,8 @@
     "_lineHeight": 40,
     "_overflow": 0,
     "_enableWrapText": true,
-    "_font": {
-      "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
-      "__expectedType__": "cc.TTFFont"
-    },
-    "_isSystemFontUsed": false,
+    "_font": null,
+    "_isSystemFontUsed": true,
     "_isItalic": false,
     "_isBold": false,
     "_isUnderline": false,

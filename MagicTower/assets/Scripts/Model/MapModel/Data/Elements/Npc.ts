@@ -10,7 +10,7 @@ export interface NpcInfo {
     desc: string;
     wall: number[];
     move: number[];
-    talk: string[];
+    talk: any[];
     unlimit: boolean;
     eventTalk: string | null;
     event: number | null;
@@ -45,12 +45,11 @@ export class Npc extends Element {
         if (this._npcInfo.eventTalk) {
             return { talk: this._npcInfo.eventTalk, index: "event" };
         }
-  
+
         return { talk: this._npcInfo.talk[this.stepIndex], index: this.stepIndex };
     }
 
     nextTalk() {
-        
         if (!this._npcInfo.unlimit) {
             ++this.stepIndex;
         }

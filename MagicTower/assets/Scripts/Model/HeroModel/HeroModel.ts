@@ -159,7 +159,7 @@ export class HeroModel extends ModelBase {
     }
 
     recordTalk(npcID: number, chatStep: number) {
-        if (this.props[PropType.RECORD_BOOK]) {
+        if (this.props[PropId.RECORD_BOOK]) {
             this.records.push({ npcID: npcID, chatStep: chatStep });
             this.save();
         }

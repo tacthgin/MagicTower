@@ -31,6 +31,7 @@ export enum PropType {
 
 export enum PropId {
     DIVINE_SHIELD = 17,
+    RECORD_BOOK = 19,
 }
 
 export interface PropInfo {
