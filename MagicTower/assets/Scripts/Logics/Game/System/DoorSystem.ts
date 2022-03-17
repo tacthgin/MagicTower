@@ -90,6 +90,7 @@ export class DoorSystem extends SystemBase {
     }
 
     async openDoor(door: Door, callback: Function | null = null) {
+        GameApp.SoundManager.playSound("Sound/door");
         let tile = this.gameMap.getTile(door.index);
         await this.createDoorAnimation(door.id, tile, false, () => {
             if (callback) {

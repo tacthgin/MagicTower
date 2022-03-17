@@ -54,6 +54,7 @@ export class MonsterFightSystem extends SystemBase {
         this.schedule(
             () => {
                 if (heroFirst) {
+                    GameApp.SoundManager.playSound("Sound/attack");
                     this.hero.showAttack(true);
                     this.monster.hurt(damageInfo.monsterDamage);
                     GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(monsterInfo));

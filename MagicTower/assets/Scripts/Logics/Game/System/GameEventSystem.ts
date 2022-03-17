@@ -4,6 +4,7 @@ import { SystemBase } from "../../../../GameFramework/Scripts/Application/Comman
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { PlaySoundParams } from "../../../../GameFramework/Scripts/Sound/PlaySoundParams";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { EventInfo } from "../../../Model/MapModel/Data/Elements/EventInfo";
@@ -38,6 +39,7 @@ export class GameEventSystem extends SystemBase {
     private hero: Hero = null!;
     private levelData: LevelData = null!;
     private eventCompleteFlag: boolean = true;
+    private soundId: number | null = null;
 
     awake(): void {
         GameApp.NodePoolManager.createNodePool("attack");
@@ -70,26 +72,7 @@ export class GameEventSystem extends SystemBase {
         return this.eventCompleteFlag;
     }
 
-    executeComplete() {
-        return this.step >= this.eventJson.step.length;
-    }
-
-    reset(): void {
-        this.eventInfo = null!;
-        this.eventJson = null;
-        this.chatStep = 0;
-        this.appearStep = 0;
-        this.disappearStep = 0;
-        this.moveStep = 0;
-        this.step = 0;
-        this.globalConfig = null;
-        this.gameMap = null!;
-        this.hero = null!;
-        this.levelData = null!;
-        this.eventCompleteFlag = true;
-    }
-
-    execute() {
+    async execute() {
         if (this.eventJson.save) {
             if (this.eventJson.save != this.levelData.level) {
                 GameApp.getModel(MapModel).addLevelEvent(this.eventJson.save, parseInt(this.eventJson.id));
@@ -98,7 +81,6 @@ export class GameEventSystem extends SystemBase {
         }
         if (this.step < this.eventJson.step.length) {
             let stepName = this.eventJson.step[this.step++];
-            GameFrameworkLog.log(stepName);
             switch (stepName) {
                 case "chat":
                     this.chat();
@@ -143,6 +125,27 @@ export class GameEventSystem extends SystemBase {
                     break;
                 case "jump":
                     GameApp.getModel(MapModel).jumpLevel(this.eventJson.jump[0], { x: this.eventJson.jump[1], y: this.eventJson.jump[2] });
+                    this.execute();
+                    break;
+                case "sound":
+                    let soundInfo = this.eventJson.sound;
+                    if (soundInfo) {
+                        let loop = false;
+                        if (soundInfo[1]) {
+                            loop = true;
+                        }
+                        let soundId = await GameApp.SoundManager.playSound(`Sound/${soundInfo[0]}`, undefined, PlaySoundParams.create(loop));
+                        if (loop) {
+                            this.soundId = soundId;
+                        }
+                    }
+                    this.execute();
+                    break;
+                case "stopSound":
+                    if (this.soundId != null) {
+                        GameApp.SoundManager.stopSound(this.soundId);
+                        this.soundId = null;
+                    }
                     this.execute();
                     break;
             }
@@ -223,6 +226,7 @@ export class GameEventSystem extends SystemBase {
 
     private beAttack(info: any) {
         if (info.hero) {
+            GameApp.SoundManager.playSound("beAttacked");
             this.hero.magicLight(info.hero);
         } else if (info.monster) {
             let position = this.gameMap.getPositionAt(this.gameMap.getTile(info.monster));
@@ -261,5 +265,21 @@ export class GameEventSystem extends SystemBase {
             npc.clearEventTalk();
         }
         this.execute();
+    }
+
+    private reset(): void {
+        this.eventInfo = null!;
+        this.eventJson = null;
+        this.chatStep = 0;
+        this.appearStep = 0;
+        this.disappearStep = 0;
+        this.moveStep = 0;
+        this.step = 0;
+        this.globalConfig = null;
+        this.gameMap = null!;
+        this.hero = null!;
+        this.levelData = null!;
+        this.eventCompleteFlag = true;
+        this.soundId = null;
     }
 }
