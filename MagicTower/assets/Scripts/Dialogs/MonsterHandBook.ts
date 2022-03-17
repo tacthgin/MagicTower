@@ -12,9 +12,9 @@ export class MonsterHandBook extends DialogBase {
     private content: Node = null!;
 
     onRecyle() {
-        this.content.children.forEach((item) => {
-            GameApp.NodePoolManager.releaseNode(MonsterHandBookItem, item);
-        });
+        for (let i = this.content.children.length - 1; i >= 0; i--) {
+            GameApp.NodePoolManager.releaseNode(MonsterHandBookItem, this.content.children[i]);
+        }
     }
 
     async onOpen(useData: { monsters: Monster[] }) {

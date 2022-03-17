@@ -1,4 +1,4 @@
-import { Component, instantiate, Label, Prefab, v3, _decorator } from "cc";
+import { Component, Label, _decorator } from "cc";
 import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
 import { CalculateSystem } from "../Logics/Game/System/CalculateSystem";
 import { MonsterIcon } from "../Logics/Game/UI/MonsterIcon";
@@ -10,25 +10,18 @@ const { ccclass, property } = _decorator;
 
 @ccclass("MonsterHandBookItem")
 export class MonsterHandBookItem extends Component {
+    @property(MonsterIcon)
+    private monsterIcon: MonsterIcon = null!;
     @property(Label)
     private labels: Label[] = [];
     @property(Label)
     private monsterName: Label = null!;
     @property(Label)
     private damageLabel: Label = null!;
-    @property(Prefab)
-    private monsterIconPrefab: Prefab = null!;
-
-    private monsterNode: any = null;
 
     init(monster: Monster) {
         let monsterInfo = monster.monsterInfo;
-        if (!this.monsterNode) {
-            this.monsterNode = instantiate(this.monsterIconPrefab);
-            this.monsterNode.position = v3(-120, -20);
-            this.monsterNode.parent = this.node;
-        }
-        this.monsterNode.getComponent(MonsterIcon)?.init(parseInt(monsterInfo.id));
+        this.monsterIcon.init(parseInt(monsterInfo.id));
         this.labels[0].string = monsterInfo.hp.toString();
         this.labels[1].string = monsterInfo.attack.toString();
         this.labels[2].string = monsterInfo.defence.toString();

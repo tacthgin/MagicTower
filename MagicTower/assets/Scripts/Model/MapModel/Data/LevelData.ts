@@ -189,11 +189,16 @@ export class LevelData extends LoadBase {
         let layerInfo = this.getLayerInfo("monster");
         let monsters: Monster[] = [];
         if (layerInfo && layerInfo.elements) {
+            let tempMonsters: { [id: number]: Monster } = {};
             for (let index in layerInfo.elements) {
                 let monster = layerInfo.elements[index];
                 if (!monster.hide) {
-                    monsters.push(layerInfo.elements[index]);
+                    tempMonsters[monster.id] = monster;
                 }
+            }
+
+            for (let id in tempMonsters) {
+                monsters.push(tempMonsters[id]);
             }
         }
 
