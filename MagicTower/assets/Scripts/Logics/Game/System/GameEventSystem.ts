@@ -72,7 +72,7 @@ export class GameEventSystem extends SystemBase {
         return this.eventCompleteFlag;
     }
 
-    async execute() {
+    execute() {
         if (this.eventJson.save) {
             if (this.eventJson.save != this.levelData.level) {
                 GameApp.getModel(MapModel).addLevelEvent(this.eventJson.save, parseInt(this.eventJson.id));
@@ -130,14 +130,14 @@ export class GameEventSystem extends SystemBase {
                 case "sound":
                     let soundInfo = this.eventJson.sound;
                     if (soundInfo) {
-                        let loop = false;
-                        if (soundInfo[1]) {
-                            loop = true;
-                        }
-                        let soundId = await GameApp.SoundManager.playSound(`Sound/${soundInfo[0]}`, undefined, PlaySoundParams.create(loop));
-                        if (loop) {
-                            this.soundId = soundId;
-                        }
+                        let loop = !!soundInfo[1];
+                        let playFunc = async () => {
+                            this.soundId = await GameApp.SoundManager.playSound(`Sound/${soundInfo[0]}`, undefined, PlaySoundParams.create(loop));
+                            if (!loop) {
+                                this.soundId = null;
+                            }
+                        };
+                        playFunc();
                     }
                     this.execute();
                     break;
