@@ -11,6 +11,7 @@ import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { ISaveManager } from "../Save/ISaveManager";
 import { WebSaveHelp } from "../Save/WebSaveHelp";
+import { ISceneManager } from "../Scene/ISceneManager";
 import { ISoundManager } from "../Sound/ISoundManager";
 import { IUIManager } from "../UI/IUIManager";
 import { Utility } from "../Utility/Utility";
@@ -19,6 +20,7 @@ import { ICommandManager } from "./Command/ICommandManager";
 import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
 import { CNodeHelp } from "./NodePool/CNodeHelp";
+import { CSceneHelp } from "./Scene/CSceneHelp";
 import { SoundController } from "./Sound/SoundController";
 import { CUIFormHelp } from "./UI/Helper/CUIFormHelp";
 import { UIConstant } from "./UI/UIConstant";
@@ -94,6 +96,13 @@ export class GameApp extends Component {
      */
     static get FsmManager(): IFsmManager {
         return GameFrameworkEntry.getModule<IFsmManager>("FsmManager");
+    }
+
+    /**
+     * 场景管理器
+     */
+    static get SceneManager(): ISceneManager {
+        return GameFrameworkEntry.getModule<ISceneManager>("SceneManager");
     }
 
     /**
@@ -184,6 +193,10 @@ export class GameApp extends Component {
         }
         //初始化存储模块
         GameApp.SaveManager.setSaveHelp(new WebSaveHelp());
+        //初始化场景管理
+        let sceneHelp = new CSceneHelp();
+        sceneHelp.setGlobalNode(this.node);
+        GameApp.SceneManager.setSceneHelp(sceneHelp);
         //初始化JSON工具类
         Utility.Json.setResourceManager(resourceManager);
         Utility.Json.setSystemUtility(Utility.System);
