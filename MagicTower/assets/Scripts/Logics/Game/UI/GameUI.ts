@@ -59,6 +59,7 @@ export class GameUI extends Component {
     onLoad() {
         this.registerEvent();
         this.initUI();
+        console.log(GameApp.SceneManager.getScene());
     }
 
     onDestroy() {

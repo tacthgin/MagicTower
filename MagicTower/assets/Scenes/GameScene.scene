@@ -3342,10 +3342,7 @@
     "_fillRange": 0,
     "_isTrimmedMode": true,
     "_useGrayscale": false,
-    "_atlas": {
-      "__uuid__": "6d86a1f7-6d2b-4cb1-b12c-b1f85af4e857",
-      "__expectedType__": "cc.SpriteAtlas"
-    },
+    "_atlas": null,
     "_id": "57VyiIl+FMXIMtm5SJ+69u"
   },
   {

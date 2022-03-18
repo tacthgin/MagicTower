@@ -195,7 +195,6 @@ export class GameApp extends Component {
         GameApp.SaveManager.setSaveHelp(new WebSaveHelp());
         //初始化场景管理
         let sceneHelp = new CSceneHelp();
-        sceneHelp.setGlobalNode(this.node);
         GameApp.SceneManager.setSceneHelp(sceneHelp);
         //初始化JSON工具类
         Utility.Json.setResourceManager(resourceManager);

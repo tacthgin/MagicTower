@@ -8,13 +8,9 @@ import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
-import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
-import { CommonEventArgs } from "../../Event/CommonEventArgs";
-import { GameEvent } from "../../Event/GameEvent";
 import { MonsterDieEventArgs } from "../../Event/MonsterDIeEventArgs";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { DisappearCommand } from "../Command/DisappearCommand";
-import { EventCollisionCommand } from "../Command/EventCollisionCommand";
 import { Hero } from "../Map/Hero/Hero";
 import { CalculateSystem } from "./CalculateSystem";
 
@@ -39,7 +35,7 @@ export class MonsterFightSystem extends SystemBase {
 
         let heroModel = GameApp.getModel(HeroModel);
         let monsterInfo = this.monster.monsterInfo;
-        if (!CalculateSystem.canHeroAttack(heroModel, monsterInfo, !monsterInfo.firstAttack)) {
+        if (!CalculateSystem.canHeroAttack(heroModel, monsterInfo)) {
             UIFactory.showToast(`你打不过${monsterInfo.name}`);
             return true;
         }

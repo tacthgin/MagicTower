@@ -49,8 +49,8 @@
         "jump": null,
         "step": [
             "appear",
-            "chat",
             "sound",
+            "chat",
             "appear",
             "chat",
             "beAttack",

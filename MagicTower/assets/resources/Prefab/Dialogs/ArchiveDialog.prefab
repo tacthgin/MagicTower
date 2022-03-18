@@ -44,8 +44,8 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 392,
-      "y": 191,
+      "x": 0,
+      "y": 0,
       "z": 0
     },
     "_lrot": {
@@ -258,11 +258,8 @@
     "_lineHeight": 22,
     "_overflow": 1,
     "_enableWrapText": true,
-    "_font": {
-      "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
-      "__expectedType__": "cc.TTFFont"
-    },
-    "_isSystemFontUsed": false,
+    "_font": null,
+    "_isSystemFontUsed": true,
     "_isItalic": false,
     "_isBold": false,
     "_isUnderline": false,
@@ -542,11 +539,8 @@
     "_lineHeight": 40,
     "_overflow": 1,
     "_enableWrapText": false,
-    "_font": {
-      "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
-      "__expectedType__": "cc.TTFFont"
-    },
-    "_isSystemFontUsed": false,
+    "_font": null,
+    "_isSystemFontUsed": true,
     "_isItalic": false,
     "_isBold": false,
     "_isUnderline": false,
@@ -1123,11 +1117,8 @@
     "_lineHeight": 40,
     "_overflow": 1,
     "_enableWrapText": false,
-    "_font": {
-      "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
-      "__expectedType__": "cc.TTFFont"
-    },
-    "_isSystemFontUsed": false,
+    "_font": null,
+    "_isSystemFontUsed": true,
     "_isItalic": false,
     "_isBold": false,
     "_isUnderline": false,
@@ -1704,11 +1695,8 @@
     "_lineHeight": 40,
     "_overflow": 1,
     "_enableWrapText": false,
-    "_font": {
-      "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
-      "__expectedType__": "cc.TTFFont"
-    },
-    "_isSystemFontUsed": false,
+    "_font": null,
+    "_isSystemFontUsed": true,
     "_isItalic": false,
     "_isBold": false,
     "_isUnderline": false,
@@ -2282,11 +2270,8 @@
     "_lineHeight": 40,
     "_overflow": 1,
     "_enableWrapText": false,
-    "_font": {
-      "__uuid__": "aea5f106-3988-4c50-abab-08a3c9a569ba",
-      "__expectedType__": "cc.TTFFont"
-    },
-    "_isSystemFontUsed": false,
+    "_font": null,
+    "_isSystemFontUsed": true,
     "_isItalic": false,
     "_isBold": false,
     "_isUnderline": false,

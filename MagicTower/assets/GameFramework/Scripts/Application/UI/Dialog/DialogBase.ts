@@ -1,4 +1,5 @@
 import { Enum, EventTouch, Node, screen, UITransform, _decorator } from "cc";
+import { GameFrameworkLog } from "../../../Base/Log/GameFrameworkLog";
 import { GameApp } from "../../GameApp";
 import { DialogAction } from "./DialogAction";
 import { DialogUIForm } from "./DialogUIForm";
@@ -61,7 +62,7 @@ export class DialogBase extends DialogUIForm {
         if (this.touchId != null && this.touchId != event.getID()) {
             return;
         }
-
+        GameFrameworkLog.log("dialog onTouchStart");
         this.touchId = event.getID(); //处理多点触摸
     }
 
@@ -75,6 +76,7 @@ export class DialogBase extends DialogUIForm {
             if (this.clickBgClose) {
                 this.close();
             }
+            GameFrameworkLog.log("dialog onTouchEnd");
         }
         event.propagationStopped = true;
     }

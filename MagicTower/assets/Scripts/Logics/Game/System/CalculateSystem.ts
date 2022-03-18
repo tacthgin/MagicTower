@@ -10,7 +10,7 @@ export class CalculateSystem {
      * @param monsterInfo 怪物数据
      * @param heroFirstAttack 勇士先攻击
      */
-    static canHeroAttack(heroModel: HeroModel, monsterInfo: MonsterInfo, heroFirstAttack: boolean = true) {
+    static canHeroAttack(heroModel: HeroModel, monsterInfo: MonsterInfo) {
         let heroAttackCount = this.getHeroAttackCount(heroModel, monsterInfo);
         if (heroAttackCount == 0) {
             return false;
@@ -20,7 +20,7 @@ export class CalculateSystem {
             return true;
         }
         if (heroAttackCount == monsterAttackCount) {
-            return heroFirstAttack;
+            return !monsterInfo.firstAttack;
         }
         return heroAttackCount < monsterAttackCount;
     }
@@ -76,6 +76,11 @@ export class CalculateSystem {
      */
     static totalHeroDamage(heroModel: HeroModel, monsterInfo: MonsterInfo) {
         let damage = CalculateSystem.perAttackDamage(heroModel, monsterInfo);
-        return CalculateSystem.getMonsterAttackCount(heroModel, monsterInfo) * damage.heroDamage;
+        let heroAttackCount = CalculateSystem.getHeroAttackCount(heroModel, monsterInfo);
+        if (heroAttackCount == 0) {
+            return Number.MAX_SAFE_INTEGER;
+        }
+        let monsterAttackCount = heroAttackCount - 1;
+        return monsterAttackCount * damage.heroDamage;
     }
 }

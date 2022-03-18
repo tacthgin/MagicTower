@@ -1,4 +1,4 @@
-import { Node, TiledUserNodeData, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
+import { Node, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -8,7 +8,6 @@ import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { AstarFactory } from "../../../../GameFramework/Scripts/ToolLibary/Astar/AstarFactory";
 import { IAstar } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAstar";
-import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
@@ -264,7 +263,7 @@ export class MoveSystem extends SystemBase {
                     let monster = this._levelData.getLayerElement<Monster>("monster", index);
                     if (monster) {
                         let monsterInfo = monster.monsterInfo;
-                        return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo, !monsterInfo.firstAttack);
+                        return CalculateSystem.canHeroAttack(this._heroModel, monsterInfo);
                     } else {
                         throw new GameFrameworkError("move monster error");
                     }
