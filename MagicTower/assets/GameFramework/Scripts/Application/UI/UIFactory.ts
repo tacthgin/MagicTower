@@ -1,7 +1,7 @@
 import { Vec3 } from "cc";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { IUIManager } from "../../UI/IUIManager";
-import { ToastType } from "./Toast/ColorToast";
+import { ToastType } from "./Toast/ToastType";
 import { UIConstant } from "./UIConstant";
 
 export class UIFactory {

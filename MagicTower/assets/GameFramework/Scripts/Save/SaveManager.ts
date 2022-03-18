@@ -17,7 +17,9 @@ export class SaveManager extends GameFrameworkModule implements ISaveManager {
 
     update(elapseSeconds: number): void {}
 
-    shutDown(): void {}
+    shutDown(): void {
+        this._saveHelp = null;
+    }
 
     setSaveHelp(saveHelp: ISaveHelp): void {
         this._saveHelp = saveHelp;

@@ -1,15 +1,11 @@
 import { RichText, screen, tween, UITransform, v3, Vec3, _decorator } from "cc";
 import { GameApp } from "../../GameApp";
+import { ToastType } from "./ToastType";
 import { ToastUIForm } from "./ToastUIForm";
 
 const { ccclass, property } = _decorator;
 
 const SHORTEST_LENGTH: number = 120;
-
-export enum ToastType {
-    NORAML,
-    RICH,
-}
 
 @ccclass("ColorToast")
 export class ColorToast extends ToastUIForm {
