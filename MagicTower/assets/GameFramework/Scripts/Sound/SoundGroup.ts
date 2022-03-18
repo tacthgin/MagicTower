@@ -10,6 +10,7 @@ export class SoundGroup implements ISoundGroup {
     private readonly _soundAgents: Array<SoundAgent> = null!;
     private _mute: boolean = false;
     private _volume: number = 1;
+    private _prePlaySoundAgents: Array<SoundAgent> = null!;
 
     constructor(name: string) {
         if (!name) {
@@ -17,6 +18,7 @@ export class SoundGroup implements ISoundGroup {
         }
         this._name = name;
         this._soundAgents = new Array<SoundAgent>();
+        this._prePlaySoundAgents = new Array<SoundAgent>();
     }
 
     get name(): string {
@@ -84,6 +86,7 @@ export class SoundGroup implements ISoundGroup {
             candidateAgent.loop = playSoundParams.loop;
             candidateAgent.time = playSoundParams.time;
             candidateAgent.play();
+            this._prePlaySoundAgents.push(candidateAgent);
         } else {
             throw new GameFrameworkError("set sound asset failed");
         }
@@ -139,6 +142,20 @@ export class SoundGroup implements ISoundGroup {
             if (soundAgent.isPlaying) {
                 soundAgent.stop();
             }
+        }
+    }
+
+    /**
+     * 轮询声音组
+     * @param elapseSeconds
+     */
+    update(elapseSeconds: number): void {
+        //解决同一帧内，播放多个动画，agent被替换问题
+        if (this._prePlaySoundAgents.length > 0) {
+            this._prePlaySoundAgents.forEach((soundAgent) => {
+                soundAgent.updateState();
+            });
+            this._prePlaySoundAgents.length = 0;
         }
     }
 }

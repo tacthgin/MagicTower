@@ -98,11 +98,15 @@ export class SoundAgent implements ISoundAgent {
         return this._soundAgentHelp.setSoundAsset(soundAsset);
     }
 
-    refreshMute() {
+    refreshMute(): void {
         this._soundAgentHelp.mute = this._soundGroup.mute || this._muteInSoundGroup;
     }
 
-    refreshVolume() {
+    refreshVolume(): void {
         this._soundAgentHelp.volume = this._soundGroup.volume * this._volumeInSoundGroup;
+    }
+
+    updateState(): void {
+        this._soundAgentHelp.updateState();
     }
 }

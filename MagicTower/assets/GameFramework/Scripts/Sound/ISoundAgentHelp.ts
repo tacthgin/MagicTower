@@ -53,4 +53,9 @@ export interface ISoundAgentHelp {
      * 设置声音资源
      */
     setSoundAsset(asset: object): boolean;
+
+    /**
+     * 更新播放状态
+     */
+    updateState(): void;
 }

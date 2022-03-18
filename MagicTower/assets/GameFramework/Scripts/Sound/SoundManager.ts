@@ -28,7 +28,11 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         return this._backgroundSerialId;
     }
 
-    update(elapseSeconds: number): void {}
+    update(elapseSeconds: number): void {
+        for (let pair of this._soundGroups) {
+            pair[1].update(elapseSeconds)
+        }
+    }
 
     shutDown(): void {
         this.stopAllLoadedSounds();
