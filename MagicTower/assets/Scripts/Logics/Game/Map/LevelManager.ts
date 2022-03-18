@@ -72,6 +72,7 @@ export class LevelManager extends Component {
         }
         this.touchId = event.getID();
         this.moveHero(event.getUILocation());
+        GameFrameworkLog.log(GameApp.SceneManager.getScene());
     }
 
     private onTouchEnd(event: Touch) {
