@@ -95,10 +95,10 @@ export class JsonUtility {
 
     /**
      * 内部获得json的key缓存
-     * @param json
-     * @param path
-     * @param key
-     * @returns
+     * @param json json对象
+     * @param path json路径作为key
+     * @param key json元素的key
+     * @returns json的key缓存
      */
     private internalGetJsonKeyCache(json: object, path: string, key: string): Map<number | string, object> {
         let jsonCache = this._cacheJsonKeyMap.get(path);
