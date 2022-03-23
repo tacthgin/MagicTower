@@ -11,6 +11,10 @@ export class ChatDialog extends DialogBase {
     private talkContent: string | string[] = null!;
     private endCallback: Function | null = null;
 
+    onDisable() {
+        console.log("onDisable");
+    }
+
     onOpen(userData: { content: string | string[]; endCallback: Function | null }) {
         this.talkContent = userData.content;
         this.endCallback = userData.endCallback;

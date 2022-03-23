@@ -44,9 +44,7 @@ export class DialogUIForm extends Component implements IUIForm {
 
     onOpen(userData?: Object): void {}
 
-    onClose(isShutDown: boolean, userData?: Object): void {
-        this.node.removeFromParent();
-    }
+    onClose(isShutDown: boolean, userData?: Object): void {}
 
     onPause(): void {}
 

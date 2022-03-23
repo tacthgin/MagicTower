@@ -1,6 +1,9 @@
 import { Node, tween, Tween, Vec3 } from "cc";
+import { DialogActionFactory } from "../../DialogActionFactory";
+import { DialogAction } from "../DialogAction";
 import { DialogActionBase } from "../DialogActionBase";
 
+@DialogActionFactory.registerAction(DialogAction.ScaleAction)
 export class ScaleAction extends DialogActionBase {
     protected getStartAction(node: Node): Tween<Node> | null {
         return tween(node)

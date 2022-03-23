@@ -1,24 +1,21 @@
 import { Node, Tween } from "cc";
-import { Constructor } from "../../../Base/DataStruct/Constructor";
-import { IRerference } from "../../../Base/ReferencePool/IRerference";
-import { ReferencePool } from "../../../Base/ReferencePool/ReferencePool";
+import { IRerference } from "../../../../Base/ReferencePool/IRerference";
+import { ReferencePool } from "../../../../Base/ReferencePool/ReferencePool";
 
 export abstract class DialogActionBase implements IRerference {
     private _endActionCallback: () => void = null!;
     private _dialogActionNode: Node = null!;
     private _isEndActionOver: boolean = true;
 
-    protected create(endActionCallback: () => void, dialogActionNode: Node) {
-        let dialogAction = ReferencePool.acquire(this.constructor as Constructor<DialogActionBase>);
-        dialogAction._endActionCallback = endActionCallback;
-        dialogAction._dialogActionNode = dialogActionNode;
-        return dialogAction;
-    }
-
     clear(): void {
         this._endActionCallback = null!;
         this._dialogActionNode = null!;
         this._isEndActionOver = true;
+    }
+
+    initialize(dialogActionNode: Node, endActionCallback: () => void) {
+        this._dialogActionNode = dialogActionNode;
+        this._endActionCallback = endActionCallback;
     }
 
     executeStartAction(): void {
@@ -36,16 +33,23 @@ export abstract class DialogActionBase implements IRerference {
                 this._isEndActionOver = false;
                 action
                     .call(() => {
-                        this._endActionCallback && this._endActionCallback();
-                        this._isEndActionOver = true;
+                        this.endActionCallback();
                     })
                     .start();
+            } else {
+                this.endActionCallback();
             }
         }
     }
 
     resetAction(): void {
         this._isEndActionOver = true;
+    }
+
+    private endActionCallback() {
+        this._endActionCallback && this._endActionCallback();
+        this._isEndActionOver = true;
+        ReferencePool.release(this);
     }
 
     /**
