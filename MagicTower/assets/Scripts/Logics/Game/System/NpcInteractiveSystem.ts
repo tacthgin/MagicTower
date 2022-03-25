@@ -5,12 +5,11 @@ import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFa
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
-import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
+import { Door } from "../../../Model/MapModel/Data/Elements/Door";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
-import { CollisionCommand } from "../Command/CollisionCommand";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
 import { MoveCommand } from "../Command/MoveCommand";
@@ -41,8 +40,8 @@ export class NpcInteractiveSystem extends SystemBase {
                 callback: (accept: boolean) => {
                     if (accept) {
                         this.npcTrade();
-                        this.interactiveComplete();
                         this.npc.nextTalk();
+                        this.interactiveComplete();
                     }
                     GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.COLLISION_COMPLETE));
                 },
