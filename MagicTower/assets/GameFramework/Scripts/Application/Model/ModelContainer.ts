@@ -6,7 +6,7 @@ import { IModel } from "./IModel";
 import { ModelBase } from "./ModelBase";
 
 /**
- * model容器
+ * Model容器
  */
 export class ModelContainer {
     private static readonly s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();
@@ -122,7 +122,7 @@ export class ModelContainer {
 
         ModelContainer.s_modelConstructors.forEach((ctor, name) => {
             let model = this.getModel(ctor);
-            model.setSaveManager(this._saveManager!);
+            model.setSaveManager(this._saveManager!, name);
             modelInfos.push({
                 model: model,
                 value: this._saveManager?.getObject(name) || null,

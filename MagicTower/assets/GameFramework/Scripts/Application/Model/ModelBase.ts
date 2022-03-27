@@ -8,6 +8,8 @@ import { ModelEventArgs } from "./ModelEventArgs";
 
 export abstract class ModelBase extends ScheduleBase implements IModel {
     private _saveManager: ISaveManager | null = null;
+    private _saveName: string = "";
+    private _saveObject: any = {};
     private _eventPool: EventPool<ModelEventArgs> = null!;
 
     constructor() {
@@ -43,8 +45,9 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
      * 设置存储管理器
      * @param saveManager 存储管理器
      */
-    setSaveManager(saveManager: ISaveManager): void {
+    setSaveManager(saveManager: ISaveManager, saveName: string): void {
         this._saveManager = saveManager;
+        this._saveName = saveName;
     }
 
     check<T extends ModelEventArgs>(id: number, eventHandle: EventHandle<T>, thisArg?: any): boolean {
@@ -72,8 +75,8 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
     }
 
     /**
-     * 加载模型本地数据
-     * @param localData 模型本地数据
+     * 加载模型数据
+     * @param localData 模型数据
      */
     abstract load(localData: object | null): void;
 
@@ -84,8 +87,15 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
         if (!this._saveManager) {
             throw new GameFrameworkError("you must set save manager first");
         }
-        //let saveObject = {};
-        //this._saveManager.setObject(ModelContainer.getClassName(this), this);
+        if (this._saveObject) {
+            this._saveManager.setObject(this._saveName, this);
+        }
+    }
+
+    addSaveKey(name: string) {
+        if (name in this) {
+            this._saveObject[name] = (this as any)[name];
+        }
     }
 
     /**
