@@ -117,12 +117,4 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
             }
         }
     }
-
-    /**
-     * 保存标志装饰器
-     * @returns 装饰器函数
-     */
-    static saveMark(...args: any[]) {
-        console.log(args);
-    }
 }
