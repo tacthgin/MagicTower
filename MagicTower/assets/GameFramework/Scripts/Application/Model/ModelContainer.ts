@@ -11,6 +11,7 @@ import { ModelBase } from "./ModelBase";
 export class ModelContainer {
     private static readonly s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();
     private static readonly s_nameConstructors: Map<Constructor<ModelBase>, string> = new Map<Constructor<ModelBase>, string>();
+    private static readonly s_saveKeys: Map<Constructor<ModelBase>, string[]> = new Map<Constructor<ModelBase>, string[]>();
     private readonly _models: GameFrameworkLinkedList<ModelBase> = null!;
     private readonly _cachedModels: Map<Constructor<ModelBase>, ModelBase> = null!;
     private _saveManager: ISaveManager | null = null;
@@ -42,6 +43,20 @@ export class ModelContainer {
             throw new GameFrameworkError("model has not register");
         }
         return name;
+    }
+
+    /**
+     * 缓存模型需要保存的键名
+     * @param model 模型
+     * @param key 键名
+     */
+    static addModelSaveKey(model: Constructor<ModelBase>, key: string): void {
+        let keys = this.s_saveKeys.get(model);
+        if (!keys) {
+            keys = new Array<string>();
+            this.s_saveKeys.set(model, keys);
+        }
+        keys.push(key);
     }
 
     /**
@@ -137,7 +152,11 @@ export class ModelContainer {
         /** 加载完数据以后，重定义属性的setter */
         modelInfos.forEach((modelInfo) => {
             modelInfo.model.load(modelInfo.value);
-            modelInfo.model.defineSetterProperty();
+            let saveKeys = ModelContainer.s_saveKeys.get(modelInfo.model.constructor as any);
+            console.log(modelInfo.model, saveKeys);
+            if (saveKeys) {
+                modelInfo.model.defineSetterProperty(saveKeys);
+            }
         });
     }
 

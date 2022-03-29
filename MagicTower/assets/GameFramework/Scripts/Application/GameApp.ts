@@ -21,7 +21,9 @@ import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
 import { CNodeHelp } from "./NodePool/CNodeHelp";
 import { CSceneHelp } from "./Scene/CSceneHelp";
+import { SoundConstant } from "./Sound/SoundConstant";
 import { SoundController } from "./Sound/SoundController";
+import { SoundFactory } from "./Sound/SoundFactory";
 import { CUIFormHelp } from "./UI/Helper/CUIFormHelp";
 import { UIConstant } from "./UI/UIConstant";
 import { UIFactory } from "./UI/UIFactory";
@@ -188,6 +190,9 @@ export class GameApp extends Component {
         let soundController = this.getComponent(SoundController);
         if (soundController) {
             soundManager.setSoundHelp(soundController);
+            soundManager.addSoundGroup(SoundConstant.SOUND_BACKGROUND_GROUP);
+            soundManager.addSoundGroup(SoundConstant.SOUND_EFFECT_GROUP);
+            SoundFactory.setSoundManager(soundManager);
         } else {
             throw new GameFrameworkError("sound controller is invalid");
         }

@@ -94,28 +94,20 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
     }
 
     /**
-     * 添加需要保存的键名
-     * @param key 键名
-     */
-    addSaveKey(key: string) {
-        if (key in this) {
-            this._saveObject[key] = (this as any)[key];
-        }
-    }
-
-    /**
      * 重定义保存标志的setter
+     * @param saveKeys 需要保存的键名
      */
-    defineSetterProperty() {
-        console.log(this._saveName, this._saveObject);
-        for (let key in this._saveObject) {
+    defineSetterProperty(saveKeys: string[]) {
+        console.log(this._saveName, saveKeys);
+        saveKeys.forEach((key) => {
+            this._saveObject[key] = (this as any)[key];
             Reflect.defineProperty(this, key, {
                 set: (value: any) => {
                     this._saveObject[key] = value;
                     this.save();
                 },
             });
-        }
+        });
     }
 
     /**
