@@ -88,7 +88,7 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
             throw new GameFrameworkError("you must set save manager first");
         }
         if (this._saveObject) {
-            this._saveManager.setObject(this._saveName, this);
+            this._saveManager.setObject(this._saveName, this._saveObject);
         }
     }
 
