@@ -4,6 +4,9 @@ import { IUIManager } from "../../UI/IUIManager";
 import { ToastType } from "./Toast/ToastType";
 import { UIConstant } from "./UIConstant";
 
+/**
+ * UI工厂
+ */
 export class UIFactory {
     private static _toastAssetPath: string = "";
     private static _uiManager: IUIManager = null!;
