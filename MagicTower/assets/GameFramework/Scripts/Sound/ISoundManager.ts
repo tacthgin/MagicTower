@@ -8,20 +8,6 @@ import { PlaySoundParams } from "./PlaySoundParams";
  */
 export interface ISoundManager {
     /**
-     * 背景音乐分组
-     */
-    readonly BACKGROUND_GROUP_NAME: string;
-
-    /**
-     * 声音默认组
-     */
-    readonly DEFAULT_GROUP_NAME: string;
-
-    /**
-     * 背景音乐序列id
-     */
-    readonly backgroundSerialId: number;
-    /**
      * 设置资源管理器
      * @param resourceManager 资源管理器
      */
@@ -39,14 +25,7 @@ export interface ISoundManager {
      * @param soundGroupName 声音组名字
      * @param playSoundParams 声音播放参数
      */
-    playSound(soundAssetPath: string, soundGroupName?: string, playSoundParams?: PlaySoundParams): Promise<number>;
-
-    /**
-     * 播放背景声音
-     * @param soundAssetPath 声音资源路径
-     * @param playSoundParams 声音播放参数
-     */
-    playBackgroundSound(soundAssetPath: string, playSoundParams?: PlaySoundParams): Promise<number>;
+    playSound(soundAssetPath: string, soundGroupName: string, playSoundParams?: PlaySoundParams): Promise<number>;
 
     /**
      * 暂停声音播放
@@ -70,11 +49,6 @@ export interface ISoundManager {
      * 停止所有正在播放的
      */
     stopAllLoadedSounds(): void;
-
-    /**
-     * 停止所有除了背景播放的声音
-     */
-    stopAllSoundsExceptBackground(): void;
 
     /**
      * 是否有声音组

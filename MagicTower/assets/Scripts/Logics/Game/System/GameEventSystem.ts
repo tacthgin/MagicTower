@@ -2,6 +2,7 @@ import { IVec2, Node, tween, v3 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { SoundFactory } from "../../../../GameFramework/Scripts/Application/Sound/SoundFactory";
 import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { PlaySoundParams } from "../../../../GameFramework/Scripts/Sound/PlaySoundParams";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
@@ -131,7 +132,7 @@ export class GameEventSystem extends SystemBase {
                     if (soundInfo) {
                         let loop = !!soundInfo[1];
                         let playFunc = async () => {
-                            this.soundId = await GameApp.SoundManager.playSound(`Sound/${soundInfo[0]}`, undefined, PlaySoundParams.create(loop));
+                            this.soundId = await SoundFactory.playEffectSound(`Sound/${soundInfo[0]}`, PlaySoundParams.create(loop));
                             if (!loop) {
                                 this.soundId = null;
                             }
@@ -225,7 +226,7 @@ export class GameEventSystem extends SystemBase {
 
     private beAttack(info: any) {
         if (info.hero) {
-            GameApp.SoundManager.playSound("Sound/beAttacked");
+            SoundFactory.playEffectSound("Sound/beAttacked");
             this.hero.magicLight(info.hero);
         } else if (info.monster) {
             let position = this.gameMap.getPositionAt(this.gameMap.getTile(info.monster));

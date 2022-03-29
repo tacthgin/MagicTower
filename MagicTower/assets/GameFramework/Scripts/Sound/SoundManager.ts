@@ -15,22 +15,15 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
     private _resourceManager: IResourceManager | null = null;
     private _soundHelp: ISoundHelp | null = null;
     private _serialId: number = 0;
-    private _backgroundSerialId: number = 0;
-    readonly BACKGROUND_GROUP_NAME: string = "gameframework_background_sound_group";
-    readonly DEFAULT_GROUP_NAME: string = "gameframework_default_sound_group";
 
     constructor() {
         super();
         this._soundGroups = new Map<string, SoundGroup>();
     }
 
-    get backgroundSerialId(): number {
-        return this._backgroundSerialId;
-    }
-
     update(elapseSeconds: number): void {
         for (let pair of this._soundGroups) {
-            pair[1].update(elapseSeconds)
+            pair[1].update(elapseSeconds);
         }
     }
 
@@ -47,16 +40,20 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         this._soundHelp = soundHelp;
     }
 
-    async playSound(soundAssetPath: string, soundGroupName: string = "", playSoundParams?: PlaySoundParams): Promise<number> {
+    async playSound(soundAssetPath: string, soundGroupName: string, playSoundParams?: PlaySoundParams): Promise<number> {
         if (!this._resourceManager) {
             throw new GameFrameworkError("resource mamager not exist");
         }
+
+        if (!soundGroupName) {
+            throw new GameFrameworkError("you must set sound group name first");
+        }
+
         let audioClip = await this._resourceManager.loadAsset(soundAssetPath);
         if (!audioClip) {
             throw new GameFrameworkError(`audio clip ${soundAssetPath} not exist`);
         }
 
-        soundGroupName = soundGroupName || this.DEFAULT_GROUP_NAME;
         if (!this.hasSoundGroup(soundGroupName)) {
             this.addSoundGroup(soundGroupName);
         }
@@ -70,17 +67,6 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         soundGroup.playSound(this._serialId, audioClip, playSoundParams);
         ReferencePool.release(playSoundParams);
         return this._serialId;
-    }
-
-    async playBackgroundSound(soundAssetPath: string, playSoundParams?: PlaySoundParams): Promise<number> {
-        if (this._backgroundSerialId != 0) {
-            this.stopSound(this._backgroundSerialId);
-        }
-        if (!playSoundParams) {
-            playSoundParams = PlaySoundParams.create(true);
-        }
-        this._backgroundSerialId = await this.playSound(soundAssetPath, this.BACKGROUND_GROUP_NAME, playSoundParams);
-        return this._backgroundSerialId;
     }
 
     pauseSound(serialId: number): void {
@@ -110,14 +96,6 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
     stopAllLoadedSounds(): void {
         for (let soundGroupInfo of this._soundGroups) {
             soundGroupInfo[1].stopAllLoadedSounds();
-        }
-    }
-
-    stopAllSoundsExceptBackground(): void {
-        for (let soundGroupInfo of this._soundGroups) {
-            if (soundGroupInfo[0] !== this.BACKGROUND_GROUP_NAME) {
-                soundGroupInfo[1].stopAllLoadedSounds();
-            }
         }
     }
 

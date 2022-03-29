@@ -1,6 +1,7 @@
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { SoundFactory } from "../../../../GameFramework/Scripts/Application/Sound/SoundFactory";
 import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
@@ -50,7 +51,7 @@ export class MonsterFightSystem extends SystemBase {
         this.schedule(
             () => {
                 if (heroFirst) {
-                    GameApp.SoundManager.playSound("Sound/attack");
+                    SoundFactory.playEffectSound("Sound/attack");
                     this.hero.showAttack(true);
                     this.monster.hurt(damageInfo.monsterDamage);
                     GameApp.EventManager.fireNow(this, MonsterFightEventArgs.create(monsterInfo));

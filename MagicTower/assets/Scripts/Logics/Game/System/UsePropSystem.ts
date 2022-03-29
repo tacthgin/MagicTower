@@ -2,6 +2,7 @@ import { IVec2, v2 } from "cc";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { SoundFactory } from "../../../../GameFramework/Scripts/Application/Sound/SoundFactory";
 import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
@@ -58,7 +59,7 @@ export class UsePropSystem extends SystemBase {
     }
 
     eatProp(layerName: string, tile: IVec2, spriteFrameName: string) {
-        GameApp.SoundManager.playSound("Sound/eat");
+        SoundFactory.playEffectSound("Sound/eat");
         let name = spriteFrameName.split("_")[0];
         let propJson = Utility.Json.getJsonKeyCache(layerName, "spriteId", name) as any;
         if (propJson) {
