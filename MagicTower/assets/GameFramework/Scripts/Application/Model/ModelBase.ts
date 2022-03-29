@@ -75,12 +75,6 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
     }
 
     /**
-     * 加载模型数据
-     * @param localData 模型数据
-     */
-    abstract load(localData: object | null): void;
-
-    /**
      * 存储模型本地数据
      */
     save(): void {
@@ -92,11 +86,36 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
         }
     }
 
-    addSaveKey(name: string) {
-        if (name in this) {
-            this._saveObject[name] = (this as any)[name];
+    /**
+     * 添加需要保存的键名
+     * @param key 键名
+     */
+    addSaveKey(key: string) {
+        if (key in this) {
+            this._saveObject[key] = (this as any)[key];
         }
     }
+
+    /**
+     * 重定义保存标志的setter
+     */
+    defineSetterProperty() {
+        console.log(this._saveName, this._saveObject);
+        for (let key in this._saveObject) {
+            Reflect.defineProperty(this, key, {
+                set: (value: any) => {
+                    this._saveObject[key] = value;
+                    this.save();
+                },
+            });
+        }
+    }
+
+    /**
+     * 加载模型数据
+     * @param localData 模型数据
+     */
+    abstract load(localData: object | null): void;
 
     /**
      * 按键值赋予模型数据

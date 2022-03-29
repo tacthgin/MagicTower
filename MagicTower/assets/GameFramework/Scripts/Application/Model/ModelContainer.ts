@@ -134,8 +134,10 @@ export class ModelContainer {
             return r.model.priority - l.model.priority;
         });
 
-        modelInfos.forEach((value) => {
-            value.model.load(value.value);
+        /** 加载完数据以后，重定义属性的setter */
+        modelInfos.forEach((modelInfo) => {
+            modelInfo.model.load(modelInfo.value);
+            modelInfo.model.defineSetterProperty();
         });
     }
 
