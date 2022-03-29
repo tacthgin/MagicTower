@@ -1,4 +1,3 @@
-import { ModelBase } from "./ModelBase";
 import { ModelContainer } from "./ModelContainer";
 
 /**
@@ -7,5 +6,5 @@ import { ModelContainer } from "./ModelContainer";
  * @param key
  */
 export function saveMark(target: any, key: string) {
-    ModelContainer.addModelSaveKey(target, key);
+    ModelContainer.addModelSaveKey(target.constructor, key);
 }

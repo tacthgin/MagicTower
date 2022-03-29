@@ -50,11 +50,11 @@ export class ModelContainer {
      * @param model 模型
      * @param key 键名
      */
-    static addModelSaveKey(model: Constructor<ModelBase>, key: string): void {
-        let keys = this.s_saveKeys.get(model);
+    static addModelSaveKey(modelConstructor: Constructor<ModelBase>, key: string): void {
+        let keys = this.s_saveKeys.get(modelConstructor);
         if (!keys) {
             keys = new Array<string>();
-            this.s_saveKeys.set(model, keys);
+            this.s_saveKeys.set(modelConstructor, keys);
         }
         keys.push(key);
     }
@@ -133,6 +133,7 @@ export class ModelContainer {
         let modelInfos: Array<{
             model: ModelBase;
             value: object | null;
+            name: string;
         }> = [];
 
         ModelContainer.s_modelConstructors.forEach((ctor, name) => {
@@ -141,6 +142,7 @@ export class ModelContainer {
             modelInfos.push({
                 model: model,
                 value: this._saveManager?.getObject(name) || null,
+                name: name,
             });
         });
 
@@ -152,10 +154,12 @@ export class ModelContainer {
         /** 加载完数据以后，重定义属性的setter */
         modelInfos.forEach((modelInfo) => {
             modelInfo.model.load(modelInfo.value);
-            let saveKeys = ModelContainer.s_saveKeys.get(modelInfo.model.constructor as any);
-            console.log(modelInfo.model, saveKeys);
-            if (saveKeys) {
-                modelInfo.model.defineSetterProperty(saveKeys);
+            let constructor = ModelContainer.s_modelConstructors.get(modelInfo.name);
+            if (constructor) {
+                let saveKeys = ModelContainer.s_saveKeys.get(constructor);
+                if (saveKeys) {
+                    modelInfo.model.defineSetterProperty(saveKeys);
+                }
             }
         });
     }

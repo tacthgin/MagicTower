@@ -13,7 +13,7 @@ import { ModelEventArgs } from "./ModelEventArgs";
 export abstract class ModelBase extends ScheduleBase implements IModel {
     private readonly _eventPool: EventPool<ModelEventArgs> = null!;
     private _saveManager: ISaveManager | null = null;
-    private _saveObject: any = {};
+    private _saveObject: any = null;
     private _saveName: string = "";
 
     constructor() {
@@ -86,6 +86,7 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
         if (!this._saveManager) {
             throw new GameFrameworkError("you must set save manager first");
         }
+
         if (this._saveObject) {
             this._saveManager.setObject(this._saveName, this._saveObject);
         } else {
@@ -98,7 +99,7 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
      * @param saveKeys 需要保存的键名
      */
     defineSetterProperty(saveKeys: string[]) {
-        console.log(this._saveName, saveKeys);
+        this._saveObject = {};
         saveKeys.forEach((key) => {
             this._saveObject[key] = (this as any)[key];
             Reflect.defineProperty(this, key, {
