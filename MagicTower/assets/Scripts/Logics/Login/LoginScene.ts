@@ -1,6 +1,7 @@
 import { AudioClip, Component, JsonAsset, Label, Prefab, SpriteFrame, TiledMapAsset, _decorator } from "cc";
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
+import { SettingModel } from "../../Model/SettingModel/SettingModel";
 
 const { ccclass, property } = _decorator;
 

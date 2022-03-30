@@ -9,7 +9,7 @@ import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { Monster } from "../../../Model/MapModel/Data/Elements/Monster";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
-import { MonsterDieEventArgs } from "../../Event/MonsterDIeEventArgs";
+import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { Hero } from "../Map/Hero/Hero";

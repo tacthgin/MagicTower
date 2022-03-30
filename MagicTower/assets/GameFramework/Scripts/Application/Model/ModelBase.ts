@@ -12,9 +12,14 @@ import { ModelEventArgs } from "./ModelEventArgs";
  */
 export abstract class ModelBase extends ScheduleBase implements IModel {
     private readonly _eventPool: EventPool<ModelEventArgs> = null!;
+    /** 存储管理器 */
     private _saveManager: ISaveManager | null = null;
+    /** 保存对象，通过存储属性装饰器保存要存的键名 */
     private _saveObject: any = null;
+    /** 模型保存的名字 */
     private _saveName: string = "";
+    /** 赋值变量的时候，是否自动保存 */
+    private _autoSave: boolean = false;
 
     constructor() {
         super();
@@ -103,9 +108,20 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
         saveKeys.forEach((key) => {
             this._saveObject[key] = (this as any)[key];
             Reflect.defineProperty(this, key, {
+                configurable: true,
+                enumerable: true,
                 set: (value: any) => {
-                    this._saveObject[key] = value;
-                    this.save();
+                    let oldValue = this._saveObject[key];
+                    if (oldValue !== value) {
+                        this._saveObject[key] = value;
+                        if (this._autoSave) {
+                            this.save();
+                        }
+                    }
+                },
+
+                get: () => {
+                    return this._saveObject[key];
                 },
             });
         });
@@ -128,5 +144,13 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
                 thisInfo[key] = (data as any)[key];
             }
         }
+    }
+
+    /**
+     * 是否开启自动保存
+     * @param autoSave 自动保存
+     */
+    protected setAutoSave(autoSave: boolean) {
+        this._autoSave = autoSave;
     }
 }

@@ -18,7 +18,7 @@ import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventArgs";
 import { EventCollisionEventArgs } from "../../Event/EventCollisionEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
-import { MonsterDieEventArgs } from "../../Event/MonsterDIeEventArgs";
+import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
 import { MoveEventArgs } from "../../Event/MoveEventArgs";
 import { ShowEventArgs } from "../../Event/ShowEventArgs";
 import { SpecialMoveEventArgs } from "../../Event/SpecialMoveEventArgs";

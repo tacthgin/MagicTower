@@ -1,5 +1,4 @@
 {
-    "heroSpeed": 0.2,
     "npcSpeed": 0.5,
     "fadeInterval": 0.5,
     "weakenAttr": {
@@ -38,19 +37,13 @@
         "attack": 2,
         "defence": 4
     },
-    "useTestLoad": true,
+    "useTestLoad": false,
     "hero": {
         "heroAttr": [
             1000,
             100,
             100,
             0
-        ],
-        "animation": [
-            "player_up",
-            "player_right",
-            "player_down",
-            "player_left"
         ],
         "position": {
             "x": 5,
@@ -59,7 +52,6 @@
         "direction": 2,
         "swardId": 12,
         "shieldId": 17,
-        "props": {},
-        "heroSpeed": 0.2
+        "props": {}
     }
 }

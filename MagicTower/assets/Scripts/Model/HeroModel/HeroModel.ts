@@ -1,6 +1,7 @@
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
+import { saveMark } from "../../../GameFramework/Scripts/Application/Model/ModelDecorator";
 import { IVec2 } from "../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
@@ -18,15 +19,22 @@ type TalkInfo = {
 
 @ModelContainer.registerModel("HeroModel")
 export class HeroModel extends ModelBase {
+    @saveMark
     private heroAttr: number[] = null!;
+    @saveMark
     private position: IVec2 = null!;
+    @saveMark
     private direction: number = 0;
+    @saveMark
     private records: TalkInfo[] = null!;
+    @saveMark
     private swardId: number = 0;
+    @saveMark
     private shieldId: number = 0;
+    @saveMark
     private props: { [key: number | string]: number } = {};
-    private animation: string[] = null!;
-    private heroSpeed: number = 0;
+    private animation: string[] = ["player_up", "player_right", "player_down", "player_left"];
+    private heroSpeed: number = 0.2;
 
     constructor() {
         super();
