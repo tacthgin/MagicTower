@@ -54,7 +54,6 @@ export class HeroModel extends ModelBase {
 
     setAttr(attr: HeroAttr, value: number) {
         this.heroAttr[attr] = value;
-        this.save();
         this.fireNow(HeroAttrEventArgs.create(attr, value));
     }
 
@@ -85,7 +84,6 @@ export class HeroModel extends ModelBase {
         if (heroDireciton != null) {
             this.direction = heroDireciton;
         }
-        this.save();
     }
 
     getPosition() {
@@ -101,7 +99,7 @@ export class HeroModel extends ModelBase {
             this.swardId = 0;
             this.shieldId = 0;
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.REFRESH_ARCHIVE));
-            this.save();
+
             return true;
         } else {
             GameFrameworkLog.error(`can't find weakenAttr json`);
@@ -133,7 +131,7 @@ export class HeroModel extends ModelBase {
                         count *= prop.initNum;
                     }
                     this.props[id] = this.getPropNum(id) + count;
-                    this.save();
+
                     this.fireNow(HeroPropEventArgs.create(HeroEvent.REFRESH_PROP, id, count));
                 } else if (prop.type >= PropType.HEALING_SALVE && prop.type <= PropType.DEFENCE_GEM) {
                     let value = prop.value + Math.floor((mapLevel - 1) / 10 + 1);
@@ -168,7 +166,6 @@ export class HeroModel extends ModelBase {
     recordTalk(npcID: number, chatStep: number) {
         if (this.props[PropId.RECORD_BOOK]) {
             this.records.push({ npcID: npcID, chatStep: chatStep });
-            this.save();
         }
     }
 
