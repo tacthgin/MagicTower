@@ -13,6 +13,9 @@ import { MonsterInfo } from "../../../Model/MapModel/Data/Elements/Monster";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
+import { SaveEvent } from "../../../Model/SaveModel/SaveEvent";
+import { SaveModel } from "../../../Model/SaveModel/SaveModel";
+import { LoadArchiveEventArgs } from "../../../Model/SaveModel/SaveModelEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { MonsterFightEventArgs } from "../../Event/MonsterFightEventArgs";
 import { ElementFactory } from "../Map/ElementFactory";
@@ -68,10 +71,6 @@ export class GameUI extends Component {
         GameApp.EventManager.unsubscribeTarget(this);
     }
 
-    start() {
-        this.loadArchive();
-    }
-
     loadArchive() {
         this.refreshHeroAttr();
         this.refreshProps();
@@ -86,6 +85,9 @@ export class GameUI extends Component {
 
         this.mapModel = GameApp.getModel(MapModel);
         this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onRefreshLevel, this);
+
+        let saveModel = GameApp.getModel(SaveModel);
+        saveModel.subscribe(SaveEvent.LOAD_ARCHIVE, this.onLoadArchive, this);
 
         let eventManager = GameApp.EventManager;
         eventManager.subscribe(GameEvent.REFRESH_ARCHIVE, this.onRefreshArchive, this);
@@ -133,6 +135,10 @@ export class GameUI extends Component {
     }
 
     private onRefreshArchive(sender: object, event: GameEventArgs) {
+        this.loadArchive();
+    }
+
+    private onLoadArchive(sender: object, event: LoadArchiveEventArgs) {
         this.loadArchive();
     }
 

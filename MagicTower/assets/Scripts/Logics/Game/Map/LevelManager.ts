@@ -6,6 +6,7 @@ import { Stair } from "../../../Model/MapModel/Data/Elements/Stair";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { MapJumpLevelEventArgs, MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
+import { SaveModel } from "../../../Model/SaveModel/SaveModel";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
@@ -81,6 +82,7 @@ export class LevelManager extends Component {
     }
 
     private loadArchive() {
+        GameApp.getModel(SaveModel).loadArchive();
         let currentLevel = this.mapModel.level;
         this.createMap(currentLevel);
         this.showHero();

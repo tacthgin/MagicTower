@@ -3,6 +3,7 @@ import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/Mode
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
 import { HeroModel } from "../HeroModel/HeroModel";
 import { MapModel } from "../MapModel/MapModel";
+import { LoadArchiveEventArgs } from "./SaveModelEventArgs";
 
 type ArchiveInfo = {
     map: object;
@@ -27,6 +28,7 @@ export class SaveModel extends ModelBase {
     }
 
     loadArchive(index?: number) {
+        if (index === this._currentArchiveIndex) return false;
         if (index !== undefined) {
             this._currentArchiveIndex = index;
         } else {
@@ -42,6 +44,8 @@ export class SaveModel extends ModelBase {
         }
         GameApp.getModel(MapModel).LoadExternalData(map);
         GameApp.getModel(HeroModel).LoadExternalData(hero);
+        this.fireNow(LoadArchiveEventArgs.create());
+        return true;
     }
 
     saveArchive() {
