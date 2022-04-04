@@ -1,15 +1,14 @@
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
-import { saveMark } from "../../../GameFramework/Scripts/Application/Model/ModelDecorator";
 import { SoundConstant } from "../../../GameFramework/Scripts/Application/Sound/SoundConstant";
 import { SoundFactory } from "../../../GameFramework/Scripts/Application/Sound/SoundFactory";
 
 @ModelContainer.registerModel("SettingModel")
 export class SettingModel extends ModelBase {
-    @saveMark
+    @ModelBase.saveMark
     private _musicEnabled: boolean = true;
-    @saveMark
+    @ModelBase.saveMark
     private _effectEnabled: boolean = true;
 
     set musicEnabled(enabled: boolean) {
@@ -38,7 +37,7 @@ export class SettingModel extends ModelBase {
         return this._effectEnabled;
     }
 
-    load(data: object | null = null): void {
+    protected onLoad(data: object | null = null): void {
         if (data) {
             this.loadData(data);
         }

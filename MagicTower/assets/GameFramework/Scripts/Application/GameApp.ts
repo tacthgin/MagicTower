@@ -142,9 +142,10 @@ export class GameApp extends Component {
         GameFrameworkEntry.shutDown();
     }
 
-    loadLocalModel() {
+    /** 初始化所有模型并加载本地模型数据 */
+    initModels() {
         try {
-            this._modelContainer.loadLocalModel();
+            this._modelContainer.initModels();
         } catch (error) {
             GameFrameworkLog.error("load local model failed:", error);
         }

@@ -1,7 +1,6 @@
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
-import { saveMark } from "../../../GameFramework/Scripts/Application/Model/ModelDecorator";
 import { IVec2 } from "../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
@@ -19,19 +18,19 @@ type TalkInfo = {
 
 @ModelContainer.registerModel("HeroModel")
 export class HeroModel extends ModelBase {
-    @saveMark
+    @ModelBase.saveMark
     private heroAttr: number[] = null!;
-    @saveMark
+    @ModelBase.saveMark
     private position: IVec2 = null!;
-    @saveMark
+    @ModelBase.saveMark
     private direction: number = 0;
-    @saveMark
+    @ModelBase.saveMark
     private records: TalkInfo[] = null!;
-    @saveMark
+    @ModelBase.saveMark
     private swardId: number = 0;
-    @saveMark
+    @ModelBase.saveMark
     private shieldId: number = 0;
-    @saveMark
+    @ModelBase.saveMark
     private props: { [key: number | string]: number } = {};
     private animation: string[] = ["player_up", "player_right", "player_down", "player_left"];
     private heroSpeed: number = 0.2;
@@ -42,7 +41,7 @@ export class HeroModel extends ModelBase {
         this.records = [];
     }
 
-    load(data: object | null = null) {
+    protected onLoad(data: object | null = null) {
         let heroInitData = Utility.Json.getJsonElement("global", "hero");
         let loadData = data || heroInitData;
         if (loadData) {

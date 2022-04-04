@@ -15,7 +15,7 @@ export class LoginScene extends Component {
 
     async start() {
         await this.loadResources();
-        GameApp.instance.loadLocalModel();
+        GameApp.instance.initModels();
         this.gotoGameScene();
     }
 

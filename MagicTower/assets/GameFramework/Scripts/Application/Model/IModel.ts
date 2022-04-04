@@ -1,7 +1,14 @@
 import { EventHandle } from "../../Base/EventPool/EventHandle";
 import { ModelEventArgs } from "./ModelEventArgs";
 
+/**
+ * 模型接口
+ */
 export interface IModel {
+    /**
+     * 保存对象
+     */
+    readonly saveObject: object;
     /**
      * 查询事件是否已经被订阅
      * @param id 事件id
@@ -49,4 +56,10 @@ export interface IModel {
      * 存储模型本地数据
      */
     save(): void;
+
+    /**
+     * 加载外部数据(本地或者网络数据)
+     * @param data 本地或者网络数据
+     */
+    LoadExternalData(data: object | null): void;
 }

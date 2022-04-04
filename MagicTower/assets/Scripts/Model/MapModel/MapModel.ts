@@ -83,7 +83,7 @@ export class MapModel extends ModelBase {
         return levelData;
     }
 
-    load(info: any = null) {
+    onLoad(info: any = null) {
         if (info) {
             this.currentLevel = info.currentLevel;
             for (let level in info.maps) {

@@ -6,12 +6,11 @@ import { IModel } from "./IModel";
 import { ModelBase } from "./ModelBase";
 
 /**
- * Model容器
+ * 模型容器
  */
 export class ModelContainer {
     private static readonly s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();
     private static readonly s_nameConstructors: Map<Constructor<ModelBase>, string> = new Map<Constructor<ModelBase>, string>();
-    private static readonly s_saveKeys: Map<Constructor<ModelBase>, string[]> = new Map<Constructor<ModelBase>, string[]>();
     private readonly _models: GameFrameworkLinkedList<ModelBase> = null!;
     private readonly _cachedModels: Map<Constructor<ModelBase>, ModelBase> = null!;
     private _saveManager: ISaveManager | null = null;
@@ -43,20 +42,6 @@ export class ModelContainer {
             throw new GameFrameworkError("model has not register");
         }
         return name;
-    }
-
-    /**
-     * 缓存模型需要保存的键名
-     * @param model 模型
-     * @param key 键名
-     */
-    static addModelSaveKey(modelConstructor: Constructor<ModelBase>, key: string): void {
-        let keys = this.s_saveKeys.get(modelConstructor);
-        if (!keys) {
-            keys = new Array<string>();
-            this.s_saveKeys.set(modelConstructor, keys);
-        }
-        keys.push(key);
     }
 
     /**
@@ -124,9 +109,9 @@ export class ModelContainer {
     }
 
     /**
-     * 加载本地模型数据
+     * 初始化所有模型
      */
-    loadLocalModel(): void {
+    initModels(): void {
         if (!this._saveManager) {
             throw new GameFrameworkError("you must set save manager first");
         }
@@ -138,6 +123,7 @@ export class ModelContainer {
 
         ModelContainer.s_modelConstructors.forEach((ctor, name) => {
             let model = this.getModel(ctor);
+            model.defineSaveProperty();
             model.setSaveManager(this._saveManager!, name);
             modelInfos.push({
                 model: model,
@@ -151,16 +137,8 @@ export class ModelContainer {
             return r.model.priority - l.model.priority;
         });
 
-        /** 加载完数据以后，重定义属性的setter */
         modelInfos.forEach((modelInfo) => {
-            modelInfo.model.load(modelInfo.value);
-            let constructor = ModelContainer.s_modelConstructors.get(modelInfo.name);
-            if (constructor) {
-                let saveKeys = ModelContainer.s_saveKeys.get(constructor);
-                if (saveKeys) {
-                    modelInfo.model.defineSetterProperty(saveKeys);
-                }
-            }
+            modelInfo.model.LoadExternalData(modelInfo.value);
         });
     }
 

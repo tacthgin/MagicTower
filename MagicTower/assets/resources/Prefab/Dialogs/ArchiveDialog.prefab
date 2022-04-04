@@ -198,7 +198,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 4,
+      "x": 0,
       "y": 109,
       "z": 0
     },
@@ -249,14 +249,14 @@
       "b": 255,
       "a": 255
     },
-    "_string": "你若给我 220 个金币，\n我就替你提升以下一种能力。",
-    "_horizontalAlign": 0,
+    "_string": "存档",
+    "_horizontalAlign": 1,
     "_verticalAlign": 0,
     "_actualFontSize": 22,
     "_fontSize": 22,
     "_fontFamily": "Regular",
     "_lineHeight": 22,
-    "_overflow": 1,
+    "_overflow": 0,
     "_enableWrapText": true,
     "_font": null,
     "_isSystemFontUsed": true,
@@ -302,8 +302,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 292,
-      "height": 96
+      "width": 44,
+      "height": 27.72
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -365,7 +365,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -35,
+      "y": -22.202,
       "z": 0
     },
     "_lrot": {
@@ -392,7 +392,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "hpBtn",
+    "_name": "saveBtn1",
     "_objFlags": 0,
     "_parent": {
       "__id__": 16
@@ -426,7 +426,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 60,
+      "y": 75,
       "z": 0
     },
     "_lrot": {
@@ -509,6 +509,7 @@
     "__type__": "cc.Label",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 18
     },
@@ -530,7 +531,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "生命力 + 100",
+    "_string": "存档1",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -556,6 +557,7 @@
     "__type__": "cc.Widget",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 18
     },
@@ -591,6 +593,7 @@
     "__type__": "cc.UIOpacity",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 18
     },
@@ -609,6 +612,7 @@
     "__type__": "cc.UITransform",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 18
     },
@@ -797,6 +801,7 @@
     "__type__": "cc.Sprite",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 17
     },
@@ -845,6 +850,7 @@
     "__type__": "cc.Button",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 17
     },
@@ -917,6 +923,7 @@
     "__type__": "cc.UIOpacity",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 17
     },
@@ -935,6 +942,7 @@
     "__type__": "cc.UITransform",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 17
     },
@@ -970,7 +978,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "attackBtn",
+    "_name": "saveBtn2",
     "_objFlags": 0,
     "_parent": {
       "__id__": 16
@@ -1004,7 +1012,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 20,
+      "y": 25,
       "z": 0
     },
     "_lrot": {
@@ -1108,7 +1116,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "攻击力 + 2",
+    "_string": "存档2",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -1548,7 +1556,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "defenceBtn",
+    "_name": "saveBtn3",
     "_objFlags": 0,
     "_parent": {
       "__id__": 16
@@ -1582,7 +1590,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -20,
+      "y": -25,
       "z": 0
     },
     "_lrot": {
@@ -1686,7 +1694,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "防御力 + 4",
+    "_string": "存档3",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -2157,7 +2165,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -60,
+      "y": -75,
       "z": 0
     },
     "_lrot": {
@@ -2261,7 +2269,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "不用了，谢谢",
+    "_string": "关闭",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 20,
@@ -2559,7 +2567,7 @@
     "__prefab": {
       "__id__": 126
     },
-    "_resizeMode": 0,
+    "_resizeMode": 1,
     "_layoutType": 2,
     "_cellSize": {
       "__type__": "cc.Size",
@@ -2572,7 +2580,7 @@
     "_paddingTop": 0,
     "_paddingBottom": 0,
     "_spacingX": 0,
-    "_spacingY": 10,
+    "_spacingY": 20,
     "_verticalDirection": 1,
     "_horizontalDirection": 0,
     "_constraint": 0,
@@ -2617,7 +2625,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 200,
-      "height": 150
+      "height": 180
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",

@@ -46,7 +46,7 @@ export class ShopModel extends ModelBase {
         return this._beginGold;
     }
 
-    load(data: any = null) {
+    onLoad(data: any = null) {
         if (!data) {
             data = Utility.Json.getJsonElement("global", "shop");
             for (let key in data) {
