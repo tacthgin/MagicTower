@@ -48,4 +48,9 @@ export class Element extends LoadBase implements IRerference {
         this._id = 0;
         this._index = -1;
     }
+
+    load(info: any) {
+        this.loadData(info);
+        return this;
+    }
 }

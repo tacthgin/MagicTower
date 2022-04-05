@@ -9,6 +9,8 @@ const { ccclass, property } = _decorator;
 export class ArchiveDialog extends DialogBase {
     @property(Node)
     private saveNodes: Node[] = null!;
+    @property(Label)
+    private saveLabel: Label = null!;
     private saveModel: SaveModel = null!;
 
     onOpen() {
@@ -21,6 +23,7 @@ export class ArchiveDialog extends DialogBase {
             this.setTitle(i);
         }
         this.selectSaveNode(this.saveModel.currentArchiveIndex);
+        this.saveLabel.string = `保存存档${this.saveModel.currentArchiveIndex + 1}`;
     }
 
     private setTitle(index: number) {
