@@ -6,7 +6,9 @@ import { Stair } from "../../../Model/MapModel/Data/Elements/Stair";
 import { MapEvent } from "../../../Model/MapModel/MapEvent";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { MapJumpLevelEventArgs, MapSwitchLevelEventArgs } from "../../../Model/MapModel/MapModelEventArgs";
+import { SaveEvent } from "../../../Model/SaveModel/SaveEvent";
 import { SaveModel } from "../../../Model/SaveModel/SaveModel";
+import { LoadArchiveEventArgs } from "../../../Model/SaveModel/SaveModelEventArgs";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { SceneAppearEventArgs } from "../../Event/SceneAppearEventArgs";
@@ -50,6 +52,9 @@ export class LevelManager extends Component {
         this.mapModel.subscribe(MapEvent.SWITCH_LEVEL, this.onSwitchLevel, this);
         this.mapModel.subscribe(MapEvent.JUMP_LEVEL, this.onJumpLevel, this);
 
+        let saveModel = GameApp.getModel(SaveModel);
+        saveModel.subscribe(SaveEvent.LOAD_ARCHIVE, this.onLoadArchive, this);
+
         let eventManager = GameApp.EventManager;
         eventManager.subscribe(GameEvent.SCENE_APPEAR, this.onSceneAppear, this);
         eventManager.subscribe(GameEvent.SCENE_DISAPPEAR, this.onSceneDisappear, this);
@@ -83,9 +88,6 @@ export class LevelManager extends Component {
 
     private loadArchive() {
         GameApp.getModel(SaveModel).loadArchive();
-        let currentLevel = this.mapModel.level;
-        this.createMap(currentLevel);
-        this.showHero();
     }
 
     private createMap(level: number): GameMap {
@@ -117,6 +119,13 @@ export class LevelManager extends Component {
 
     private getCurrentMap(): GameMap | null {
         return this.maps[this.mapModel.level] || null;
+    }
+
+    private onLoadArchive(sender: object, event: LoadArchiveEventArgs) {
+        this.clearMap();
+        let currentLevel = this.mapModel.level;
+        this.createMap(currentLevel);
+        this.showHero();
     }
 
     private onSwitchLevel(sender: object, eventArgs: MapSwitchLevelEventArgs) {
@@ -170,5 +179,12 @@ export class LevelManager extends Component {
             return;
         }
         this.collisionSystem.moveHero(touchPos);
+    }
+
+    private clearMap() {
+        for (let level in this.maps) {
+            this.maps[level].destroy();
+        }
+        this.maps = {};
     }
 }

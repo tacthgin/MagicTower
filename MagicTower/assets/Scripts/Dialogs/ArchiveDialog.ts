@@ -1,8 +1,6 @@
-import { _decorator, Node, Button, UIOpacity } from "cc";
+import { _decorator, Node, Button, UIOpacity, find, Label } from "cc";
 import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
 import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
-import { HeroAttr } from "../Model/HeroModel/HeroAttr";
-import { HeroModel } from "../Model/HeroModel/HeroModel";
 import { SaveModel } from "../Model/SaveModel/SaveModel";
 
 const { ccclass, property } = _decorator;
@@ -15,7 +13,19 @@ export class ArchiveDialog extends DialogBase {
 
     onOpen() {
         this.saveModel = GameApp.getModel(SaveModel);
+        this.loadArchive();
+    }
+
+    private loadArchive() {
+        for (let i = 0; i < this.saveNodes.length; i++) {
+            this.setTitle(i);
+        }
         this.selectSaveNode(this.saveModel.currentArchiveIndex);
+    }
+
+    private setTitle(index: number) {
+        let title = this.saveModel.getTitle(index);
+        find("Label", this.saveNodes[index])!.getComponent(Label)!.string = title || `加载存档${index + 1}`;
     }
 
     private selectSaveNode(index: number) {
@@ -28,18 +38,14 @@ export class ArchiveDialog extends DialogBase {
         switch (customEventData) {
             case "save":
                 this.saveModel.saveArchive();
+                this.setTitle(this.saveModel.currentArchiveIndex);
                 break;
             default:
                 let index = customEventData[customEventData.length - 1];
-                if (this.saveModel.loadArchive(parseInt(index))) {
+                if (this.saveModel.loadArchive(parseInt(index) - 1)) {
                     this.close();
                 }
                 break;
         }
-    }
-
-    private packageArchiveStr(): string {
-        let heroModel = GameApp.getModel(HeroModel);
-        return `存档${this.saveModel.currentArchiveIndex}:血量${heroModel.getAttr(HeroAttr.HP)}`;
     }
 }

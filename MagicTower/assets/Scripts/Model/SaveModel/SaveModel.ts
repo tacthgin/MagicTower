@@ -1,6 +1,7 @@
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
+import { HeroAttr } from "../HeroModel/HeroAttr";
 import { HeroModel } from "../HeroModel/HeroModel";
 import { MapModel } from "../MapModel/MapModel";
 import { LoadArchiveEventArgs } from "./SaveModelEventArgs";
@@ -15,6 +16,8 @@ export class SaveModel extends ModelBase {
     @ModelBase.saveMark
     private _archives: string[] = [];
     @ModelBase.saveMark
+    private _titles: string[] = [];
+    @ModelBase.saveMark
     private _currentArchiveIndex: number = 0;
 
     get currentArchiveIndex(): number {
@@ -25,6 +28,10 @@ export class SaveModel extends ModelBase {
         if (data) {
             this.loadData(data);
         }
+    }
+
+    getTitle(index: number) {
+        return this._titles[index] || "";
     }
 
     loadArchive(index?: number) {
@@ -49,11 +56,14 @@ export class SaveModel extends ModelBase {
     }
 
     saveArchive() {
+        let heroModel = GameApp.getModel(HeroModel);
+        let mapModel = GameApp.getModel(MapModel);
         let archiveInfo: ArchiveInfo = {
-            hero: GameApp.getModel(HeroModel).saveObject,
-            map: GameApp.getModel(MapModel).saveObject,
+            hero: heroModel.saveObject,
+            map: mapModel.saveObject,
         };
         this._archives[this._currentArchiveIndex] = JSON.stringify(archiveInfo);
+        this._titles[this._currentArchiveIndex] = `层数:${mapModel.level},血量:${heroModel.getAttr(HeroAttr.HP)},攻击${heroModel.getAttr(HeroAttr.ATTACK)},防御${heroModel.getAttr(HeroAttr.DEFENCE)}`;
         this.save();
     }
 
