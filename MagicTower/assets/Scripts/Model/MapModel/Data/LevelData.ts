@@ -51,18 +51,18 @@ export class LevelData extends LoadBase {
 
     load(info: any) {
         this.loadData(info);
-        // for (let layerName in this._layerInfo) {
-        //     let layerInfo = this._layerInfo[layerName];
-        //     for (let key in layerInfo) {
-        //         let constructor = CLASS_MAP[key];
-        //         if (constructor) {
-        //             for (let key in layerInfo) {
-        //                 let element = new constructor();
-        //                 layerInfo[key] = element.load(layerInfo[key]);
-        //             }
-        //         }
-        //     }
-        // }
+        for (let layerName in this._layerInfo) {
+            let elements = this._layerInfo[layerName].elements;
+            let constructor = CLASS_MAP[layerName];
+            if (constructor) {
+                for (let index in elements) {
+                    if (constructor) {
+                        let element = new constructor();
+                        elements[index] = element.load(elements[index]);
+                    }
+                }
+            }
+        }
         return this;
     }
 

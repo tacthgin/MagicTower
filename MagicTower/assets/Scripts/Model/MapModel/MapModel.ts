@@ -12,9 +12,12 @@ import { MapJumpLevelEventArgs, MapSwitchLevelEventArgs } from "./MapModelEventA
 export class MapModel extends ModelBase {
     private readonly MIN_LEVEL: number = 0;
     private readonly MAX_LEVEL: number = 50;
+    @ModelBase.saveMark
     private currentLevel: number = 1;
+    @ModelBase.saveMark
     private maps: { [key: number | string]: LevelData } = {};
     /** 跨层事件缓存 */
+    @ModelBase.saveMark
     private _levelEventCache: { [level: number | string]: number } = {};
 
     private levelTempDatas: { [key: number | string]: LevelTempData } = {};
@@ -83,7 +86,8 @@ export class MapModel extends ModelBase {
         return levelData;
     }
 
-    load(info: any = null) {
+    onLoad(info: any = null) {
+        this.clearData();
         if (info) {
             this.currentLevel = info.currentLevel;
             for (let level in info.maps) {
@@ -116,6 +120,11 @@ export class MapModel extends ModelBase {
         } else {
             return null;
         }
+    }
+
+    private clearData() {
+        this.currentLevel = 1;
+        this.maps = {};
     }
 
     private useTestLoad() {

@@ -1,7 +1,7 @@
+import { Constructor } from "../../Base/DataStruct/Constructor";
 import { EventHandle } from "../../Base/EventPool/EventHandle";
 import { EventPool } from "../../Base/EventPool/EventPool";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
-import { GameFrameworkLog } from "../../Base/Log/GameFrameworkLog";
 import { ISaveManager } from "../../Save/ISaveManager";
 import { ScheduleBase } from "../Base/ScheduleBase";
 import { IModel } from "./IModel";
@@ -11,11 +11,12 @@ import { ModelEventArgs } from "./ModelEventArgs";
  * 模型基类
  */
 export abstract class ModelBase extends ScheduleBase implements IModel {
+    private static readonly s_saveKeys: Map<Constructor<ModelBase>, Array<string>> = new Map<Constructor<ModelBase>, Array<string>>();
     private readonly _eventPool: EventPool<ModelEventArgs> = null!;
     /** 存储管理器 */
     private _saveManager: ISaveManager | null = null;
     /** 保存对象，通过存储属性装饰器保存要存的键名 */
-    private _saveObject: any = null;
+    private readonly _saveObject: any = {};
     /** 模型保存的名字 */
     private _saveName: string = "";
     /** 赋值变量的时候，是否自动保存 */
@@ -31,6 +32,13 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
      */
     get priority(): number {
         return 0;
+    }
+
+    /**
+     * 保存对象
+     */
+    get saveObject(): Readonly<object> {
+        return this._saveObject;
     }
 
     /**
@@ -92,20 +100,16 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
             throw new GameFrameworkError("you must set save manager first");
         }
 
-        if (this._saveObject) {
-            this._saveManager.setObject(this._saveName, this._saveObject);
-        } else {
-            GameFrameworkLog.error(`you must set model ${this._saveName} save object first`);
-        }
+        this._saveManager.setObject(this._saveName, this._saveObject);
     }
 
     /**
-     * 重定义保存标志的setter
-     * @param saveKeys 需要保存的键名
+     * 定义保存标志的属性
      */
-    defineSetterProperty(saveKeys: string[]) {
-        this._saveObject = {};
-        saveKeys.forEach((key) => {
+    defineSaveProperty(): void {
+        let keys = ModelBase.s_saveKeys.get(this.constructor as any);
+        if (!keys) return;
+        keys.forEach((key) => {
             this._saveObject[key] = (this as any)[key];
             Reflect.defineProperty(this, key, {
                 configurable: true,
@@ -119,7 +123,6 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
                         }
                     }
                 },
-
                 get: () => {
                     return this._saveObject[key];
                 },
@@ -128,10 +131,21 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
     }
 
     /**
-     * 加载模型数据
-     * @param localData 模型数据
+     * 加载外部数据(本地或者网络数据)
+     * @param data 本地或者网络数据
      */
-    abstract load(localData: object | null): void;
+    LoadExternalData(data: object | null) {
+        let oldValue = this._autoSave;
+        this._autoSave = false;
+        this.onLoad(data);
+        this._autoSave = oldValue;
+    }
+
+    /**
+     * 加载本地或者网络数据回调
+     * @param data 本地或者网络数据
+     */
+    protected abstract onLoad(data: object | null): void;
 
     /**
      * 按键值赋予模型数据
@@ -152,5 +166,20 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
      */
     protected setAutoSave(autoSave: boolean) {
         this._autoSave = autoSave;
+    }
+
+    /**
+     * 模型变量保存属性装饰器
+     * @param target
+     * @param key
+     */
+    protected static saveMark(target: ModelBase, key: string) {
+        let constructor: any = target.constructor;
+        let keys = ModelBase.s_saveKeys.get(constructor);
+        if (!keys) {
+            keys = new Array<string>();
+            ModelBase.s_saveKeys.set(constructor, keys);
+        }
+        keys.push(key);
     }
 }

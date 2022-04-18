@@ -1,7 +1,6 @@
 import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
 import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
 import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
-import { saveMark } from "../../../GameFramework/Scripts/Application/Model/ModelDecorator";
 import { IVec2 } from "../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
@@ -19,19 +18,19 @@ type TalkInfo = {
 
 @ModelContainer.registerModel("HeroModel")
 export class HeroModel extends ModelBase {
-    @saveMark
+    @ModelBase.saveMark
     private heroAttr: number[] = null!;
-    @saveMark
+    @ModelBase.saveMark
     private position: IVec2 = null!;
-    @saveMark
+    @ModelBase.saveMark
     private direction: number = 0;
-    @saveMark
+    @ModelBase.saveMark
     private records: TalkInfo[] = null!;
-    @saveMark
+    @ModelBase.saveMark
     private swardId: number = 0;
-    @saveMark
+    @ModelBase.saveMark
     private shieldId: number = 0;
-    @saveMark
+    @ModelBase.saveMark
     private props: { [key: number | string]: number } = {};
     private animation: string[] = ["player_up", "player_right", "player_down", "player_left"];
     private heroSpeed: number = 0.2;
@@ -42,7 +41,7 @@ export class HeroModel extends ModelBase {
         this.records = [];
     }
 
-    load(data: object | null = null) {
+    protected onLoad(data: object | null = null) {
         let heroInitData = Utility.Json.getJsonElement("global", "hero");
         let loadData = data || heroInitData;
         if (loadData) {
@@ -55,7 +54,6 @@ export class HeroModel extends ModelBase {
 
     setAttr(attr: HeroAttr, value: number) {
         this.heroAttr[attr] = value;
-        this.save();
         this.fireNow(HeroAttrEventArgs.create(attr, value));
     }
 
@@ -86,7 +84,6 @@ export class HeroModel extends ModelBase {
         if (heroDireciton != null) {
             this.direction = heroDireciton;
         }
-        this.save();
     }
 
     getPosition() {
@@ -102,7 +99,7 @@ export class HeroModel extends ModelBase {
             this.swardId = 0;
             this.shieldId = 0;
             GameApp.EventManager.fireNow(this, CommonEventArgs.create(GameEvent.REFRESH_ARCHIVE));
-            this.save();
+
             return true;
         } else {
             GameFrameworkLog.error(`can't find weakenAttr json`);
@@ -134,7 +131,7 @@ export class HeroModel extends ModelBase {
                         count *= prop.initNum;
                     }
                     this.props[id] = this.getPropNum(id) + count;
-                    this.save();
+
                     this.fireNow(HeroPropEventArgs.create(HeroEvent.REFRESH_PROP, id, count));
                 } else if (prop.type >= PropType.HEALING_SALVE && prop.type <= PropType.DEFENCE_GEM) {
                     let value = prop.value + Math.floor((mapLevel - 1) / 10 + 1);
@@ -169,7 +166,6 @@ export class HeroModel extends ModelBase {
     recordTalk(npcID: number, chatStep: number) {
         if (this.props[PropId.RECORD_BOOK]) {
             this.records.push({ npcID: npcID, chatStep: chatStep });
-            this.save();
         }
     }
 
