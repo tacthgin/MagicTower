@@ -3,14 +3,43 @@
  */
 export class Random {
     /** 随机种子,默认为当前时间戳 */
-    private seed: number = Date.now();
+    private _seed: number = Date.now();
+    /** 使用系统的随机函数 */
+    private _systemFlag: boolean = true;
+
+    /**
+     * 设置使用系统随机函数标志
+     */
+    set systemFlag(value: boolean) {
+        this._systemFlag = value;
+    }
+
+    /**
+     * 获取使用系统随机函数标志
+     */
+    get systemFlag(): boolean {
+        return this._systemFlag;
+    }
+
+    /**
+     * 创建随机数
+     * @param seed 随机种子
+     */
+    static create(seed?: number): Random {
+        let random = new Random();
+        if (seed !== undefined) {
+            random.setSeed(seed);
+        }
+        return random;
+    }
 
     /**
      * 设置随机种子
      * @param seed 种子
      */
     setSeed(seed: number): void {
-        this.seed = seed;
+        this.systemFlag = false;
+        this._seed = seed;
     }
 
     /**
@@ -18,30 +47,7 @@ export class Random {
      * @returns
      */
     getRandom(): number {
-        this.seed = (this.seed * 9301 + 49297) % 233280;
-        return this.seed / 233280;
-    }
-
-    /**
-     * 根据随机种子范围随机，这个值不小于 min（有可能等于），并且小于（不等于）max
-     * @param min 最小值
-     * @param max 最大值
-     * @returns  随机到的任意数
-     */
-    randomSeed(min: number, max: number): number {
-        return this.getRandom() * (max - min) + min;
-    }
-
-    /**
-     * 根据随机种子，整数范围随机，含最大值，含最小值
-     * @param min 最小值
-     * @param max 最大值
-     * @returns 随机到的整数
-     */
-    randomSeedInt(min: number, max: number): number {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(this.getRandom() * (max - min + 1)) + min;
+        return this._systemFlag ? Math.random() : this.internalGetSeedRandom();
     }
 
     /**
@@ -51,7 +57,7 @@ export class Random {
      * @returns 随机到的任意数
      */
     random(min: number, max: number): number {
-        return Math.random() * (max - min) + min;
+        return this.getRandom() * (max - min) + min;
     }
 
     /**
@@ -63,7 +69,7 @@ export class Random {
     randomInt(min: number, max: number): number {
         min = Math.ceil(min);
         max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        return Math.floor(this.getRandom() * (max - min + 1)) + min;
     }
 
     /**
@@ -96,7 +102,7 @@ export class Random {
         let length = -1;
         while (randomIndexs.length < count) {
             length = array.length - randomIndexs.length;
-            let index = Math.floor(Math.random() * length);
+            let index = Math.floor(this.getRandom() * length);
             randomIndexs.push(indexes[index] || index);
             indexes[index] = indexes[length - 1] || length - 1;
         }
@@ -115,7 +121,7 @@ export class Random {
      * @returns 随机到的索引值，没有符合的索引返回-1
      */
     randomFromArray(array: number[]): number {
-        let pro = Math.random();
+        let pro = this.getRandom();
         for (let i = 0; i < array.length; ++i) {
             if (pro <= array[i]) {
                 return i;
@@ -132,7 +138,7 @@ export class Random {
      * @returns 随机到的key值，没有符合的key值，返回空字符串
      */
     randomFromMap(map: { [key: string]: number }): string {
-        let pro = Math.random();
+        let pro = this.getRandom();
         for (let key in map) {
             if (pro <= map[key]) {
                 return key;
@@ -141,5 +147,14 @@ export class Random {
             }
         }
         return "";
+    }
+
+    /**
+     * 根据随机种子获取随机数
+     * @returns 随机数
+     */
+    private internalGetSeedRandom(): number {
+        this._seed = (this._seed * 9301 + 49297) % 233280;
+        return this._seed / 233280;
     }
 }
