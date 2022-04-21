@@ -45,10 +45,9 @@ export class JsonUtility {
      * @returns json对象
      */
     getJson<T extends object>(name: string, clone: boolean = false): T | null {
-        let jsonAsset = this._cacheJsonMap.get(name);
-        if (jsonAsset) {
-            let json: any = clone ? this._systemUtility.clone(jsonAsset.json) : jsonAsset.json;
-            return json;
+        let json = this._cacheJsonMap.get(name);
+        if (json) {
+            return (clone ? this._systemUtility.clone(json) : json) as T;
         } else {
             throw new GameFrameworkError(`can't find json ${name}`);
         }

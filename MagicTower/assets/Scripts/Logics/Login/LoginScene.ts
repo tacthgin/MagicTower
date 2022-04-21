@@ -22,6 +22,13 @@ export class LoginScene extends Component {
             {
                 path: "Json",
                 assetType: JsonAsset,
+                completeCallback: (err: Error | null, data: any[]) => {
+                    if (!err) {
+                        data.forEach((jsonAsset) => {
+                            Utility.Json.addJson(jsonAsset.name, jsonAsset.json);
+                        });
+                    }
+                },
             },
             {
                 path: "Sound",
@@ -41,22 +48,18 @@ export class LoginScene extends Component {
             },
         ];
 
-        //单独加载json
-        let info = resouceInfos[0];
-        let step = 1 / resouceInfos.length;
-        await GameApp.ResourceManager.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number, item: any) => {
-            let progress = finished / total;
-            this.setProgress(progress, 1);
-            Utility.Json.addJson(item.file._name, item.file);
-        });
-
-        for (let i = 1; i < resouceInfos.length; i++) {
-            info = resouceInfos[i];
-            step = (i + 1) / resouceInfos.length;
-            await GameApp.ResourceManager.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number, item: any) => {
-                let progress = finished / total;
-                this.setProgress(progress, step);
-            });
+        for (let i = 0; i < resouceInfos.length; i++) {
+            let info = resouceInfos[i];
+            let step = (i + 1) / resouceInfos.length;
+            await GameApp.ResourceManager.loadDirWithCallback(
+                info.path,
+                info.assetType as any,
+                (finished: number, total: number) => {
+                    let progress = finished / total;
+                    this.setProgress(progress, step);
+                },
+                resouceInfos[i].completeCallback
+            );
         }
     }
 
