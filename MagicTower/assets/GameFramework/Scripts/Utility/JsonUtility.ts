@@ -101,6 +101,7 @@ export class JsonUtility {
         let jsonCache = this._cacheJsonKeyMap.get(name);
         if (!jsonCache) {
             jsonCache = new Map<string, Map<string | number, object>>();
+            this._cacheJsonKeyMap.set(name, jsonCache);
         }
 
         let keyArray: string[] | null = null;
@@ -116,12 +117,13 @@ export class JsonUtility {
         let keyCache = jsonCache.get(jsonKey);
         if (!keyCache) {
             keyCache = new Map<string | number, object>();
+            jsonCache.set(jsonKey, keyCache);
             let values: any[] = [];
             for (let id in json) {
                 let jsonObject = (json as any)[id];
                 values.length = 0;
-                for (let i = 0; i < keys.length; i++) {
-                    values.push(jsonObject[keys[i]]);
+                for (let i = 0; i < keyArray.length; i++) {
+                    values.push(jsonObject[keyArray[i]]);
                 }
                 if (values.length > 0) {
                     keyCache.set(this.combine(values), jsonObject);
@@ -134,11 +136,15 @@ export class JsonUtility {
 
     private combine(keys: number | string | any[]) {
         if (keys instanceof Array) {
-            let result = "";
-            keys.forEach((key) => {
-                result += `_${key}`;
-            });
-            return result;
+            if (keys.length == 1) {
+                return keys[0];
+            } else {
+                let result = "";
+                keys.forEach((key) => {
+                    result += `_${key}`;
+                });
+                return result;
+            }
         }
 
         return keys;
