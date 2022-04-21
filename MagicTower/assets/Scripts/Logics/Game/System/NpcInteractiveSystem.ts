@@ -9,6 +9,7 @@ import { Door } from "../../../Model/MapModel/Data/Elements/Door";
 import { Npc } from "../../../Model/MapModel/Data/Elements/Npc";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
+import { DisappearOrAppearState } from "../../Event/DisappearOrAppearEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
@@ -128,7 +129,7 @@ export class NpcInteractiveSystem extends SystemBase {
         if (wallIndex) {
             let door = this.levelData.getLayerElement<Door>("door", wallIndex);
             if (door) {
-                GameApp.CommandManager.createCommand(DisappearCommand).execute("door", wallIndex, this.npcMoveDetail.bind(this));
+                GameApp.CommandManager.createCommand(DisappearCommand).execute("door", wallIndex, DisappearOrAppearState.ALL, this.npcMoveDetail.bind(this));
                 return;
             }
         }

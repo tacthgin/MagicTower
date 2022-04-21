@@ -11,6 +11,7 @@ import { PropInfo } from "../../../Model/HeroModel/Prop";
 import { Door, DoorState } from "../../../Model/MapModel/Data/Elements/Door";
 import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
+import { DisappearOrAppearState } from "../../Event/DisappearOrAppearEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
 import { AppearCommand } from "../Command/AppearCommand";
 import { DisappearCommand } from "../Command/DisappearCommand";
@@ -59,7 +60,7 @@ export class DoorSystem extends SystemBase {
             let heroModel = GameApp.getModel(HeroModel);
             if (keyID && heroModel.getPropNum(keyID) > 0) {
                 heroModel.addProp(keyID, 1, -1);
-                GameApp.CommandManager.createCommand(DisappearCommand).execute("door", doorInfo.index, () => {
+                GameApp.CommandManager.createCommand(DisappearCommand).execute("door", doorInfo.index, DisappearOrAppearState.ALL, () => {
                     let eventId = this.levelData.triggerDoorEvent(DoorState.DISAPPEAR_EVENT, doorInfo.index);
                     if (eventId) {
                         GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
@@ -69,7 +70,7 @@ export class DoorSystem extends SystemBase {
                 });
             }
         } else if (doorInfo.canWallOpen()) {
-            GameApp.CommandManager.createCommand(DisappearCommand).execute("door", doorInfo.index, () => {
+            GameApp.CommandManager.createCommand(DisappearCommand).execute("door", doorInfo.index, DisappearOrAppearState.ALL, () => {
                 let index = this.levelData.triggerDoorEvent(DoorState.WALL_SHOW_EVENT, doorInfo.index);
                 if (index) {
                     GameApp.CommandManager.createCommand(ShowCommand).execute(index);
