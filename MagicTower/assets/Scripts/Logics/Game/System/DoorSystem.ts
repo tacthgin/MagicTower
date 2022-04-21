@@ -78,7 +78,7 @@ export class DoorSystem extends SystemBase {
             });
         } else if (doorInfo.doorState == DoorState.APPEAR) {
             //隐藏的墙门
-            GameApp.CommandManager.createCommand(AppearCommand).execute("door", doorInfo.index, doorInfo.id, () => {
+            GameApp.CommandManager.createCommand(AppearCommand).execute("door", doorInfo.index, doorInfo.id, DisappearOrAppearState.ALL, () => {
                 let eventId = this.levelData.triggerDoorEvent(DoorState.APPEAR_EVENT, doorInfo.index);
                 if (eventId) {
                     GameApp.CommandManager.createCommand(EventCollisionCommand).execute(eventId);
