@@ -11,16 +11,13 @@ export class LoginScene extends Component {
 
     private progress: number = 0;
 
-    onLoad() {}
-
     async start() {
         await this.loadResources();
         GameApp.instance.initModels();
         this.gotoGameScene();
     }
 
-    async loadResources() {
-        Utility.Json.setJsonDirPath("Json");
+    private async loadResources() {
         let resouceInfos = [
             {
                 path: "Json",
@@ -44,20 +41,33 @@ export class LoginScene extends Component {
             },
         ];
 
-        for (let i = 0; i < resouceInfos.length; i++) {
-            let info = resouceInfos[i];
-            let step = (i + 1) / resouceInfos.length;
-            await GameApp.ResourceManager.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number) => {
+        //单独加载json
+        let info = resouceInfos[0];
+        let step = 1 / resouceInfos.length;
+        await GameApp.ResourceManager.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number, item: any) => {
+            let progress = finished / total;
+            this.setProgress(progress, 1);
+            Utility.Json.addJson(item.file._name, item.file);
+        });
+
+        for (let i = 1; i < resouceInfos.length; i++) {
+            info = resouceInfos[i];
+            step = (i + 1) / resouceInfos.length;
+            await GameApp.ResourceManager.loadDirWithCallback(info.path, info.assetType as any, (finished: number, total: number, item: any) => {
                 let progress = finished / total;
-                if (progress > this.progress) {
-                    this.progress = progress * step;
-                    this.progressLabel.string = `${(this.progress * 100).toFixed(2)}%`;
-                }
+                this.setProgress(progress, step);
             });
         }
     }
 
-    gotoGameScene() {
+    private gotoGameScene() {
         GameApp.SceneManager.loadScene("GameScene");
+    }
+
+    private setProgress(progress: number, step: number) {
+        if (progress > this.progress) {
+            this.progress = progress * step;
+            this.progressLabel.string = `${(this.progress * 100).toFixed(2)}%`;
+        }
     }
 }

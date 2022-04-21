@@ -203,7 +203,6 @@ export class GameApp extends Component {
         let sceneHelp = new CSceneHelp();
         GameApp.SceneManager.setSceneHelp(sceneHelp);
         //初始化JSON工具类
-        Utility.Json.setResourceManager(resourceManager);
         Utility.Json.setSystemUtility(Utility.System);
     }
 

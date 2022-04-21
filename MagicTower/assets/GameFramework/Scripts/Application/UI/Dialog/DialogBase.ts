@@ -1,4 +1,4 @@
-import { Enum, EventTouch, Node, screen, UITransform, _decorator } from "cc";
+import { Button, Enum, EventTouch, Node, screen, UITransform, _decorator } from "cc";
 import { IUIGroup } from "../../../UI/IUIGroup";
 import { GameApp } from "../../GameApp";
 import { DialogAction } from "./DialogAction/DialogAction";
@@ -117,5 +117,9 @@ export class DialogBase extends DialogUIForm {
         this.unregisterTouchEvent();
         GameApp.UIManager.closeUIForm(this);
         this.node.removeFromParent();
+    }
+
+    private onCloseBtnClick(button: Button, customEventData: string) {
+        this.close();
     }
 }
