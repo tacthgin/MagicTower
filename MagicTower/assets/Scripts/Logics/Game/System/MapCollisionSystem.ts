@@ -15,10 +15,10 @@ import { LevelData } from "../../../Model/MapModel/Data/LevelData";
 import { MapModel } from "../../../Model/MapModel/MapModel";
 import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
 import { CommonEventArgs } from "../../Event/CommonEventArgs";
-import { DisappearOrAppearEventArgs } from "../../Event/DisappearOrAppearEventArgs";
+import { DisappearOrAppearEventArgs, DisappearOrAppearState } from "../../Event/DisappearOrAppearEventArgs";
 import { EventCollisionEventArgs } from "../../Event/EventCollisionEventArgs";
 import { GameEvent } from "../../Event/GameEvent";
-import { MonsterDieEventArgs } from "../../Event/MonsterDieEventArgs";
+import { MonsterDieEventArgs } from "../../Event/MonsterDIeEventArgs";
 import { MoveEventArgs } from "../../Event/MoveEventArgs";
 import { ShowEventArgs } from "../../Event/ShowEventArgs";
 import { SpecialMoveEventArgs } from "../../Event/SpecialMoveEventArgs";
@@ -183,11 +183,11 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private onCommandAppear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
-        this.appear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.elementId, eventArgs.callback);
+        this.appear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.elementId, eventArgs.state, eventArgs.callback);
     }
 
     private onCommandDisappear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
-        this.disappear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.callback);
+        this.disappear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.state, eventArgs.callback);
     }
 
     private onCommandEvent(sender: object, eventArgs: EventCollisionEventArgs) {
@@ -225,7 +225,7 @@ export class MapCollisionSystem extends SystemBase {
 
         let elementInfo = this.levelData.getLayerElementWithoutName(index);
         if (elementInfo) {
-            this.appear(elementInfo.layerName, elementInfo.element.index, elementInfo.element.id);
+            this.appear(elementInfo.layerName, elementInfo.element.index, DisappearOrAppearState.ALL, elementInfo.element.id);
         } else {
             GameFrameworkLog.error(`${index} show not exist`);
         }
@@ -286,7 +286,7 @@ export class MapCollisionSystem extends SystemBase {
         return this.gameMap.getGidByName(name);
     }
 
-    private appear(layerName: string, tileOrIndex: IVec2 | number, id: number, callback: Function | null = null) {
+    private appear(layerName: string, tileOrIndex: IVec2 | number, state: DisappearOrAppearState, id: number, callback: Function | null = null) {
         let { index, tile } = this.getTileOrIndex(tileOrIndex);
 
         switch (layerName) {
@@ -341,22 +341,26 @@ export class MapCollisionSystem extends SystemBase {
         }
     }
 
-    private disappear(layerName: string, tileOrIndex: IVec2 | number, callback: Function | null) {
+    private disappear(layerName: string, tileOrIndex: IVec2 | number, state: DisappearOrAppearState, callback: Function | null) {
         let { index, tile } = this.getTileOrIndex(tileOrIndex);
 
-        if (layerName == "door") {
-            let door = this.levelData.getLayerElement<Door>("door", index);
-            if (door) {
-                this.doorSystem.openDoor(door, callback);
-            }
-            this.scheduleOnce(() => {
+        if (state == DisappearOrAppearState.ALL || state == DisappearOrAppearState.VIEW) {
+            if (layerName == "door") {
+                let door = this.levelData.getLayerElement<Door>("door", index);
+                if (door) {
+                    this.doorSystem.openDoor(door, callback);
+                }
+                this.scheduleOnce(() => {
+                    this.gameMap.setTileGIDAt(layerName, tile, 0);
+                }, 0);
+            } else {
                 this.gameMap.setTileGIDAt(layerName, tile, 0);
-            }, 0);
-        } else {
-            this.gameMap.setTileGIDAt(layerName, tile, 0);
+            }
         }
 
-        this.levelData.setDisappear(layerName, index);
+        if (state == DisappearOrAppearState.ALL || state == DisappearOrAppearState.MODEL) {
+            this.levelData.setDisappear(layerName, index);
+        }
     }
 
     private eventCollision(eventID: number | string | IVec2) {
