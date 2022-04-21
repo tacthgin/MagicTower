@@ -15,7 +15,7 @@ export class WebSaveHelp implements ISaveHelp {
 
     getNumber(name: string, defaultValue?: number): number | null {
         let value = localStorage.getItem(name);
-        if (value !== null) {
+        if (value) {
             return Number(value);
         } else if (defaultValue !== undefined) {
             return defaultValue;
@@ -29,7 +29,7 @@ export class WebSaveHelp implements ISaveHelp {
 
     getString(name: string, defaultValue?: string): string | null {
         let value = localStorage.getItem(name);
-        if (value !== null) {
+        if (value) {
             return value;
         } else if (defaultValue !== undefined) {
             return defaultValue;
@@ -49,7 +49,7 @@ export class WebSaveHelp implements ISaveHelp {
 
     getObject(name: string, defaultValue?: object): object | null {
         let value = localStorage.getItem(name);
-        if (value !== null) {
+        if (value) {
             let newValue = null;
             try {
                 newValue = JSON.parse(value);
