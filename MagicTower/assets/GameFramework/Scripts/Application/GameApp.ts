@@ -37,7 +37,11 @@ const { ccclass, executionOrder } = _decorator;
 @executionOrder(1)
 export class GameApp extends Component {
     private static _instance: GameApp | null = null;
+    /** 引用计数 */
+    private static _referenceCount: number = 0;
+    /** 模型容器 */
     private _modelContainer: ModelContainer = null!;
+    /** 命令系统管理 */
     private _commandManager: CommandManager = null!;
 
     static get instance(): GameApp {
@@ -129,6 +133,7 @@ export class GameApp extends Component {
             this.destroy();
             return;
         } else {
+            ++GameApp._referenceCount;
             GameApp._instance = this;
             game.addPersistRootNode(this.node);
         }
@@ -136,10 +141,13 @@ export class GameApp extends Component {
     }
 
     onDestroy() {
-        GameApp._instance = null;
+        --GameApp._referenceCount;
+        if (GameApp._referenceCount == 0) {
+            GameApp._instance = null;
+            GameFrameworkEntry.shutDown();
+        }
         this._modelContainer.shutDown();
         this._commandManager.shutDown();
-        GameFrameworkEntry.shutDown();
     }
 
     /** 初始化所有模型并加载本地模型数据 */

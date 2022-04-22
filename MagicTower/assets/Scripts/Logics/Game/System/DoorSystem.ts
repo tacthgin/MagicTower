@@ -27,8 +27,8 @@ export class DoorSystem extends SystemBase {
     private levelData: LevelData = null!;
 
     awake(): void {
-        GameApp.NodePoolManager.createNodePool(DoorAnimationNode);
-        GameApp.NodePoolManager.createNodePool(DoorAnimationReverseNode);
+        GameApp.NodePoolManager.createNodePool("DoorAnimationNode", DoorAnimationNode);
+        GameApp.NodePoolManager.createNodePool("DoorAnimationReverseNode", DoorAnimationReverseNode);
     }
 
     clear(): void {

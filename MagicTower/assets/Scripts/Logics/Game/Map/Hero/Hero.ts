@@ -48,7 +48,7 @@ export class Hero extends Component {
     onLoad() {
         this._heroModel = GameApp.getModel(HeroModel);
         this._heroFSM = GameApp.FsmManager.createFsm("hero fsm", this, [new IdleState(), new MoveState(), new AttackState()]);
-        GameApp.NodePoolManager.createNodePool(Lightning);
+        GameApp.NodePoolManager.createNodePool("Lightning", Lightning);
     }
 
     onDestroy() {
