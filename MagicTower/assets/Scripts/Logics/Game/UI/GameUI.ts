@@ -105,7 +105,7 @@ export class GameUI extends Component {
         this.monsterSprite.parent = this.monsterNode;
         this.monsterSprite.active = false;
 
-        GameApp.NodePoolManager.createNodePool(PropButton);
+        GameApp.NodePoolManager.createNodePool("PropButton", PropButton);
         GameApp.NodePoolManager.createNodePool("key");
     }
 

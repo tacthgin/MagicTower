@@ -6,7 +6,7 @@ import { INodeHelp } from "./INodeHelp";
  * 节点对象
  */
 export class NodeObject extends ObjectBase {
-    private _nodeHelper: INodeHelp | null = null;
+    private _nodeHelper: INodeHelp = null!;
 
     static create(name: string, node: object, nodeHelp: INodeHelp): NodeObject {
         let nodeObejct = ReferencePool.acquire(NodeObject);
@@ -16,12 +16,12 @@ export class NodeObject extends ObjectBase {
     }
 
     onUnspawn(): void {
-        this._nodeHelper?.releaseNode(this.target);
+        this._nodeHelper.releaseNode(this.target);
     }
 
     clear(): void {
         super.clear();
-        this._nodeHelper?.releaseNode(this.target);
-        this._nodeHelper = null;
+        this._nodeHelper.releaseNode(this.target);
+        this._nodeHelper = null!;
     }
 }

@@ -37,7 +37,7 @@ export class UsePropSystem extends SystemBase {
 
     awake(): void {
         GameApp.EventManager.subscribe(GameEvent.USE_PROP, this.onUseProp, this);
-        GameApp.NodePoolManager.createNodePool(MonsterHandBookItem);
+        GameApp.NodePoolManager.createNodePool("MonsterHandBookItem", MonsterHandBookItem);
     }
 
     initliaze(gameMap: IGameMap, hero: Hero) {

@@ -16,14 +16,16 @@ import { NodeObject } from "./NodeObject";
  */
 @GameFrameworkEntry.registerModule("NodePoolManager")
 export class NodePoolManager extends GameFrameworkModule implements INodePoolManager {
-    private readonly _nodePools: Map<Constructor<NodeBase> | string, ObjectPoolBase> = null!;
+    private readonly _nodePools: Map<string, ObjectPoolBase> = null!;
+    private readonly _constructorToNameMap: Map<Constructor<NodeBase>, string> = null!;
     private _resourceManager: IResourceManager | null = null;
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _nodeHelp: INodeHelp | null = null;
 
     constructor() {
         super();
-        this._nodePools = new Map<Constructor<NodeBase>, ObjectPoolBase>();
+        this._nodePools = new Map<string, ObjectPoolBase>();
+        this._constructorToNameMap = new Map<Constructor<NodeBase>, string>();
     }
 
     get priority(): number {
@@ -47,11 +49,13 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
     }
 
     hasNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): boolean {
-        return this._nodePools.has(nodeConstructorOrNodePoolName);
+        let nodePoolName = this.internalGetPoolName(nodeConstructorOrNodePoolName);
+        return this._nodePools.has(nodePoolName);
     }
 
     getNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): IObjectPool<NodeObject> | null {
-        let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName);
+        let nodePoolName = this.internalGetPoolName(nodeConstructorOrNodePoolName);
+        let objectPool = this._nodePools.get(nodePoolName);
         if (objectPool) {
             return objectPool as unknown as IObjectPool<NodeObject>;
         }
@@ -59,22 +63,29 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         return null;
     }
 
-    createNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): IObjectPool<NodeObject> {
-        if (typeof nodeConstructorOrNodePoolName === "string" && !nodeConstructorOrNodePoolName) {
-            throw new GameFrameworkError("node pool name is invalid");
+    createNodePool<T extends NodeBase>(nodePoolName: string, nodeConstructor?: Constructor<T>): IObjectPool<NodeObject> {
+        if (!nodePoolName) {
+            throw new GameFrameworkError("nodePoolName is invalid");
         }
 
-        let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName);
+        let objectPool = this._nodePools.get(nodePoolName);
         if (objectPool) {
-            throw new GameFrameworkError(`node pool is exist`);
+            throw new GameFrameworkError(`node pool ${nodePoolName} is exist`);
         }
 
         if (!this._objectPoolManager) {
             throw new GameFrameworkError("you must set object pool manager first");
         }
 
-        objectPool = this._objectPoolManager.createSingleSpawnObjectPoolBase(NodeObject, this.internalGetPoolName(nodeConstructorOrNodePoolName));
-        this._nodePools.set(nodeConstructorOrNodePoolName, objectPool);
+        objectPool = this._objectPoolManager.createSingleSpawnObjectPoolBase(NodeObject, nodePoolName);
+        this._nodePools.set(nodePoolName, objectPool);
+        if (nodeConstructor) {
+            if (this._constructorToNameMap.has(nodeConstructor)) {
+                throw new GameFrameworkError(`${nodePoolName} already exist node constructor`);
+            } else {
+                this._constructorToNameMap.set(nodeConstructor, nodePoolName);
+            }
+        }
 
         return objectPool as unknown as IObjectPool<NodeObject>;
     }
@@ -88,9 +99,10 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             throw new GameFrameworkError("you must set object pool manager first");
         }
 
-        let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName);
+        let nodePoolName = this.internalGetPoolName(nodeConstructorOrNodePoolName);
+        let objectPool = this._nodePools.get(nodePoolName);
         if (objectPool) {
-            return this._objectPoolManager.destroyObjectPool(NodeObject, this.internalGetPoolName(nodeConstructorOrNodePoolName));
+            return this._objectPoolManager.destroyObjectPool(NodeObject, nodePoolName);
         }
 
         return false;
@@ -101,7 +113,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             throw new GameFrameworkError("you must set node help first");
         }
 
-        let objectPool = this._nodePools.get(nodeConstructorOrNodePoolName) as unknown as IObjectPool<NodeObject>;
+        let objectPool = this.getNodePool(nodeConstructorOrNodePoolName);
         if (!objectPool) {
             throw new GameFrameworkError("object pool is not exist, you must create first");
         }
@@ -114,7 +126,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             objectPool.register(nodeObject, true);
         }
 
-        return nodeObject.target;
+        return nodeObject.target as T;
     }
 
     async createNodeWithPath<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, assetPath: string, name?: string): Promise<object> {
@@ -142,7 +154,12 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         return false;
     }
 
-    private internalGetPoolName<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string) {
-        return typeof nodeConstructorOrNodePoolName === "string" ? nodeConstructorOrNodePoolName : nodeConstructorOrNodePoolName.name;
+    /**
+     * 获取节点池名字
+     * @param nodeConstructorOrNodePoolName 节点池名字或者节点构造器
+     * @returns 节点池名字
+     */
+    private internalGetPoolName<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): string {
+        return typeof nodeConstructorOrNodePoolName === "string" ? nodeConstructorOrNodePoolName : this._constructorToNameMap.get(nodeConstructorOrNodePoolName) || "";
     }
 }
