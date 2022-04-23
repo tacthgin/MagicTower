@@ -43,6 +43,10 @@ export class ArchiveDialog extends DialogBase {
                 this.saveModel.saveArchive();
                 this.setTitle(this.saveModel.currentArchiveIndex);
                 break;
+            case "delete":
+                this.saveModel.deleteArchive();
+                this.loadArchive();
+                break;
             default:
                 let index = customEventData[customEventData.length - 1];
                 if (this.saveModel.loadArchive(parseInt(index) - 1)) {

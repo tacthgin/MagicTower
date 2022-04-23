@@ -67,6 +67,13 @@ export class SaveModel extends ModelBase {
         this.save();
     }
 
+    deleteArchive() {
+        let index = this._currentArchiveIndex;
+        this._archives[index] = "";
+        this._titles[index] = "";
+        this.save();
+    }
+
     private parseArchive(archiveStr: string): ArchiveInfo | null {
         if (archiveStr) {
             return JSON.parse(archiveStr);
