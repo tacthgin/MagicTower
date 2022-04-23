@@ -183,7 +183,7 @@ export class MapCollisionSystem extends SystemBase {
     }
 
     private onCommandAppear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
-        this.appear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.elementId, eventArgs.state, eventArgs.callback);
+        this.appear(eventArgs.layerName, eventArgs.tileOrIndex, eventArgs.state, eventArgs.elementId, eventArgs.callback);
     }
 
     private onCommandDisappear(sender: object, eventArgs: DisappearOrAppearEventArgs) {
