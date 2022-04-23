@@ -94,6 +94,7 @@ export class MoveSystem extends SystemBase {
             if (path.length == 0) {
                 UIFactory.showToast("勇士迷路了");
             } else {
+                this.setCanHeroMoving(false);
                 let endTile: IVec2 = path[path.length - 1];
                 let isRemoveEnd = !this.canMoveTile(endTile, true);
                 if (isRemoveEnd) {
