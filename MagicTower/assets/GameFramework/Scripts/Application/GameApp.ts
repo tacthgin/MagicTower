@@ -143,7 +143,7 @@ export class GameApp extends Component {
 
     onLoad() {
         if (GameApp._instance) {
-            this.destroy();
+            this.node.destroy();
             return;
         } else {
             ++GameApp._referenceCount;
