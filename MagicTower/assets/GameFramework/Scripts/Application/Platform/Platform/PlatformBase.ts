@@ -1,5 +1,5 @@
+import { PlatformType } from "../PlatformType";
 import { IPlatform } from "./IPlatform";
-import { PlatformType } from "./PlatformType";
 
 export abstract class PlatformBase implements IPlatform {
     private _platformType: PlatformType = null!;

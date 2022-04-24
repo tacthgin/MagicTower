@@ -1,9 +1,9 @@
-import { IPlatform } from "../IPlatform";
+import { IWebPlatform } from "../IPlatform";
 
 /**
  * 微信平台接口
  */
-export interface IWXPlatform extends IPlatform {
+export interface IWXPlatform extends IWebPlatform {
     /**
      * 注册微信小游戏事件回调
      * @param eventName

@@ -20,6 +20,9 @@ import { ICommandManager } from "./Command/ICommandManager";
 import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
 import { CNodeHelp } from "./NodePool/CNodeHelp";
+import { CPlatformHelp } from "./Platform/Helper/CPlatformHelp";
+import { IPlatformManager } from "./Platform/IPlatformManager";
+import { PlatformManager } from "./Platform/PlatformManager";
 import { CSceneHelp } from "./Scene/CSceneHelp";
 import { SoundConstant } from "./Sound/SoundConstant";
 import { SoundController } from "./Sound/SoundController";
@@ -43,6 +46,8 @@ export class GameApp extends Component {
     private _modelContainer: ModelContainer = null!;
     /** 命令系统管理 */
     private _commandManager: CommandManager = null!;
+    /** 平台管理 */
+    private _platformManager: PlatformManager = null!;
 
     static get instance(): GameApp {
         return this._instance!;
@@ -128,6 +133,14 @@ export class GameApp extends Component {
         return GameApp.instance._commandManager;
     }
 
+    /**
+     * 平台管理器
+     * @returns 平台管理器
+     */
+    static get PlatformManager(): IPlatformManager {
+        return GameApp.instance._platformManager;
+    }
+
     onLoad() {
         if (GameApp._instance) {
             this.destroy();
@@ -166,6 +179,8 @@ export class GameApp extends Component {
         this.initializeCommand();
         //初始化model
         this.initializeModel();
+        //初始化平台
+        this.initializePlatform();
     }
 
     private initalizeFramework() {
@@ -222,6 +237,11 @@ export class GameApp extends Component {
     private initializeCommand() {
         this._commandManager = new CommandManager();
         this._commandManager.setObjectPoolManager(GameApp.ObjectPoolManager);
+    }
+
+    private initializePlatform() {
+        this._platformManager = new PlatformManager();
+        this._platformManager.initalize(new CPlatformHelp());
     }
 
     update(elapseSeconds: number) {

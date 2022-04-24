@@ -1,4 +1,4 @@
-import { PlatformType } from "./PlatformType";
+import { PlatformType } from "../PlatformType";
 
 /**
  * 平台辅助器
