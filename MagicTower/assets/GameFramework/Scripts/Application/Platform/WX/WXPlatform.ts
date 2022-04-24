@@ -1,245 +1,295 @@
-// import { GameEvent } from "../Constant/GameEvent";
-
+import { GameFrameworkError } from "../../../Base/GameFrameworkError";
+import { PlatformBase } from "../PlatformBase";
 import { IWXPlatform } from "./IWXPlatform";
 
-// const AD_INFO = { a: 'adunit-38a5473745748ead' }
+declare const wx: any;
 
 /**
  * 微信平台
  */
-export class WXPlatform implements IWXPlatform {
+export class WXPlatform extends PlatformBase implements IWXPlatform {
+    /** 广告名字对应的video数据 */
+    private readonly _adInfo: { [name: string]: any } = {};
+    /** 广告配置数据 */
+    private readonly _adSettingInfo: Readonly<{ [name: string]: string }> = {};
+
     initalize(): void {
-        throw new Error("Method not implemented.");
+        //展示菜单中的转发选项
+        wx.showShareMenu();
+
+        //更新分享菜单信息
+        wx.updateShareMenu({
+            withShareTicket: true,
+        });
+    }
+
+    /**
+     * 注册微信小游戏事件回调
+     * @param eventName
+     * @param callback
+     */
+    registerEvent(eventName: string, callback?: Function): void {
+        // // 监听小游戏回到前台的事件
+        // wx.onShow((res: any) => {});
+        // //隐藏到后台事件
+        // wx.onHide((res: any) => {});
+        // // 内存警告
+        // wx.onMemoryWarning(() => {
+        //     console.log("onMemoryWarningReceive");
+        // });
+        // //音频中断结束事件
+        // wx.onAudioInterruptionEnd(() => {});
+        // //网络状态切换事件
+        // wx.onNetworkStatusChange((res: any) => {});
+        let func = wx[eventName];
+        if (func && func instanceof Function) {
+            func((res: any) => {
+                this.executeCallback(res, callback);
+            });
+        } else {
+            throw new GameFrameworkError("wx register function is invalid");
+        }
+    }
+
+    /**
+     * 短震动(15ms)
+     */
+    vibrateShort(): void {
+        wx.vibrateShort();
+    }
+
+    /**
+     * 长震动(400ms)
+     */
+    vibrate(): void {
+        wx.vibrateLong();
+    }
+
+    /**
+     * 授权
+     * @param name 授权的名字
+     * @param callback 授权后的回调函数
+     */
+    authorize(name: string, callback?: Function): void {
+        wx.getSetting({
+            success(res: any): void {
+                if (!res.authSetting[name]) {
+                    wx.authorize({
+                        scope: name,
+                        success(): void {
+                            callback && callback();
+                        },
+                    });
+                }
+            },
+        });
+    }
+
+    /**
+     * 播放广告
+     * @param name 广告名字
+     * @param callback 播放广告回调函数
+     */
+    showAd(name: string, callback?: Function): void {
+        let video = this.createAd(name);
+        if (!video) {
+            this.executeCallback({ success: false }, callback);
+        }
+        video.offError();
+        video.onError((err: any) => {
+            this.executeCallback({ success: false }, callback);
+        });
+
+        video.offClose();
+        video.onClose((res: any) => {
+            this.executeCallback(
+                {
+                    success: true,
+                    isEnded: (res && res.isEnded) || res === undefined,
+                },
+                callback
+            );
+        });
+
+        video
+            .load()
+            .then(() => {
+                video.show();
+            })
+            .catch((res: any) => {
+                this.executeCallback(
+                    {
+                        success: false,
+                        noVideoCount: res.errMsg === "no advertisement",
+                    },
+                    callback
+                );
+            });
+    }
+
+    /**
+     * 加载广告
+     * @param name 广告名字
+     * @param callback 加载成功或者失败回调函数
+     */
+    loadAd(name: string, callback?: Function): void {
+        let video = this.createAd(name);
+        if (video) {
+            video.onError((err: any) => {
+                this.executeCallback({ success: false }, callback);
+            });
+
+            video
+                .load()
+                .then(() => {
+                    this.executeCallback({ success: true }, callback);
+                })
+                .catch(() => {
+                    this.executeCallback({ success: false }, callback);
+                });
+        } else {
+            this.executeCallback({ success: false }, callback);
+        }
+    }
+
+    /**
+     * 分享
+     * @param title 分享标题
+     * @param imageUrl 图片链接
+     */
+    shareAppMessage(title: string, imageUrl: string): void {
+        wx.shareAppMessage({
+            title: title,
+            imageUrl: imageUrl,
+        });
+    }
+
+    /**
+     * 展示菊花加载
+     * @param content 加载的内容
+     * @param mask 是否添加遮罩
+     */
+    showLoading(content: string = "加载中", mask: boolean = true): void {
+        wx.showLoading({
+            title: content,
+            mask: mask,
+        });
+    }
+
+    /**
+     * 隐藏菊花加载
+     */
+    hideLoading(): void {
+        wx.hideLoading();
+    }
+
+    /**
+     * 存储数据到云存档
+     * @param saveName 存档名字
+     * @param info 数据
+     * @param failCallback 存档失败回调函数
+     */
+    setCloudInfo(saveName: string, info: any, failCallback?: Function): void {
+        const db = wx.cloud.database();
+        const c = db.collection(saveName);
+        c.where({ _openid: "user-open-id" }).get({
+            success(res: any) {
+                if (res.data.length == 0) {
+                    c.add({ data: { gameInfo: info } }).catch((res: any) => {
+                        failCallback && failCallback();
+                    });
+                } else {
+                    c.doc(res.data[0]._id)
+                        .set({ data: { gameInfo: info } })
+                        .catch((res: any) => {
+                            failCallback && failCallback();
+                        });
+                }
+            },
+        });
+    }
+
+    /**
+     * 获取云存档
+     * @param saveName 存档名字
+     * @param callback 加载存档回调函数
+     */
+    getCloudInfo(saveName: string, callback?: Function): void {
+        const db = wx.cloud.database();
+        const c = db.collection(saveName);
+        c.where({ _openid: "user-open-id" }).get({
+            success(res: any) {
+                if (res.data.length > 0) {
+                    c.doc(res.data[0]._id)
+                        .get()
+                        .then((res: any) => {
+                            console.log("getinfo", res);
+                            callback && callback(res.data.gameInfo);
+                        })
+                        .catch((res: any) => {
+                            callback && callback(null);
+                        });
+                } else {
+                    callback && callback(null);
+                }
+            },
+        });
+    }
+
+    /**
+     * 设置数据域数据
+     * @param kvData 数据
+     */
+    setUserCloudStorage(kvData: any): void {
+        //kvData: [{key: 'level', value: 5}] or {key: 'level', value: 5}
+        wx.setUserCloudStorage({
+            KVDataList: kvData instanceof Array ? kvData : [kvData],
+        });
+    }
+
+    /**
+     * 数据域发送数据
+     * @param content 数据
+     */
+    postMessage(content: string): void {
+        wx.getOpenDataContext().postMessage({
+            message: content,
+        });
+    }
+
+    /**
+     * 预加载所有广告
+     */
+    private preloadAd(): void {
+        for (let adName in this._adInfo) {
+            this.loadAd(adName);
+        }
+    }
+
+    /**
+     * 创建广告
+     * @param name 广告名字
+     * @returns 广告
+     */
+    private createAd(name: string): any {
+        let video = null;
+        if (!this._adInfo[name]) {
+            video = wx.createRewardedVideoAd({ adUnitId: this._adSettingInfo[name] });
+            if (video) {
+                this._adInfo[name] = video;
+            }
+        } else {
+            video = this._adInfo[name];
+        }
+        return video;
+    }
+
+    /**
+     * 执行回调函数
+     * @param data 数据
+     * @param callback 回调函数
+     */
+    private executeCallback(data: any, callback?: Function): void {
+        callback && callback(data);
     }
 }
-
-// export let WXUtil = {
-//     init: function () {
-//         this.initSetting()
-//         this.listenEvent()
-//     },
-
-//     initSetting: function () {
-//         //初始化云存储环境
-//         wx.cloud.init({env: 'earth-pnljm'})
-
-//         //展示菜单中的转发选项
-//         wx.showShareMenu()
-
-//         //更新分享菜单信息
-//         wx.updateShareMenu({
-//             withShareTicket: true,
-//         })
-
-//         //广告info
-//         this.adInfo = {}
-//     },
-
-//     listenEvent: function () {
-//         // 监听小游戏回到前台的事件
-//         wx.onShow((res) => {
-//             NotifyCenter.emit(GameEvent.ON_SHOW, res)
-//         })
-
-//         //隐藏到后台事件
-//         wx.onHide((res) => {
-//             NotifyCenter.emit(GameEvent.ON_HIDE)
-//         })
-
-//         // 内存警告
-//         wx.onMemoryWarning(() => {
-//             console.log('onMemoryWarningReceive')
-//         })
-
-//         //音频中断结束事件
-//         wx.onAudioInterruptionEnd(() => {
-//             NotifyCenter.emit(GameEvent.ON_AUDIO_INTERRUPTION_END)
-//         })
-
-//         //网络状态切换事件
-//         wx.onNetworkStatusChange((res) => {
-//             NotifyCenter.emit(GameEvent.ON_NETWORK_STATUS_CHANGE, res)
-//         })
-//     },
-
-//     preloadAd: function () {
-//         for (let adName in AD_INFO) {
-//             this.loadAd(adName)
-//         }
-//     },
-
-//     //短震动(15ms)
-//     vibrateShort: function () {
-//         wx.vibrateShort()
-//     },
-
-//     //长震动(400ms)
-//     vibrateLong: function () {
-//         wx.vibrateLong()
-//     },
-
-//     //授权
-//     authorize: function (name, callback) {
-//         wx.getSetting({
-//             success(res) {
-//                 if (!res.authSetting[name]) {
-//                     wx.authorize({
-//                         scope: name,
-//                         success() {
-//                             callback()
-//                         }
-//                     })
-//                 }
-//             }
-//         })
-//     },
-
-//     //创建广告
-//     createAd: function (name) {
-//         let video = null
-//         if (!this.adInfo[name]) {
-//             video = wx.createRewardedVideoAd({ adUnitId: AD_INFO[name] })
-//             if (video) {
-//                 this.adInfo[name] = video
-//             }
-//         } else {
-//             video = this.adInfo[name]
-//         }
-//         return video
-//     },
-
-//     //播放广告
-//     showAd: function (name, callback) {
-//         let video = this.createAd(name)
-//         if (video) {
-//             video.offError()
-//             video.onError(err => {
-//                 callback && callback({
-//                     success: false
-//                 })
-//             })
-
-//             video.offClose()
-//             video.onClose(res => {
-//                 callback && callback({
-//                     success: true,
-//                     isEnded: res && res.isEnded || res === undefined
-//                 })
-//             })
-
-//             video.load().then(() => {
-//                 video.show()
-//             }).catch((res) => {
-//                 console.log(res)
-//                 callback && callback({
-//                     success: false,
-//                     noVideoCount: res.errMsg === 'no advertisement'
-//                 })
-//             })
-//         } else {
-//             callback && callback({
-//                 success: false
-//             })
-//         }
-//     },
-
-//     //获取广告次数
-//     loadAd: function (name, callback) {
-//         let video = this.createAd(name)
-//         if (video) {
-//             video.onError((err) => {
-//                 callback && callback({ success: false })
-//             })
-
-//             video.load().then(() => {
-//                 callback && callback({ success: true })
-//             }).catch(() => {
-//                 callback && callback({ success: false })
-//             })
-//         } else {
-//             callback && callback({ success: false })
-//         }
-//     },
-
-//     //分享
-//     shareAppMessage: function () {
-//         wx.shareAppMessage({
-//             title: '快来玩这游戏啊，好好玩哦',
-//             imageUrl: 'share.jpg'
-//         })
-//     },
-
-//     //菊花
-//     showLoading: function (content) {
-//         wx.showLoading({
-//             title: content || '加载中',
-//             mask: true
-//         })
-//     },
-
-//     hideLoading: function () {
-//         wx.hideLoading()
-//     },
-
-//     //存档数据
-//     setCloudInfo: function (saveName, info, failCallback) {
-//         const db = wx.cloud.database()
-//         const c = db.collection(saveName)
-//         c.where({ _openid: 'user-open-id' }).get({
-//             success(res) {
-//                 if (res.data.length == 0) {
-//                     c.add({ data: { gameInfo: info }}).catch(res => {
-//                         failCallback && failCallback()
-//                     })
-//                 }else {
-//                     c.doc(res.data[0]._id).set({ data: { gameInfo: info }}).catch(res => {
-//                         failCallback && failCallback()
-//                     })
-//                 }
-//             }
-//         })
-//     },
-
-//     //获取存档
-//     getCloudInfo: function (saveName, callback) {
-//         const db = wx.cloud.database()
-//         const c = db.collection(saveName)
-//         c.where({ _openid: 'user-open-id' }).get({
-//             success(res) {
-//                 if (res.data.length > 0) {
-//                     c.doc(res.data[0]._id).get().then(res => {
-//                         console.log('getinfo', res)
-//                         callback && callback(res.data.gameInfo)
-//                     }).catch(res => {
-//                         callback && callback(null)
-//                     })
-//                 }else {
-//                     callback && callback(null)
-//                 }
-//             }
-//         })
-//     },
-
-//     //设置数据域数据
-//     setUserCloudStorage: function (kvData) {
-//         //kvData: [{key: 'level', value: 5}] or {key: 'level', value: 5}
-//         wx.setUserCloudStorage({
-//             KVDataList: (kvData instanceof Array) ? kvData : [kvData]
-//         })
-//     },
-
-//     //向数据域发送数据
-//     postMessage: function (content) {
-//         wx.getOpenDataContext().postMessage({
-//             message: content
-//         })
-//     },
-
-//     //所有函数调用都通过这个接口
-//     execute: function (funcName, ...rest) {
-//         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-//             let func = WXUtil[funcName]
-//             func && func.apply(WXUtil, rest)
-//         }
-//     }
-// }
