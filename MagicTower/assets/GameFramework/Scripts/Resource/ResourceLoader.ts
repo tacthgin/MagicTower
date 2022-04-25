@@ -2,18 +2,18 @@ import { Asset, AssetManager } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
 import { IResourceLoader } from "./IResourceLoader";
-import { IResourceLoaderHelp } from "./IResourceLoaderHelp";
+import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
 import { IResourceManager } from "./IResourceManager";
-import { IResourcePathHelp } from "./IResourcePathHelp";
+import { IResourcePathHelper } from "./IResourcePathHelper";
 import { ResourceCompleteCallback, ResourceProgressCallback } from "./ResourceCallback";
 
 export class ResourceLoader implements IResourceLoader {
-    private _resourceLoaderHelp: IResourceLoaderHelp = null!;
-    private _resoucePathHelp: IResourcePathHelp = null!;
+    private _resourceLoaderHelp: IResourceLoaderHelper = null!;
+    private _resoucePathHelp: IResourcePathHelper = null!;
     private _cachedDirs: Map<string, Array<Asset>> = null!;
     private _resourceManger: IResourceManager = null!;
 
-    constructor(resourceLoaderHelp: IResourceLoaderHelp, resourcePathHelp: IResourcePathHelp, resourceManager: IResourceManager) {
+    constructor(resourceLoaderHelp: IResourceLoaderHelper, resourcePathHelp: IResourcePathHelper, resourceManager: IResourceManager) {
         this._resourceLoaderHelp = resourceLoaderHelp;
         this._resoucePathHelp = resourcePathHelp;
         this._resourceManger = resourceManager;

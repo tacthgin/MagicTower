@@ -3,6 +3,7 @@
  */
 export enum PlatformType {
     NONE,
+    WIN32,
     ANDROID,
     IOS,
     WX,

@@ -1,18 +1,18 @@
 import { GameFrameworkLogLevel } from "./GameFrameworkLogLevel";
-import { ILogHelp } from "./ILogHelp";
+import { ILogHelper } from "./ILogHelper";
 
 /**
  * 游戏框架日志
  */
 export class GameFrameworkLog {
-    private static s_logHelp: ILogHelp | null = null;
+    private static s_logHelper: ILogHelper | null = null;
 
     /**
      * 设置日志辅助器
-     * @param logHelp 日志辅助器
+     * @param logHelper 日志辅助器
      */
-    static setLogHelp(logHelp: ILogHelp) {
-        this.s_logHelp = logHelp;
+    static setLogHelper(logHelper: ILogHelper) {
+        this.s_logHelper = logHelper;
     }
 
     /**
@@ -20,10 +20,10 @@ export class GameFrameworkLog {
      * @param message 参数列表
      */
     static debug(...message: any[]): void {
-        if (!this.s_logHelp) {
+        if (!this.s_logHelper) {
             return;
         }
-        this.s_logHelp.log(GameFrameworkLogLevel.DEBUG, ...message);
+        this.s_logHelper.log(GameFrameworkLogLevel.DEBUG, ...message);
     }
 
     /**
@@ -31,10 +31,10 @@ export class GameFrameworkLog {
      * @param message 参数列表
      */
     static log(...message: any[]): void {
-        if (!this.s_logHelp) {
+        if (!this.s_logHelper) {
             return;
         }
-        this.s_logHelp.log(GameFrameworkLogLevel.INFO, ...message);
+        this.s_logHelper.log(GameFrameworkLogLevel.INFO, ...message);
     }
 
     /**
@@ -42,10 +42,10 @@ export class GameFrameworkLog {
      * @param message 参数列表
      */
     static info(...message: any[]): void {
-        if (!this.s_logHelp) {
+        if (!this.s_logHelper) {
             return;
         }
-        this.s_logHelp.log(GameFrameworkLogLevel.INFO, ...message);
+        this.s_logHelper.log(GameFrameworkLogLevel.INFO, ...message);
     }
 
     /**
@@ -53,10 +53,10 @@ export class GameFrameworkLog {
      * @param message 参数列表
      */
     static warn(...message: any[]): void {
-        if (!this.s_logHelp) {
+        if (!this.s_logHelper) {
             return;
         }
-        this.s_logHelp.log(GameFrameworkLogLevel.WARN, ...message);
+        this.s_logHelper.log(GameFrameworkLogLevel.WARN, ...message);
     }
 
     /**
@@ -64,10 +64,10 @@ export class GameFrameworkLog {
      * @param message 参数列表
      */
     static error(...message: any[]): void {
-        if (!this.s_logHelp) {
+        if (!this.s_logHelper) {
             return;
         }
-        this.s_logHelp.log(GameFrameworkLogLevel.ERROR, ...message);
+        this.s_logHelper.log(GameFrameworkLogLevel.ERROR, ...message);
     }
 
     /**
@@ -75,9 +75,9 @@ export class GameFrameworkLog {
      * @param message
      */
     static trace(...message: any[]): void {
-        if (!this.s_logHelp) {
+        if (!this.s_logHelper) {
             return;
         }
-        this.s_logHelp.log(GameFrameworkLogLevel.TRACE, ...message);
+        this.s_logHelper.log(GameFrameworkLogLevel.TRACE, ...message);
     }
 }

@@ -1,10 +1,10 @@
 import { Component, _decorator } from "cc";
-import { IUIGroupHelp } from "../../../UI/IUIGroupHelp";
+import { IUIGroupHelper } from "../../../UI/IUIGroupHelper";
 
 const { ccclass, property } = _decorator;
 
-@ccclass("CUIGroupHelp")
-export class CUIGroupHelp extends Component implements IUIGroupHelp {
+@ccclass("CUIGroupHelper")
+export class CUIGroupHelper extends Component implements IUIGroupHelper {
     setDepth(depth: number): void {
         this.node.setSiblingIndex(depth);
     }

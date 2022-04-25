@@ -4,6 +4,7 @@ import { IPlatformManager } from "./IPlatformManager";
 import { AndroidPlatform } from "./Platform/Android/AndroidPlatform";
 import { IOSPlatform } from "./Platform/IOS/IOSPlatform";
 import { INativePlatform, IPlatform, IWebPlatform } from "./Platform/IPlatform";
+import { Win32Platform } from "./Platform/Win32/Win32Platform";
 import { WXPlatform } from "./Platform/WX/WXPlatform";
 import { PlatformType } from "./PlatformType";
 
@@ -52,6 +53,9 @@ export class PlatformManager implements IPlatformManager {
 
     private createPlatform(): void {
         switch (this._platformType) {
+            case PlatformType.WIN32:
+                this._platform = new Win32Platform(this._platformType);
+                break;
             case PlatformType.ANDROID:
                 this._platform = new AndroidPlatform(this._platformType);
                 break;

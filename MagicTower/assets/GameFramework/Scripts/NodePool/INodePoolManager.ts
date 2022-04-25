@@ -2,7 +2,7 @@ import { Constructor } from "../Base/DataStruct/Constructor";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IObjectPool } from "../ObjectPool/IObjectPool";
 import { IResourceManager } from "../Resource/IResourceManager";
-import { INodeHelp } from "./INodeHelp";
+import { INodeHelper } from "./INodeHelper";
 import { NodeBase } from "./NodeBase";
 import { NodeObject } from "./NodeObject";
 
@@ -24,9 +24,9 @@ export interface INodePoolManager {
 
     /**
      * 设置节点辅助器
-     * @param nodeHelp 节点辅助器
+     * @param nodeHelper 节点辅助器
      */
-    setNodeHelp(nodeHelp: INodeHelp): void;
+    setNodeHelper(nodeHelper: INodeHelper): void;
 
     /**
      * 是否有节点池

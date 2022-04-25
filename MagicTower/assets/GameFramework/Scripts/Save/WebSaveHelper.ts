@@ -1,10 +1,10 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
-import { ISaveHelp } from "./ISaveHelp";
+import { ISaveHelper } from "./ISaveHelper";
 
 /**
  * 使用web标准的localStorage作为存储辅助器
  */
-export class WebSaveHelp implements ISaveHelp {
+export class WebSaveHelper implements ISaveHelper {
     get count(): number {
         return localStorage.length;
     }

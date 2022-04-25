@@ -1,11 +1,11 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { ISoundGroup } from "./ISoundGroup";
-import { ISoundHelp } from "./ISoundHelp";
+import { ISoundHelper } from "./ISoundHelper";
 import { PlaySoundParams } from "./PlaySoundParams";
 import { SoundAgent } from "./SoundAgent";
 
 export class SoundGroup implements ISoundGroup {
-    private _soundHelp: ISoundHelp | null = null;
+    private _soundHelper: ISoundHelper | null = null;
     private _name: string = "";
     private readonly _soundAgents: Array<SoundAgent> = null!;
     private _mute: boolean = false;
@@ -47,10 +47,10 @@ export class SoundGroup implements ISoundGroup {
 
     /**
      * 添加声音辅助器
-     * @param soundHelp
+     * @param soundHelper
      */
-    addSoundHelp(soundHelp: ISoundHelp): void {
-        this._soundHelp = soundHelp;
+    addSoundHelper(soundHelper: ISoundHelper): void {
+        this._soundHelper = soundHelper;
     }
 
     /**
@@ -70,8 +70,8 @@ export class SoundGroup implements ISoundGroup {
         }
 
         if (!candidateAgent) {
-            if (this._soundHelp) {
-                let soundAgentHelp = this._soundHelp.acquireSoundAgentHelp();
+            if (this._soundHelper) {
+                let soundAgentHelp = this._soundHelper.acquireSoundAgentHelper();
                 candidateAgent = new SoundAgent(this, soundAgentHelp);
                 this._soundAgents.push(candidateAgent);
             } else {

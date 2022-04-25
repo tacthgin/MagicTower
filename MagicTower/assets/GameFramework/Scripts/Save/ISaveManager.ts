@@ -1,4 +1,4 @@
-import { ISaveHelp } from "./ISaveHelp";
+import { ISaveHelper } from "./ISaveHelper";
 
 /**
  * 存储管理接口
@@ -11,9 +11,9 @@ export interface ISaveManager {
 
     /**
      * 设置存储辅助器
-     * @param saveHelp
+     * @param saveHelper
      */
-    setSaveHelp(saveHelp: ISaveHelp): void;
+    setSaveHelper(saveHelper: ISaveHelper): void;
 
     /**
      * 存储数字类型

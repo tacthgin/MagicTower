@@ -1,10 +1,10 @@
 import { GameFrameworkLogLevel } from "./GameFrameworkLogLevel";
-import { ILogHelp } from "./ILogHelp";
+import { ILogHelper } from "./ILogHelper";
 
 /**
  * web打印日志辅助器
  */
-export class WebLogHelp implements ILogHelp {
+export class WebLogHelper implements ILogHelper {
     /**
      * 游戏框架日志辅助器接口
      * @param level 日志级别

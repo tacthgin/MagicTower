@@ -1,16 +1,16 @@
 import { Component, instantiate, Node, UITransform, v3, _decorator } from "cc";
 import { GameFrameworkError } from "../../../Base/GameFrameworkError";
 import { IUIForm } from "../../../UI/IUIForm";
-import { IUIFormHelp } from "../../../UI/IUIFormHelp";
+import { IUIFormHelper } from "../../../UI/IUIFormHelper";
 import { IUIGroup } from "../../../UI/IUIGroup";
-import { IUIGroupHelp } from "../../../UI/IUIGroupHelp";
+import { IUIGroupHelper } from "../../../UI/IUIGroupHelper";
 import { UIConstant } from "../UIConstant";
-import { CUIGroupHelp } from "./CUIGroupHelp";
+import { CUIGroupHelper } from "./CUIGroupHelper";
 
 const { ccclass, property } = _decorator;
 
-@ccclass("CUIFormHelp")
-export class CUIFormHelp extends Component implements IUIFormHelp {
+@ccclass("CUIFormHelper")
+export class CUIFormHelper extends Component implements IUIFormHelper {
     @property(Node)
     private dialogLayer: Node = null!;
 
@@ -68,11 +68,11 @@ export class CUIFormHelp extends Component implements IUIFormHelp {
         (uiFormInstance as Node).destroy();
     }
 
-    getDialogUIGroupHelp(): IUIGroupHelp {
-        return this.dialogLayer.getComponent(CUIGroupHelp)!;
+    getDialogUIGroupHelp(): IUIGroupHelper {
+        return this.dialogLayer.getComponent(CUIGroupHelper)!;
     }
 
-    getToastUIGroupHelp(): IUIGroupHelp {
-        return this.toastLayer.getComponent(CUIGroupHelp)!;
+    getToastUIGroupHelp(): IUIGroupHelper {
+        return this.toastLayer.getComponent(CUIGroupHelper)!;
     }
 }

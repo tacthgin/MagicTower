@@ -5,7 +5,7 @@ import { ResourceCompleteCallback, ResourceProgressCallback } from "./ResourceCa
 /**
  * 辅助资源加载器，由于cocos自己封装了一套，所以用cocos引擎的
  */
-export interface IResourceLoaderHelp {
+export interface IResourceLoaderHelper {
     /**
      * 加载单一资源
      * @param path 路径

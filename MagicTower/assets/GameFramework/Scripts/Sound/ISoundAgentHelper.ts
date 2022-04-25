@@ -1,4 +1,7 @@
-export interface ISoundAgentHelp {
+/**
+ * 声音代理辅助器接口
+ */
+export interface ISoundAgentHelper {
     /**
      * 是否正在播放
      */

@@ -1,12 +1,12 @@
 import { AudioClip, AudioSource } from "cc";
-import { ISoundAgentHelp } from "../../Sound/ISoundAgentHelp";
+import { ISoundAgentHelper } from "../../Sound/ISoundAgentHelper";
 
 const PLAYING_STATES = [AudioSource.AudioState.PLAYING, AudioSource.AudioState.PAUSED];
 
 /**
  * 声音代理辅助器(封装cocos的AudioSource)
  */
-export class CSoundAgentHelp implements ISoundAgentHelp {
+export class CSoundAgentHelper implements ISoundAgentHelper {
     private _audioSource: AudioSource = null!;
     private _mute: boolean = false;
     private _volume: number = 1;

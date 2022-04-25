@@ -1,4 +1,4 @@
-import { ISceneHelp } from "./ISceneHelp";
+import { ISceneHelper } from "./ISceneHelper";
 
 /**
  * 场景管理器接口
@@ -6,9 +6,9 @@ import { ISceneHelp } from "./ISceneHelp";
 export interface ISceneManager {
     /**
      * 设置场景辅助器
-     * @param sceneHelp
+     * @param sceneHelper
      */
-    setSceneHelp(sceneHelp: ISceneHelp): void;
+    setSceneHelper(sceneHelper: ISceneHelper): void;
 
     /**
      * 获取场景

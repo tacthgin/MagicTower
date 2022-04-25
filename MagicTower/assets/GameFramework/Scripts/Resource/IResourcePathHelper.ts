@@ -1,7 +1,7 @@
 import { Asset } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 
-export interface IResourcePathHelp {
+export interface IResourcePathHelper {
     /**
      * 处理资源类型不同的情况下，路径不一致的问题
      * @param path 路径

@@ -1,17 +1,17 @@
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { ObjectBase } from "../ObjectPool/ObjectBase";
-import { INodeHelp } from "./INodeHelp";
+import { INodeHelper } from "./INodeHelper";
 
 /**
  * 节点对象
  */
 export class NodeObject extends ObjectBase {
-    private _nodeHelper: INodeHelp = null!;
+    private _nodeHelper: INodeHelper = null!;
 
-    static create(name: string, node: object, nodeHelp: INodeHelp): NodeObject {
+    static create(name: string, node: object, nodeHelper: INodeHelper): NodeObject {
         let nodeObejct = ReferencePool.acquire(NodeObject);
         nodeObejct.initialize(name, node);
-        nodeObejct._nodeHelper = nodeHelp;
+        nodeObejct._nodeHelper = nodeHelper;
         return nodeObejct;
     }
 

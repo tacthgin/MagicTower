@@ -1,7 +1,7 @@
 /**
  * 存储辅助器接口
  */
-export interface ISaveHelp {
+export interface ISaveHelper {
     /**
      * 存储数据个数
      */

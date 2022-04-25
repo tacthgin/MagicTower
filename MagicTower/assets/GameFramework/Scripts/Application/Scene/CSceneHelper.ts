@@ -1,8 +1,8 @@
 import { director, Scene } from "cc";
 import { GameFrameworkLog } from "../../Base/Log/GameFrameworkLog";
-import { ISceneHelp } from "../../Scene/ISceneHelp";
+import { ISceneHelper } from "../../Scene/ISceneHelper";
 
-export class CSceneHelp implements ISceneHelp {
+export class CSceneHelper implements ISceneHelper {
     getScene<T extends object>(): T | null {
         return director.getScene() as T;
     }

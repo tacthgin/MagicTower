@@ -1,12 +1,12 @@
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { ObjectBase } from "../ObjectPool/ObjectBase";
-import { IUIFormHelp } from "./IUIFormHelp";
+import { IUIFormHelper } from "./IUIFormHelper";
 
 export class UIFormInstanceObject extends ObjectBase {
     private _uiFormAsset: object | null = null;
-    private _uiFormHelper: IUIFormHelp | null = null;
+    private _uiFormHelper: IUIFormHelper | null = null;
 
-    static create(name: string, uiFormAsset: object, uiFormInstance: object, uiFormHelper: IUIFormHelp): UIFormInstanceObject {
+    static create(name: string, uiFormAsset: object, uiFormInstance: object, uiFormHelper: IUIFormHelper): UIFormInstanceObject {
         let uiFromInstanceObject = ReferencePool.acquire(UIFormInstanceObject);
         uiFromInstanceObject.initialize(name, uiFormInstance);
         uiFromInstanceObject._uiFormAsset = uiFormAsset;

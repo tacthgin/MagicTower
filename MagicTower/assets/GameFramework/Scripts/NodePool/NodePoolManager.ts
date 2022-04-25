@@ -6,7 +6,7 @@ import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IObjectPool } from "../ObjectPool/IObjectPool";
 import { ObjectPoolBase } from "../ObjectPool/ObjectPoolBase";
 import { IResourceManager } from "../Resource/IResourceManager";
-import { INodeHelp } from "./INodeHelp";
+import { INodeHelper } from "./INodeHelper";
 import { INodePoolManager } from "./INodePoolManager";
 import { NodeBase } from "./NodeBase";
 import { NodeObject } from "./NodeObject";
@@ -20,7 +20,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
     private readonly _constructorToNameMap: Map<Constructor<NodeBase>, string> = null!;
     private _resourceManager: IResourceManager | null = null;
     private _objectPoolManager: IObejctPoolManager | null = null;
-    private _nodeHelp: INodeHelp | null = null;
+    private _nodeHelper: INodeHelper | null = null;
 
     constructor() {
         super();
@@ -44,8 +44,8 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         this._objectPoolManager = objectPoolManager;
     }
 
-    setNodeHelp(nodeHelp: INodeHelp): void {
-        this._nodeHelp = nodeHelp;
+    setNodeHelper(nodeHelper: INodeHelper): void {
+        this._nodeHelper = nodeHelper;
     }
 
     hasNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): boolean {
@@ -109,7 +109,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
     }
 
     createNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): object {
-        if (!this._nodeHelp) {
+        if (!this._nodeHelper) {
             throw new GameFrameworkError("you must set node help first");
         }
 
@@ -122,7 +122,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
 
         let nodeObject = objectPool.spawn(name);
         if (!nodeObject) {
-            nodeObject = NodeObject.create(name, this._nodeHelp.instantiateNode(asset), this._nodeHelp);
+            nodeObject = NodeObject.create(name, this._nodeHelper.instantiateNode(asset), this._nodeHelper);
             objectPool.register(nodeObject, true);
         }
 

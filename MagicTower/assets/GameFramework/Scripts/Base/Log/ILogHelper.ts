@@ -1,7 +1,7 @@
 import { GameFrameworkLogLevel } from "./GameFrameworkLogLevel";
 
 /** 日志辅助器 */
-export interface ILogHelp {
+export interface ILogHelper {
     /**
      * 游戏框架日志辅助器接口
      * @param level 日志级别

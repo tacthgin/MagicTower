@@ -3,14 +3,14 @@ import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
-import { WebLogHelp } from "../Base/Log/WebLogHelp";
+import { WebLogHelper } from "../Base/Log/WebLogHelper";
 import { IEventManager } from "../Event/IEventManager";
 import { IFsmManager } from "../Fsm/IFsmManager";
 import { INodePoolManager } from "../NodePool/INodePoolManager";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { ISaveManager } from "../Save/ISaveManager";
-import { WebSaveHelp } from "../Save/WebSaveHelp";
+import { WebSaveHelper } from "../Save/WebSaveHelper";
 import { ISceneManager } from "../Scene/ISceneManager";
 import { ISoundManager } from "../Sound/ISoundManager";
 import { IUIManager } from "../UI/IUIManager";
@@ -19,15 +19,15 @@ import { CommandManager } from "./Command/CommandManager";
 import { ICommandManager } from "./Command/ICommandManager";
 import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
-import { CNodeHelp } from "./NodePool/CNodeHelp";
-import { CPlatformHelp } from "./Platform/Helper/CPlatformHelp";
+import { CNodeHelper } from "./NodePool/CNodeHelper";
+import { CPlatformHelper } from "./Platform/Helper/CPlatformHelper";
 import { IPlatformManager } from "./Platform/IPlatformManager";
 import { PlatformManager } from "./Platform/PlatformManager";
-import { CSceneHelp } from "./Scene/CSceneHelp";
+import { CSceneHelper } from "./Scene/CSceneHelper";
 import { SoundConstant } from "./Sound/SoundConstant";
 import { SoundController } from "./Sound/SoundController";
 import { SoundFactory } from "./Sound/SoundFactory";
-import { CUIFormHelp } from "./UI/Helper/CUIFormHelp";
+import { CUIFormHelper } from "./UI/Helper/CUIFormHelper";
 import { UIConstant } from "./UI/UIConstant";
 import { UIFactory } from "./UI/UIFactory";
 
@@ -185,19 +185,19 @@ export class GameApp extends Component {
 
     private initalizeFramework() {
         //设置log辅助
-        GameFrameworkLog.setLogHelp(new WebLogHelp());
+        GameFrameworkLog.setLogHelper(new WebLogHelper());
         let resourceManager = GameApp.ResourceManager;
         let objectPoolManager = GameApp.ObjectPoolManager;
         //初始化ui模块
         let uiManager = GameApp.UIManager;
         uiManager.setResourceManager(resourceManager);
         uiManager.setObjectPoolManager(objectPoolManager);
-        let uiFormHelp = this.getComponent(CUIFormHelp);
-        if (uiFormHelp) {
-            uiManager.setUIFormHelp(uiFormHelp);
+        let uiFormHelper = this.getComponent(CUIFormHelper);
+        if (uiFormHelper) {
+            uiManager.setUIFormHelper(uiFormHelper);
             //创建弹窗和toast的ui组
-            uiManager.addUIGroup(UIConstant.DIALOG_LAYER_GROUP, 0, uiFormHelp.getDialogUIGroupHelp());
-            uiManager.addUIGroup(UIConstant.TOAST_LAYER_GROUP, 1, uiFormHelp.getToastUIGroupHelp());
+            uiManager.addUIGroup(UIConstant.DIALOG_LAYER_GROUP, 0, uiFormHelper.getDialogUIGroupHelp());
+            uiManager.addUIGroup(UIConstant.TOAST_LAYER_GROUP, 1, uiFormHelper.getToastUIGroupHelp());
         } else {
             throw new GameFrameworkError("you must set ui form help first");
         }
@@ -207,13 +207,13 @@ export class GameApp extends Component {
         let nodePoolManager = GameApp.NodePoolManager;
         nodePoolManager.setResourceManager(resourceManager);
         nodePoolManager.setObjectPoolManager(objectPoolManager);
-        nodePoolManager.setNodeHelp(new CNodeHelp());
+        nodePoolManager.setNodeHelper(new CNodeHelper());
         //初始化声音模块
         let soundManager = GameApp.SoundManager;
         soundManager.setResourceManager(resourceManager);
         let soundController = this.getComponent(SoundController);
         if (soundController) {
-            soundManager.setSoundHelp(soundController);
+            soundManager.setSoundHelper(soundController);
             soundManager.addSoundGroup(SoundConstant.SOUND_BACKGROUND_GROUP);
             soundManager.addSoundGroup(SoundConstant.SOUND_EFFECT_GROUP);
             SoundFactory.setSoundManager(soundManager);
@@ -221,10 +221,10 @@ export class GameApp extends Component {
             throw new GameFrameworkError("sound controller is invalid");
         }
         //初始化存储模块
-        GameApp.SaveManager.setSaveHelp(new WebSaveHelp());
+        GameApp.SaveManager.setSaveHelper(new WebSaveHelper());
         //初始化场景管理
-        let sceneHelp = new CSceneHelp();
-        GameApp.SceneManager.setSceneHelp(sceneHelp);
+        let sceneHelper = new CSceneHelper();
+        GameApp.SceneManager.setSceneHelper(sceneHelper);
         //初始化JSON工具类
         Utility.Json.setSystemUtility(Utility.System);
     }
@@ -241,7 +241,7 @@ export class GameApp extends Component {
 
     private initializePlatform() {
         this._platformManager = new PlatformManager();
-        this._platformManager.initalize(new CPlatformHelp());
+        this._platformManager.initalize(new CPlatformHelper());
     }
 
     update(elapseSeconds: number) {

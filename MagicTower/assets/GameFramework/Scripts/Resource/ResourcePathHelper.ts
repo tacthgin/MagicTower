@@ -1,8 +1,8 @@
 import { Asset, SpriteFrame, Texture2D } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
-import { IResourcePathHelp } from "./IResourcePathHelp";
+import { IResourcePathHelper } from "./IResourcePathHelper";
 
-export class ResourcePathHelp implements IResourcePathHelp {
+export class ResourcePathHelper implements IResourcePathHelper {
     getPath<T extends Asset>(path: string, assetType?: Constructor<T>): string {
         if (assetType) {
             if ((assetType as unknown) == SpriteFrame) {

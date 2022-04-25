@@ -8,9 +8,9 @@ import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IObjectPool } from "../ObjectPool/IObjectPool";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { IUIForm } from "./IUIForm";
-import { IUIFormHelp } from "./IUIFormHelp";
+import { IUIFormHelper } from "./IUIFormHelper";
 import { IUIGroup } from "./IUIGroup";
-import { IUIGroupHelp } from "./IUIGroupHelp";
+import { IUIGroupHelper } from "./IUIGroupHelper";
 import { IUIManager } from "./IUIManager";
 import { UIEvent } from "./UIEvent";
 import { UIEventArgs } from "./UIEventArgs";
@@ -26,7 +26,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     private _resourceManger: IResourceManager | null = null;
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _instancePool: IObjectPool<UIFormInstanceObject> = null!;
-    private _uiFormHelp: IUIFormHelp | null = null;
+    private _uiFormHelper: IUIFormHelper | null = null;
     private _serialId: number = 0;
     private _shutDown: boolean = false;
     private _recyleQueue: Array<IUIForm> = null!;
@@ -106,8 +106,8 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._resourceManger = resourceManager;
     }
 
-    setUIFormHelp(uiFormHelp: IUIFormHelp): void {
-        this._uiFormHelp = uiFormHelp;
+    setUIFormHelper(uiFormHelper: IUIFormHelper): void {
+        this._uiFormHelper = uiFormHelper;
     }
 
     subscribe(id: number, eventHandle: EventHandle<UIEventArgs>, thisArg?: any): void {
@@ -150,7 +150,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         return uiGroups;
     }
 
-    addUIGroup(uiGroupName: string, uiGroupDepth: number, uiGroupHelp: IUIGroupHelp): boolean {
+    addUIGroup(uiGroupName: string, uiGroupDepth: number, uiGroupHelp: IUIGroupHelper): boolean {
         if (!uiGroupName) {
             throw new GameFrameworkError("ui group name is invalid");
         }
@@ -230,7 +230,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
             throw new GameFrameworkError("you must set object pool manager first");
         }
 
-        if (!this._uiFormHelp) {
+        if (!this._uiFormHelper) {
             throw new GameFrameworkError("you must set ui form help first");
         }
 
@@ -261,7 +261,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
                     return -1;
                 }
             }
-            uiFromInstanceObject = UIFormInstanceObject.create(uiFormAssetName, asset, this._uiFormHelp.instantiateUIForm(asset), this._uiFormHelp);
+            uiFromInstanceObject = UIFormInstanceObject.create(uiFormAssetName, asset, this._uiFormHelper.instantiateUIForm(asset), this._uiFormHelper);
             this._instancePool.register(uiFromInstanceObject, true);
             isNewInstance = true;
         }
@@ -329,7 +329,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     }
 
     private internalOpenUIForm(serialId: number, uiFormAssetName: string, uiGroup: UIGroup, uiFormInstance: object, pauseCoveredUIForm: boolean, isNewInstance: boolean, userData?: Object) {
-        let uiForm = this._uiFormHelp!.createUIForm(uiFormInstance, uiGroup, userData);
+        let uiForm = this._uiFormHelper!.createUIForm(uiFormInstance, uiGroup, userData);
         if (uiForm) {
             uiForm.onInit(serialId, uiFormAssetName, uiGroup, pauseCoveredUIForm, isNewInstance, userData);
             uiGroup.addUIForm(uiForm);

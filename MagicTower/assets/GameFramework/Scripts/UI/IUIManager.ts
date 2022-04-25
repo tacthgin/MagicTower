@@ -2,9 +2,9 @@ import { EventHandle } from "../Base/EventPool/EventHandle";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { IUIForm } from "./IUIForm";
-import { IUIFormHelp } from "./IUIFormHelp";
+import { IUIFormHelper } from "./IUIFormHelper";
 import { IUIGroup } from "./IUIGroup";
-import { IUIGroupHelp } from "./IUIGroupHelp";
+import { IUIGroupHelper } from "./IUIGroupHelper";
 import { UIEventArgs } from "./UIEventArgs";
 
 export interface IUIManager {
@@ -47,9 +47,9 @@ export interface IUIManager {
 
     /**
      * 设置界面辅助器
-     * @param uiFormHelp 界面辅助器
+     * @param uiFormHelper 界面辅助器
      */
-    setUIFormHelp(uiFormHelp: IUIFormHelp): void;
+    setUIFormHelper(uiFormHelper: IUIFormHelper): void;
 
     /**
      * 订阅UI事件
@@ -99,7 +99,7 @@ export interface IUIManager {
      * @param uiGroupHelp 界面组辅助器
      * @returns 是否成功添加
      */
-    addUIGroup(uiGroupName: string, uiGroupDepth: number, uiGroupHelp: IUIGroupHelp): boolean;
+    addUIGroup(uiGroupName: string, uiGroupDepth: number, uiGroupHelp: IUIGroupHelper): boolean;
 
     /**
      * 界面组中是否存在界面

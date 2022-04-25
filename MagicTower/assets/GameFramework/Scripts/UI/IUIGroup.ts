@@ -1,5 +1,5 @@
 import { IUIForm } from "./IUIForm";
-import { IUIGroupHelp } from "./IUIGroupHelp";
+import { IUIGroupHelper } from "./IUIGroupHelper";
 
 /**
  * 界面组接口
@@ -33,7 +33,7 @@ export interface IUIGroup {
     /**
      * 获取界面组辅助器
      */
-    readonly helper: IUIGroupHelp;
+    readonly helper: IUIGroupHelper;
 
     /**
      * 界面组中是否存在界面

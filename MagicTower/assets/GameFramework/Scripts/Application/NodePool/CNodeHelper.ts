@@ -1,7 +1,7 @@
 import { instantiate, Node } from "cc";
-import { INodeHelp } from "../../NodePool/INodeHelp";
+import { INodeHelper } from "../../NodePool/INodeHelper";
 
-export class CNodeHelp implements INodeHelp {
+export class CNodeHelper implements INodeHelper {
     instantiateNode(asset: object): object {
         return instantiate(asset);
     }

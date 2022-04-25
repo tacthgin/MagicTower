@@ -3,11 +3,11 @@ import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
-import { ResourcePathHelp } from "./ResourcePathHelp";
+import { ResourcePathHelper } from "./ResourcePathHelper";
 import { IResourceLoader } from "./IResourceLoader";
-import { IResourceLoaderHelp } from "./IResourceLoaderHelp";
+import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
 import { IResourceManager, OptionBundle, OptionExt } from "./IResourceManager";
-import { IResourcePathHelp } from "./IResourcePathHelp";
+import { IResourcePathHelper } from "./IResourcePathHelper";
 import { ResourceLoader } from "./ResourceLoader";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { ResourceProgressCallback, ResourceCompleteCallback } from "./ResourceCallback";
@@ -16,7 +16,7 @@ import { ResourceProgressCallback, ResourceCompleteCallback } from "./ResourceCa
 export class ResourceManager extends GameFrameworkModule implements IResourceManager {
     private _resourceLoaders: Map<string, ResourceLoader> = null!;
     private _remoteAssets: Map<string, Asset> = null!;
-    private _resourceHelpPath: IResourcePathHelp = null!;
+    private _resourceHelpPath: IResourcePathHelper = null!;
     private readonly _bundleRegExp: RegExp = /^\$\w+\//;
     private _internaleResourceLoaderName: string = null!;
 
@@ -24,7 +24,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         super();
         this._resourceLoaders = new Map<string, ResourceLoader>();
         this._remoteAssets = new Map<string, Asset>();
-        this._resourceHelpPath = new ResourcePathHelp();
+        this._resourceHelpPath = new ResourcePathHelper();
         this.setInternalResourceLoader();
     }
 
@@ -140,7 +140,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
      * @param name 资源加载器名称
      * @param bundle 资源加载器
      */
-    private createResourceLoader(name: string, bundle: IResourceLoaderHelp): void {
+    private createResourceLoader(name: string, bundle: IResourceLoaderHelper): void {
         let resourceLoader = this._resourceLoaders.get(name);
         if (resourceLoader) {
             throw new GameFrameworkError(`has exist resource loader ${name}`);

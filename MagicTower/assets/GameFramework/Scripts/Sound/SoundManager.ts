@@ -4,7 +4,7 @@ import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { ISoundGroup } from "./ISoundGroup";
-import { ISoundHelp } from "./ISoundHelp";
+import { ISoundHelper } from "./ISoundHelper";
 import { ISoundManager } from "./ISoundManager";
 import { PlaySoundParams } from "./PlaySoundParams";
 import { SoundGroup } from "./SoundGroup";
@@ -13,7 +13,7 @@ import { SoundGroup } from "./SoundGroup";
 export class SoundManager extends GameFrameworkModule implements ISoundManager {
     private readonly _soundGroups: Map<string, SoundGroup> = null!;
     private _resourceManager: IResourceManager | null = null;
-    private _soundHelp: ISoundHelp | null = null;
+    private _soundHelper: ISoundHelper | null = null;
     private _serialId: number = 0;
 
     constructor() {
@@ -36,8 +36,8 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         this._resourceManager = resourceManager;
     }
 
-    setSoundHelp(soundHelp: ISoundHelp): void {
-        this._soundHelp = soundHelp;
+    setSoundHelper(soundHelper: ISoundHelper): void {
+        this._soundHelper = soundHelper;
     }
 
     async playSound(soundAssetPath: string, soundGroupName: string, playSoundParams?: PlaySoundParams): Promise<number> {
@@ -122,8 +122,8 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
             return false;
         } else {
             soundGroup = new SoundGroup(soundGroupName);
-            if (this._soundHelp) {
-                soundGroup.addSoundHelp(this._soundHelp);
+            if (this._soundHelper) {
+                soundGroup.addSoundHelper(this._soundHelper);
             }
             this._soundGroups.set(soundGroupName, soundGroup);
             return true;

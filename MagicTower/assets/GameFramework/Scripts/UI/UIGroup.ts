@@ -3,17 +3,17 @@ import { GameFrameworkLinkedList } from "../Base/GameFrameworkLinkedList";
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { IUIForm } from "./IUIForm";
 import { IUIGroup } from "./IUIGroup";
-import { IUIGroupHelp } from "./IUIGroupHelp";
+import { IUIGroupHelper } from "./IUIGroupHelper";
 import { UIFormInfo } from "./UIFormInfo";
 
 export class UIGroup implements IUIGroup {
     private readonly _uiFormInfos: GameFrameworkLinkedList<UIFormInfo> = null!;
     private _name: string = null!;
-    private _uiGroupHelp: IUIGroupHelp = null!;
+    private _uiGroupHelp: IUIGroupHelper = null!;
     private _depth: number = 0;
     private _pause: boolean = false;
 
-    constructor(name: string, depth: number, uiGroupHelp: IUIGroupHelp) {
+    constructor(name: string, depth: number, uiGroupHelp: IUIGroupHelper) {
         this._name = name;
         this._depth = depth;
         this._uiGroupHelp = uiGroupHelp;
@@ -57,7 +57,7 @@ export class UIGroup implements IUIGroup {
         return null!;
     }
 
-    get helper(): IUIGroupHelp {
+    get helper(): IUIGroupHelper {
         return this._uiGroupHelp;
     }
 

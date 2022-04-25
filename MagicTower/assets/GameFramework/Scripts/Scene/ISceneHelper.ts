@@ -1,4 +1,4 @@
-export interface ISceneHelp {
+export interface ISceneHelper {
     /**
      * 获取场景
      */

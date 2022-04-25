@@ -1,7 +1,7 @@
 /**
  * 界面组辅助器接口
  */
-export interface IUIGroupHelp {
+export interface IUIGroupHelper {
     /**
      * 设置界面组深度
      */

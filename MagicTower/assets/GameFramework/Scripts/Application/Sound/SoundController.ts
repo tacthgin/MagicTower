@@ -1,14 +1,14 @@
 import { AudioSource, Component, Node, _decorator } from "cc";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
-import { ISoundAgentHelp } from "../../Sound/ISoundAgentHelp";
-import { ISoundHelp } from "../../Sound/ISoundHelp";
-import { CSoundAgentHelp } from "./CSoundAgentHelp";
+import { ISoundAgentHelper } from "../../Sound/ISoundAgentHelper";
+import { ISoundHelper } from "../../Sound/ISoundHelper";
+import { CSoundAgentHelper } from "./CSoundAgentHelper";
 
 const { ccclass, property, executionOrder } = _decorator;
 
 @ccclass("SoundController")
 @executionOrder(0)
-export class SoundController extends Component implements ISoundHelp {
+export class SoundController extends Component implements ISoundHelper {
     @property(Node)
     private audioSourceNode: Node = null!;
 
@@ -18,8 +18,8 @@ export class SoundController extends Component implements ISoundHelp {
         }
     }
 
-    acquireSoundAgentHelp(): ISoundAgentHelp {
+    acquireSoundAgentHelper(): ISoundAgentHelper {
         let audioSource = this.audioSourceNode.addComponent(AudioSource);
-        return new CSoundAgentHelp(audioSource);
+        return new CSoundAgentHelper(audioSource);
     }
 }

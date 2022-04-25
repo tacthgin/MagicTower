@@ -4,7 +4,7 @@ import { IUIGroup } from "./IUIGroup";
 /**
  * 界面辅助器接口
  */
-export interface IUIFormHelp {
+export interface IUIFormHelper {
     /**
      * 实例化界面
      * @param uiFormAsset 需要实例化的界面资源

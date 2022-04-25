@@ -1,6 +1,6 @@
 import { IResourceManager } from "../Resource/IResourceManager";
 import { ISoundGroup } from "./ISoundGroup";
-import { ISoundHelp } from "./ISoundHelp";
+import { ISoundHelper } from "./ISoundHelper";
 import { PlaySoundParams } from "./PlaySoundParams";
 
 /**
@@ -15,9 +15,9 @@ export interface ISoundManager {
 
     /**
      * 设置声音辅助器
-     * @param soundHelp
+     * @param soundHelper
      */
-    setSoundHelp(soundHelp: ISoundHelp): void;
+    setSoundHelper(soundHelper: ISoundHelper): void;
 
     /**
      * 播放声音

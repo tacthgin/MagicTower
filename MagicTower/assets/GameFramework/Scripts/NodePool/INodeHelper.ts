@@ -1,7 +1,7 @@
 /**
  * 节点辅助器接口
  */
-export interface INodeHelp {
+export interface INodeHelper {
     /**
      * 实例化节点
      * @param asset 节点资源

@@ -1,16 +1,16 @@
 import { ISoundAgent } from "./ISoundAgent";
-import { ISoundAgentHelp } from "./ISoundAgentHelp";
+import { ISoundAgentHelper } from "./ISoundAgentHelper";
 import { ISoundGroup } from "./ISoundGroup";
 
 export class SoundAgent implements ISoundAgent {
     private _soundGroup: ISoundGroup = null!;
-    private _soundAgentHelp: ISoundAgentHelp = null!;
+    private _soundAgentHelp: ISoundAgentHelper = null!;
     private _serialId: number = 0;
     private _soundAsset: object | null = null;
     private _muteInSoundGroup: boolean = false;
     private _volumeInSoundGroup: number = 1;
 
-    constructor(soundGroup: ISoundGroup, soundAgentHelp: ISoundAgentHelp) {
+    constructor(soundGroup: ISoundGroup, soundAgentHelp: ISoundAgentHelper) {
         this._soundGroup = soundGroup;
         this._soundAgentHelp = soundAgentHelp;
     }
