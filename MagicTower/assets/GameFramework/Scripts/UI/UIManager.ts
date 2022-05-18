@@ -26,7 +26,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     private _resourceManger: IResourceManager | null = null;
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _instancePool: IObjectPool<UIFormInstanceObject> = null!;
-    private _uiFormHelper: IUIFormHelper | null = null;
+    private _uiFormHelper: IUIFormHelper = null!;
     private _serialId: number = 0;
     private _shutDown: boolean = false;
     private _recyleQueue: Array<IUIForm> = null!;
@@ -329,7 +329,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     }
 
     private internalOpenUIForm(serialId: number, uiFormAssetName: string, uiGroup: UIGroup, uiFormInstance: object, pauseCoveredUIForm: boolean, isNewInstance: boolean, userData?: Object) {
-        let uiForm = this._uiFormHelper!.createUIForm(uiFormInstance, uiGroup, userData);
+        let uiForm = this._uiFormHelper.createUIForm(uiFormInstance, uiGroup, userData);
         if (uiForm) {
             uiForm.onInit(serialId, uiFormAssetName, uiGroup, pauseCoveredUIForm, isNewInstance, userData);
             uiGroup.addUIForm(uiForm);
