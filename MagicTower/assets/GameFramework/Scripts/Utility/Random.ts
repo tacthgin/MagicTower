@@ -23,11 +23,13 @@ export class Random {
 
     /**
      * 创建随机数
+     * @param systemFlag 设置使用系统的随机函数
      * @param seed 随机种子
      */
-    static create(seed?: number): Random {
+    static create(systemFlag: boolean = true, seed: number | null = null): Random {
         let random = new Random();
-        if (seed !== undefined) {
+        random._systemFlag = systemFlag;
+        if (seed !== null) {
             random.setSeed(seed);
         }
         return random;
@@ -38,7 +40,6 @@ export class Random {
      * @param seed 种子
      */
     setSeed(seed: number): void {
-        this.systemFlag = false;
         this._seed = seed;
     }
 
