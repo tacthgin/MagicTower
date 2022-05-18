@@ -167,7 +167,7 @@ export class CommandManager implements ICommandManager {
             system = commandObject.target as T;
         }
 
-        this._updateSystemPool.addLast(system);
+        system.openSchedule && this._updateSystemPool.addLast(system);
         system.awake();
 
         return system;
@@ -176,7 +176,7 @@ export class CommandManager implements ICommandManager {
     destroySystem<T extends SystemBase>(system: T): void {
         system.shutDown();
         this._systemPool.upspawn(system);
-        this._updateSystemPool.remove(system);
+        system.openSchedule && this._updateSystemPool.remove(system);
     }
 
     createUniqueSystem<T extends SystemBase>(systemConstructor: Constructor<T>): T {
@@ -184,7 +184,7 @@ export class CommandManager implements ICommandManager {
         if (!system) {
             system = ReferencePool.acquire(systemConstructor);
             this._uniqueSystems.set(systemConstructor, system);
-            this._updateSystemPool.addLast(system);
+            system.openSchedule && this._updateSystemPool.addLast(system);
         }
 
         return system as T;
@@ -195,7 +195,7 @@ export class CommandManager implements ICommandManager {
             let system = this._uniqueSystems.get(systemConstructor)!;
             system.shutDown();
             ReferencePool.release(system);
-            this._updateSystemPool.remove(system);
+            system.openSchedule && this._updateSystemPool.remove(system);
             return this._uniqueSystems.delete(systemConstructor);
         }
         return false;

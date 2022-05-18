@@ -12,11 +12,13 @@ export class ModelContainer {
     private static readonly s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();
     private static readonly s_nameConstructors: Map<Constructor<ModelBase>, string> = new Map<Constructor<ModelBase>, string>();
     private readonly _models: GameFrameworkLinkedList<ModelBase> = null!;
+    private readonly _updateModels: GameFrameworkLinkedList<ModelBase> = null!;
     private readonly _cachedModels: Map<Constructor<ModelBase>, ModelBase> = null!;
     private _saveManager: ISaveManager | null = null;
 
     constructor() {
         this._models = new GameFrameworkLinkedList<ModelBase>();
+        this._updateModels = new GameFrameworkLinkedList<ModelBase>();
         this._cachedModels = new Map<Constructor<ModelBase>, ModelBase>();
     }
 
@@ -49,7 +51,7 @@ export class ModelContainer {
      * @param elapseSeconds 逻辑流逝时间
      */
     update(elapseSeconds: number) {
-        this._models.forEach((modelBase: ModelBase) => {
+        this._updateModels.forEach((modelBase: ModelBase) => {
             modelBase.update(elapseSeconds);
         });
     }
@@ -61,6 +63,10 @@ export class ModelContainer {
         this._models.forEach((modelBase: ModelBase) => {
             modelBase.shutDown();
         });
+        this._models.clear();
+        this._updateModels.clear();
+        this._cachedModels.clear();
+        this._saveManager = null;
     }
 
     /**
@@ -167,6 +173,7 @@ export class ModelContainer {
         }
 
         this._cachedModels.set(constructor, model);
+        model.openSchedule && this._updateModels.addLast(model);
 
         return model;
     }
