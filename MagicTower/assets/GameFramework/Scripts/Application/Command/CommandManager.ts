@@ -9,15 +9,20 @@ import { CommandObject } from "./CommandObject";
 import { ICommandManager } from "./ICommandManager";
 import { SystemBase } from "./SystemBase";
 
+/**
+ * 命令、系统管理器
+ */
 export class CommandManager implements ICommandManager {
     private static readonly s_nameConstructors: Map<Constructor<CommandBase | SystemBase>, string> = new Map<Constructor<CommandBase | SystemBase>, string>();
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _commandPool: IObjectPool<CommandObject> = null!;
     private _systemPool: IObjectPool<CommandObject> = null!;
+    private _uniqueSystems: Map<Constructor<SystemBase>, SystemBase> = null!;
     private _updateSystemPool: GameFrameworkLinkedList<SystemBase> = null!;
 
     constructor() {
         this._updateSystemPool = new GameFrameworkLinkedList<SystemBase>();
+        this._uniqueSystems = new Map<Constructor<SystemBase>, SystemBase>();
     }
 
     set commandAutoRelaseInterval(value: number) {
@@ -45,11 +50,11 @@ export class CommandManager implements ICommandManager {
     }
 
     set commandPriority(value: number) {
-        this._systemPool.priority = value;
+        this._commandPool.priority = value;
     }
 
     get commandPriority(): number {
-        return this._systemPool.priority;
+        return this._commandPool.priority;
     }
 
     set systemAutoRelaseInterval(value: number) {
@@ -110,6 +115,7 @@ export class CommandManager implements ICommandManager {
      */
     shutDown() {
         this._updateSystemPool.clear();
+        this._uniqueSystems.clear();
     }
 
     setObjectPoolManager(objectPoolManager: IObejctPoolManager): void {
@@ -171,5 +177,27 @@ export class CommandManager implements ICommandManager {
         system.shutDown();
         this._systemPool.upspawn(system);
         this._updateSystemPool.remove(system);
+    }
+
+    createUniqueSystem<T extends SystemBase>(systemConstructor: Constructor<T>): T {
+        let system = this._uniqueSystems.get(systemConstructor);
+        if (!system) {
+            system = ReferencePool.acquire(systemConstructor);
+            this._uniqueSystems.set(systemConstructor, system);
+            this._updateSystemPool.addLast(system);
+        }
+
+        return system as T;
+    }
+
+    destroyUniqueSystem<T extends SystemBase>(systemConstructor: Constructor<T>): boolean {
+        if (this._uniqueSystems.has(systemConstructor)) {
+            let system = this._uniqueSystems.get(systemConstructor)!;
+            system.shutDown();
+            ReferencePool.release(system);
+            this._updateSystemPool.remove(system);
+            return this._uniqueSystems.delete(systemConstructor);
+        }
+        return false;
     }
 }
