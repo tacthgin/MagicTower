@@ -4,8 +4,7 @@ import { ReferencePool } from "../../Base/ReferencePool/ReferencePool";
 import { ScheduleInfo } from "./ScheduleInfo";
 
 export class ScheduleBase {
-    private _scheduleHandles: GameFrameworkLinkedList<ScheduleInfo> = null!;
-    private static readonly DEFAULT_FRAME_SECONDS: number = 0.016;
+    private readonly _scheduleHandles: GameFrameworkLinkedList<ScheduleInfo> = null!;
 
     constructor() {
         this._scheduleHandles = new GameFrameworkLinkedList<ScheduleInfo>();
@@ -21,11 +20,9 @@ export class ScheduleBase {
     schedule(handle: Function, interval: number, count: number = Number.MAX_SAFE_INTEGER, priority: number = 0): void {
         if (interval < 0) {
             throw new GameFrameworkError("interval is invalid");
-        } else if (interval == 0) {
-            interval = ScheduleBase.DEFAULT_FRAME_SECONDS;
         }
 
-        if (count < 0) {
+        if (count <= 0) {
             throw new GameFrameworkError("count is invalid");
         }
 
@@ -69,6 +66,7 @@ export class ScheduleBase {
                 current.value.update(elapseSeconds);
                 if (current.value.isStoped()) {
                     next = current.next;
+                    ReferencePool.release(current.value);
                     this._scheduleHandles.remove(current);
                     current = next;
                 } else {
