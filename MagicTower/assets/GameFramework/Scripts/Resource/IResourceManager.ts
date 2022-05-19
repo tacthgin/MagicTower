@@ -1,21 +1,33 @@
-import { Asset } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
+import { IAsset } from "./Asset/IAsset";
+import { IAssetManager, ResourceCompleteCallback, ResourceProgressCallback } from "./Asset/IAssetManager";
+import { OptionBundle, OptionExt } from "./Asset/IOption";
 import { IResourceLoader } from "./IResourceLoader";
-import { ResourceCompleteCallback, ResourceProgressCallback } from "./ResourceCallback";
-
-export interface OptionExt {
-    ext?: string;
-}
-
-export interface OptionBundle {
-    version?: string;
-    scriptAsyncLoading?: boolean;
-}
+import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
+import { IResourcePathHelper } from "./IResourcePathHelper";
 
 /**
  * 资源管理
  */
 export interface IResourceManager {
+    /**
+     * 设置内置的资源加载器
+     * @param resourceLoaderHelper 资源加载辅助器
+     */
+    setInternalResourceLoader(resourceLoaderHelper: IResourceLoaderHelper): void;
+
+    /**
+     * 设置资源管理器
+     * @param assetManager 资源管理器
+     */
+    setAssetManager(assetManager: IAssetManager): void;
+
+    /**
+     * 设置资源路径辅助器
+     * @param resourcePathHelper 资源路径辅助器
+     */
+    setResourcePathHelper(resourcePathHelper: IResourcePathHelper): void;
+
     /**
      * 加载bundle，返回bundle的资源加载器
      * @param bundleNameOrUrl bundle名字或者url
@@ -37,7 +49,7 @@ export interface IResourceManager {
      * @param assetType 资源类型
      * @returns 需要加载的资源
      */
-    loadAsset<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<T | null>;
+    loadAsset<T extends IAsset>(path: string, assetType?: Constructor<T>): Promise<T | null>;
 
     /**
      * 使用回调方式加载单一资源
@@ -47,7 +59,7 @@ export interface IResourceManager {
      * @param onComplete 资源加载完成回调
      * @returns 是否加载成功
      */
-    loadAssetWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): Promise<boolean>;
+    loadAssetWithCallback<T extends IAsset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): Promise<boolean>;
 
     /**
      * 加载文件夹资源
@@ -55,7 +67,7 @@ export interface IResourceManager {
      * @param assetType 资源类型
      * @returns 是否加载成功
      */
-    loadDir<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<boolean>;
+    loadDir<T extends IAsset>(path: string, assetType?: Constructor<T>): Promise<boolean>;
 
     /**
      * 使用回调方式加载文件夹资源
@@ -65,7 +77,7 @@ export interface IResourceManager {
      * @param onComplete 资源加载完成回调
      * @returns 是否加载成功
      */
-    loadDirWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): Promise<boolean>;
+    loadDirWithCallback<T extends IAsset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): Promise<boolean>;
 
     /**
      * 加载远程资源
@@ -73,7 +85,7 @@ export interface IResourceManager {
      * @param options 远程资源附加扩展名
      * @returns 加载的远程资源
      */
-    loadRemote(url: string, options?: OptionExt): Promise<Asset | null>;
+    loadRemote(url: string, options?: OptionExt): Promise<IAsset | null>;
 
     /**
      * 获取已经缓存的资源
@@ -81,20 +93,20 @@ export interface IResourceManager {
      * @param assetType 资源类型
      * @returns 资源
      */
-    getAsset<T extends Asset>(path: string, assetType?: Constructor<T>): T | null;
+    getAsset<T extends IAsset>(path: string, assetType?: Constructor<T>): T | null;
 
     /**
      * 获取远程资源
      * @param url 远程资源url
      * @returns 远程资源
      */
-    getRemoteAsset(url: string): Asset | null;
+    getRemoteAsset(url: string): IAsset | null;
 
     /**
      * 释放资源，有依赖的资源可能不会释放
      * @param asset
      */
-    releaseAsset(asset: Asset): void;
+    releaseAsset(asset: IAsset): void;
 
     /**
      * 释放文件夹资源

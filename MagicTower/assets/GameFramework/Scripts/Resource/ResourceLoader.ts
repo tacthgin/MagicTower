@@ -1,37 +1,45 @@
-import { Asset, AssetManager } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
+import { IAsset } from "./Asset/IAsset";
+import { ResourceCompleteCallback, ResourceProgressCallback } from "./Asset/IAssetManager";
+import { IRequestItem } from "./Asset/IRequestItem";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
 import { IResourceManager } from "./IResourceManager";
 import { IResourcePathHelper } from "./IResourcePathHelper";
-import { ResourceCompleteCallback, ResourceProgressCallback } from "./ResourceCallback";
 
+/**
+ * 资源加载器
+ */
 export class ResourceLoader implements IResourceLoader {
-    private _resourceLoaderHelp: IResourceLoaderHelper = null!;
-    private _resoucePathHelp: IResourcePathHelper = null!;
-    private _cachedDirs: Map<string, Array<Asset>> = null!;
+    private _resourceLoaderHelper: IResourceLoaderHelper = null!;
+    private _resourcePathHelper: IResourcePathHelper = null!;
+    private _cachedDirs: Map<string, Array<IAsset>> = null!;
     private _resourceManger: IResourceManager = null!;
 
-    constructor(resourceLoaderHelp: IResourceLoaderHelper, resourcePathHelp: IResourcePathHelper, resourceManager: IResourceManager) {
-        this._resourceLoaderHelp = resourceLoaderHelp;
-        this._resoucePathHelp = resourcePathHelp;
+    get name(): string {
+        return this._resourceLoaderHelper.name;
+    }
+
+    constructor(resourceLoaderHelper: IResourceLoaderHelper, resourcePathHelper: IResourcePathHelper, resourceManager: IResourceManager) {
+        this._resourceLoaderHelper = resourceLoaderHelper;
+        this._resourcePathHelper = resourcePathHelper;
         this._resourceManger = resourceManager;
-        this._cachedDirs = new Map<string, Array<Asset>>();
+        this._cachedDirs = new Map<string, Array<IAsset>>();
     }
 
     shutDown(): void {
         this._cachedDirs.clear();
     }
 
-    loadAsset<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<T | null> {
+    loadAsset<T extends IAsset>(path: string, assetType?: Constructor<T>): Promise<T | null> {
         return new Promise<T | null>((resolve) => {
-            path = this._resoucePathHelp.getPath(path, assetType);
-            let asset = this._resourceLoaderHelp.get(path, assetType);
+            path = this._resourcePathHelper.getPath(path, assetType);
+            let asset = this._resourceLoaderHelper.get(path, assetType);
             if (asset) {
                 resolve(asset);
             } else {
-                this._resourceLoaderHelp.load(path, assetType || null, null, (err: Error | null, data: T) => {
+                this._resourceLoaderHelper.load(path, assetType || null, null, (err: Error | null, data: T) => {
                     if (err) {
                         GameFrameworkLog.error(err.message);
                         resolve(null);
@@ -43,18 +51,18 @@ export class ResourceLoader implements IResourceLoader {
         });
     }
 
-    loadAssetWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): Promise<boolean> {
+    loadAssetWithCallback<T extends IAsset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
-            path = this._resoucePathHelp.getPath(path, assetType);
-            let asset = this._resourceLoaderHelp.get(path, assetType);
+            path = this._resourcePathHelper.getPath(path, assetType);
+            let asset = this._resourceLoaderHelper.get(path, assetType);
             if (asset) {
                 onComplete && onComplete(null, asset);
                 resolve(true);
             } else {
-                this._resourceLoaderHelp.load(
+                this._resourceLoaderHelper.load(
                     path,
                     assetType || null,
-                    (finished: number, total: number, item?: AssetManager.RequestItem) => {
+                    (finished: number, total: number, item?: IRequestItem) => {
                         onProgress && onProgress(finished, total, item);
                     },
                     (err: Error | null, data: T) => {
@@ -66,13 +74,13 @@ export class ResourceLoader implements IResourceLoader {
         });
     }
 
-    loadDir<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<boolean> {
+    loadDir<T extends IAsset>(path: string, assetType?: Constructor<T>): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             let result = this._cachedDirs.get(path);
             if (result) {
                 resolve(true);
             } else {
-                this._resourceLoaderHelp.loadDir(path, assetType || null, null, (err: Error | null, data: T[]) => {
+                this._resourceLoaderHelper.loadDir(path, assetType || null, null, (err: Error | null, data: T[]) => {
                     if (err) {
                         GameFrameworkLog.error(err.message);
                         resolve(false);
@@ -85,16 +93,16 @@ export class ResourceLoader implements IResourceLoader {
         });
     }
 
-    loadDirWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): Promise<boolean> {
+    loadDirWithCallback<T extends IAsset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             let result = this._cachedDirs.get(path);
             if (result) {
                 resolve(true);
             } else {
-                this._resourceLoaderHelp.loadDir(
+                this._resourceLoaderHelper.loadDir(
                     path,
                     assetType || null,
-                    (finished: number, total: number, item?: AssetManager.RequestItem) => {
+                    (finished: number, total: number, item?: IRequestItem) => {
                         onProgress && onProgress(finished, total, item);
                     },
                     (err: Error | null, data: T[]) => {
@@ -109,9 +117,9 @@ export class ResourceLoader implements IResourceLoader {
         });
     }
 
-    getAsset<T extends Asset>(path: string, assetType?: Constructor<T>): T | null {
-        path = this._resoucePathHelp.getPath(path, assetType);
-        return this._resourceLoaderHelp.get(path, assetType);
+    getAsset<T extends IAsset>(path: string, assetType?: Constructor<T>): T | null {
+        path = this._resourcePathHelper.getPath(path, assetType);
+        return this._resourceLoaderHelper.get(path, assetType);
     }
 
     releaseDir(path: string): void {

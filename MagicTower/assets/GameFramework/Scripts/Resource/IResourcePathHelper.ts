@@ -1,5 +1,5 @@
-import { Asset } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
+import { IAsset } from "./Asset/IAsset";
 
 export interface IResourcePathHelper {
     /**
@@ -7,5 +7,5 @@ export interface IResourcePathHelper {
      * @param path 路径
      * @param assetType 资源类型
      */
-    getPath<T extends Asset>(path: string, assetType?: Constructor<T>): string;
+    getPath<T extends IAsset>(path: string, assetType?: Constructor<T>): string;
 }

@@ -1,31 +1,30 @@
-import { Asset, AssetManager, assetManager, resources } from "cc";
+import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
-import { ResourcePathHelper } from "./ResourcePathHelper";
+import { IAsset } from "./Asset/IAsset";
+import { IAssetManager, ResourceCompleteCallback, ResourceProgressCallback } from "./Asset/IAssetManager";
+import { OptionBundle, OptionExt } from "./Asset/IOption";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
-import { IResourceManager, OptionBundle, OptionExt } from "./IResourceManager";
+import { IResourceManager } from "./IResourceManager";
 import { IResourcePathHelper } from "./IResourcePathHelper";
 import { ResourceLoader } from "./ResourceLoader";
-import { Constructor } from "../Base/DataStruct/Constructor";
-import { ResourceProgressCallback, ResourceCompleteCallback } from "./ResourceCallback";
 
 @GameFrameworkEntry.registerModule("ResourceManager")
 export class ResourceManager extends GameFrameworkModule implements IResourceManager {
-    private _resourceLoaders: Map<string, ResourceLoader> = null!;
-    private _remoteAssets: Map<string, Asset> = null!;
-    private _resourceHelpPath: IResourcePathHelper = null!;
+    private readonly _resourceLoaders: Map<string, ResourceLoader> = null!;
+    private readonly _remoteAssets: Map<string, IAsset> = null!;
+    private _assetManager: IAssetManager | null = null;
+    private _resourcePathHelper: IResourcePathHelper | null = null;
     private readonly _bundleRegExp: RegExp = /^\$\w+\//;
-    private _internaleResourceLoaderName: string = null!;
+    private _internaleResourceLoaderName: string = "";
 
     constructor() {
         super();
         this._resourceLoaders = new Map<string, ResourceLoader>();
-        this._remoteAssets = new Map<string, Asset>();
-        this._resourceHelpPath = new ResourcePathHelper();
-        this.setInternalResourceLoader();
+        this._remoteAssets = new Map<string, IAsset>();
     }
 
     update(elapseSeconds: number): void {}
@@ -35,6 +34,35 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         this._remoteAssets.clear();
     }
 
+    /**
+     * 设置内置的资源加载器
+     * @param resourceLoaderHelper 资源加载辅助器
+     */
+    setInternalResourceLoader(resourceLoaderHelper: IResourceLoaderHelper): void {
+        this._internaleResourceLoaderName = resourceLoaderHelper.name;
+
+        if (this.getResourceLoader(this._internaleResourceLoaderName)) {
+            throw new GameFrameworkError("internal resource loader already set");
+        }
+        this.createResourceLoader(this._internaleResourceLoaderName, resourceLoaderHelper);
+    }
+
+    /**
+     * 设置资源管理器
+     * @param assetManager 资源管理器
+     */
+    setAssetManager(assetManager: IAssetManager): void {
+        this._assetManager = assetManager;
+    }
+
+    /**
+     * 设置资源路径辅助器
+     * @param resourcePathHelper 资源路径辅助器
+     */
+    setResourcePathHelper(resourcePathHelper: IResourcePathHelper): void {
+        this._resourcePathHelper = resourcePathHelper;
+    }
+
     loadBundle(bundleNameOrUrl: string, options?: OptionBundle): Promise<IResourceLoader | null> {
         return new Promise<IResourceLoader | null>((resolve) => {
             let bundleName = this.getBundleName(bundleNameOrUrl);
@@ -42,7 +70,10 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
             if (resourceLoader) {
                 resolve(resourceLoader);
             } else {
-                assetManager.loadBundle(bundleNameOrUrl, options || null, (err: Error | null, data: AssetManager.Bundle) => {
+                if (!this._assetManager) {
+                    throw new GameFrameworkError("you must set asset manager first");
+                }
+                this._assetManager.loadBundle(bundleNameOrUrl, options || null, (err: Error | null, data: IResourceLoaderHelper) => {
                     if (err) {
                         GameFrameworkLog.error(err);
                         resolve(null);
@@ -60,33 +91,37 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         return resourceLoader || null;
     }
 
-    loadAsset<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<T | null> {
+    loadAsset<T extends IAsset>(path: string, assetType?: Constructor<T>): Promise<T | null> {
         let resourceLoaderInfo = this.internalGetBundle(path);
         return resourceLoaderInfo.resourceLoader.loadAsset(resourceLoaderInfo.path, assetType);
     }
 
-    loadAssetWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): Promise<boolean> {
+    loadAssetWithCallback<T extends IAsset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): Promise<boolean> {
         let resourceLoaderInfo = this.internalGetBundle(path);
         return resourceLoaderInfo.resourceLoader.loadAssetWithCallback(resourceLoaderInfo.path, assetType, onProgress, onComplete);
     }
 
-    loadDir<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<boolean> {
+    loadDir<T extends IAsset>(path: string, assetType?: Constructor<T>): Promise<boolean> {
         let resourceLoaderInfo = this.internalGetBundle(path);
         return resourceLoaderInfo.resourceLoader.loadDir(resourceLoaderInfo.path, assetType);
     }
 
-    loadDirWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): Promise<boolean> {
+    loadDirWithCallback<T extends IAsset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): Promise<boolean> {
         let resourceLoaderInfo = this.internalGetBundle(path);
         return resourceLoaderInfo.resourceLoader.loadDirWithCallback(resourceLoaderInfo.path, assetType, onProgress, onComplete);
     }
 
-    loadRemote(url: string, options?: OptionExt): Promise<Asset | null> {
+    loadRemote(url: string, options?: OptionExt): Promise<IAsset | null> {
         return new Promise((resolve) => {
             let asset = this.getRemoteAsset(url);
             if (asset) {
                 resolve(asset);
             } else {
-                assetManager.loadRemote(url, options || null, (err: Error | null, data: Asset) => {
+                if (!this._assetManager) {
+                    throw new GameFrameworkError("you must set asset manager first");
+                }
+
+                this._assetManager.loadRemote(url, options || null, (err: Error | null, data: IAsset) => {
                     if (err) {
                         GameFrameworkLog.error(err);
                         resolve(null);
@@ -99,40 +134,32 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         });
     }
 
-    getAsset<T extends Asset>(path: string, assetType?: Constructor<T>): T | null {
+    getAsset<T extends IAsset>(path: string, assetType?: Constructor<T>): T | null {
         let resourceLoaderInfo = this.internalGetBundle(path);
         return resourceLoaderInfo.resourceLoader.getAsset(resourceLoaderInfo.path, assetType);
     }
 
-    getRemoteAsset(url: string): Asset | null {
+    getRemoteAsset(url: string): IAsset | null {
         if (!url) {
             throw new GameFrameworkError("url is invalid");
         }
         return this._remoteAssets.get(url) || null;
     }
 
-    releaseAsset(asset: Asset): void {
+    releaseAsset(asset: IAsset): void {
+        if (!this._assetManager) {
+            throw new GameFrameworkError("you must set asset manager first");
+        }
+
         if (!asset) {
             throw new GameFrameworkError("asset is invalid");
         }
-        assetManager.releaseAsset(asset);
+        this._assetManager.releaseAsset(asset);
     }
 
     releaseDir(path: string): void {
         let resourceLoaderInfo = this.internalGetBundle(path);
         resourceLoaderInfo.resourceLoader.releaseDir(resourceLoaderInfo.path);
-    }
-
-    /**
-     * 设置内置的资源加载器
-     */
-    private setInternalResourceLoader(): void {
-        this._internaleResourceLoaderName = "resources";
-
-        if (this.getResourceLoader(this._internaleResourceLoaderName)) {
-            throw new GameFrameworkError("internal resource loader already set");
-        }
-        this.createResourceLoader(this._internaleResourceLoaderName, resources);
     }
 
     /**
@@ -145,7 +172,12 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         if (resourceLoader) {
             throw new GameFrameworkError(`has exist resource loader ${name}`);
         }
-        resourceLoader = new ResourceLoader(bundle, this._resourceHelpPath, this);
+
+        if (!this._resourcePathHelper) {
+            throw new GameFrameworkError("you must set resource path help first");
+        }
+
+        resourceLoader = new ResourceLoader(bundle, this._resourcePathHelper, this);
         this._resourceLoaders.set(name, resourceLoader);
     }
 

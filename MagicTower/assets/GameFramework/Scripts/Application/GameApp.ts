@@ -1,4 +1,4 @@
-import { Component, game, _decorator } from "cc";
+import { assetManager, Component, game, resources, _decorator } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
@@ -23,6 +23,7 @@ import { CNodeHelper } from "./NodePool/CNodeHelper";
 import { CPlatformHelper } from "./Platform/Helper/CPlatformHelper";
 import { IPlatformManager } from "./Platform/IPlatformManager";
 import { PlatformManager } from "./Platform/PlatformManager";
+import { ResourcePathHelper } from "./Resource/ResourcePathHelper";
 import { CSceneHelper } from "./Scene/CSceneHelper";
 import { SoundConstant } from "./Sound/SoundConstant";
 import { SoundController } from "./Sound/SoundController";
@@ -186,7 +187,12 @@ export class GameApp extends Component {
     private initalizeFramework() {
         //设置log辅助
         GameFrameworkLog.setLogHelper(new WebLogHelper());
+        //初始化resource
         let resourceManager = GameApp.ResourceManager;
+        resourceManager.setResourcePathHelper(new ResourcePathHelper());
+        resourceManager.setAssetManager(assetManager as any);
+        resourceManager.setInternalResourceLoader(resources as any);
+        //对象池管理
         let objectPoolManager = GameApp.ObjectPoolManager;
         //初始化ui模块
         let uiManager = GameApp.UIManager;
