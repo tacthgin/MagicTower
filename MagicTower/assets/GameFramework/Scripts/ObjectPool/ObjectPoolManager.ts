@@ -12,9 +12,9 @@ import { ObjectPoolBase } from "./ObjectPoolBase";
 
 @GameFrameworkEntry.registerModule("ObjectPoolManager")
 export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoolManager {
-    private readonly _defaultCapacity: number = Number.MAX_SAFE_INTEGER;
-    private readonly _defaultExpireTime: number = Number.MAX_VALUE;
-    private readonly _defaultPriority: number = 0;
+    private static readonly s_defaultCapacity: number = Number.MAX_SAFE_INTEGER;
+    private static readonly s_defaultExpireTime: number = Number.MAX_VALUE;
+    private static readonly s_defaultPriority: number = 0;
 
     private readonly _objectPools: Map<ConstructorNamePair<ObjectBase>, ObjectPoolBase> = null!;
     private readonly _cachedAllObjectPools: Array<ObjectPoolBase> = null!;
@@ -85,10 +85,10 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
     createSingleSpawnObjectPool<T extends ObjectBase>(
         constructor: Constructor<T>,
         name: string,
-        autoReleaseInterval: number = this._defaultExpireTime,
-        capacity: number = this._defaultCapacity,
-        expireTime: number = this._defaultExpireTime,
-        priority: number = this._defaultPriority
+        autoReleaseInterval: number = ObjectPoolManager.s_defaultExpireTime,
+        capacity: number = ObjectPoolManager.s_defaultCapacity,
+        expireTime: number = ObjectPoolManager.s_defaultExpireTime,
+        priority: number = ObjectPoolManager.s_defaultPriority
     ): IObjectPool<T> {
         return this.internalCreateObjectPool(constructor, name, false, autoReleaseInterval, capacity, expireTime, priority);
     }
@@ -96,10 +96,10 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
     createSingleSpawnObjectPoolBase(
         constructor: Constructor<ObjectBase>,
         name: string,
-        autoReleaseInterval: number = this._defaultExpireTime,
-        capacity: number = this._defaultCapacity,
-        expireTime: number = this._defaultExpireTime,
-        priority: number = this._defaultPriority
+        autoReleaseInterval: number = ObjectPoolManager.s_defaultExpireTime,
+        capacity: number = ObjectPoolManager.s_defaultCapacity,
+        expireTime: number = ObjectPoolManager.s_defaultExpireTime,
+        priority: number = ObjectPoolManager.s_defaultPriority
     ): ObjectPoolBase {
         return this.internalCreateObjectPool(constructor, name, false, autoReleaseInterval, capacity, expireTime, priority) as unknown as ObjectPoolBase;
     }
@@ -107,10 +107,10 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
     createMultiSpawnObjectPool<T extends ObjectBase>(
         constructor: Constructor<T>,
         name: string,
-        autoReleaseInterval: number = this._defaultExpireTime,
-        capacity: number = this._defaultCapacity,
-        expireTime: number = this._defaultExpireTime,
-        priority: number = this._defaultPriority
+        autoReleaseInterval: number = ObjectPoolManager.s_defaultExpireTime,
+        capacity: number = ObjectPoolManager.s_defaultCapacity,
+        expireTime: number = ObjectPoolManager.s_defaultExpireTime,
+        priority: number = ObjectPoolManager.s_defaultPriority
     ): IObjectPool<T> {
         return this.internalCreateObjectPool(constructor, name, true, autoReleaseInterval, capacity, expireTime, priority);
     }
@@ -118,10 +118,10 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
     createMultiSpawnObjectPoolBase(
         constructor: Constructor<ObjectBase>,
         name: string,
-        autoReleaseInterval: number = this._defaultExpireTime,
-        capacity: number = this._defaultCapacity,
-        expireTime: number = this._defaultExpireTime,
-        priority: number = this._defaultPriority
+        autoReleaseInterval: number = ObjectPoolManager.s_defaultExpireTime,
+        capacity: number = ObjectPoolManager.s_defaultCapacity,
+        expireTime: number = ObjectPoolManager.s_defaultExpireTime,
+        priority: number = ObjectPoolManager.s_defaultPriority
     ): ObjectPoolBase {
         return this.internalCreateObjectPool(constructor, name, true, autoReleaseInterval, capacity, expireTime, priority) as unknown as ObjectPoolBase;
     }
