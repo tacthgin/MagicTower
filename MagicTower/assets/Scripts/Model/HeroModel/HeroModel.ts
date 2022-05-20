@@ -34,6 +34,8 @@ export class HeroModel extends ModelBase {
     private props: { [key: number | string]: number } = {};
     private animation: string[] = ["player_up", "player_right", "player_down", "player_left"];
     private heroSpeed: number = 0.2;
+    /** 临时血量计算 */
+    private tempHp: number = 0;
 
     constructor() {
         super();
@@ -91,7 +93,7 @@ export class HeroModel extends ModelBase {
     }
 
     weak(): boolean {
-        let info = Utility.Json.getJsonElement("global", "weakenAttr") as any;
+        let info = Utility.Json.getJsonElement<any>("global", "weakenAttr");
         if (info) {
             this.heroAttr[HeroAttr.ATTACK] = info.attack;
             this.heroAttr[HeroAttr.DEFENCE] = info.defence;

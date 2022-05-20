@@ -118,7 +118,7 @@ export class GameUI extends Component {
     }
 
     private onRefreshProp(sender: object, event: HeroPropEventArgs) {
-        let propInfo = Utility.Json.getJsonElement("prop", event.propTypeOrId) as any;
+        let propInfo = Utility.Json.getJsonElement<PropInfo>("prop", event.propTypeOrId);
         if (propInfo) {
             this.refreshProp(event.propTypeOrId, event.propValue);
         } else {
@@ -168,7 +168,7 @@ export class GameUI extends Component {
     }
 
     private refreshProp(propId: number | string, count: number = 1) {
-        let propInfo = Utility.Json.getJsonElement("prop", propId) as any;
+        let propInfo = Utility.Json.getJsonElement<PropInfo>("prop", propId);
         if (propInfo) {
             switch (propInfo.type) {
                 case PropType.KEY:
@@ -226,7 +226,7 @@ export class GameUI extends Component {
             this.equipLabels[index].string = "无";
             this.equipSprites[index].spriteFrame = null;
         } else {
-            let equipInfo = Utility.Json.getJsonElement("prop", equipId) as any;
+            let equipInfo = Utility.Json.getJsonElement<PropInfo>("prop", equipId);
             if (equipInfo) {
                 this.equipLabels[index].string = equipInfo.name;
                 this.equipSprites[index].spriteFrame = ElementFactory.getElementSpriteFrame(equipInfo.spriteId);
