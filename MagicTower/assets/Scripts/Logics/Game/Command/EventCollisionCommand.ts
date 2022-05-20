@@ -4,7 +4,7 @@ import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { EventCollisionEventArgs } from "../../Event/EventCollisionEventArgs";
 
-@CommandManager.register("EventCollisionCommand")
+@CommandManager.registerCommand("EventCollisionCommand")
 export class EventCollisionCommand extends CommandBase {
     execute(eventIdOrTile: number | string | IVec2): void {
         GameApp.EventManager.fireNow(this, EventCollisionEventArgs.create(eventIdOrTile));

@@ -17,7 +17,7 @@ import { CalculateSystem } from "./CalculateSystem";
 
 const ATTACK_INTERVAL = 0.1;
 
-@CommandManager.register("MonsterFightSystem")
+@CommandManager.registerSystem("MonsterFightSystem", true)
 export class MonsterFightSystem extends SystemBase {
     private hero: Hero = null!;
     private monster: Monster = null!;

@@ -1,3 +1,4 @@
+import { ScheduleBase } from "../../../../GameFramework/Scripts/Application/Base/ScheduleBase";
 import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
 import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
@@ -32,7 +33,7 @@ import { MoveSystem } from "./MoveSystem";
 import { NpcInteractiveSystem } from "./NpcInteractiveSystem";
 import { UsePropSystem } from "./UsePropSystem";
 
-@CommandManager.register("MapCollisionSystem")
+@CommandManager.registerSystem("MapCollisionSystem", true)
 export class MapCollisionSystem extends SystemBase {
     private gameMap: IGameMap = null!;
     private hero: Hero = null!;
@@ -46,6 +47,10 @@ export class MapCollisionSystem extends SystemBase {
     private usePropSystem: UsePropSystem = null!;
     private doorSystem: DoorSystem = null!;
     private damageSystem: DamageSystem = null!;
+
+    constructor() {
+        super();
+    }
 
     awake(): void {
         this.monsterFightSystem = GameApp.CommandManager.createSystem(MonsterFightSystem);

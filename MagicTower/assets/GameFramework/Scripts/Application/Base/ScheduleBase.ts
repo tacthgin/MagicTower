@@ -4,15 +4,7 @@ import { ReferencePool } from "../../Base/ReferencePool/ReferencePool";
 import { ScheduleInfo } from "./ScheduleInfo";
 
 export class ScheduleBase {
-    private _openSchedule: boolean = false;
     private readonly _scheduleHandles: GameFrameworkLinkedList<ScheduleInfo> = null!;
-
-    /**
-     * 是否开启定时器
-     */
-    get openSchedule(): boolean {
-        return this._openSchedule;
-    }
 
     constructor() {
         this._scheduleHandles = new GameFrameworkLinkedList<ScheduleInfo>();
@@ -26,8 +18,6 @@ export class ScheduleBase {
      * @param priority 定时器优先级
      */
     schedule(handle: Function, interval: number, count: number = Number.MAX_SAFE_INTEGER, priority: number = 0): void {
-        if (!this._openSchedule) return;
-
         if (interval < 0) {
             throw new GameFrameworkError("interval is invalid");
         }
@@ -91,13 +81,5 @@ export class ScheduleBase {
             ReferencePool.release(scheduleInfo);
         });
         this._scheduleHandles.clear();
-    }
-
-    /**
-     * 打开定时器
-     * @param open 打开或者关闭
-     */
-    protected setOpenSchedule(open: boolean): void {
-        this._openSchedule = open;
     }
 }

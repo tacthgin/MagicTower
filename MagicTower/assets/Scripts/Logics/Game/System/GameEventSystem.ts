@@ -25,7 +25,7 @@ import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 
 /** 事件系统 */
-@CommandManager.register("GameEventSystem")
+@CommandManager.registerSystem("GameEventSystem", true)
 export class GameEventSystem extends SystemBase {
     private eventInfo: EventInfo = null!;
     private eventJson: any = null;
@@ -254,7 +254,7 @@ export class GameEventSystem extends SystemBase {
 
     private async createAttack(position: IVec2) {
         let icon = (await GameApp.NodePoolManager.createNodeWithPath("attack", "Prefab/Elements/Attack")) as Node;
-        icon.parent = (this.gameMap as any).node;
+        icon.parent = this.gameMap.node;
         icon.position = v3(position.x, position.y);
         tween(icon).delay(this.globalConfig.fadeInterval).removeSelf().start();
     }

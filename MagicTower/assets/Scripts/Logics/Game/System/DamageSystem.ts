@@ -13,7 +13,7 @@ import { MoveCommand } from "../Command/MoveCommand";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 import { Hero } from "../Map/Hero/Hero";
 
-@CommandManager.register("DamageSystem")
+@CommandManager.registerSystem("DamageSystem", true)
 export class DamageSystem extends SystemBase {
     private gameMap: IGameMap = null!;
     private levelData: LevelData = null!;

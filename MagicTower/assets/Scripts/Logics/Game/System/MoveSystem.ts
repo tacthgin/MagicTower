@@ -34,7 +34,7 @@ const LAYER_TO_MOVE: Readonly<{ [key: string]: AstarMoveType }> = {
 const CAN_MOVE_TILES_END: Readonly<string[]> = ["prop", "stair"];
 const CAN_MOVE_TILES: Readonly<string[]> = ["prop"];
 
-@CommandManager.register("MoveSystem")
+@CommandManager.registerSystem("MoveSystem")
 export class MoveSystem extends SystemBase {
     private _astarMoveType: AstarMoveType = AstarMoveType.NONE;
     private _astar: IAstar | null = null;

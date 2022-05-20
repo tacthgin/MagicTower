@@ -15,7 +15,7 @@ import { DisappearCommand } from "../Command/DisappearCommand";
 import { EventCollisionCommand } from "../Command/EventCollisionCommand";
 import { MoveCommand } from "../Command/MoveCommand";
 
-@CommandManager.register("NpcInteractiveSystem")
+@CommandManager.registerSystem("NpcInteractiveSystem")
 export class NpcInteractiveSystem extends SystemBase {
     private npc: Npc = null!;
     private heroModel: HeroModel = null!;

@@ -11,6 +11,7 @@ import { ModelBase } from "./ModelBase";
 export class ModelContainer {
     private static readonly s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();
     private static readonly s_nameConstructors: Map<Constructor<ModelBase>, string> = new Map<Constructor<ModelBase>, string>();
+    private static readonly s_scheduleConstructors: Map<Constructor<ModelBase>, boolean> = new Map<Constructor<ModelBase>, boolean>();
     private readonly _models: GameFrameworkLinkedList<ModelBase> = null!;
     private readonly _updateModels: GameFrameworkLinkedList<ModelBase> = null!;
     private readonly _cachedModels: Map<Constructor<ModelBase>, ModelBase> = null!;
@@ -25,12 +26,14 @@ export class ModelContainer {
     /**
      * 模型注册装饰函数
      * @param className 类名
+     * @param openSchedule 开启模型定时器
      * @returns
      */
-    static registerModel(className: string): (target: Constructor<ModelBase>) => void {
+    static registerModel(className: string, openSchedule: boolean = false): (target: Constructor<ModelBase>) => void {
         return (target: Constructor<ModelBase>) => {
             this.s_modelConstructors.set(className, target);
             this.s_nameConstructors.set(target, className);
+            this.s_scheduleConstructors.set(target, openSchedule);
         };
     }
 
@@ -173,7 +176,9 @@ export class ModelContainer {
         }
 
         this._cachedModels.set(constructor, model);
-        model.openSchedule && this._updateModels.addLast(model);
+        if (ModelContainer.s_scheduleConstructors.get(constructor)) {
+            this._updateModels.addLast(model);
+        }
 
         return model;
     }

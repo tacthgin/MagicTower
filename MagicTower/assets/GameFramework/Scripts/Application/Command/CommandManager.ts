@@ -14,6 +14,7 @@ import { SystemBase } from "./SystemBase";
  */
 export class CommandManager implements ICommandManager {
     private static readonly s_nameConstructors: Map<Constructor<CommandBase | SystemBase>, string> = new Map<Constructor<CommandBase | SystemBase>, string>();
+    private static readonly s_scheduleConstructors: Map<Constructor<CommandBase | SystemBase>, boolean> = new Map<Constructor<CommandBase | SystemBase>, boolean>();
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _commandPool: IObjectPool<CommandObject> = null!;
     private _systemPool: IObjectPool<CommandObject> = null!;
@@ -89,14 +90,22 @@ export class CommandManager implements ICommandManager {
         return this._systemPool.priority;
     }
 
+    static registerCommand(className: string): (target: Constructor<CommandBase>) => void {
+        return (target: Constructor<CommandBase>) => {
+            this.s_nameConstructors.set(target, className);
+        };
+    }
+
     /**
      * 注册装饰函数
      * @param className 类名
+     * @param 打开系统定时器
      * @returns
      */
-    static register(className: string): (target: Constructor<CommandBase | SystemBase>) => void {
-        return (target: Constructor<CommandBase | SystemBase>) => {
+    static registerSystem(className: string, openSchedule: boolean = false): (target: Constructor<SystemBase>) => void {
+        return (target: Constructor<SystemBase>) => {
             this.s_nameConstructors.set(target, className);
+            this.s_scheduleConstructors.set(target, openSchedule);
         };
     }
 
@@ -167,7 +176,10 @@ export class CommandManager implements ICommandManager {
             system = commandObject.target as T;
         }
 
-        system.openSchedule && this._updateSystemPool.addLast(system);
+        if (CommandManager.s_scheduleConstructors.get(systemConstructor)) {
+            this._updateSystemPool.addLast(system);
+        }
+
         system.awake();
 
         return system;
@@ -176,7 +188,9 @@ export class CommandManager implements ICommandManager {
     destroySystem<T extends SystemBase>(system: T): void {
         system.shutDown();
         this._systemPool.upspawn(system);
-        system.openSchedule && this._updateSystemPool.remove(system);
+        if (CommandManager.s_scheduleConstructors.get(system.constructor as any)) {
+            this._updateSystemPool.remove(system);
+        }
     }
 
     createUniqueSystem<T extends SystemBase>(systemConstructor: Constructor<T>): T {
@@ -184,7 +198,9 @@ export class CommandManager implements ICommandManager {
         if (!system) {
             system = ReferencePool.acquire(systemConstructor);
             this._uniqueSystems.set(systemConstructor, system);
-            system.openSchedule && this._updateSystemPool.addLast(system);
+            if (CommandManager.s_scheduleConstructors.get(systemConstructor)) {
+                this._updateSystemPool.addLast(system);
+            }
         }
 
         return system as T;
@@ -195,7 +211,9 @@ export class CommandManager implements ICommandManager {
             let system = this._uniqueSystems.get(systemConstructor)!;
             system.shutDown();
             ReferencePool.release(system);
-            system.openSchedule && this._updateSystemPool.remove(system);
+            if (CommandManager.s_scheduleConstructors.get(system.constructor as any)) {
+                this._updateSystemPool.remove(system);
+            }
             return this._uniqueSystems.delete(systemConstructor);
         }
         return false;

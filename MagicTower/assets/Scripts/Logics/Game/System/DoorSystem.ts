@@ -21,7 +21,7 @@ import { DoorAnimationNode } from "../Elements/DoorAnimaitonNode";
 import { DoorAnimationReverseNode } from "../Elements/DoorAnimaitonReverseNode";
 import { IGameMap } from "../Map/GameMap/IGameMap";
 
-@CommandManager.register("DoorSystem")
+@CommandManager.registerSystem("DoorSystem")
 export class DoorSystem extends SystemBase {
     private gameMap: IGameMap = null!;
     private levelData: LevelData = null!;

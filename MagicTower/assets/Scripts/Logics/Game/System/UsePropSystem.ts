@@ -27,7 +27,7 @@ const INDEX_DIFFS: Readonly<number[]> = [1, 11];
 /** 英雄面朝方向上，右，下，左 */
 const HERO_FACE_DIRECTION: Readonly<number[]> = [-11, 1, 11, -1];
 
-@CommandManager.register("UsePropSystem")
+@CommandManager.registerSystem("UsePropSystem")
 export class UsePropSystem extends SystemBase {
     private heroModel: HeroModel = null!;
     private mapModel: MapModel = null!;
@@ -61,7 +61,7 @@ export class UsePropSystem extends SystemBase {
     eatProp(layerName: string, tile: IVec2, spriteFrameName: string) {
         SoundFactory.playEffectSound("Sound/eat");
         let name = spriteFrameName.split("_")[0];
-        let propJson = Utility.Json.getJsonKeyCache(layerName, "spriteId", name) as any;
+        let propJson = Utility.Json.getJsonKeyCache<any>(layerName, "spriteId", name);
         if (propJson) {
             this.heroModel.addProp(propJson.id, this.levelData.level);
             GameApp.CommandManager.createCommand(DisappearCommand).execute(layerName, tile);

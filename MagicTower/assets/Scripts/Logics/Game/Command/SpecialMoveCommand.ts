@@ -3,7 +3,7 @@ import { CommandManager } from "../../../../GameFramework/Scripts/Application/Co
 import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
 import { SpecialMoveEventArgs } from "../../Event/SpecialMoveEventArgs";
 
-@CommandManager.register("SpecialMoveCommand")
+@CommandManager.registerCommand("SpecialMoveCommand")
 export class SpecialMoveCommand extends CommandBase {
     execute(specialMoveInfo: any): void {
         GameApp.EventManager.fireNow(this, SpecialMoveEventArgs.create(specialMoveInfo));
