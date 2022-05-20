@@ -6,6 +6,7 @@ import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
 import { IAsset } from "./Asset/IAsset";
 import { IAssetManager, ResourceCompleteCallback, ResourceProgressCallback } from "./Asset/IAssetManager";
 import { OptionBundle, OptionExt } from "./Asset/IOption";
+import { IHotUpdateHelper } from "./IHotUpdateHelper";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
 import { IResourceManager } from "./IResourceManager";
@@ -18,6 +19,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
     private readonly _remoteAssets: Map<string, IAsset> = null!;
     private _assetManager: IAssetManager | null = null;
     private _resourcePathHelper: IResourcePathHelper | null = null;
+    private _hotUpdateHelper: IHotUpdateHelper | null = null;
     private readonly _bundleRegExp: RegExp = /^\$\w+\//;
     private _internaleResourceLoaderName: string = "";
 
@@ -26,12 +28,18 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         this._resourceLoaders = new Map<string, ResourceLoader>();
         this._remoteAssets = new Map<string, IAsset>();
     }
+    setHotUpdateHelper(hotUpdateHelper: IHotUpdateHelper): void {
+        throw new Error("Method not implemented.");
+    }
 
     update(elapseSeconds: number): void {}
 
     shutDown(): void {
         this._resourceLoaders.clear();
         this._remoteAssets.clear();
+        this._assetManager = null;
+        this._resourcePathHelper = null;
+        this._hotUpdateHelper = null;
     }
 
     /**
@@ -160,6 +168,32 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
     releaseDir(path: string): void {
         let resourceLoaderInfo = this.internalGetBundle(path);
         resourceLoaderInfo.resourceLoader.releaseDir(resourceLoaderInfo.path);
+    }
+
+    startHotUpdate(): void {
+        if (!this._hotUpdateHelper) {
+            throw new GameFrameworkError("you must set hot update helper first");
+        }
+        this._hotUpdateHelper.startHotUpdate();
+    }
+
+    setHotUpdateCallback(
+        failCallback: (errorMessage: string) => void,
+        completeCallback: (restart: boolean) => void,
+        fileProgressCallback: ((progress: number, current: number, total: number) => void) | null = null,
+        bytesProgressCallback: ((progress: number, current: number, total: number) => void) | null = null
+    ): void {
+        if (!this._hotUpdateHelper) {
+            throw new GameFrameworkError("you must set hot update helper first");
+        }
+        this._hotUpdateHelper.setHotUpdateCallback(failCallback, completeCallback, fileProgressCallback, bytesProgressCallback);
+    }
+
+    retry(): void {
+        if (!this._hotUpdateHelper) {
+            throw new GameFrameworkError("you must set hot update helper first");
+        }
+        this._hotUpdateHelper.retry();
     }
 
     /**

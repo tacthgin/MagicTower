@@ -2,6 +2,7 @@ import { Constructor } from "../Base/DataStruct/Constructor";
 import { IAsset } from "./Asset/IAsset";
 import { IAssetManager, ResourceCompleteCallback, ResourceProgressCallback } from "./Asset/IAssetManager";
 import { OptionBundle, OptionExt } from "./Asset/IOption";
+import { IHotUpdateHelper } from "./IHotUpdateHelper";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
 import { IResourcePathHelper } from "./IResourcePathHelper";
@@ -27,6 +28,12 @@ export interface IResourceManager {
      * @param resourcePathHelper 资源路径辅助器
      */
     setResourcePathHelper(resourcePathHelper: IResourcePathHelper): void;
+
+    /**
+     * 设置热更新辅助器
+     * @param hotUpdateHelper 热更新辅助器
+     */
+    setHotUpdateHelper(hotUpdateHelper: IHotUpdateHelper): void;
 
     /**
      * 加载bundle，返回bundle的资源加载器
@@ -113,4 +120,28 @@ export interface IResourceManager {
      * @param path 文件夹路径
      */
     releaseDir(path: string): void;
+
+    /**
+     * 开始热更新
+     */
+    startHotUpdate(): void;
+
+    /**
+     * 设置热更回调
+     * @param failCallback 更新失败回调
+     * @param completeCallback 更新完成回调
+     * @param fileProgressCallback 文件热更进度回调
+     * @param bytesProgressCallback 字节数热更进度回调
+     */
+    setHotUpdateCallback(
+        failCallback: (errorMessage: string) => void,
+        completeCallback: (testart: boolean) => void,
+        fileProgressCallback?: ((progress: number, current: number, total: number) => void) | null,
+        bytesProgressCallback?: ((progress: number, current: number, total: number) => void) | null
+    ): void;
+
+    /**
+     * 重新下载热更资源
+     */
+    retry(): void;
 }

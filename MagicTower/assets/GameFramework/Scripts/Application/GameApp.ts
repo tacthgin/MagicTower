@@ -17,6 +17,7 @@ import { IUIManager } from "../UI/IUIManager";
 import { Utility } from "../Utility/Utility";
 import { CommandManager } from "./Command/CommandManager";
 import { ICommandManager } from "./Command/ICommandManager";
+import { CHotUpdateHelper } from "./HotUpdate/CHotUpdateHelp";
 import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
 import { CNodeHelper } from "./NodePool/CNodeHelper";
@@ -182,6 +183,8 @@ export class GameApp extends Component {
         this.initializeModel();
         //初始化平台
         this.initializePlatform();
+        //初始化热更新
+        this.initializeHotUpdate();
     }
 
     private initalizeFramework() {
@@ -248,6 +251,13 @@ export class GameApp extends Component {
     private initializePlatform() {
         this._platformManager = new PlatformManager();
         this._platformManager.initalize(new CPlatformHelper());
+    }
+
+    private initializeHotUpdate() {
+        let hotUpdateHelper = new CHotUpdateHelper();
+        hotUpdateHelper.setPlatformManager(this._platformManager);
+        hotUpdateHelper.setSaveManager(GameApp.SaveManager);
+        GameApp.ResourceManager.setHotUpdateHelper(hotUpdateHelper);
     }
 
     update(elapseSeconds: number) {
