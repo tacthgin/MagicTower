@@ -16,6 +16,10 @@ export class PlatformManager implements IPlatformManager {
     private _platformType: PlatformType = PlatformType.NONE;
     private _platformHelper: IPlatformHelper | null = null;
 
+    get platformType(): PlatformType {
+        return this._platformType;
+    }
+
     get NativePlatform(): INativePlatform {
         switch (this._platformType) {
             case PlatformType.ANDROID:
@@ -27,10 +31,11 @@ export class PlatformManager implements IPlatformManager {
     }
 
     get WebPlatform(): IWebPlatform {
-        if (this._platformType != PlatformType.ANDROID && this._platformType != PlatformType.IOS) {
-            return this.getPlatform();
-        } else {
-            throw new GameFrameworkError("web platform does not exist");
+        switch (this._platformType) {
+            case PlatformType.WX:
+                return this.getPlatform();
+            default:
+                throw new GameFrameworkError("web platform does not exist");
         }
     }
 
@@ -49,6 +54,10 @@ export class PlatformManager implements IPlatformManager {
         } else {
             throw new GameFrameworkError("platform does not exist");
         }
+    }
+
+    isNativePlatform(): boolean {
+        return this._platformType == PlatformType.IOS || this._platformType == PlatformType.ANDROID;
     }
 
     private createPlatform(): void {
