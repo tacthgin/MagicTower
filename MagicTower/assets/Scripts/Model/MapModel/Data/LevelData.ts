@@ -1,5 +1,5 @@
 import { js } from "cc";
-import { LoadBase } from "../../../../GameFramework/Scripts/Application/Model/LoadBase";
+import { LoadBase } from "../../../../GameFramework/Scripts/MVC/Model/LoadBase";
 import { Door, DoorState, DoorType } from "./Elements/Door";
 import { Element } from "./Elements/Element";
 import { EventInfo } from "./Elements/EventInfo";

@@ -1,11 +1,11 @@
 import { Node, Tween, tween, UIOpacity, UITransform, v2, v3, Vec3 } from "cc";
-import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
-import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Application/UI/UIFactory";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { CommandManager } from "../../../../GameFramework/Scripts/MVC/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/MVC/Command/SystemBase";
 import { AstarFactory } from "../../../../GameFramework/Scripts/ToolLibary/Astar/AstarFactory";
 import { IAstar } from "../../../../GameFramework/Scripts/ToolLibary/Astar/IAstar";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";

@@ -1,5 +1,5 @@
-import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
+import { ModelBase } from "../../../GameFramework/Scripts/MVC/Model/ModelBase";
+import { ModelContainer } from "../../../GameFramework/Scripts/MVC/Model/ModelContainer";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
 
 @ModelContainer.registerModel("ShopModel")

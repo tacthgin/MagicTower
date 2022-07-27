@@ -123,21 +123,24 @@ export interface IResourceManager {
 
     /**
      * 开始热更新
+     * @param manifestUrl 热更链接
      */
-    startHotUpdate(): void;
+    startHotUpdate(manifestUrl: string): void;
 
     /**
      * 设置热更回调
      * @param failCallback 更新失败回调
      * @param completeCallback 更新完成回调
-     * @param fileProgressCallback 文件热更进度回调
+     * @param checkCompleteCallback 如果有更新，检查更新完毕回调
      * @param bytesProgressCallback 字节数热更进度回调
+     * @param fileProgressCallback 文件热更进度回调
      */
     setHotUpdateCallback(
         failCallback: (errorMessage: string) => void,
-        completeCallback: (testart: boolean) => void,
-        fileProgressCallback?: ((progress: number, current: number, total: number) => void) | null,
-        bytesProgressCallback?: ((progress: number, current: number, total: number) => void) | null
+        completeCallback: (restart: boolean) => void,
+        checkCompleteCallback?: () => void,
+        bytesProgressCallback?: ((progress: number, current: number, total: number) => void) | null,
+        fileProgressCallback?: ((progress: number, current: number, total: number) => void) | null
     ): void;
 
     /**

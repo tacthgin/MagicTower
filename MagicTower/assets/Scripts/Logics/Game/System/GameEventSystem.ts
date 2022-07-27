@@ -1,9 +1,9 @@
 import { IVec2, Node, tween, v3 } from "cc";
-import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
-import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { SoundFactory } from "../../../../GameFramework/Scripts/Application/Sound/SoundFactory";
-import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+import { SoundFactory } from "../../../../GameFramework/Application/Sound/SoundFactory";
+import { UIFactory } from "../../../../GameFramework/Application/UI/UIFactory";
+import { CommandManager } from "../../../../GameFramework/Scripts/MVC/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/MVC/Command/SystemBase";
 import { PlaySoundParams } from "../../../../GameFramework/Scripts/Sound/PlaySoundParams";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";

@@ -28,8 +28,9 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         this._resourceLoaders = new Map<string, ResourceLoader>();
         this._remoteAssets = new Map<string, IAsset>();
     }
+
     setHotUpdateHelper(hotUpdateHelper: IHotUpdateHelper): void {
-        throw new Error("Method not implemented.");
+        this._hotUpdateHelper = hotUpdateHelper;
     }
 
     update(elapseSeconds: number): void {}
@@ -170,11 +171,11 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         resourceLoaderInfo.resourceLoader.releaseDir(resourceLoaderInfo.path);
     }
 
-    startHotUpdate(): void {
+    startHotUpdate(manifestUrl: string): void {
         if (!this._hotUpdateHelper) {
             throw new GameFrameworkError("you must set hot update helper first");
         }
-        this._hotUpdateHelper.startHotUpdate();
+        this._hotUpdateHelper.startHotUpdate(manifestUrl);
     }
 
     setHotUpdateCallback(

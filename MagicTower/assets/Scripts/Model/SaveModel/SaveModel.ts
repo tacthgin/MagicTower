@@ -1,6 +1,6 @@
-import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
-import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
+import { GameApp } from "../../../GameFramework/Application/GameApp";
+import { ModelBase } from "../../../GameFramework/Scripts/MVC/Model/ModelBase";
+import { ModelContainer } from "../../../GameFramework/Scripts/MVC/Model/ModelContainer";
 import { HeroAttr } from "../HeroModel/HeroAttr";
 import { HeroModel } from "../HeroModel/HeroModel";
 import { MapModel } from "../MapModel/MapModel";

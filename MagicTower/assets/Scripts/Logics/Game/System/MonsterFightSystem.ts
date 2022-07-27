@@ -1,9 +1,9 @@
-import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
-import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { SoundFactory } from "../../../../GameFramework/Scripts/Application/Sound/SoundFactory";
-import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+import { SoundFactory } from "../../../../GameFramework/Application/Sound/SoundFactory";
+import { UIFactory } from "../../../../GameFramework/Application/UI/UIFactory";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
+import { CommandManager } from "../../../../GameFramework/Scripts/MVC/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/MVC/Command/SystemBase";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { DoorState } from "../../../Model/MapModel/Data/Elements/Door";

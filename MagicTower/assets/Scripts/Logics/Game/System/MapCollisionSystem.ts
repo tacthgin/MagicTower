@@ -1,10 +1,9 @@
-import { ScheduleBase } from "../../../../GameFramework/Scripts/Application/Base/ScheduleBase";
-import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
-import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Application/UI/UIFactory";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { CommandManager } from "../../../../GameFramework/Scripts/MVC/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/MVC/Command/SystemBase";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { Door } from "../../../Model/MapModel/Data/Elements/Door";
 import { Element } from "../../../Model/MapModel/Data/Elements/Element";

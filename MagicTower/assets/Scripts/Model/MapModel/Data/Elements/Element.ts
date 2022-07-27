@@ -1,5 +1,5 @@
-import { LoadBase } from "../../../../../GameFramework/Scripts/Application/Model/LoadBase";
 import { IRerference } from "../../../../../GameFramework/Scripts/Base/ReferencePool/IRerference";
+import { LoadBase } from "../../../../../GameFramework/Scripts/MVC/Model/LoadBase";
 
 export class Element extends LoadBase implements IRerference {
     private _gid: number = 0;

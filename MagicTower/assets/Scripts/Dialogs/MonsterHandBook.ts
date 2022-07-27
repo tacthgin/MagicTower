@@ -1,6 +1,6 @@
 import { Node, v3, _decorator } from "cc";
-import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
-import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
+import { GameApp } from "../../GameFramework/Application/GameApp";
+import { DialogBase } from "../../GameFramework/Application/UI/Dialog/DialogBase";
 import { Monster } from "../Model/MapModel/Data/Elements/Monster";
 import { MonsterHandBookItem } from "./MonsterHandBookItem";
 

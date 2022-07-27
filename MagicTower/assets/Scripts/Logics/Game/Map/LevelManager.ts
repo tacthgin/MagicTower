@@ -1,5 +1,5 @@
 import { Component, instantiate, Node, Prefab, TiledMapAsset, Touch, tween, UIOpacity, v3, Vec2, _decorator } from "cc";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { Stair } from "../../../Model/MapModel/Data/Elements/Stair";

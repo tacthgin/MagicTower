@@ -8,6 +8,7 @@
       "__id__": 1
     },
     "optimizationPolicy": 0,
+    "persistent": false,
     "asyncLoadAssets": false
   },
   {
@@ -629,8 +630,8 @@
     "_alignFlags": 45,
     "_target": null,
     "_left": 0,
-    "_right": -710,
-    "_top": -400,
+    "_right": 0,
+    "_top": 0,
     "_bottom": 0,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,

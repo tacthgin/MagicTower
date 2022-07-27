@@ -6,7 +6,7 @@ export class DateUtility {
      * 根据时间戳，格式化文本 MM:dd hh:mm:ss
      * @param timestamp 时间戳
      * @param format 时间格式
-     * @returns
+     * @returns 格式化文本
      */
     format(timestamp: number, format: string): string {
         let date = new Date(timestamp);
@@ -35,7 +35,7 @@ export class DateUtility {
      * 根据时长，格式化文本 hh:mm:ss
      * @param interval 时长
      * @param format 时间格式
-     * @returns
+     * @returns 格式化文本
      */
     formatInterval(interval: number, format: string): string {
         let dateFormat: { [key: string]: number } = {

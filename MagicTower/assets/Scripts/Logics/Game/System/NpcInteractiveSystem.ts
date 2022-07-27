@@ -1,7 +1,7 @@
-import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
-import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Application/UI/UIFactory";
+import { CommandManager } from "../../../../GameFramework/Scripts/MVC/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/MVC/Command/SystemBase";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";

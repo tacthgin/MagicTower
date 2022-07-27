@@ -1,8 +1,8 @@
-import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
-import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
-import { SoundConstant } from "../../../GameFramework/Scripts/Application/Sound/SoundConstant";
-import { SoundFactory } from "../../../GameFramework/Scripts/Application/Sound/SoundFactory";
+import { GameApp } from "../../../GameFramework/Application/GameApp";
+import { SoundConstant } from "../../../GameFramework/Application/Sound/SoundConstant";
+import { SoundFactory } from "../../../GameFramework/Application/Sound/SoundFactory";
+import { ModelBase } from "../../../GameFramework/Scripts/MVC/Model/ModelBase";
+import { ModelContainer } from "../../../GameFramework/Scripts/MVC/Model/ModelContainer";
 
 @ModelContainer.registerModel("SettingModel")
 export class SettingModel extends ModelBase {

@@ -1,5 +1,5 @@
 import { _decorator, Label, Node } from "cc";
-import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
+import { DialogBase } from "../../GameFramework/Application/UI/Dialog/DialogBase";
 import { Npc } from "../Model/MapModel/Data/Elements/Npc";
 const { ccclass, property } = _decorator;
 

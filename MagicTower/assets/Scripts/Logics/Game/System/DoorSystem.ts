@@ -1,10 +1,10 @@
 import { Node, v3 } from "cc";
-import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
-import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { SoundFactory } from "../../../../GameFramework/Scripts/Application/Sound/SoundFactory";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+import { SoundFactory } from "../../../../GameFramework/Application/Sound/SoundFactory";
 import { GameFrameworkError } from "../../../../GameFramework/Scripts/Base/GameFrameworkError";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
+import { CommandManager } from "../../../../GameFramework/Scripts/MVC/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/MVC/Command/SystemBase";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../../../Model/HeroModel/HeroModel";
 import { PropInfo } from "../../../Model/HeroModel/Prop";

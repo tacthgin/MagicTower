@@ -1,6 +1,6 @@
 import { _decorator, PageView, Node, Label, find, instantiate } from "cc";
-import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
-import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
+import { GameApp } from "../../GameFramework/Application/GameApp";
+import { DialogBase } from "../../GameFramework/Application/UI/Dialog/DialogBase";
 import { Utility } from "../../GameFramework/Scripts/Utility/Utility";
 import { HeroModel } from "../Model/HeroModel/HeroModel";
 import { NpcInfo } from "../Model/MapModel/Data/Elements/Npc";

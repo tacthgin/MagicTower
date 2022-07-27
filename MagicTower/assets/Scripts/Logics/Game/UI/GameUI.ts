@@ -1,6 +1,6 @@
 import { Component, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, Vec3, _decorator } from "cc";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+import { UIFactory } from "../../../../GameFramework/Application/UI/UIFactory";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { GameEventArgs } from "../../../../GameFramework/Scripts/Event/GameEventArgs";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";

@@ -4,8 +4,8 @@
   "imported": true,
   "uuid": "76421772-0d32-4e3b-aab7-90a145229054",
   "files": [
-    ".tmx",
-    ".json"
+    ".json",
+    ".tmx"
   ],
   "subMetas": {},
   "userData": {}

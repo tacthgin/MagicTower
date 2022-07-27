@@ -1,7 +1,7 @@
 import { Label, _decorator } from "cc";
-import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
-import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
-import { UIFactory } from "../../GameFramework/Scripts/Application/UI/UIFactory";
+import { GameApp } from "../../GameFramework/Application/GameApp";
+import { DialogBase } from "../../GameFramework/Application/UI/Dialog/DialogBase";
+import { UIFactory } from "../../GameFramework/Application/UI/UIFactory";
 import { CommonEventArgs } from "../Logics/Event/CommonEventArgs";
 import { GameEvent } from "../Logics/Event/GameEvent";
 import { HeroModel } from "../Model/HeroModel/HeroModel";

@@ -1,5 +1,5 @@
-import { ModelEventArgs } from "../../../GameFramework/Scripts/Application/Model/ModelEventArgs";
 import { ReferencePool } from "../../../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
+import { ModelEventArgs } from "../../../GameFramework/Scripts/MVC/Model/ModelEventArgs";
 import { HeroAttr } from "./HeroAttr";
 import { HeroEvent } from "./HeroEvent";
 import { PropType } from "./Prop";

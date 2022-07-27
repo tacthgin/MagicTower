@@ -1,8 +1,8 @@
-import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
-import { ModelBase } from "../../../GameFramework/Scripts/Application/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Scripts/Application/Model/ModelContainer";
+import { GameApp } from "../../../GameFramework/Application/GameApp";
 import { IVec2 } from "../../../GameFramework/Scripts/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { ModelBase } from "../../../GameFramework/Scripts/MVC/Model/ModelBase";
+import { ModelContainer } from "../../../GameFramework/Scripts/MVC/Model/ModelContainer";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
 import { CommonEventArgs } from "../../Logics/Event/CommonEventArgs";
 import { GameEvent } from "../../Logics/Event/GameEvent";

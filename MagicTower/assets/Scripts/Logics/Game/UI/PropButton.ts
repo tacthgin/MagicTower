@@ -1,5 +1,5 @@
 import { _decorator, Component, Label, Sprite } from "cc";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
 import { PropInfo, PropType } from "../../../Model/HeroModel/Prop";
 import { UsePropEventArgs } from "../../Event/UsePropEventArgs";
 import { ElementFactory } from "../Map/ElementFactory";

@@ -1,6 +1,6 @@
 import { IVec2 } from "cc";
-import { ModelEventArgs } from "../../../GameFramework/Scripts/Application/Model/ModelEventArgs";
 import { ReferencePool } from "../../../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
+import { ModelEventArgs } from "../../../GameFramework/Scripts/MVC/Model/ModelEventArgs";
 import { StairType } from "./Data/Elements/Stair";
 import { MapEvent } from "./MapEvent";
 

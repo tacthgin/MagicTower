@@ -44,6 +44,9 @@ export class TextUtility {
      * @returns 格式化后的“数字+单位”
      */
     formatNumberUnit(num: number, precision: number = 2): string {
+        if (num === 0) {
+            return "0";
+        }
         //进制
         let system = this.unitConfig.system;
         if (system <= 0) {

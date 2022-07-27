@@ -1,8 +1,5 @@
-import { AnimationClip, Constructor, Prefab, SpriteFrame, TiledMapAsset } from "cc";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { IObjectPool } from "../../../../GameFramework/Scripts/ObjectPool/IObjectPool";
-import { Element } from "../../../Model/MapModel/Data/Elements/Element";
-import { ElementObject } from "../../../Model/MapModel/Data/Elements/ElementObject";
+import { AnimationClip, SpriteFrame } from "cc";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
 
 export class ElementFactory {
     /**id对应的动画 */

@@ -1,5 +1,5 @@
 import { Component, Label, _decorator } from "cc";
-import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
+import { GameApp } from "../../GameFramework/Application/GameApp";
 import { CalculateSystem } from "../Logics/Game/System/CalculateSystem";
 import { MonsterIcon } from "../Logics/Game/UI/MonsterIcon";
 import { HeroAttr } from "../Model/HeroModel/HeroAttr";

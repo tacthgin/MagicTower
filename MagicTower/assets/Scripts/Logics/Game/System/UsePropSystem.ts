@@ -1,10 +1,10 @@
 import { IVec2, v2 } from "cc";
-import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
-import { SystemBase } from "../../../../GameFramework/Scripts/Application/Command/SystemBase";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
-import { SoundFactory } from "../../../../GameFramework/Scripts/Application/Sound/SoundFactory";
-import { UIFactory } from "../../../../GameFramework/Scripts/Application/UI/UIFactory";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+import { SoundFactory } from "../../../../GameFramework/Application/Sound/SoundFactory";
+import { UIFactory } from "../../../../GameFramework/Application/UI/UIFactory";
 import { GameFrameworkLog } from "../../../../GameFramework/Scripts/Base/Log/GameFrameworkLog";
+import { CommandManager } from "../../../../GameFramework/Scripts/MVC/Command/CommandManager";
+import { SystemBase } from "../../../../GameFramework/Scripts/MVC/Command/SystemBase";
 import { Utility } from "../../../../GameFramework/Scripts/Utility/Utility";
 import { MonsterHandBookItem } from "../../../Dialogs/MonsterHandBookItem";
 import { HeroAttr } from "../../../Model/HeroModel/HeroAttr";

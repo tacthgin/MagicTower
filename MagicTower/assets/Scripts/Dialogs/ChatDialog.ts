@@ -1,5 +1,5 @@
 import { _decorator, Label } from "cc";
-import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
+import { DialogBase } from "../../GameFramework/Application/UI/Dialog/DialogBase";
 const { ccclass, property } = _decorator;
 
 @ccclass("ChatDialog")

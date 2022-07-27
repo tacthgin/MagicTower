@@ -22,7 +22,7 @@ export class Random {
     }
 
     /**
-     * 创建随机数
+     * 创建随机数,如果设置了随机种子，使用自定义随机
      * @param systemFlag 设置使用系统的随机函数
      * @param seed 随机种子
      */
@@ -40,6 +40,7 @@ export class Random {
      * @param seed 种子
      */
     setSeed(seed: number): void {
+        this._systemFlag = false;
         this._seed = seed;
     }
 
@@ -97,7 +98,7 @@ export class Random {
         }
 
         let indexes: { [key: string]: number } = {};
-        let randomIndexs = [];
+        let randomIndexs: number[] = [];
 
         //交换尾部，随机头部部分
         let length = -1;

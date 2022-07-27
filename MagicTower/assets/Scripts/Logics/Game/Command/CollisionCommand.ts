@@ -1,7 +1,7 @@
-import { CommandBase } from "../../../../GameFramework/Scripts/Application/Command/CommandBase";
-import { CommandManager } from "../../../../GameFramework/Scripts/Application/Command/CommandManager";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
 import { IVec2 } from "../../../../GameFramework/Scripts/Base/GameStruct/IVec2";
+import { CommandBase } from "../../../../GameFramework/Scripts/MVC/Command/CommandBase";
+import { CommandManager } from "../../../../GameFramework/Scripts/MVC/Command/CommandManager";
 import { CollisionEventArgs } from "../../Event/CollisionEventArgs";
 
 @CommandManager.registerCommand("CollisionCommand")

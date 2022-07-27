@@ -1,5 +1,6 @@
 import { Animation, Component, Sprite, _decorator } from "cc";
-import { GameApp } from "../../../../GameFramework/Scripts/Application/GameApp";
+import { GameApp } from "../../../../GameFramework/Application/GameApp";
+
 const { ccclass, property } = _decorator;
 
 @ccclass("DoorAnimationReverseNode")

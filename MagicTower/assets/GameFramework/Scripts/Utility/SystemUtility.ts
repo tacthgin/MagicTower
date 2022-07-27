@@ -16,7 +16,7 @@ export class SystemUtility {
 
         // Handle Array
         if (object instanceof Array) {
-            let copy = [];
+            let copy: any[] = [];
             for (let i = 0, len = object.length; i < len; ++i) {
                 copy[i] = this.clone(object[i]);
             }

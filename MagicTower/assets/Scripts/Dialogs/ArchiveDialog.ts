@@ -1,6 +1,6 @@
 import { _decorator, Node, Button, UIOpacity, find, Label } from "cc";
-import { GameApp } from "../../GameFramework/Scripts/Application/GameApp";
-import { DialogBase } from "../../GameFramework/Scripts/Application/UI/Dialog/DialogBase";
+import { GameApp } from "../../GameFramework/Application/GameApp";
+import { DialogBase } from "../../GameFramework/Application/UI/Dialog/DialogBase";
 import { SaveModel } from "../Model/SaveModel/SaveModel";
 
 const { ccclass, property } = _decorator;

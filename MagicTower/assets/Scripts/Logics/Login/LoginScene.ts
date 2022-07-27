@@ -1,5 +1,5 @@
-import { AudioClip, Component, JsonAsset, Label, Prefab, SpriteFrame, TiledMapAsset, _decorator } from "cc";
-import { GameApp } from "../../../GameFramework/Scripts/Application/GameApp";
+import { Asset, AudioClip, Component, JsonAsset, Label, Prefab, SpriteFrame, sys, TiledMapAsset, _decorator } from "cc";
+import { GameApp } from "../../../GameFramework/Application/GameApp";
 import { Utility } from "../../../GameFramework/Scripts/Utility/Utility";
 
 const { ccclass, property } = _decorator;
@@ -8,14 +8,43 @@ const { ccclass, property } = _decorator;
 export class LoginScene extends Component {
     @property(Label)
     private progressLabel: Label = null!;
+    @property(Label)
+    private descLabel: Label = null!;
+    @property(Asset)
+    private manifestAsset: Asset = null!;
 
     private progress: number = 0;
 
-    async start() {
+    start() {
+        this.initHotUpdate();
+    }
+
+    private initHotUpdate() {
+        this.descLabel.string = "检测更新...";
+        GameApp.ResourceManager.setHotUpdateCallback(this.onUpdateFail.bind(this), this.onUpdateComplete.bind(this));
+        GameApp.ResourceManager.startHotUpdate(this.manifestAsset ? this.manifestAsset.nativeUrl : "");
+    }
+
+    private onUpdateFail() {}
+
+    private onUpdateComplete(restart: boolean) {
+        if (restart) {
+            //重启虚拟机
+            sys.restartVM();
+            //重启游戏
+            //game.restart();
+        } else {
+            this.initGame();
+        }
+    }
+
+    private async initGame() {
         await this.loadResources();
         GameApp.instance.initModels();
         this.gotoGameScene();
     }
+
+    private retryUpdate() {}
 
     private async loadResources() {
         let resouceInfos = [
