@@ -19,7 +19,7 @@ export class GameFrameworkMap<K, V> {
     }
 
     delete(key: K, value?: V): boolean {
-        if (value != undefined) {
+        if (value !== undefined) {
             let list = this._map.get(key);
             if (list) {
                 return list.remove(value);
@@ -39,7 +39,7 @@ export class GameFrameworkMap<K, V> {
     }
 
     has(key: K, value?: V): boolean {
-        if (value != undefined) {
+        if (value !== undefined) {
             let list = this._map.get(key);
             if (list) {
                 return list.has(value);
