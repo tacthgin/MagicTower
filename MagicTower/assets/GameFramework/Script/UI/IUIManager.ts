@@ -1,4 +1,4 @@
-import { EventHandler } from "../Base/EventPool/EventHandler";
+import { FEventHandler } from "../Base/EventPool/FEventHandler";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { IUIForm } from "./IUIForm";
@@ -57,7 +57,7 @@ export interface IUIManager {
      * @param eventHandle 事件句柄
      * @param thisArg
      */
-    subscribe(id: number, eventHandle: EventHandler<UIEventArgs>, thisArg?: any): void;
+    subscribe(id: number, eventHandle: FEventHandler<UIEventArgs>, thisArg?: any): void;
 
     /**
      * 取消订阅UI事件
@@ -65,7 +65,7 @@ export interface IUIManager {
      * @param eventHandle 事件句柄
      * @param thisArg
      */
-    unsubscribe(id: number, eventHandle: EventHandler<UIEventArgs>, thisArg?: any): void;
+    unsubscribe(id: number, eventHandle: FEventHandler<UIEventArgs>, thisArg?: any): void;
 
     /**
      * 取消订阅者的所有订阅

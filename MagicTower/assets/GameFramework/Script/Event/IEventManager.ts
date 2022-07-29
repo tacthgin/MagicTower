@@ -1,4 +1,4 @@
-import { EventHandler } from "../Base/EventPool/EventHandler";
+import { FEventHandler } from "../Base/EventPool/FEventHandler";
 import { GameEventArgs } from "./GameEventArgs";
 
 export interface IEventManager {
@@ -13,7 +13,7 @@ export interface IEventManager {
      * @param eventHandle 事件处理函数
      * @param thisArg 传递的this指针
      */
-    subscribe<T extends GameEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): void;
+    subscribe<T extends GameEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void;
 
     /**
      * 取消订阅事件处理函数
@@ -21,7 +21,7 @@ export interface IEventManager {
      * @param eventHandle 事件处理函数
      * @param thisArg 传递的this指针
      */
-    unsubscribe<T extends GameEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): void;
+    unsubscribe<T extends GameEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void;
 
     /**
      * 取消订阅该目标下的所有事件处理函数
@@ -35,7 +35,7 @@ export interface IEventManager {
      * @param eventHandle 事件处理函数
      * @param thisArg 传递的this指针
      */
-    check<T extends GameEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): boolean;
+    check<T extends GameEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): boolean;
 
     /**
      * 每帧分发事件

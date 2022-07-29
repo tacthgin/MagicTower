@@ -1,4 +1,4 @@
-import { EventHandler } from "../Base/EventPool/EventHandler";
+import { FEventHandler } from "../Base/EventPool/FEventHandler";
 import { EventPool } from "../Base/EventPool/EventPool";
 import { EventPoolMode } from "../Base/EventPool/EventPoolMode";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
@@ -110,11 +110,11 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._uiFormHelper = uiFormHelper;
     }
 
-    subscribe(id: number, eventHandle: EventHandler<UIEventArgs>, thisArg?: any): void {
+    subscribe(id: number, eventHandle: FEventHandler<UIEventArgs>, thisArg?: any): void {
         this._eventPool.subscribe(id, eventHandle, thisArg);
     }
 
-    unsubscribe(id: number, eventHandle: EventHandler<UIEventArgs>, thisArg?: any): void {
+    unsubscribe(id: number, eventHandle: FEventHandler<UIEventArgs>, thisArg?: any): void {
         this._eventPool.unsubscribe(id, eventHandle, thisArg);
     }
 

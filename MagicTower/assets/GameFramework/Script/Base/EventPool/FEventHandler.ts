@@ -2,12 +2,12 @@ import { IRerference } from "../ReferencePool/IRerference";
 import { ReferencePool } from "../ReferencePool/ReferencePool";
 import { BaseEventArgs } from "./BaseEventArgs";
 
-export type EventHandler<T extends BaseEventArgs> = (sender: object, e: T) => void;
+export type FEventHandler<T extends BaseEventArgs> = (sender: object, eventArgs: T) => void;
 
 export class EventHandlerTarget<T extends BaseEventArgs> implements IRerference {
     private _id: number = null!;
     private _target: object = null!;
-    private _handler: EventHandler<T> = null!;
+    private _handler: FEventHandler<T> = null!;
 
     get id(): number {
         return this._id;
@@ -17,11 +17,11 @@ export class EventHandlerTarget<T extends BaseEventArgs> implements IRerference 
         return this._target;
     }
 
-    get handler(): EventHandler<T> {
+    get handler(): FEventHandler<T> {
         return this._handler;
     }
 
-    static create<T extends BaseEventArgs>(id: number, target: object, handler: EventHandler<T>): EventHandlerTarget<T> {
+    static create<T extends BaseEventArgs>(id: number, target: object, handler: FEventHandler<T>): EventHandlerTarget<T> {
         let eventHandleTarget = ReferencePool.acquire(EventHandlerTarget<T>);
         eventHandleTarget._id = id;
         eventHandleTarget._target = target;

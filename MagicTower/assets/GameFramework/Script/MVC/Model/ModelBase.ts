@@ -1,5 +1,5 @@
 import { Constructor } from "../../Base/DataStruct/Constructor";
-import { EventHandler } from "../../Base/EventPool/EventHandler";
+import { FEventHandler } from "../../Base/EventPool/FEventHandler";
 import { EventPool } from "../../Base/EventPool/EventPool";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { ISaveManager } from "../../Save/ISaveManager";
@@ -68,16 +68,16 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
         this._saveName = saveName;
     }
 
-    check<T extends ModelEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): boolean {
-        return this._eventPool.check(id, eventHandle as EventHandler<ModelEventArgs>, thisArg);
+    check<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): boolean {
+        return this._eventPool.check(id, eventHandle as FEventHandler<ModelEventArgs>, thisArg);
     }
 
-    subscribe<T extends ModelEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): void {
-        this._eventPool.subscribe(id, eventHandle as EventHandler<ModelEventArgs>, thisArg);
+    subscribe<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void {
+        this._eventPool.subscribe(id, eventHandle as FEventHandler<ModelEventArgs>, thisArg);
     }
 
-    unsubscribe<T extends ModelEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): void {
-        this._eventPool.unsubscribe(id, eventHandle as EventHandler<ModelEventArgs>, thisArg);
+    unsubscribe<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandle as FEventHandler<ModelEventArgs>, thisArg);
     }
 
     unsubscribeTarget(target: object): void {
