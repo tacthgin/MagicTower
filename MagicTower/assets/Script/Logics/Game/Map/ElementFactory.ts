@@ -10,7 +10,7 @@ export class ElementFactory {
     }
 
     static getHeroSpriteFrame(name: string): SpriteFrame | null {
-        return GameApp.ResourceManager.getAsset(`Sprite/${name}`, SpriteFrame);
+        return GameApp.ResourceManager.getAsset(`Texture/${name}`, SpriteFrame);
     }
 
     static getElementAnimationClip(name: string) {
