@@ -301,25 +301,6 @@ export class GameFrameworkLinkedList<T> {
         }
     }
 
-    [Symbol.iterator](): IterableIterator<T> {
-        let current = this._first;
-        return {
-            next() {
-                if (current) {
-                    let value = current.value;
-                    current = current.next;
-                    return { done: false, value: value } as unknown as IteratorYieldResult<T>;
-                } else {
-                    return { done: true, value: undefined } as unknown as IteratorReturnResult<T>;
-                }
-            },
-
-            [Symbol.iterator](): IterableIterator<T> {
-                return this;
-            },
-        };
-    }
-
     private acquireNode(value: T): LinkedListNode<T> {
         if (value === undefined || value === null) {
             throw new GameFrameworkError("value is invalid");
@@ -347,6 +328,25 @@ export class GameFrameworkLinkedList<T> {
     private addToEmpty(value: T): void {
         let newNode = this.acquireNode(value);
         this._last = this._first = newNode;
+    }
+
+    [Symbol.iterator](): IterableIterator<T> {
+        let current = this._first;
+        return {
+            next() {
+                if (current) {
+                    let value = current.value;
+                    current = current.next;
+                    return { done: false, value: value } as unknown as IteratorYieldResult<T>;
+                } else {
+                    return { done: true, value: undefined } as unknown as IteratorReturnResult<T>;
+                }
+            },
+
+            [Symbol.iterator](): IterableIterator<T> {
+                return this;
+            },
+        };
     }
 
     get [Symbol.toStringTag](): string {
