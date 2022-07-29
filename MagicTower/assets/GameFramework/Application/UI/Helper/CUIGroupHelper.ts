@@ -1,5 +1,5 @@
 import { Component, _decorator } from "cc";
-import { IUIGroupHelper } from "../../../Scripts/UI/IUIGroupHelper";
+import { IUIGroupHelper } from "../../../Script/UI/IUIGroupHelper";
 
 const { ccclass, property } = _decorator;
 

@@ -1,5 +1,5 @@
 import { instantiate, Node } from "cc";
-import { INodeHelper } from "../../Scripts/NodePool/INodeHelper";
+import { INodeHelper } from "../../Script/NodePool/INodeHelper";
 
 export class CNodeHelper implements INodeHelper {
     instantiateNode(asset: object): object {

@@ -1,6 +1,6 @@
 import { Constructor, Node } from "cc";
-import { GameFrameworkError } from "../../../Scripts/Base/GameFrameworkError";
-import { ReferencePool } from "../../../Scripts/Base/ReferencePool/ReferencePool";
+import { GameFrameworkError } from "../../../Script/Base/GameFrameworkError";
+import { ReferencePool } from "../../../Script/Base/ReferencePool/ReferencePool";
 import { DialogAction } from "./DialogAction/DialogAction";
 import { DialogActionBase } from "./DialogAction/DialogActionBase";
 

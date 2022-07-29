@@ -1,4 +1,4 @@
-import { GameFrameworkError } from "../../../../Scripts/Base/GameFrameworkError";
+import { GameFrameworkError } from "../../../../Script/Base/GameFrameworkError";
 import { PlatformBase } from "../PlatformBase";
 import { IWXPlatform } from "./IWXPlatform";
 

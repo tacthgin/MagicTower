@@ -1,6 +1,6 @@
 import { Node, Tween } from "cc";
-import { IRerference } from "../../../../Scripts/Base/ReferencePool/IRerference";
-import { ReferencePool } from "../../../../Scripts/Base/ReferencePool/ReferencePool";
+import { IRerference } from "../../../../Script/Base/ReferencePool/IRerference";
+import { ReferencePool } from "../../../../Script/Base/ReferencePool/ReferencePool";
 
 export abstract class DialogActionBase implements IRerference {
     private _endActionCallback: () => void = null!;

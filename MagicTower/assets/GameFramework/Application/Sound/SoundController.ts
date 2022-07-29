@@ -1,7 +1,7 @@
 import { AudioSource, Component, Node, _decorator } from "cc";
-import { GameFrameworkError } from "../../Scripts/Base/GameFrameworkError";
-import { ISoundAgentHelper } from "../../Scripts/Sound/ISoundAgentHelper";
-import { ISoundHelper } from "../../Scripts/Sound/ISoundHelper";
+import { GameFrameworkError } from "../../Script/Base/GameFrameworkError";
+import { ISoundAgentHelper } from "../../Script/Sound/ISoundAgentHelper";
+import { ISoundHelper } from "../../Script/Sound/ISoundHelper";
 import { CSoundAgentHelper } from "./CSoundAgentHelper";
 
 const { ccclass, property, executionOrder } = _decorator;

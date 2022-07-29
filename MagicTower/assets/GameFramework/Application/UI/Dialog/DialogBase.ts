@@ -1,5 +1,5 @@
 import { Button, Enum, EventTouch, Node, screen, UITransform, _decorator } from "cc";
-import { IUIGroup } from "../../../Scripts/UI/IUIGroup";
+import { IUIGroup } from "../../../Script/UI/IUIGroup";
 import { GameApp } from "../../GameApp";
 import { DialogAction } from "./DialogAction/DialogAction";
 import { DialogActionBase } from "./DialogAction/DialogActionBase";

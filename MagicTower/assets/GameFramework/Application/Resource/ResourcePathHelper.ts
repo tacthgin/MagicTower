@@ -1,6 +1,6 @@
 import { Constructor, SpriteFrame, Texture2D } from "cc";
-import { IAsset } from "../../Scripts/Resource/Asset/IAsset";
-import { IResourcePathHelper } from "../../Scripts/Resource/IResourcePathHelper";
+import { IAsset } from "../../Script/Resource/Asset/IAsset";
+import { IResourcePathHelper } from "../../Script/Resource/IResourcePathHelper";
 
 export class ResourcePathHelper implements IResourcePathHelper {
     getPath<T extends IAsset>(path: string, assetType?: Constructor<T>): string {

@@ -1,6 +1,6 @@
 import { Component } from "cc";
-import { IUIForm } from "../../../Scripts/UI/IUIForm";
-import { IUIGroup } from "../../../Scripts/UI/IUIGroup";
+import { IUIForm } from "../../../Script/UI/IUIForm";
+import { IUIGroup } from "../../../Script/UI/IUIGroup";
 
 export class DialogUIForm extends Component implements IUIForm {
     private _serialId: number = -1;
@@ -17,7 +17,7 @@ export class DialogUIForm extends Component implements IUIForm {
         return this._uiFormAssetName;
     }
 
-    get handle(): object {
+    get handler(): object {
         return this.node;
     }
 

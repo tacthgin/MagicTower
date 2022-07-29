@@ -1,6 +1,6 @@
 import { Vec3 } from "cc";
-import { GameFrameworkError } from "../../Scripts/Base/GameFrameworkError";
-import { IUIManager } from "../../Scripts/UI/IUIManager";
+import { GameFrameworkError } from "../../Script/Base/GameFrameworkError";
+import { IUIManager } from "../../Script/UI/IUIManager";
 import { ToastType } from "./Toast/ToastType";
 import { UIConstant } from "./UIConstant";
 

@@ -1,9 +1,9 @@
 import { Component, instantiate, Node, UITransform, v3, _decorator } from "cc";
-import { GameFrameworkError } from "../../../Scripts/Base/GameFrameworkError";
-import { IUIForm } from "../../../Scripts/UI/IUIForm";
-import { IUIFormHelper } from "../../../Scripts/UI/IUIFormHelper";
-import { IUIGroup } from "../../../Scripts/UI/IUIGroup";
-import { IUIGroupHelper } from "../../../Scripts/UI/IUIGroupHelper";
+import { GameFrameworkError } from "../../../Script/Base/GameFrameworkError";
+import { IUIForm } from "../../../Script/UI/IUIForm";
+import { IUIFormHelper } from "../../../Script/UI/IUIFormHelper";
+import { IUIGroup } from "../../../Script/UI/IUIGroup";
+import { IUIGroupHelper } from "../../../Script/UI/IUIGroupHelper";
 import { UIConstant } from "../UIConstant";
 import { CUIGroupHelper } from "./CUIGroupHelper";
 

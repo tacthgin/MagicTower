@@ -1,7 +1,7 @@
-import { GameFrameworkError } from "../../Scripts/Base/GameFrameworkError";
-import { GameFrameworkLog } from "../../Scripts/Base/Log/GameFrameworkLog";
-import { IHotUpdateHelper } from "../../Scripts/Resource/IHotUpdateHelper";
-import { ISaveManager } from "../../Scripts/Save/ISaveManager";
+import { GameFrameworkError } from "../../Script/Base/GameFrameworkError";
+import { GameFrameworkLog } from "../../Script/Base/Log/GameFrameworkLog";
+import { IHotUpdateHelper } from "../../Script/Resource/IHotUpdateHelper";
+import { ISaveManager } from "../../Script/Save/ISaveManager";
 import { IPlatformManager } from "../Platform/IPlatformManager";
 
 export class CHotUpdateHelper implements IHotUpdateHelper {

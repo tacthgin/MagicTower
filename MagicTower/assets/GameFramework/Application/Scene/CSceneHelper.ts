@@ -1,6 +1,6 @@
 import { director, Scene } from "cc";
-import { GameFrameworkLog } from "../../Scripts/Base/Log/GameFrameworkLog";
-import { ISceneHelper } from "../../Scripts/Scene/ISceneHelper";
+import { GameFrameworkLog } from "../../Script/Base/Log/GameFrameworkLog";
+import { ISceneHelper } from "../../Script/Scene/ISceneHelper";
 
 export class CSceneHelper implements ISceneHelper {
     getScene<T extends object>(): T | null {

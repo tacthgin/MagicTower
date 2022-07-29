@@ -1,4 +1,4 @@
-import { GameFrameworkError } from "../../Scripts/Base/GameFrameworkError";
+import { GameFrameworkError } from "../../Script/Base/GameFrameworkError";
 import { IPlatformHelper } from "./Helper/IPlatformHelper";
 import { IPlatformManager } from "./IPlatformManager";
 import { AndroidPlatform } from "./Platform/Android/AndroidPlatform";

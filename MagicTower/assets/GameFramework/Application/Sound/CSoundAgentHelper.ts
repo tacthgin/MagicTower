@@ -1,5 +1,5 @@
 import { AudioClip, AudioSource } from "cc";
-import { ISoundAgentHelper } from "../../Scripts/Sound/ISoundAgentHelper";
+import { ISoundAgentHelper } from "../../Script/Sound/ISoundAgentHelper";
 
 const PLAYING_STATES = [AudioSource.AudioState.PLAYING, AudioSource.AudioState.PAUSED];
 

@@ -1,5 +1,5 @@
-import { ISoundManager } from "../../Scripts/Sound/ISoundManager";
-import { PlaySoundParams } from "../../Scripts/Sound/PlaySoundParams";
+import { ISoundManager } from "../../Script/Sound/ISoundManager";
+import { PlaySoundParams } from "../../Script/Sound/PlaySoundParams";
 import { SoundConstant } from "./SoundConstant";
 
 /**
