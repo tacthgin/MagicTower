@@ -6,7 +6,7 @@ import { GameFrameworkError } from "./GameFrameworkError";
 export class LinkedListNode<T> {
     private _next: LinkedListNode<T> | null = null;
     private _previous: LinkedListNode<T> | null = null;
-    private _value: T | null = null;
+    private _value: T = null!;
 
     constructor(value: T) {
         this._value = value;
@@ -33,11 +33,11 @@ export class LinkedListNode<T> {
     }
 
     get value(): T {
-        return this._value!;
+        return this._value;
     }
 
     clear() {
-        this._value = null;
+        this._value = null!;
         this._previous = null;
         this._next = null;
     }
@@ -100,7 +100,7 @@ export class GameFrameworkLinkedList<T> {
     /**
      * 链表中存在该指定的值值相等的节点
      * @param value 指定的值
-     * @returns
+     * @returns 链表中存在该指定的值值相等的节点
      */
     has(value: T): boolean {
         return this.get(value) != null;
@@ -215,7 +215,7 @@ export class GameFrameworkLinkedList<T> {
      * @returns
      */
     remove(nodeOrValue: LinkedListNode<T> | T, reverse: boolean = false): boolean {
-        if (!nodeOrValue) {
+        if (nodeOrValue === undefined || nodeOrValue === null) {
             throw new GameFrameworkError("node or value is invalid");
         }
 
@@ -321,7 +321,7 @@ export class GameFrameworkLinkedList<T> {
     }
 
     private acquireNode(value: T): LinkedListNode<T> {
-        if (!value) {
+        if (value === undefined || value === null) {
             throw new GameFrameworkError("value is invalid");
         }
         ++this._size;
