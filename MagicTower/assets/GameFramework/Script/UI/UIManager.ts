@@ -1,4 +1,4 @@
-import { FEventHandler } from "../Base/EventPool/FEventHandler";
+import { EventHandler } from "../Base/EventPool/EventHandler";
 import { EventPool } from "../Base/EventPool/EventPool";
 import { EventPoolMode } from "../Base/EventPool/EventPoolMode";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
@@ -36,7 +36,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._uiGroups = new Map<string, UIGroup>();
         this._uiFormBeingLoaded = new Map<number, string>();
         this._uiFormToReleaseOnLoad = new Set<number>();
-        this._eventPool = new EventPool<UIEventArgs>(EventPoolMode.ALLOW_NO_HANDLER);
+        this._eventPool = new EventPool<UIEventArgs>(EventPoolMode.ALLOW_MULTI_HANDLER);
         this._recyleQueue = new Array<IUIForm>();
     }
 
@@ -110,12 +110,16 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._uiFormHelper = uiFormHelper;
     }
 
-    subscribe(id: number, eventHandle: FEventHandler<UIEventArgs>, thisArg?: any): void {
-        this._eventPool.subscribe(id, eventHandle, thisArg);
+    check(id: number, eventHandler: EventHandler<UIEventArgs>, thisArg?: any): boolean {
+        return this._eventPool.check(id, eventHandler, thisArg);
     }
 
-    unsubscribe(id: number, eventHandle: FEventHandler<UIEventArgs>, thisArg?: any): void {
-        this._eventPool.unsubscribe(id, eventHandle, thisArg);
+    subscribe(id: number, eventHandler: EventHandler<UIEventArgs>, thisArg?: any): void {
+        this._eventPool.subscribe(id, eventHandler, thisArg);
+    }
+
+    unsubscribe(id: number, eventHandler: EventHandler<UIEventArgs>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandler, thisArg);
     }
 
     unsubscribeTarget(target: object): void {

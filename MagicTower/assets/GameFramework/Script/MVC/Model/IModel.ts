@@ -1,4 +1,4 @@
-import { FEventHandler } from "../../Base/EventPool/FEventHandler";
+import { EventHandler } from "../../Base/EventPool/EventHandler";
 import { ModelEventArgs } from "./ModelEventArgs";
 
 /**
@@ -12,27 +12,27 @@ export interface IModel {
     /**
      * 查询事件是否已经被订阅
      * @param id 事件id
-     * @param eventHandle 事件回调函数
+     * @param eventHandler 事件回调函数
      * @param thisArg this参数
      * @returns 事件是否已经被订阅
      */
-    check<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): boolean;
+    check<T extends ModelEventArgs>(id: number, eventHandler: EventHandler<T>, thisArg?: any): boolean;
 
     /**
      * 订阅事件
      * @param id 事件id
-     * @param eventHandle 事件回调函数
+     * @param eventHandler 事件回调函数
      * @param thisArg this参数
      */
-    subscribe<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void;
+    subscribe<T extends ModelEventArgs>(id: number, eventHandler: EventHandler<T>, thisArg?: any): void;
 
     /**
      * 取消订阅事件
      * @param id 事件id
-     * @param eventHandle 事件回调函数
+     * @param eventHandler 事件回调函数
      * @param thisArg this参数
      */
-    unsubscribe<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void;
+    unsubscribe<T extends ModelEventArgs>(id: number, eventHandler: EventHandler<T>, thisArg?: any): void;
 
     /**
      * 取消订阅者的所有订阅

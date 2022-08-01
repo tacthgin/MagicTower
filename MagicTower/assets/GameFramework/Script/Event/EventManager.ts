@@ -1,4 +1,4 @@
-import { FEventHandler } from "../Base/EventPool/FEventHandler";
+import { EventHandler } from "../Base/EventPool/EventHandler";
 import { EventPool } from "../Base/EventPool/EventPool";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
@@ -30,20 +30,20 @@ export class EventManager extends GameFrameworkModule implements IEventManager {
         this._eventPool.clear();
     }
 
-    subscribe<T extends GameEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void {
-        this._eventPool.subscribe(id, eventHandle as FEventHandler<GameEventArgs>, thisArg);
+    subscribe<T extends GameEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): void {
+        this._eventPool.subscribe(id, eventHandle as EventHandler<GameEventArgs>, thisArg);
     }
 
-    unsubscribe<T extends GameEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void {
-        this._eventPool.unsubscribe(id, eventHandle as FEventHandler<GameEventArgs>, thisArg);
+    unsubscribe<T extends GameEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandle as EventHandler<GameEventArgs>, thisArg);
     }
 
     unsubscribeTarget(target: object): void {
         this._eventPool.unsubscribeTarget(target);
     }
 
-    check<T extends GameEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): boolean {
-        return this._eventPool.check(id, eventHandle as FEventHandler<GameEventArgs>, thisArg);
+    check<T extends GameEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): boolean {
+        return this._eventPool.check(id, eventHandle as EventHandler<GameEventArgs>, thisArg);
     }
 
     fire(sender: object, e: GameEventArgs): void {

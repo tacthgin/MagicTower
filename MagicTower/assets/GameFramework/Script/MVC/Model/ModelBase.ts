@@ -1,6 +1,7 @@
 import { Constructor } from "../../Base/DataStruct/Constructor";
-import { FEventHandler } from "../../Base/EventPool/FEventHandler";
+import { EventHandler } from "../../Base/EventPool/EventHandler";
 import { EventPool } from "../../Base/EventPool/EventPool";
+import { EventPoolMode } from "../../Base/EventPool/EventPoolMode";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { ISaveManager } from "../../Save/ISaveManager";
 import { ScheduleBase } from "../Base/ScheduleBase";
@@ -24,7 +25,7 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
 
     constructor() {
         super();
-        this._eventPool = new EventPool<ModelEventArgs>();
+        this._eventPool = new EventPool<ModelEventArgs>(EventPoolMode.ALLOW_MULTI_HANDLER);
     }
 
     /**
@@ -68,16 +69,16 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
         this._saveName = saveName;
     }
 
-    check<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): boolean {
-        return this._eventPool.check(id, eventHandle as FEventHandler<ModelEventArgs>, thisArg);
+    check<T extends ModelEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): boolean {
+        return this._eventPool.check(id, eventHandle as EventHandler<ModelEventArgs>, thisArg);
     }
 
-    subscribe<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void {
-        this._eventPool.subscribe(id, eventHandle as FEventHandler<ModelEventArgs>, thisArg);
+    subscribe<T extends ModelEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): void {
+        this._eventPool.subscribe(id, eventHandle as EventHandler<ModelEventArgs>, thisArg);
     }
 
-    unsubscribe<T extends ModelEventArgs>(id: number, eventHandle: FEventHandler<T>, thisArg?: any): void {
-        this._eventPool.unsubscribe(id, eventHandle as FEventHandler<ModelEventArgs>, thisArg);
+    unsubscribe<T extends ModelEventArgs>(id: number, eventHandle: EventHandler<T>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandle as EventHandler<ModelEventArgs>, thisArg);
     }
 
     unsubscribeTarget(target: object): void {

@@ -1,4 +1,4 @@
-import { FEventHandler } from "../Base/EventPool/FEventHandler";
+import { EventHandler } from "../Base/EventPool/EventHandler";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { IUIForm } from "./IUIForm";
@@ -52,20 +52,29 @@ export interface IUIManager {
     setUIFormHelper(uiFormHelper: IUIFormHelper): void;
 
     /**
+     * 事件是否已经注册
+     * @param id 事件id
+     * @param eventHandler 事件句柄
+     * @param thisArg 函数this指针
+     * @returns 事件是否已经注册
+     */
+    check(id: number, eventHandler: EventHandler<UIEventArgs>, thisArg?: any): boolean;
+
+    /**
      * 订阅UI事件
      * @param id 事件id
-     * @param eventHandle 事件句柄
-     * @param thisArg
+     * @param eventHandler 事件句柄
+     * @param thisArg 函数this指针
      */
-    subscribe(id: number, eventHandle: FEventHandler<UIEventArgs>, thisArg?: any): void;
+    subscribe(id: number, eventHandler: EventHandler<UIEventArgs>, thisArg?: any): void;
 
     /**
      * 取消订阅UI事件
      * @param id 事件id
-     * @param eventHandle 事件句柄
-     * @param thisArg
+     * @param eventHandler 事件句柄
+     * @param thisArg 函数this指针
      */
-    unsubscribe(id: number, eventHandle: FEventHandler<UIEventArgs>, thisArg?: any): void;
+    unsubscribe(id: number, eventHandler: EventHandler<UIEventArgs>, thisArg?: any): void;
 
     /**
      * 取消订阅者的所有订阅

@@ -4,7 +4,7 @@ import { GameFrameworkError } from "../GameFrameworkError";
 import { ReferencePool } from "../ReferencePool/ReferencePool";
 import { BaseEventArgs } from "./BaseEventArgs";
 import { Event } from "./Event";
-import { FEventHandler, EventHandlerTarget } from "./FEventHandler";
+import { EventHandler, EventHandlerTarget } from "./EventHandler";
 import { EventPoolMode } from "./EventPoolMode";
 
 /**
@@ -53,12 +53,27 @@ export class EventPool<T extends BaseEventArgs> {
     }
 
     /**
+     * 事件是否已经注册
+     * @param id 事件id
+     * @param eventHandler 事件句柄
+     * @param thisArg 函数this指针
+     * @returns 事件是否已经注册
+     */
+    check(id: number, eventHandler: EventHandler<T>, thisArg?: any): boolean {
+        if (!eventHandler) {
+            throw new GameFrameworkError("eventHandler is invalid");
+        }
+
+        return this.findEventHandlerTarget(id, eventHandler, thisArg) !== null;
+    }
+
+    /**
      * 订阅事件
      * @param id 事件id
-     * @param eventHandler
-     * @param thisArg
+     * @param eventHandler 事件句柄
+     * @param thisArg 函数this指针
      */
-    subscribe(id: number, eventHandler: FEventHandler<T>, thisArg?: any): void {
+    subscribe(id: number, eventHandler: EventHandler<T>, thisArg?: any): void {
         if (!eventHandler) {
             throw new GameFrameworkError("eventHandler is invalid");
         }
@@ -82,11 +97,11 @@ export class EventPool<T extends BaseEventArgs> {
 
     /**
      * 取消订阅事件
-     * @param id
-     * @param eventHandler
-     * @param thisArg
+     * @param id 事件id
+     * @param eventHandler 事件句柄
+     * @param thisArg 函数this指针
      */
-    unsubscribe(id: number, eventHandler: FEventHandler<T>, thisArg?: any): void {
+    unsubscribe(id: number, eventHandler: EventHandler<T>, thisArg?: any): void {
         if (!eventHandler) {
             throw new GameFrameworkError("eventHandler is invalid");
         }
@@ -102,7 +117,7 @@ export class EventPool<T extends BaseEventArgs> {
 
     /**
      * 取消订阅目标上的所有事件
-     * @param target 目标
+     * @param target 订阅者
      */
     unsubscribeTarget(target: object): void {
         let eventHandlerTargetList = this._targetHandlers.get(target);
@@ -113,21 +128,6 @@ export class EventPool<T extends BaseEventArgs> {
             }
             this._targetHandlers.delete(target);
         }
-    }
-
-    /**
-     * 事件是否已经注册
-     * @param id 事件id
-     * @param eventHandler 注册的回调函数
-     * @param thisArg 函数this指针
-     * @returns 事件是否已经注册
-     */
-    check(id: number, eventHandler: FEventHandler<T>, thisArg?: any): boolean {
-        if (!eventHandler) {
-            throw new GameFrameworkError("eventHandler is invalid");
-        }
-
-        return this.findEventHandlerTarget(id, eventHandler, thisArg) !== null;
     }
 
     /**
@@ -178,7 +178,7 @@ export class EventPool<T extends BaseEventArgs> {
      * @param thisArg 函数this指针
      * @returns 查找符合的事件目标
      */
-    private findEventHandlerTarget(id: number, eventHandler: FEventHandler<T>, thisArg?: any): EventHandlerTarget<T> | null {
+    private findEventHandlerTarget(id: number, eventHandler: EventHandler<T>, thisArg?: any): EventHandlerTarget<T> | null {
         let eventHandlerTargetList = this._eventHandlerTargets.get(id);
         if (eventHandlerTargetList) {
             let node = eventHandlerTargetList.find((eventTargetHandle: EventHandlerTarget<T>) => {
