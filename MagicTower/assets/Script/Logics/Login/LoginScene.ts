@@ -63,6 +63,10 @@ export class LoginScene extends Component {
                 path: "Sound",
                 assetType: AudioClip,
             },
+            {
+                path: "TiledMap",
+                assetType: TiledMapAsset,
+            },
         ];
 
         for (let i = 0; i < resouceInfos.length; i++) {
