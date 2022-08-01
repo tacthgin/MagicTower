@@ -4,10 +4,20 @@ import { ReferencePool } from "../../Base/ReferencePool/ReferencePool";
 import { ScheduleInfo } from "./ScheduleInfo";
 
 export class ScheduleBase {
-    private readonly _scheduleHandles: GameFrameworkLinkedList<ScheduleInfo> = null!;
+    private readonly _scheduleHandlers: GameFrameworkLinkedList<ScheduleInfo> = null!;
 
     constructor() {
-        this._scheduleHandles = new GameFrameworkLinkedList<ScheduleInfo>();
+        this._scheduleHandlers = new GameFrameworkLinkedList<ScheduleInfo>();
+    }
+
+    /**
+     * 关闭并清理定时器
+     */
+    shutDown(): void {
+        this._scheduleHandlers.forEach((scheduleInfo: ScheduleInfo) => {
+            ReferencePool.release(scheduleInfo);
+        });
+        this._scheduleHandlers.clear();
     }
 
     /**
@@ -28,8 +38,8 @@ export class ScheduleBase {
 
         let scheduleInfo = ScheduleInfo.create(handler, this, interval, count, priority);
         let node: LinkedListNode<ScheduleInfo> | null = null;
-        if (this._scheduleHandles.size > 0) {
-            for (let current = this._scheduleHandles.first; current != null; current = current.next) {
+        if (this._scheduleHandlers.size > 0) {
+            for (let current = this._scheduleHandlers.first; current != null; current = current.next) {
                 if (scheduleInfo.priority >= current.value.priority) {
                     node = current;
                     break;
@@ -38,9 +48,9 @@ export class ScheduleBase {
         }
 
         if (node) {
-            this._scheduleHandles.addBefore(node, scheduleInfo);
+            this._scheduleHandlers.addBefore(node, scheduleInfo);
         } else {
-            this._scheduleHandles.addLast(scheduleInfo);
+            this._scheduleHandlers.addLast(scheduleInfo);
         }
     }
 
@@ -55,31 +65,45 @@ export class ScheduleBase {
     }
 
     /**
+     * 取消定时器
+     * @param handler 回调函数
+     */
+    unschedule(handler: Function) {
+        let node = this._scheduleHandlers.find((scheduleInfo: ScheduleInfo) => {
+            return scheduleInfo.handler === handler;
+        }, this);
+
+        if (node) {
+            this._scheduleHandlers.remove(node);
+            ReferencePool.release(node.value);
+        }
+    }
+
+    /**
      * 轮询定时器
      * @param elapseSeconds 逻辑流逝时间
      */
-    update(elapseSeconds: number): void {
-        if (this._scheduleHandles.size != 0) {
-            let current: LinkedListNode<ScheduleInfo> | null = this._scheduleHandles.first;
+    update(elapseSeconds: number): void {}
+
+    /**
+     * 内部轮询定时器
+     * @param elapseSeconds 逻辑流逝时间
+     */
+    internalUpdate(elapseSeconds: number): void {
+        if (this._scheduleHandlers.size != 0) {
+            let current: LinkedListNode<ScheduleInfo> | null = this._scheduleHandlers.first;
             let next: LinkedListNode<ScheduleInfo> | null = null;
             while (current) {
                 current.value.update(elapseSeconds);
                 if (current.value.isStoped()) {
                     next = current.next;
                     ReferencePool.release(current.value);
-                    this._scheduleHandles.remove(current);
+                    this._scheduleHandlers.remove(current);
                     current = next;
                 } else {
                     current = current.next;
                 }
             }
         }
-    }
-
-    shutDown(): void {
-        this._scheduleHandles.forEach((scheduleInfo: ScheduleInfo) => {
-            ReferencePool.release(scheduleInfo);
-        });
-        this._scheduleHandles.clear();
     }
 }

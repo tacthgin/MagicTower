@@ -5,7 +5,7 @@ import { ReferencePool } from "../../Base/ReferencePool/ReferencePool";
  * 定时器数据
  */
 export class ScheduleInfo implements IRerference {
-    private _handle: Function = null!;
+    private _handler: Function = null!;
     private _thisArg: any = undefined;
     private _interval: number = 0;
     private _scheduleCount: number = 0;
@@ -16,9 +16,13 @@ export class ScheduleInfo implements IRerference {
         return this._priority;
     }
 
+    get handler(): Function {
+        return this._handler;
+    }
+
     static create(handler: Function, thisArg: any, interval: number, scheduleCount: number, priority: number): ScheduleInfo {
         let scheduleInfo = ReferencePool.acquire(ScheduleInfo);
-        scheduleInfo._handle = handler;
+        scheduleInfo._handler = handler;
         scheduleInfo._thisArg = thisArg;
         scheduleInfo._interval = interval;
         scheduleInfo._scheduleCount = scheduleCount;
@@ -35,14 +39,14 @@ export class ScheduleInfo implements IRerference {
             this._totalSeconds += elapseSeconds;
             if (this._totalSeconds >= this._interval) {
                 this._totalSeconds -= this._interval;
-                this._handle.call(this._thisArg);
+                this._handler.call(this._thisArg);
                 --this._scheduleCount;
             }
         }
     }
 
     clear(): void {
-        this._handle = null!;
+        this._handler = null!;
         this._thisArg = undefined;
         this._interval = 0;
         this._scheduleCount = 0;
