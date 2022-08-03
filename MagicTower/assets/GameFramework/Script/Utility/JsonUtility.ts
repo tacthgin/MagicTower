@@ -1,23 +1,19 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { SystemUtility } from "./SystemUtility";
 
-interface JsonAsset {
-    json: object | null;
-}
-
 /**
  * Json工具类
  */
 export class JsonUtility {
     /** 缓存json文件 */
-    private readonly _cacheJsonMap: Map<string, JsonAsset> = null!;
+    private readonly _cacheJsonMap: Map<string, object> = null!;
     /** 根据特定的json字段来缓存json元素 */
     private readonly _cacheJsonKeyMap: Map<string, Map<string, Map<string | number, object>>> = null!;
     /** 系统工具类 */
     private _systemUtility: SystemUtility = null!;
 
     constructor() {
-        this._cacheJsonMap = new Map<string, JsonAsset>();
+        this._cacheJsonMap = new Map<string, object>();
         this._cacheJsonKeyMap = new Map<string, Map<string, Map<string | number, object>>>();
     }
 
@@ -32,10 +28,10 @@ export class JsonUtility {
     /**
      * 添加json资源
      * @param name 资源名字
-     * @param jsonAsset json资源
+     * @param json json资源
      */
-    addJson(name: string, jsonAsset: JsonAsset) {
-        this._cacheJsonMap.set(name, jsonAsset);
+    addJson(name: string, json: object) {
+        this._cacheJsonMap.set(name, json);
     }
 
     /**

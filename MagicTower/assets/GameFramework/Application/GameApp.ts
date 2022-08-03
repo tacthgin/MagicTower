@@ -2,13 +2,12 @@ import { assetManager, Component, Constructor, game, resources, _decorator } fro
 import { GameFrameworkEntry } from "../Script/Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Script/Base/GameFrameworkError";
 import { GameFrameworkLog } from "../Script/Base/Log/GameFrameworkLog";
-import { WebLogHelper } from "../Script/Base/Log/WebLogHelper";
 import { IEventManager } from "../Script/Event/IEventManager";
 import { IFsmManager } from "../Script/Fsm/IFsmManager";
 import { CommandManager } from "../Script/MVC/Command/CommandManager";
 import { ICommandManager } from "../Script/MVC/Command/ICommandManager";
 import { IModel } from "../Script/MVC/Model/IModel";
-import { ModelContainer } from "../Script/MVC/Model/ModelContainer";
+import { ModelManager } from "../Script/MVC/Model/ModelManager";
 import { INodePoolManager } from "../Script/NodePool/INodePoolManager";
 import { IObejctPoolManager } from "../Script/ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Script/Resource/IResourceManager";
@@ -19,14 +18,15 @@ import { ISoundManager } from "../Script/Sound/ISoundManager";
 import { IUIManager } from "../Script/UI/IUIManager";
 import { Utility } from "../Script/Utility/Utility";
 import { CHotUpdateHelper } from "./HotUpdate/CHotUpdateHelper";
+import { WebLogHelper } from "./Log/WebLogHelper";
 import { CNodeHelper } from "./NodePool/CNodeHelper";
 import { CPlatformHelper } from "./Platform/Helper/CPlatformHelper";
 import { IPlatformManager } from "./Platform/IPlatformManager";
 import { PlatformManager } from "./Platform/PlatformManager";
 import { ResourcePathHelper } from "./Resource/ResourcePathHelper";
 import { CSceneHelper } from "./Scene/CSceneHelper";
+import { CSoundHelper } from "./Sound/CSoundHelper";
 import { SoundConstant } from "./Sound/SoundConstant";
-import { SoundController } from "./Sound/SoundController";
 import { SoundFactory } from "./Sound/SoundFactory";
 import { CUIFormHelper } from "./UI/Helper/CUIFormHelper";
 import { UIConstant } from "./UI/UIConstant";
@@ -44,7 +44,7 @@ export class GameApp extends Component {
     /** 引用计数 */
     private static _referenceCount: number = 0;
     /** 模型容器 */
-    private _modelContainer: ModelContainer = null!;
+    private _modelManager: ModelManager = null!;
     /** 命令系统管理 */
     private _commandManager: CommandManager = null!;
     /** 平台管理 */
@@ -123,7 +123,7 @@ export class GameApp extends Component {
      * @returns
      */
     static getModel<T extends IModel>(constructor: Constructor<T>): T {
-        return GameApp.instance._modelContainer.getModel(constructor) as T;
+        return GameApp.instance._modelManager.getModel(constructor) as T;
     }
 
     /**
@@ -160,14 +160,14 @@ export class GameApp extends Component {
             GameApp._instance = null;
             GameFrameworkEntry.shutDown();
         }
-        this._modelContainer.shutDown();
+        this._modelManager.shutDown();
         this._commandManager.shutDown();
     }
 
     /** 初始化所有模型并加载本地模型数据 */
     initModels() {
         try {
-            this._modelContainer.initModels();
+            this._modelManager.initModels();
         } catch (error) {
             GameFrameworkLog.error("load local model failed:", error);
         }
@@ -187,7 +187,7 @@ export class GameApp extends Component {
     }
 
     private initalizeFramework() {
-        //设置log辅助
+        //设置日志辅助
         GameFrameworkLog.setLogHelper(new WebLogHelper());
         //初始化resource
         let resourceManager = GameApp.ResourceManager;
@@ -219,27 +219,26 @@ export class GameApp extends Component {
         //初始化声音模块
         let soundManager = GameApp.SoundManager;
         soundManager.setResourceManager(resourceManager);
-        let soundController = this.getComponent(SoundController);
-        if (soundController) {
-            soundManager.setSoundHelper(soundController);
+        let soundHelper = this.getComponent(CSoundHelper);
+        if (soundHelper) {
+            soundManager.setSoundHelper(soundHelper);
             soundManager.addSoundGroup(SoundConstant.SOUND_BACKGROUND_GROUP);
             soundManager.addSoundGroup(SoundConstant.SOUND_EFFECT_GROUP);
             SoundFactory.setSoundManager(soundManager);
         } else {
-            throw new GameFrameworkError("sound controller is invalid");
+            throw new GameFrameworkError("sound helper is invalid");
         }
         //初始化存储模块
         GameApp.SaveManager.setSaveHelper(new WebSaveHelper());
         //初始化场景管理
-        let sceneHelper = new CSceneHelper();
-        GameApp.SceneManager.setSceneHelper(sceneHelper);
+        GameApp.SceneManager.setSceneHelper(new CSceneHelper());
         //初始化JSON工具类
         Utility.Json.setSystemUtility(Utility.System);
     }
 
     private initializeModel() {
-        this._modelContainer = new ModelContainer();
-        this._modelContainer.setSaveManager(GameApp.SaveManager);
+        this._modelManager = new ModelManager();
+        this._modelManager.setSaveManager(GameApp.SaveManager);
     }
 
     private initializeCommand() {
@@ -262,6 +261,5 @@ export class GameApp extends Component {
     update(elapseSeconds: number) {
         GameFrameworkEntry.update(elapseSeconds);
         this._commandManager.update(elapseSeconds);
-        this._modelContainer.update(elapseSeconds);
     }
 }

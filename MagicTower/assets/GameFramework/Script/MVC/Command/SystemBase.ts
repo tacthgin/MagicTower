@@ -1,7 +1,6 @@
-import { IRerference } from "../../Base/ReferencePool/IRerference";
-import { ScheduleBase } from "../Base/ScheduleBase";
+import { ScheduleBase } from "../Schedule/ScheduleBase";
 
-export abstract class SystemBase extends ScheduleBase implements IRerference {
+export abstract class SystemBase extends ScheduleBase {
     /**
      * 系统被分配的时候调用
      */

@@ -6,9 +6,9 @@ import { CSoundAgentHelper } from "./CSoundAgentHelper";
 
 const { ccclass, property, executionOrder } = _decorator;
 
-@ccclass("SoundController")
+@ccclass("CSoundHelper")
 @executionOrder(0)
-export class SoundController extends Component implements ISoundHelper {
+export class CSoundHelper extends Component implements ISoundHelper {
     @property(Node)
     private audioSourceNode: Node = null!;
 

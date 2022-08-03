@@ -2,9 +2,9 @@ import { GameApp } from "../../../GameFramework/Application/GameApp";
 import { SoundConstant } from "../../../GameFramework/Application/Sound/SoundConstant";
 import { SoundFactory } from "../../../GameFramework/Application/Sound/SoundFactory";
 import { ModelBase } from "../../../GameFramework/Script/MVC/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Script/MVC/Model/ModelContainer";
+import { ModelManager } from "../../../GameFramework/Script/MVC/Model/ModelManager";
 
-@ModelContainer.registerModel("SettingModel")
+@ModelManager.registerModel("SettingModel")
 export class SettingModel extends ModelBase {
     @ModelBase.saveMark
     private _musicEnabled: boolean = true;

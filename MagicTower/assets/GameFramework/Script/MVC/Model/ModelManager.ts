@@ -8,7 +8,7 @@ import { ModelBase } from "./ModelBase";
 /**
  * 模型容器
  */
-export class ModelContainer {
+export class ModelManager {
     private static readonly s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();
     private static readonly s_nameConstructors: Map<Constructor<ModelBase>, string> = new Map<Constructor<ModelBase>, string>();
     private static readonly s_scheduleConstructors: Map<Constructor<ModelBase>, boolean> = new Map<Constructor<ModelBase>, boolean>();
@@ -50,16 +50,6 @@ export class ModelContainer {
     }
 
     /**
-     * 轮询模型
-     * @param elapseSeconds 逻辑流逝时间
-     */
-    update(elapseSeconds: number) {
-        this._updateModels.forEach((modelBase: ModelBase) => {
-            modelBase.update(elapseSeconds);
-        });
-    }
-
-    /**
      * 关闭模型模块
      */
     shutDown() {
@@ -89,7 +79,7 @@ export class ModelContainer {
         let ctor = constructor as unknown as Constructor<ModelBase>;
         let model = this._cachedModels.get(ctor);
         if (!model) {
-            let className = ModelContainer.s_nameConstructors.get(ctor);
+            let className = ModelManager.s_nameConstructors.get(ctor);
             if (className) {
                 model = this.createModel(ctor);
             } else {
@@ -105,7 +95,7 @@ export class ModelContainer {
      * @returns 模型
      */
     getModelWithName<T extends IModel>(className: string): T {
-        let ctor = ModelContainer.s_modelConstructors.get(className);
+        let ctor = ModelManager.s_modelConstructors.get(className);
         if (ctor) {
             let model = this._cachedModels.get(ctor);
             if (!model) {
@@ -130,7 +120,7 @@ export class ModelContainer {
             name: string;
         }> = [];
 
-        ModelContainer.s_modelConstructors.forEach((ctor, name) => {
+        ModelManager.s_modelConstructors.forEach((ctor, name) => {
             let model = this.getModel(ctor);
             model.defineSaveProperty();
             model.setSaveManager(this._saveManager!, name);
@@ -176,7 +166,7 @@ export class ModelContainer {
         }
 
         this._cachedModels.set(constructor, model);
-        if (ModelContainer.s_scheduleConstructors.get(constructor)) {
+        if (ModelManager.s_scheduleConstructors.get(constructor)) {
             this._updateModels.addLast(model);
         }
 

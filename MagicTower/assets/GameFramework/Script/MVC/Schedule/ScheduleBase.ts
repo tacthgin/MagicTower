@@ -1,19 +1,26 @@
 import { GameFrameworkLinkedList, LinkedListNode } from "../../Base/Container/GameFrameworkLinkedList";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { ReferencePool } from "../../Base/ReferencePool/ReferencePool";
+import { IScheduleBase } from "./IScheduleBase";
 import { ScheduleInfo } from "./ScheduleInfo";
 
-export class ScheduleBase {
+export class ScheduleBase implements IScheduleBase {
+    /** 定时器句柄 */
     private readonly _scheduleHandlers: GameFrameworkLinkedList<ScheduleInfo> = null!;
+    /** 是否暂停当前所有定时器 */
+    private _pause: boolean = false;
+    /** 定时器优先级 */
+    private _priority: number = 0;
+
+    set pause(value: boolean) {
+        this._pause = value;
+    }
 
     constructor() {
         this._scheduleHandlers = new GameFrameworkLinkedList<ScheduleInfo>();
     }
 
-    /**
-     * 关闭并清理定时器
-     */
-    shutDown(): void {
+    clear(): void {
         this._scheduleHandlers.forEach((scheduleInfo: ScheduleInfo) => {
             ReferencePool.release(scheduleInfo);
         });
@@ -36,21 +43,15 @@ export class ScheduleBase {
             throw new GameFrameworkError("count is invalid");
         }
 
-        let scheduleInfo = ScheduleInfo.create(handler, this, interval, count, priority);
-        let node: LinkedListNode<ScheduleInfo> | null = null;
-        if (this._scheduleHandlers.size > 0) {
-            for (let current = this._scheduleHandlers.first; current != null; current = current.next) {
-                if (scheduleInfo.priority >= current.value.priority) {
-                    node = current;
-                    break;
-                }
-            }
-        }
+        let currentScheduleInfo = ScheduleInfo.create(handler, this, interval, count, priority);
+        let node: LinkedListNode<ScheduleInfo> | null = this._scheduleHandlers.find((scheduleInfo) => {
+            return currentScheduleInfo.priority >= scheduleInfo.priority;
+        });
 
         if (node) {
-            this._scheduleHandlers.addBefore(node, scheduleInfo);
+            this._scheduleHandlers.addBefore(node, currentScheduleInfo);
         } else {
-            this._scheduleHandlers.addLast(scheduleInfo);
+            this._scheduleHandlers.addLast(currentScheduleInfo);
         }
     }
 
@@ -89,7 +90,7 @@ export class ScheduleBase {
      * 内部轮询定时器
      * @param elapseSeconds 逻辑流逝时间
      */
-    internalUpdate(elapseSeconds: number): void {
+    private internalUpdate(elapseSeconds: number): void {
         if (this._scheduleHandlers.size != 0) {
             let current: LinkedListNode<ScheduleInfo> | null = this._scheduleHandlers.first;
             let next: LinkedListNode<ScheduleInfo> | null = null;

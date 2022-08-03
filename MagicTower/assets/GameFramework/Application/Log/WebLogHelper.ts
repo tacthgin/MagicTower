@@ -1,5 +1,5 @@
-import { GameFrameworkLogLevel } from "./GameFrameworkLogLevel";
-import { ILogHelper } from "./ILogHelper";
+import { GameFrameworkLogLevel } from "../../Script/Base/Log/GameFrameworkLogLevel";
+import { ILogHelper } from "../../Script/Base/Log/ILogHelper";
 
 /**
  * web打印日志辅助器

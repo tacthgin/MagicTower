@@ -1,6 +1,6 @@
 import { GameApp } from "../../../GameFramework/Application/GameApp";
 import { ModelBase } from "../../../GameFramework/Script/MVC/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Script/MVC/Model/ModelContainer";
+import { ModelManager } from "../../../GameFramework/Script/MVC/Model/ModelManager";
 import { HeroAttr } from "../HeroModel/HeroAttr";
 import { HeroModel } from "../HeroModel/HeroModel";
 import { MapModel } from "../MapModel/MapModel";
@@ -11,7 +11,7 @@ type ArchiveInfo = {
     hero: object;
 };
 
-@ModelContainer.registerModel("SaveModel")
+@ModelManager.registerModel("SaveModel")
 export class SaveModel extends ModelBase {
     @ModelBase.saveMark
     private _archives: string[] = [];

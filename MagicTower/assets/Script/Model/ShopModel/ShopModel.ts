@@ -1,8 +1,8 @@
 import { ModelBase } from "../../../GameFramework/Script/MVC/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Script/MVC/Model/ModelContainer";
+import { ModelManager } from "../../../GameFramework/Script/MVC/Model/ModelManager";
 import { Utility } from "../../../GameFramework/Script/Utility/Utility";
 
-@ModelContainer.registerModel("ShopModel")
+@ModelManager.registerModel("ShopModel")
 export class ShopModel extends ModelBase {
     private _beginGold: number = 0;
     private _hp: number = 0;

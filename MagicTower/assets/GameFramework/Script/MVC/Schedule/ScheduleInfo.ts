@@ -11,6 +11,7 @@ export class ScheduleInfo implements IRerference {
     private _scheduleCount: number = 0;
     private _totalSeconds: number = 0;
     private _priority: number = 0;
+    private _forever: boolean = false;
 
     get priority(): number {
         return this._priority;
@@ -27,6 +28,7 @@ export class ScheduleInfo implements IRerference {
         scheduleInfo._interval = interval;
         scheduleInfo._scheduleCount = scheduleCount;
         scheduleInfo._priority = priority;
+        scheduleInfo._forever = scheduleCount === Number.MAX_SAFE_INTEGER;
         return scheduleInfo;
     }
 
@@ -35,7 +37,9 @@ export class ScheduleInfo implements IRerference {
     }
 
     update(elapseSeconds: number): void {
-        if (this._scheduleCount > 0) {
+        if (this._forever) {
+            this._handler.call(this._thisArg);
+        } else if (this._scheduleCount > 0) {
             this._totalSeconds += elapseSeconds;
             if (this._totalSeconds >= this._interval) {
                 this._totalSeconds -= this._interval;
@@ -52,5 +56,6 @@ export class ScheduleInfo implements IRerference {
         this._scheduleCount = 0;
         this._totalSeconds = 0;
         this._priority = 0;
+        this._forever = false;
     }
 }

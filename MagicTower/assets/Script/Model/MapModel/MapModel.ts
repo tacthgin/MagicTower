@@ -1,14 +1,14 @@
 import { IVec2 } from "cc";
 import { GameFrameworkLog } from "../../../GameFramework/Script/Base/Log/GameFrameworkLog";
 import { ModelBase } from "../../../GameFramework/Script/MVC/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Script/MVC/Model/ModelContainer";
+import { ModelManager } from "../../../GameFramework/Script/MVC/Model/ModelManager";
 import { Utility } from "../../../GameFramework/Script/Utility/Utility";
 import { StairType } from "./Data/Elements/Stair";
 import { LevelData } from "./Data/LevelData";
 import { LevelTempData } from "./Data/LevelTempData";
 import { MapJumpLevelEventArgs, MapSwitchLevelEventArgs } from "./MapModelEventArgs";
 
-@ModelContainer.registerModel("MapModel")
+@ModelManager.registerModel("MapModel")
 export class MapModel extends ModelBase {
     private readonly MIN_LEVEL: number = 0;
     private readonly MAX_LEVEL: number = 50;

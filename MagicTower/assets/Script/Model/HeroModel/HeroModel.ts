@@ -2,7 +2,7 @@ import { GameApp } from "../../../GameFramework/Application/GameApp";
 import { IVec2 } from "../../../GameFramework/Script/Base/GameStruct/IVec2";
 import { GameFrameworkLog } from "../../../GameFramework/Script/Base/Log/GameFrameworkLog";
 import { ModelBase } from "../../../GameFramework/Script/MVC/Model/ModelBase";
-import { ModelContainer } from "../../../GameFramework/Script/MVC/Model/ModelContainer";
+import { ModelManager } from "../../../GameFramework/Script/MVC/Model/ModelManager";
 import { Utility } from "../../../GameFramework/Script/Utility/Utility";
 import { CommonEventArgs } from "../../Logics/Event/CommonEventArgs";
 import { GameEvent } from "../../Logics/Event/GameEvent";
@@ -16,7 +16,7 @@ type TalkInfo = {
     chatStep: number;
 };
 
-@ModelContainer.registerModel("HeroModel")
+@ModelManager.registerModel("HeroModel")
 export class HeroModel extends ModelBase {
     @ModelBase.saveMark
     private heroAttr: number[] = null!;
