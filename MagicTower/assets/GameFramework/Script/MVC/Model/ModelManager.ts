@@ -6,7 +6,7 @@ import { IModel } from "./IModel";
 import { ModelBase } from "./ModelBase";
 
 /**
- * 模型容器
+ * 模型管理器
  */
 export class ModelManager {
     private static readonly s_modelConstructors: Map<string, Constructor<ModelBase>> = new Map<string, Constructor<ModelBase>>();

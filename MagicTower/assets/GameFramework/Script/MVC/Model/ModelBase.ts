@@ -4,7 +4,7 @@ import { EventPool } from "../../Base/EventPool/EventPool";
 import { EventPoolMode } from "../../Base/EventPool/EventPoolMode";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { ISaveManager } from "../../Save/ISaveManager";
-import { ScheduleBase } from "../Base/ScheduleBase";
+import { ScheduleBase } from "../Schedule/ScheduleBase";
 import { IModel } from "./IModel";
 import { ModelEventArgs } from "./ModelEventArgs";
 
@@ -55,7 +55,6 @@ export abstract class ModelBase extends ScheduleBase implements IModel {
      * 关闭并清理模型
      */
     shutDown() {
-        super.shutDown();
         this._eventPool.shutDown();
     }
 
